@@ -1,0 +1,107 @@
+header.MuiPaper-root {
+    background-color: transparent;
+
+    .MuiStack-root {
+        padding: 0.3vh 0 0.3vh 40px;
+    }
+
+    .MuiStack-root .logo {
+        height: 3.5vh;
+        width: auto;
+    }
+
+    .MuiStack-root .logo img {
+       height: 100%;
+    }
+
+    .MuiToolbar-root {
+        color: #637381;
+    }
+    
+}
+
+.MuiBox-root {
+    .MuiToolbar-root {
+        min-height: 66px;
+    }
+}
+
+
+
+.MuiDrawer-docked {
+    width: 200px;
+}
+
+.MuiPaper-root.MuiDrawer-paper {
+    background: #111827;
+    
+
+    .MuiSvgIcon-root path {
+        fill: #DFE3E8 ;
+    }
+    
+    .MuiTypography-root {
+        color: #DFE3E8;
+    }
+
+    .MuiList-root {
+        .MuiListItem-root {
+            .MuiButtonBase-root.MuiListItemButton-root:hover {
+                background-color: #1B2231;
+            }
+        }
+    }
+    
+
+    .MuiCollapse-root {
+
+        li {
+
+            a.MuiListItemButton-root {
+                padding-left: 20px;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+    
+            ::before {
+                content:'';
+                display: block;
+                width: 5px;
+                height: 5px;
+                background: #DFE3E8;
+                border-radius: 5px;
+                position: absolute;
+                left: 5px;
+                top: 50%;
+                margin-top: -3px;
+            }
+                
+        }
+
+        li {
+            
+
+            a.Mui-selected {
+                background-color: transparent;
+                .MuiTypography-root {
+                    color:#637381;
+                    font-weight: bold;
+                }   
+                
+                ::before {
+                    width: 8px;
+                    height: 8px;
+                    background: #3785FF;
+                    margin-top: -5px;
+                    left: 4px;
+                }
+            }
+        }
+        
+    }
+     
+    
+}
+
+
+

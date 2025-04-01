@@ -1,0 +1,50 @@
+main {
+    .MuiContainer-root {
+        max-width: 100%;
+        background: #F3F3F3;
+
+        .MuiBox-root {
+            background-color: #fff;
+            
+        }
+
+        .MuiBreadcrumbs-root {
+            display: none;
+        }
+
+        .MuiTypography-h4 {
+            font-weight: bold;
+            font-size: 26px;
+            color: #637381;
+        }
+
+        .sort-box {
+            border-top: 2px solid #787878;
+            border-bottom: 1px solid #D6D9DC;
+            padding: 10px;
+        }
+        .MuiFormControl-root {
+            margin: 0;
+        }
+
+        .accordion-group {
+            .MuiCollapse-wrapper {
+                border-top: 1px solid #000;
+                
+                .MuiAccordionDetails-root {
+                    
+                    .sensor-list>div {
+                        border: 1px solid #ccc;
+                        margin: 10px;
+                    }
+                }
+                .sensor-tit {
+                    border-bottom: 1px solid #ccc;
+                    margin-bottom: 10px;
+                    padding: 10px;
+                }
+            }
+            
+        }
+    }
+}
