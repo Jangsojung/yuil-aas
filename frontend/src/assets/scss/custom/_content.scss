@@ -1,0 +1,91 @@
+main {
+  .MuiContainer-root {
+    //컨테이너
+    max-width: 100%;
+    background: #f3f3f3;
+
+    .MuiBox-root {
+      background-color: #fff;
+    }
+
+    .MuiBreadcrumbs-root {
+      display: none;
+    }
+
+    .MuiTypography-h4 {
+      font-weight: bold;
+      font-size: 20px;
+      color: #637381;
+    }
+
+    //검색영역
+    .sort-box {
+      border-top: 2px solid #787878;
+      border-bottom: 1px solid #d6d9dc;
+      padding: 10px;
+      background-color: #ececec;
+    }
+    .MuiFormControl-root {
+      margin: 0;
+      .MuiInputBase-root.MuiOutlinedInput-root {
+        background-color: #fff;
+      }
+    }
+
+    //버튼
+    .MuiButtonBase-root.MuiButton-root {
+      padding: 5px 5px;
+      min-width: 55px;
+      line-height: 1.2;
+      color: #fff;
+    }
+
+    //아코디언
+    .accordion-group {
+      .MuiCollapse-wrapper {
+        border-top: 1px solid #000;
+
+        .MuiAccordionDetails-root {
+          .sensor-list > div {
+            border: 1px solid #ccc;
+            margin: 10px;
+          }
+        }
+        .sensor-tit {
+          border-bottom: 1px solid #ccc;
+          margin-bottom: 10px;
+          padding: 10px;
+        }
+      }
+    }
+
+    //체크박스
+    .MuiButtonBase-root.MuiCheckbox-root {
+      padding: 0;
+    }
+
+    //테이블영역
+    .table-outer {
+      height: calc(100% - 130px);
+    }
+    .table-wrap {
+      height: 100%;
+
+      .MuiTableContainer-root {
+        height: 100%;
+      }
+    }
+    .MuiTable-root {
+      border-top: 2px solid #787878;
+      th {
+        text-align: center;
+        padding: 8px;
+        background-color: #efefef;
+      }
+      td {
+        text-align: center;
+        padding: 8px;
+      }
+    }
+  }
+}
