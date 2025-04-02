@@ -1,5 +1,5 @@
 import express from 'express';
-import { getFactories, getBaseCode } from '../../controller/base_code/BaseCodeController.js';
+import { getFactories, getBaseCode } from '../../controller/basic_code/BasicCodeController.js';
 
 const router = express.Router();
 

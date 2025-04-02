@@ -1,4 +1,4 @@
-import { getFactoriesFromDB, getBaseCodeFromDB } from '../../service/base_code/BaseCodeService.js';
+import { getFactoriesFromDB, getBaseCodeFromDB } from '../../service/basic_code/BasicCodeService.js';
 
 export const getFactories = async (res) => {
   try {
