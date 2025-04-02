@@ -46,6 +46,7 @@ select,
 table,
 textarea {
     font-family: var(--mainEng-font), var(--mainKor-font), "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", helvetica, sans-serif;
+    letter-spacing: -0.03em !important;
 }
 
 // 링크 초기화

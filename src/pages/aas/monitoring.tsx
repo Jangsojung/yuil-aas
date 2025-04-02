@@ -1,6 +1,15 @@
-import * as React from 'react';
+
+import React from "react";
+import Sort from '../../layouts/sort'
+import Monitoring  from '../../section/aas/monitoring/view'
 
 
 export default function MonitoringPage() {
-  return <div>모니터링</div>;
+  return (
+    <div className="table-outer">
+      <Sort />
+      <Monitoring />
+    </div>
+    
+  )
 }

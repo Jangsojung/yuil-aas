@@ -7,6 +7,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+import Checkbox from '../../components/checkbox'
+
 function createData(
   name: string,
   calories: number,
@@ -45,6 +47,18 @@ export default function BasicTable() {
               <TableCell>{row.fat}</TableCell>
               <TableCell>{row.carbs}</TableCell>
               <TableCell>{row.protein}</TableCell>
+            </TableRow>
+          ))}
+          {rows.map((row) => (
+            <TableRow
+              key={row.name}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+            >
+              
+              <TableCell>{row.calories}</TableCell>
+              <TableCell>{row.fat}</TableCell>
+              <TableCell>{row.carbs}</TableCell>
+              <TableCell><Checkbox /></TableCell>
             </TableRow>
           ))}
         </TableBody>
