@@ -4,7 +4,8 @@ import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
-import SelectSmall from '../../components/select';
+import SelectFactory from '../../components/select/factory';
+import SelectPeriod from '../../components/select/period';
 import TextField from '../../components/input';
 
 import styled from '@mui/system/styled';
@@ -34,7 +35,7 @@ export default function Sort() {
                   <div>공장이름</div>
                 </Grid>
                 <Grid size={8}>
-                  <SelectSmall />
+                  <SelectFactory />
                 </Grid>
               </Grid>
             </Grid>
@@ -47,7 +48,7 @@ export default function Sort() {
                   <TextField />
                 </Grid>
                 <Grid size={4}>
-                  <SelectSmall />
+                  <SelectPeriod />
                 </Grid>
               </Grid>
             </Grid>
