@@ -7,6 +7,9 @@ import Button from '@mui/material/Button';
 import SelectFactory from '../../components/select/factory';
 import SelectPeriod from '../../components/select/period';
 import TextField from '../../components/input';
+import Checkbox from '../../components/checkbox';
+import BasicDatePicker from '../../components/datepicker';
+
 
 import styled from '@mui/system/styled';
 
@@ -29,7 +32,7 @@ export default function Sort() {
       <Grid container spacing={1}>
         <Grid size={8}>
           <Grid container spacing={1}>
-          <Grid size={4}>
+            <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={4}>
                   <div>공장</div>
@@ -42,7 +45,7 @@ export default function Sort() {
             <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={4}>
-                  <div>사출기</div>
+                  <div>설비그룹</div>
                 </Grid>
                 <Grid size={8}>
                   <SelectFactory />
@@ -51,7 +54,8 @@ export default function Sort() {
             </Grid>
             <Grid size={4}>
               <Grid container spacing={1}>
-                <Grid size={4}>
+                <Grid size={4} className="d-flex gap-5">
+                  <Checkbox />
                   <div>주기</div>
                 </Grid>
                 <Grid size={4}>
@@ -60,6 +64,19 @@ export default function Sort() {
                 <Grid size={4}>
                   <SelectPeriod />
                 </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid size={4}>
+              <Grid container spacing={1}>
+                <Grid size={4} className="d-flex gap-5">
+                  <Checkbox />
+                  <div>날짜</div>
+                </Grid>
+                <Grid size={8}>
+                  <BasicDatePicker />
+                </Grid>
+                
               </Grid>
             </Grid>
           </Grid>

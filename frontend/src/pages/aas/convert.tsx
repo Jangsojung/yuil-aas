@@ -1,6 +1,10 @@
 import * as React from 'react';
 
+import ConvertView from '../../section/aas/convert/view';
+
 
 export default function ConvertPage() {
-  return <div>DATA 변환</div>;
+  return (
+    <ConvertView />
+  );
 }

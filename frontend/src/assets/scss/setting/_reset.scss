@@ -101,3 +101,14 @@ img {
 #skip a:active {
   top: 10px;
 }
+
+.d-flex {
+  display: flex;
+}
+.space-between {
+  justify-content: space-between;
+}
+
+.gap-5 {
+  gap: 5px;
+}

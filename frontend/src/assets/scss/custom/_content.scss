@@ -69,6 +69,10 @@ main {
     }
 
     //테이블영역
+    .MuiTableContainer-root {      
+      border-radius: 0;
+      box-shadow: none;
+    }
     .table-outer {
       height: calc(100% - 130px);
     }
@@ -77,13 +81,15 @@ main {
 
       .MuiTableContainer-root {
         height: 100%;
+        border-radius: 0;
+        box-shadow: none;
       }
     }
     .MuiTable-root {
       border-top: 2px solid #787878;
       th {
         text-align: center;
-        padding: 8px;
+        padding: 0px;
         background-color: #efefef;
       }
       td {
@@ -96,6 +102,15 @@ main {
     .MuiTablePagination-selectLabel,.MuiTablePagination-select {
       display: none;
     }
+
+    //데이트피커
+    .MuiFormControl-root.MuiTextField-root {
+      .MuiInputBase-input {
+        padding: 9px;
+        line-height: 1;
+      }
+    }
+  
 
 
   }
