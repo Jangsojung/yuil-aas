@@ -21,9 +21,7 @@ export default function SelectSmall() {
         label='Period'
         onChange={handleChange}
       >
-        {periods.map((period, idx) => (
-          <MenuItem value={idx}>{period}</MenuItem>
-        ))}
+        {periods && periods.map((period, idx) => <MenuItem value={idx}>{period}</MenuItem>)}
       </Select>
     </FormControl>
   );
