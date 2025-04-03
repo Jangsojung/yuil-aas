@@ -24,6 +24,11 @@ main {
       border-bottom: 1px solid #d6d9dc;
       padding: 10px;
       background-color: #ececec;
+
+      .MuiGrid-root.MuiGrid-container {
+        align-items: center;
+      }
+
     }
     .MuiFormControl-root {
       margin: 0;
@@ -36,28 +41,27 @@ main {
     .MuiButtonBase-root.MuiButton-root {
       padding: 5px 5px;
       min-width: 55px;
-      line-height: 1.2;
+      line-height: 1.4;
+    }
+
+    .MuiButton-containedSuccess {
       color: #fff;
-    }
+    }    
 
-    //아코디언
-    .accordion-group {
-      .MuiCollapse-wrapper {
-        border-top: 1px solid #000;
-
-        .MuiAccordionDetails-root {
-          .sensor-list > div {
-            border: 1px solid #ccc;
-            margin: 10px;
-          }
-        }
-        .sensor-tit {
-          border-bottom: 1px solid #ccc;
-          margin-bottom: 10px;
-          padding: 10px;
-        }
-      }
+    //센서리스트
+    .sensor-list > div {
+      border: 1px solid #ccc;
+      margin: 10px;
     }
+    .sensor-list .MuiGrid-container {
+      padding: 15px;
+    }
+    .sensor-tit {
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 10px;
+      
+    }
+    
 
     //체크박스
     .MuiButtonBase-root.MuiCheckbox-root {
@@ -87,5 +91,12 @@ main {
         padding: 8px;
       }
     }
+
+    //페이징
+    .MuiTablePagination-selectLabel,.MuiTablePagination-select {
+      display: none;
+    }
+
+
   }
 }

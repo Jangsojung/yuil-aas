@@ -8,6 +8,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import Checkbox from '../../components/checkbox';
+import SelectFactory from '../../components/select/factory';
 
 function createData(name: string, calories: number, fat: number, carbs: number, protein: number) {
   return { name, calories, fat, carbs, protein };
@@ -25,6 +26,7 @@ export default function BasicTable() {
             <TableCell>설정온도 Prop 1.1.2</TableCell>
             <TableCell>현재온도 Prop 1.1.1</TableCell>
             <TableCell>설정온도 Prop 1.1.2</TableCell>
+            <TableCell><SelectFactory /> Prop 1.1.2</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -33,6 +35,7 @@ export default function BasicTable() {
               <TableCell>{row.calories}</TableCell>
               <TableCell>{row.fat}</TableCell>
               <TableCell>{row.carbs}</TableCell>
+              <TableCell>{row.protein}</TableCell>
               <TableCell>{row.protein}</TableCell>
             </TableRow>
           ))}
@@ -44,6 +47,7 @@ export default function BasicTable() {
               <TableCell>
                 <Checkbox />
               </TableCell>
+              <TableCell>{row.protein}</TableCell>
             </TableRow>
           ))}
         </TableBody>

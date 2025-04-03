@@ -29,17 +29,27 @@ export default function Sort() {
       <Grid container spacing={1}>
         <Grid size={8}>
           <Grid container spacing={1}>
-            <Grid size={6}>
+          <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={4}>
-                  <div>공장이름</div>
+                  <div>공장</div>
                 </Grid>
                 <Grid size={8}>
                   <SelectFactory />
                 </Grid>
               </Grid>
             </Grid>
-            <Grid size={6}>
+            <Grid size={4}>
+              <Grid container spacing={1}>
+                <Grid size={4}>
+                  <div>사출기</div>
+                </Grid>
+                <Grid size={8}>
+                  <SelectFactory />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={4}>
                   <div>주기</div>
@@ -57,15 +67,28 @@ export default function Sort() {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+
+            {/* 기초코드 버튼 */}
             <Button variant='contained' color='success'>
               등록
             </Button>
-            <Button variant='contained' color='primary'>
+            <Button variant='outlined' color='success'>
               수정
             </Button>
             <Button variant='contained' color='error'>
               삭제
             </Button>
+            {/* 기초코드 버튼 */}
+
+            {/* 기초코드 등록화면버튼 */}
+            <Button variant='contained' color='success'>
+              센서추가
+            </Button>
+            <Button variant='contained' color='primary'>
+              저장
+            </Button>
+            {/* 기초코드 등록화면버튼 */}
+
           </Stack>
         </Grid>
       </Grid>
