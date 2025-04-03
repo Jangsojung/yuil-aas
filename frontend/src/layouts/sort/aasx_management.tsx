@@ -7,21 +7,8 @@ import Button from '@mui/material/Button';
 import SelectFactory from '../../components/select/factory';
 import SelectPeriod from '../../components/select/period';
 import TextField from '../../components/input';
+import ModalBasic from '../../components/modal';
 
-import styled from '@mui/system/styled';
-
-const Item = styled('div')(({ theme }) => ({
-  backgroundColor: '#fff',
-  border: '1px solid',
-  borderColor: '#ced7e0',
-  padding: theme.spacing(1),
-  borderRadius: '4px',
-  textAlign: 'center',
-  ...theme.applyStyles('dark', {
-    backgroundColor: '#1A2027',
-    borderColor: '#444d58',
-  }),
-}));
 
 export default function Sort() {
   return (
@@ -67,15 +54,14 @@ export default function Sort() {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <Button variant='contained' color='success'>
-              등록
-            </Button>
+            <ModalBasic/>
             {/* <Button variant='outlined' color='success'>
               수정
             </Button> */}
             <Button variant='contained' color='error'>
               삭제
             </Button>
+            
           </Stack>
         </Grid>
       </Grid>
