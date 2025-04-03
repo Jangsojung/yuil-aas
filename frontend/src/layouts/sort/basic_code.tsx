@@ -4,12 +4,11 @@ import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
-import SelectFactory from '../../components/select/factory';
+import SelectFacilityGroup from '../../components/select/facility_group';
 import SelectPeriod from '../../components/select/period';
 import TextField from '../../components/input';
 import Checkbox from '../../components/checkbox';
 import BasicDatePicker from '../../components/datepicker';
-
 
 import styled from '@mui/system/styled';
 
@@ -32,7 +31,7 @@ export default function Sort() {
       <Grid container spacing={1}>
         <Grid size={8}>
           <Grid container spacing={1}>
-            <Grid size={4}>
+            {/* <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={4}>
                   <div>공장</div>
@@ -41,20 +40,20 @@ export default function Sort() {
                   <SelectFactory />
                 </Grid>
               </Grid>
-            </Grid>
+            </Grid> */}
             <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={4}>
-                  <div>설비그룹</div>
+                  <div>설비 그룹</div>
                 </Grid>
                 <Grid size={8}>
-                  <SelectFactory />
+                  <SelectFacilityGroup />
                 </Grid>
               </Grid>
             </Grid>
-            <Grid size={4}>
+            {/* <Grid size={4}>
               <Grid container spacing={1}>
-                <Grid size={4} className="d-flex gap-5">
+                <Grid size={4} className='d-flex gap-5'>
                   <Checkbox />
                   <div>주기</div>
                 </Grid>
@@ -65,18 +64,17 @@ export default function Sort() {
                   <SelectPeriod />
                 </Grid>
               </Grid>
-            </Grid>
+            </Grid> */}
 
             <Grid size={4}>
               <Grid container spacing={1}>
-                <Grid size={4} className="d-flex gap-5">
-                  <Checkbox />
+                <Grid size={4} className='d-flex gap-5'>
+                  {/* <Checkbox /> */}
                   <div>날짜</div>
                 </Grid>
                 <Grid size={8}>
                   <BasicDatePicker />
                 </Grid>
-                
               </Grid>
             </Grid>
           </Grid>
@@ -84,7 +82,6 @@ export default function Sort() {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-
             {/* 기초코드 버튼 */}
             <Button variant='contained' color='success'>
               등록
@@ -98,14 +95,13 @@ export default function Sort() {
             {/* 기초코드 버튼 */}
 
             {/* 기초코드 등록화면버튼 */}
-            <Button variant='contained' color='success'>
+            {/* <Button variant='contained' color='success'>
               센서추가
             </Button>
             <Button variant='contained' color='primary'>
               저장
-            </Button>
+            </Button> */}
             {/* 기초코드 등록화면버튼 */}
-
           </Stack>
         </Grid>
       </Grid>
