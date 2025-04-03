@@ -3,6 +3,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { useRecoilState } from 'recoil';
+import { currentFactoryState } from '../../recoil/atoms';
 
 interface Factory {
   fc_idx: number;
@@ -11,7 +13,7 @@ interface Factory {
 
 export default function SelectSmall() {
   const [factories, setFactories] = React.useState<Factory[]>([]);
-  const [currentFactory, setCurrentFactory] = React.useState<number>();
+  const [currentFactory, setCurrentFactory] = useRecoilState(currentFactoryState);
 
   React.useEffect(() => {
     getFactories();
