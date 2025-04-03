@@ -1,6 +1,6 @@
-import Table from '../../../../components/table/aasx_management';
+import Table from '../../../../components/table/data_management';
 
-export default function Monitoring() {
+export default function Data() {
   return (
     <div className='table-wrap'>
       <Table />
