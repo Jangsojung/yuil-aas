@@ -16,5 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
+  "extensions": [".js", ".jsx", ".ts", ".tsx"],
   "include": ["frontend/src"]
 }
