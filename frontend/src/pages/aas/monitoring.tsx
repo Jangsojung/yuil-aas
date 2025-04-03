@@ -1,5 +1,5 @@
 import React from 'react';
-import Sort from '../../layouts/sort/basic_code';
+import Sort from '../../layouts/sort/kamp_monitoring';
 import Monitoring from '../../section/aas/monitoring/view';
 
 export default function MonitoringPage() {

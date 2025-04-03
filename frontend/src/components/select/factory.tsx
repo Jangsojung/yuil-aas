@@ -44,17 +44,9 @@ export default function SelectSmall() {
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }} size='small'>
       <InputLabel id='demo-select-small-label'>Factory</InputLabel>
-      <Select
-        labelId='demo-select-small-label'
-        id='demo-select-small'
-        value={currentFactory}
-        label='Factory'
-        onChange={handleChange}
-      >
+      <Select labelId='demo-select-small-label' id='demo-select-small' value={currentFactory} onChange={handleChange}>
         {factories.map((factory) => (
-          <MenuItem value={factory.fc_idx}>
-            {factory.fc_idx} - {factory.fc_name}
-          </MenuItem>
+          <MenuItem value={factory.fc_idx}>{factory.fc_name}</MenuItem>
         ))}
       </Select>
     </FormControl>
