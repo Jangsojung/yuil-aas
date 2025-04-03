@@ -4,8 +4,15 @@ main {
     max-width: 100%;
     background: #f3f3f3;
 
+    
+    
     .MuiBox-root {
       background-color: #fff;
+
+      .MuiContainer-root {
+        padding-left: 0;
+        padding-right: 0;
+      }
     }
 
     .MuiBreadcrumbs-root {
@@ -27,6 +34,10 @@ main {
 
       .MuiGrid-root.MuiGrid-container {
         align-items: center;
+      }
+
+      .w-100 .MuiFormControl-root{
+        width: 100%;
       }
 
     }
@@ -109,6 +120,21 @@ main {
         padding: 9px;
         line-height: 1;
       }
+    }
+
+    //타이틀
+    .second-title {
+      background-color: #ececec;
+      color: #637381;
+      padding: 10px;
+    }
+
+    //데이터 송신
+    .tree-wrap {
+      width: 100%;
+      background: #fff;
+      margin-top: 0;
+      margin-left: 0;
     }
   
 

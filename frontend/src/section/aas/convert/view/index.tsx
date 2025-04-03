@@ -4,8 +4,9 @@ import SelectFactory from '../../../../components/select/factory';
 
 export default function ConvertView() {
     return (
-        <div>변환</div>
-        
+        <div>
+            
+        </div>
         
     );
 }
