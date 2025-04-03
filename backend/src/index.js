@@ -6,6 +6,7 @@ import http from 'http';
 import { WebSocketServer } from 'ws';
 import BaseCodeRouter from './router/basic_code/BasicCodeRouter.js';
 import KampMonitoringRouter from './router/kamp_monitoring/KampMonitoringRouter.js';
+import EdgeGatewayRouter from './router/edge_gateway/EdgeGatewayRouter.js';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ export const pool = mysql.createPool({
 
 app.use('/api/base_code', BaseCodeRouter());
 app.use('/api/kamp_monitoring', KampMonitoringRouter());
+app.use('/api/edge_gateway', EdgeGatewayRouter());
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
