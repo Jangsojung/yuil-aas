@@ -33,7 +33,7 @@ export default function BasicTable() {
 
   const getFiles = async (fc_idx: number) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/kamp_monitoring/AASXfiles?fc_idx=${fc_idx}`, {
+      const response = await fetch(`http://localhost:5001/api/kamp_monitoring/AASXfiles?af_kind=3&fc_idx=${fc_idx}`, {
         method: 'GET',
       });
 

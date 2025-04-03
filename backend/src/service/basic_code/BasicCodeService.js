@@ -47,7 +47,6 @@ export const getFacilityGroupsFromDB = async (fc_idx = 3, order = 'asc') => {
             fg_name: facilityGroup.fg_name,
           };
         });
-        console.log(facilityGroups);
 
         resolve(facilityGroups);
       }

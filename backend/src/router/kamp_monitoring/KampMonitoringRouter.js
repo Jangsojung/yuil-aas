@@ -11,9 +11,9 @@ export default () => {
   });
 
   router.get('/AASXfiles', (req, res) => {
-    const { fc_idx } = req.query;
+    const { af_kind, fc_idx } = req.query;
 
-    getAASXFiles(fc_idx, res);
+    getAASXFiles(af_kind, fc_idx, res);
   });
 
   return router;

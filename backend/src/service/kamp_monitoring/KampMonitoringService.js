@@ -29,11 +29,12 @@ export const getFilesFromDB = async (fc_idx) => {
   });
 };
 
-export const getAASXFilesFromDB = async (fc_idx) => {
+export const getAASXFilesFromDB = async (af_kind, fc_idx) => {
   return new Promise((resolve, reject) => {
-    const query = 'select af_idx, af_name, createdAt from tb_aasx_file where fc_idx = ? order by af_idx desc';
+    const query =
+      'select af_idx, af_name, createdAt from tb_aasx_file where af_kind = ? and fc_idx = ? order by af_idx desc';
 
-    pool.query(query, [fc_idx], (err, results) => {
+    pool.query(query, [af_kind, fc_idx], (err, results) => {
       if (err) {
         reject(err);
       } else {
