@@ -61,18 +61,19 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {files.map((file) => (
-              <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell>{file.af_idx}</TableCell>
-                <TableCell>{file.af_name}</TableCell>
-                <TableCell>
-                  <Checkbox checked={file.is_conversion === 1} />
-                </TableCell>
-                <TableCell>
-                  <Checkbox checked={file.is_transmission === 1} />
-                </TableCell>
-              </TableRow>
-            ))}
+            {files &&
+              files.map((file) => (
+                <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  <TableCell>{file.af_idx}</TableCell>
+                  <TableCell>{file.af_name}</TableCell>
+                  <TableCell>
+                    <Checkbox checked={file.is_conversion === 1} />
+                  </TableCell>
+                  <TableCell>
+                    <Checkbox checked={file.is_transmission === 1} />
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

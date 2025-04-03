@@ -87,21 +87,22 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {edgeGateways.map((eg) => (
-              <TableRow key={eg.eg_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedEdgeGateways.includes(eg.eg_idx)}
-                    onChange={() => handleCheckboxChange(eg.eg_idx)}
-                  />
-                </TableCell>
-                <TableCell>{eg.eg_idx}</TableCell>
-                <TableCell>{eg.eg_server_temp}</TableCell>
-                <TableCell>{eg.eg_network === 1 ? '연결 됨' : '연결 안 됨'}</TableCell>
-                <TableCell>{eg.eg_pc_temp}</TableCell>
-                <TableCell>{eg.eg_ip_port}</TableCell>
-              </TableRow>
-            ))}
+            {edgeGateways &&
+              edgeGateways.map((eg) => (
+                <TableRow key={eg.eg_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedEdgeGateways.includes(eg.eg_idx)}
+                      onChange={() => handleCheckboxChange(eg.eg_idx)}
+                    />
+                  </TableCell>
+                  <TableCell>{eg.eg_idx}</TableCell>
+                  <TableCell>{eg.eg_server_temp} °C</TableCell>
+                  <TableCell>{eg.eg_network === 1 ? '연결 됨' : '연결 안 됨'}</TableCell>
+                  <TableCell>{eg.eg_pc_temp} °C</TableCell>
+                  <TableCell>{eg.eg_ip_port}</TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

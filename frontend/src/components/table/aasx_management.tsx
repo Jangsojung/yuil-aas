@@ -85,19 +85,20 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {files.map((file) => (
-              <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedFiles.includes(file.af_idx)}
-                    onChange={() => handleCheckboxChange(file.af_idx)}
-                  />
-                </TableCell>
-                <TableCell>{file.af_idx}</TableCell>
-                <TableCell>{file.af_name}</TableCell>
-                <TableCell>{new Date(file.createdAt).toLocaleDateString()}</TableCell>
-              </TableRow>
-            ))}
+            {files &&
+              files.map((file) => (
+                <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedFiles.includes(file.af_idx)}
+                      onChange={() => handleCheckboxChange(file.af_idx)}
+                    />
+                  </TableCell>
+                  <TableCell>{file.af_idx}</TableCell>
+                  <TableCell>{file.af_name}</TableCell>
+                  <TableCell>{new Date(file.createdAt).toLocaleDateString()}</TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
