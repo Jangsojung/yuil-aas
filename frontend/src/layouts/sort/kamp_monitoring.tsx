@@ -41,20 +41,6 @@ export default function Sort() {
             </Grid>
           </Grid>
         </Grid>
-
-        <Grid size={4}>
-          <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <Button variant='contained' color='success'>
-              등록
-            </Button>
-            <Button variant='contained' color='primary'>
-              수정
-            </Button>
-            <Button variant='contained' color='error'>
-              삭제
-            </Button>
-          </Stack>
-        </Grid>
       </Grid>
     </Box>
   );

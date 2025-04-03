@@ -28,3 +28,30 @@ export const getFilesFromDB = async (fc_idx) => {
     });
   });
 };
+
+export const getAASXFilesFromDB = async (fc_idx) => {
+  return new Promise((resolve, reject) => {
+    const query = 'select af_idx, af_name, createdAt from tb_aasx_file where fc_idx = ? order by af_idx desc';
+
+    pool.query(query, [fc_idx], (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        const files = results.map((file) => {
+          return {
+            af_idx: file.af_idx,
+            af_name: file.af_name,
+            createdAt: file.createdAt,
+          };
+        });
+
+        resolve(files);
+      }
+    });
+  });
+};
