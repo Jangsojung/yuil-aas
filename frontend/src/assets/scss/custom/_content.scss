@@ -1,11 +1,11 @@
 main {
+  >.MuiContainer-root {
+    max-width: 100%;
+  }
   .MuiContainer-root {
     //컨테이너
-    max-width: 100%;
     background: #f3f3f3;
 
-    
-    
     .MuiBox-root {
       background-color: #fff;
 
@@ -42,7 +42,7 @@ main {
 
     }
     .MuiFormControl-root {
-      margin: 0;
+      // margin: 0;
       .MuiInputBase-root.MuiOutlinedInput-root {
         background-color: #fff;
       }
@@ -135,10 +135,27 @@ main {
       background: #fff;
       margin-top: 0;
       margin-left: 0;
+      max-width: 100%;
     }
   
-  
-
-
   }
+ 
+}
+
+
+ //모달
+ .MuiDialog-container {
+  .MuiBox-root {
+    margin-left: 3px;
+  }
+  input {
+    width: 100%;
+    padding: 3px;
+    border: 1px solid #DCE0E4;
+  }
+  .file-list {
+    margin-top: 15px;
+    height: 60px;
+  }
+
 }

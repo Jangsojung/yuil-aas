@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import SelectFactory from '../../components/select/factory';
 import SelectPeriod from '../../components/select/period';
 import TextField from '../../components/input';
+import ModalBasic from '../../components/modal/edgemodal';
 
 import styled from '@mui/system/styled';
 
@@ -31,9 +32,7 @@ export default function Sort() {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <Button variant='contained' color='success'>
-              등록
-            </Button>
+            <ModalBasic/>
             <Button variant='contained' color='error'>
               삭제
             </Button>

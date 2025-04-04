@@ -7,11 +7,11 @@ import BasicTabs from '../../../../components/tab';
 
 export default function TransmitView() {
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="sm" className="tree-wrap">
             <Box sx={{ backgroundColor: '#ececec'}} className="second-title" >
                 선택한 aasx 파일 검증
             </Box>
-            <Grid container spacing={1} className="tree-wrap">
+            <Grid container spacing={1}>
                 <Grid size={6}>
                     <TreeView />
                 </Grid>

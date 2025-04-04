@@ -4,6 +4,8 @@ import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
 
 import Layout from './layouts/dashboard';
+import authLayout from './layouts/auth';
+
 import DashboardPage from './pages/aas/dashboard';
 import ConvertPage from './pages/aas/convert';
 import TransmitPage from './pages/aas/transmit';
@@ -135,7 +137,7 @@ export default function ReactRouter() {
             },
             {
               path: '/',
-              Component: Layout,
+              Component: authLayout,
               children: [
                 {
                   path: '/signIn/sign',
