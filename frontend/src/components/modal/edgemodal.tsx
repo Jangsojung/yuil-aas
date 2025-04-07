@@ -20,7 +20,7 @@ import Switch, { SwitchProps } from '@mui/material/Switch';
 import { useRecoilState } from 'recoil';
 import { edgeGatewayRefreshState } from '../../recoil/atoms';
 
-const GreyButton = styled(Button)<ButtonProps>(() => ({
+const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
   fontWeight: 'bold',
   backgroundColor: '#ffffff',
@@ -111,54 +111,100 @@ const IOSSwitch = styled((props: SwitchProps) => (
   },
 }));
 
-export default function CustomizedDialogs() {
-  const [open, setOpen] = React.useState(false);
+interface EdgeGateway {
+  eg_idx: number;
+  eg_server_temp: number;
+  eg_network: number;
+  eg_pc_temp: number;
+  eg_ip_port: String;
+}
+
+interface CustomizedDialogsProps {
+  modalType?: 'insert' | 'update';
+  open: boolean;
+  handleClose: () => void;
+  edgeGatewayData: EdgeGateway | null; // EdgeGateway 타입으로 명시
+}
+
+export default function CustomizedDialogs({
+  modalType = 'insert',
+  open,
+  handleClose,
+  edgeGatewayData = null,
+}: CustomizedDialogsProps) {
   const [serverTemp, setServerTemp] = React.useState('');
   const [networkStatus, setNetworkStatus] = React.useState(true);
   const [pcTemp, setPcTemp] = React.useState('');
   const [pcIp, setPcIp] = React.useState('');
   const [pcPort, setPcPort] = React.useState('');
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
+  const [edgeGatewayId, setEdgeGatewayId] = React.useState<number | null>(null);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // 데이터가 변경될 때 폼 필드 업데이트
+  React.useEffect(() => {
+    if (modalType === 'update' && edgeGatewayData) {
+      setEdgeGatewayId(edgeGatewayData.eg_idx);
+      setServerTemp(edgeGatewayData.eg_server_temp.toString());
+      setNetworkStatus(edgeGatewayData.eg_network === 1);
+      setPcTemp(edgeGatewayData.eg_pc_temp.toString());
 
-  const handleNetworkStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      // IP:PORT 분리
+      const ipPortParts = edgeGatewayData.eg_ip_port.split(':');
+      if (ipPortParts.length === 2) {
+        setPcIp(ipPortParts[0]);
+        setPcPort(ipPortParts[1]);
+      } else {
+        setPcIp(edgeGatewayData.eg_ip_port.toString());
+        setPcPort('');
+      }
+    } else {
+      // 등록 모달의 경우 초기화
+      handleReset();
+    }
+  }, [modalType, edgeGatewayData, open]);
+
+  const handleNetworkStatusChange = (event) => {
     setNetworkStatus(event.target.checked);
   };
 
-  const handleAdd = async () => {
+  const handleAction = async () => {
     if (!serverTemp || !pcTemp || !pcIp || !pcPort) {
       alert('모든 필드를 입력해야 합니다.');
       return;
     }
 
+    const payload = {
+      serverTemp,
+      networkStatus,
+      pcTemp,
+      pcIp,
+      pcPort,
+    };
+
     try {
-      const response = await fetch(`http://localhost:5001/api/edge_gateway`, {
-        method: 'POST',
+      let url = 'http://localhost:5001/api/edge_gateway';
+      let method = 'POST';
+
+      if (modalType === 'update') {
+        url = `http://localhost:5001/api/edge_gateway?eg_idx=${edgeGatewayId}`;
+        method = 'PUT';
+      }
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          serverTemp,
-          networkStatus,
-          pcTemp,
-          pcIp,
-          pcPort,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch detections');
+        throw new Error(`Failed to ${modalType === 'insert' ? '등록' : '수정'} edge gateway`);
       }
 
       setRefreshTrigger((prev) => prev + 1);
       handleClose();
-    } catch (err: any) {
+    } catch (err) {
       console.log(err.message);
     }
   };
@@ -169,122 +215,122 @@ export default function CustomizedDialogs() {
     setPcIp('');
     setPcPort('');
     setNetworkStatus(true);
+    setEdgeGatewayId(null);
   };
 
-  return (
-    <React.Fragment>
-      <Button variant='contained' color='success' onClick={handleClickOpen}>
-        등록
-      </Button>
+  const title = modalType === 'insert' ? 'Edge Gateway 등록' : 'Edge Gateway 수정';
+  const actionButtonText = modalType === 'insert' ? '등록' : '수정';
 
-      <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
-        <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
-          Edge Gateway 등록
-        </DialogTitle>
-        <IconButton
-          aria-label='close'
-          onClick={handleClose}
-          sx={(theme) => ({
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: theme.palette.grey[500],
-          })}
-        >
-          <CloseIcon />
-        </IconButton>
-        <DialogContent dividers className='file-upload'>
-          <Grid container spacing={1}>
-            <Grid size={4}>
-              <Grid container spacing={1}>
-                <Grid size={6}>
-                  <Box sx={{ typography: 'subtitle2' }}>서버 온도</Box>
-                </Grid>
-                <Grid size={6} className='d-flex gap-5 align-flex-end'>
-                  <TextField
-                    hiddenLabel
-                    type='number'
-                    id='outlined-size-small'
-                    size='small'
-                    value={serverTemp}
-                    onChange={(e) => setServerTemp(e.target.value)}
-                  />
-                  <span>℃</span>
-                </Grid>
+  return (
+    <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
+      <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
+        {title}
+      </DialogTitle>
+      <IconButton
+        aria-label='close'
+        onClick={handleClose}
+        sx={(theme) => ({
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          color: theme.palette.grey[500],
+        })}
+      >
+        <CloseIcon />
+      </IconButton>
+      <DialogContent dividers className='file-upload'>
+        <Grid container spacing={1}>
+          <Grid size={4}>
+            <Grid container spacing={1}>
+              <Grid size={6}>
+                <Box sx={{ typography: 'subtitle2' }}>서버 온도</Box>
               </Grid>
-            </Grid>
-            <Grid size={8}>
-              <Grid container spacing={1}>
-                <Grid size={4}>
-                  <Box sx={{ typography: 'subtitle2' }}>네트워크 상태</Box>
-                </Grid>
-                <Grid size={8}>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={<IOSSwitch sx={{ m: 1 }} checked={networkStatus} onChange={handleNetworkStatusChange} />}
-                      label={networkStatus ? '연결 됨' : '연결 안 됨'}
-                    />
-                  </FormGroup>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid size={4}>
-              <Grid container spacing={1}>
-                <Grid size={6}>
-                  <Box sx={{ typography: 'subtitle2' }}>PC 온도</Box>
-                </Grid>
-                <Grid size={6} className='d-flex gap-5 align-flex-end'>
-                  <TextField
-                    hiddenLabel
-                    type='number'
-                    id='outlined-size-small'
-                    size='small'
-                    value={pcTemp}
-                    onChange={(e) => setPcTemp(e.target.value)}
-                  />
-                  <span>℃</span>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid size={8}>
-              <Grid container spacing={1}>
-                <Grid size={4}>
-                  <Box sx={{ typography: 'subtitle2' }}>PC IP:PORT</Box>
-                </Grid>
-                <Grid size={8} className='d-flex gap-5 align-flex-end'>
-                  <TextField
-                    hiddenLabel
-                    id='outlined-size-small'
-                    size='small'
-                    value={pcIp}
-                    onChange={(e) => setPcIp(e.target.value)}
-                  />
-                  <span>:</span>
-                  <TextField
-                    hiddenLabel
-                    type='number'
-                    id='outlined-size-small'
-                    size='small'
-                    value={pcPort}
-                    onChange={(e) => setPcPort(e.target.value)}
-                  />
-                </Grid>
+              <Grid size={6} className='d-flex gap-5 align-flex-end'>
+                <TextField
+                  hiddenLabel
+                  type='number'
+                  id='outlined-size-small'
+                  size='small'
+                  value={serverTemp}
+                  onChange={(e) => setServerTemp(e.target.value)}
+                />
+                <span>℃</span>
               </Grid>
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleAdd} variant='contained' color='primary'>
-            등록
-          </Button>
+          <Grid size={8}>
+            <Grid container spacing={1}>
+              <Grid size={4}>
+                <Box sx={{ typography: 'subtitle2' }}>네트워크 상태</Box>
+              </Grid>
+              <Grid size={8}>
+                <FormGroup>
+                  <FormControlLabel
+                    control={<IOSSwitch sx={{ m: 1 }} checked={networkStatus} onChange={handleNetworkStatusChange} />}
+                    label={networkStatus ? '연결 됨' : '연결 안 됨'}
+                  />
+                </FormGroup>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid size={4}>
+            <Grid container spacing={1}>
+              <Grid size={6}>
+                <Box sx={{ typography: 'subtitle2' }}>PC 온도</Box>
+              </Grid>
+              <Grid size={6} className='d-flex gap-5 align-flex-end'>
+                <TextField
+                  hiddenLabel
+                  type='number'
+                  id='outlined-size-small'
+                  size='small'
+                  value={pcTemp}
+                  onChange={(e) => setPcTemp(e.target.value)}
+                />
+                <span>℃</span>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid size={8}>
+            <Grid container spacing={1}>
+              <Grid size={4}>
+                <Box sx={{ typography: 'subtitle2' }}>PC IP:PORT</Box>
+              </Grid>
+              <Grid size={8} className='d-flex gap-5 align-flex-end'>
+                <TextField
+                  hiddenLabel
+                  id='outlined-size-small'
+                  size='small'
+                  value={pcIp}
+                  onChange={(e) => setPcIp(e.target.value)}
+                />
+                <span>:</span>
+                <TextField
+                  hiddenLabel
+                  type='number'
+                  id='outlined-size-small'
+                  size='small'
+                  value={pcPort}
+                  onChange={(e) => setPcPort(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleAction} variant='contained' color='primary'>
+          {actionButtonText}
+        </Button>
+        {modalType === 'insert' && (
           <Button autoFocus onClick={handleReset} variant='outlined' color='primary'>
             초기화
           </Button>
-          <GreyButton variant='outlined' color='grey' onClick={handleClose}>
-            취소
-          </GreyButton>
-        </DialogActions>
-      </BootstrapDialog>
-    </React.Fragment>
+        )}
+        <GreyButton variant='outlined' onClick={handleClose}>
+          취소
+        </GreyButton>
+      </DialogActions>
+    </BootstrapDialog>
   );
 }

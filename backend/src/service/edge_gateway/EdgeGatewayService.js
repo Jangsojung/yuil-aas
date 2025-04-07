@@ -44,6 +44,20 @@ export const insertEdgeGatewaysToDB = async (serverTemp, networkStatus, pcTemp, 
   }
 };
 
+export const updateEdgeGatewayToDB = async (eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort) => {
+  try {
+    const ipPort = `${pcIp}:${pcPort}`;
+
+    const query = `update tb_aasx_edge_gateway set eg_server_temp = ?, eg_network = ?, eg_pc_temp = ?, eg_ip_port = ?, eg_path ='/src/files/kamp' where eg_idx = ?`;
+    await pool.promise().query(query, [serverTemp, networkStatus, pcTemp, ipPort, eg_idx]);
+
+    console.log('Edge Gateway updated successfully');
+  } catch (err) {
+    console.log('Failed to update Edge Gateway: ', err);
+    throw err;
+  }
+};
+
 export const deleteEdgeGatewaysFromDB = async (ids) => {
   try {
     const query = `delete from tb_aasx_edge_gateway where eg_idx in (?)`;
@@ -51,7 +65,7 @@ export const deleteEdgeGatewaysFromDB = async (ids) => {
 
     console.log('Edge Gateway deleted successfully');
   } catch (err) {
-    console.log('Failed to deleted Edge Gateway: ', err);
+    console.log('Failed to delete Edge Gateway: ', err);
     throw err;
   }
 };

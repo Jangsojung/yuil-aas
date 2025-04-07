@@ -12,6 +12,7 @@ import ModalBasic from '../../components/modal/edgemodal';
 import styled from '@mui/system/styled';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { edgeGatewayRefreshState, selectedEdgeGatewaysState } from '../../recoil/atoms';
+import CustomizedDialogs from '../../components/modal/edgemodal';
 
 const Item = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
@@ -30,6 +31,7 @@ export default function Sort() {
   const selectedEdgeGateways = useRecoilValue(selectedEdgeGatewaysState);
   const setSelectedEdgeGateways = useSetRecoilState(selectedEdgeGatewaysState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
+  const [openInsertModal, setOpenInsertModal] = React.useState(false);
 
   const handleDelete = async () => {
     if (selectedEdgeGateways.length === 0) {
@@ -67,6 +69,16 @@ export default function Sort() {
     }
   };
 
+  // 등록 모달 열기
+  const handleOpenInsertModal = () => {
+    setOpenInsertModal(true);
+  };
+
+  // 모달 닫기 핸들러
+  const handleCloseInsertModal = () => {
+    setOpenInsertModal(false);
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
@@ -74,7 +86,10 @@ export default function Sort() {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <ModalBasic />
+            {/* <ModalBasic /> */}
+            <Button variant='contained' color='success' onClick={handleOpenInsertModal}>
+              등록
+            </Button>
             <Button
               variant='contained'
               color='error'
@@ -86,6 +101,9 @@ export default function Sort() {
           </Stack>
         </Grid>
       </Grid>
+
+      {/* 등록 모달 */}
+      <CustomizedDialogs modalType='insert' open={openInsertModal} handleClose={handleCloseInsertModal} />
     </Box>
   );
 }

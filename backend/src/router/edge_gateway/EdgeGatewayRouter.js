@@ -2,6 +2,7 @@ import express from 'express';
 import {
   getEdgeGateways,
   insertEdgeGateways,
+  updateEdgeGateway,
   deleteEdgeGateways,
 } from '../../controller/edge_gateway/EdgeGatewayController.js';
 
@@ -15,6 +16,13 @@ export default () => {
   router.post('/', (req, res) => {
     const { serverTemp, networkStatus, pcTemp, pcIp, pcPort } = req.body;
     insertEdgeGateways(serverTemp, networkStatus, pcTemp, pcIp, pcPort, res);
+  });
+
+  router.put('/', (req, res) => {
+    const { eg_idx } = req.query;
+    const { serverTemp, networkStatus, pcTemp, pcIp, pcPort } = req.body;
+
+    updateEdgeGateway(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, res);
   });
 
   router.delete('/', (req, res) => {

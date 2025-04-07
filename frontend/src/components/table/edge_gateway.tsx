@@ -7,12 +7,12 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
 
-// import Checkbox from '../../components/checkbox';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentFactoryState, edgeGatewayRefreshState, selectedEdgeGatewaysState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
-
+import CustomizedDialogs from '../modal/edgemodal';
 interface EdgeGateway {
   eg_idx: number;
   eg_server_temp: number;
@@ -27,7 +27,9 @@ export default function BasicTable() {
   const [edgeGateways, setEdgeGateways] = React.useState<EdgeGateway[]>([]);
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useRecoilState(selectedEdgeGatewaysState);
   const [selectAll, setSelectAll] = React.useState(false);
-  const [openModal, setOpenModal] = React.useState(false);
+
+  // 모달 상태 관리
+  const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
   const [selectedEdgeGateway, setSelectedEdgeGateway] = React.useState<EdgeGateway | null>(null);
 
   React.useEffect(() => {
@@ -75,13 +77,15 @@ export default function BasicTable() {
     });
   };
 
+  // 더블클릭 시 업데이트 모달 열기
   const handleDoubleClick = (edgeGateway: EdgeGateway) => {
     setSelectedEdgeGateway(edgeGateway);
-    setOpenModal(true);
+    setOpenUpdateModal(true);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+    setSelectedEdgeGateway(null);
   };
 
   React.useEffect(() => {
@@ -90,6 +94,12 @@ export default function BasicTable() {
 
   return (
     <>
+      {/* <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <Button variant='contained' color='success' onClick={handleOpenInsertModal}>
+          등록
+        </Button>
+      </div> */}
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label='simple table'>
           <TableHead>
@@ -97,8 +107,8 @@ export default function BasicTable() {
               <TableCell>
                 <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
               </TableCell>
-              {cells.map((cell) => (
-                <TableCell>{cell}</TableCell>
+              {cells.map((cell, index) => (
+                <TableCell key={index}>{cell}</TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -107,7 +117,7 @@ export default function BasicTable() {
               edgeGateways.map((eg) => (
                 <TableRow
                   key={eg.eg_idx}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
                   onDoubleClick={() => handleDoubleClick(eg)}
                 >
                   <TableCell>
@@ -128,10 +138,13 @@ export default function BasicTable() {
       </TableContainer>
       <Pagenation count={edgeGateways.length} />
 
-      {/* 모달위치예정
-      <Dialog open={openModal} onClose={handleCloseModal}>
-      */}
-      <></>
+      {/* 수정 모달 */}
+      <CustomizedDialogs
+        modalType='update'
+        open={openUpdateModal}
+        handleClose={handleCloseUpdateModal}
+        edgeGatewayData={selectedEdgeGateway}
+      />
     </>
   );
 }
