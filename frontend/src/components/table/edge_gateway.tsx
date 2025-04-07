@@ -9,8 +9,8 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
 // import Checkbox from '../../components/checkbox';
-import { useRecoilValue } from 'recoil';
-import { currentFactoryState } from '../../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { currentFactoryState, edgeGatewayRefreshState, selectedEdgeGatewaysState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 
 interface EdgeGateway {
@@ -23,15 +23,18 @@ interface EdgeGateway {
 
 export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
+  const refreshTrigger = useRecoilValue(edgeGatewayRefreshState);
   const [edgeGateways, setEdgeGateways] = React.useState<EdgeGateway[]>([]);
-  const [selectedEdgeGateways, setSelectedEdgeGateways] = React.useState<number[]>([]);
+  const [selectedEdgeGateways, setSelectedEdgeGateways] = useRecoilState(selectedEdgeGatewaysState);
   const [selectAll, setSelectAll] = React.useState(false);
+  const [openModal, setOpenModal] = React.useState(false);
+  const [selectedEdgeGateway, setSelectedEdgeGateway] = React.useState<EdgeGateway | null>(null);
 
   React.useEffect(() => {
     if (currentFactory !== null) {
       getEdgeGateways(currentFactory);
     }
-  }, [currentFactory]);
+  }, [currentFactory, refreshTrigger]);
 
   const getEdgeGateways = async (fc_idx: number) => {
     try {
@@ -72,6 +75,19 @@ export default function BasicTable() {
     });
   };
 
+  const handleDoubleClick = (edgeGateway: EdgeGateway) => {
+    setSelectedEdgeGateway(edgeGateway);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  React.useEffect(() => {
+    setSelectAll(false);
+  }, [edgeGateways]);
+
   return (
     <>
       <TableContainer component={Paper}>
@@ -89,7 +105,11 @@ export default function BasicTable() {
           <TableBody>
             {edgeGateways &&
               edgeGateways.map((eg) => (
-                <TableRow key={eg.eg_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableRow
+                  key={eg.eg_idx}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  onDoubleClick={() => handleDoubleClick(eg)}
+                >
                   <TableCell>
                     <Checkbox
                       checked={selectedEdgeGateways.includes(eg.eg_idx)}
@@ -107,6 +127,11 @@ export default function BasicTable() {
         </Table>
       </TableContainer>
       <Pagenation count={edgeGateways.length} />
+
+      {/* 모달위치예정
+      <Dialog open={openModal} onClose={handleCloseModal}>
+      */}
+      <></>
     </>
   );
 }

@@ -17,17 +17,18 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch, { SwitchProps } from '@mui/material/Switch';
 
-const GreyButton = styled(Button)<ButtonProps>(() => ({
-    color: '#637381',
-    fontWeight: 'bold',
-    backgroundColor: '#ffffff',
-    borderColor: grey[300],
-    '&:hover': {
-      backgroundColor: grey[300],
-    },
-    
-}));
+import { useRecoilState } from 'recoil';
+import { edgeGatewayRefreshState } from '../../recoil/atoms';
 
+const GreyButton = styled(Button)<ButtonProps>(() => ({
+  color: '#637381',
+  fontWeight: 'bold',
+  backgroundColor: '#ffffff',
+  borderColor: grey[300],
+  '&:hover': {
+    backgroundColor: grey[300],
+  },
+}));
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '.MuiDialog-paper': {
@@ -51,7 +52,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 const IOSSwitch = styled((props: SwitchProps) => (
-  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+  <Switch focusVisibleClassName='.Mui-focusVisible' disableRipple {...props} />
 ))(({ theme }) => ({
   width: 42,
   height: 26,
@@ -110,9 +111,14 @@ const IOSSwitch = styled((props: SwitchProps) => (
   },
 }));
 
-
 export default function CustomizedDialogs() {
   const [open, setOpen] = React.useState(false);
+  const [serverTemp, setServerTemp] = React.useState('');
+  const [networkStatus, setNetworkStatus] = React.useState(true);
+  const [pcTemp, setPcTemp] = React.useState('');
+  const [pcIp, setPcIp] = React.useState('');
+  const [pcPort, setPcPort] = React.useState('');
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -121,22 +127,62 @@ export default function CustomizedDialogs() {
     setOpen(false);
   };
 
+  const handleNetworkStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNetworkStatus(event.target.checked);
+  };
+
+  const handleAdd = async () => {
+    if (!serverTemp || !pcTemp || !pcIp || !pcPort) {
+      alert('모든 필드를 입력해야 합니다.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/edge_gateway`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          serverTemp,
+          networkStatus,
+          pcTemp,
+          pcIp,
+          pcPort,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch detections');
+      }
+
+      setRefreshTrigger((prev) => prev + 1);
+      handleClose();
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  };
+
+  const handleReset = () => {
+    setServerTemp('');
+    setPcTemp('');
+    setPcIp('');
+    setPcPort('');
+    setNetworkStatus(true);
+  };
+
   return (
     <React.Fragment>
-        <Button variant='contained' color='success' onClick={handleClickOpen}>
-            등록
-        </Button>
-      
-      <BootstrapDialog
-        onClose={handleClose}
-        aria-labelledby="customized-dialog-title"
-        open={open}
-      >
-        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+      <Button variant='contained' color='success' onClick={handleClickOpen}>
+        등록
+      </Button>
+
+      <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
+        <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
           Edge Gateway 등록
         </DialogTitle>
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={handleClose}
           sx={(theme) => ({
             position: 'absolute',
@@ -147,18 +193,21 @@ export default function CustomizedDialogs() {
         >
           <CloseIcon />
         </IconButton>
-        <DialogContent dividers className="file-upload">
+        <DialogContent dividers className='file-upload'>
           <Grid container spacing={1}>
             <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={6}>
                   <Box sx={{ typography: 'subtitle2' }}>서버 온도</Box>
                 </Grid>
-                <Grid size={6} className="d-flex gap-5 align-flex-end">
+                <Grid size={6} className='d-flex gap-5 align-flex-end'>
                   <TextField
                     hiddenLabel
-                    id="outlined-size-small"
-                    size="small"
+                    type='number'
+                    id='outlined-size-small'
+                    size='small'
+                    value={serverTemp}
+                    onChange={(e) => setServerTemp(e.target.value)}
                   />
                   <span>℃</span>
                 </Grid>
@@ -172,8 +221,8 @@ export default function CustomizedDialogs() {
                 <Grid size={8}>
                   <FormGroup>
                     <FormControlLabel
-                      control={<IOSSwitch sx={{ m: 1 }} defaultChecked />}
-                      label="연결 됨"
+                      control={<IOSSwitch sx={{ m: 1 }} checked={networkStatus} onChange={handleNetworkStatusChange} />}
+                      label={networkStatus ? '연결 됨' : '연결 안 됨'}
                     />
                   </FormGroup>
                 </Grid>
@@ -184,11 +233,14 @@ export default function CustomizedDialogs() {
                 <Grid size={6}>
                   <Box sx={{ typography: 'subtitle2' }}>PC 온도</Box>
                 </Grid>
-                <Grid size={6} className="d-flex gap-5 align-flex-end">
+                <Grid size={6} className='d-flex gap-5 align-flex-end'>
                   <TextField
                     hiddenLabel
-                    id="outlined-size-small"
-                    size="small"
+                    type='number'
+                    id='outlined-size-small'
+                    size='small'
+                    value={pcTemp}
+                    onChange={(e) => setPcTemp(e.target.value)}
                   />
                   <span>℃</span>
                 </Grid>
@@ -199,17 +251,22 @@ export default function CustomizedDialogs() {
                 <Grid size={4}>
                   <Box sx={{ typography: 'subtitle2' }}>PC IP:PORT</Box>
                 </Grid>
-                <Grid size={8} className="d-flex gap-5 align-flex-end">
+                <Grid size={8} className='d-flex gap-5 align-flex-end'>
                   <TextField
                     hiddenLabel
-                    id="outlined-size-small"
-                    size="small"
+                    id='outlined-size-small'
+                    size='small'
+                    value={pcIp}
+                    onChange={(e) => setPcIp(e.target.value)}
                   />
                   <span>:</span>
                   <TextField
                     hiddenLabel
-                    id="outlined-size-small"
-                    size="small"
+                    type='number'
+                    id='outlined-size-small'
+                    size='small'
+                    value={pcPort}
+                    onChange={(e) => setPcPort(e.target.value)}
                   />
                 </Grid>
               </Grid>
@@ -217,13 +274,13 @@ export default function CustomizedDialogs() {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button variant='contained' color='primary'>
+          <Button onClick={handleAdd} variant='contained' color='primary'>
             등록
           </Button>
-          <Button autoFocus onClick={handleClose} variant="outlined" color='primary'>
+          <Button autoFocus onClick={handleReset} variant='outlined' color='primary'>
             초기화
           </Button>
-          <GreyButton variant="outlined" color='grey'>
+          <GreyButton variant='outlined' color='grey' onClick={handleClose}>
             취소
           </GreyButton>
         </DialogActions>
