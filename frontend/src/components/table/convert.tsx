@@ -9,8 +9,8 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
 // import Checkbox from '../../components/checkbox';
-import { useRecoilValue } from 'recoil';
-import { currentFactoryState } from '../../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { currentFactoryState, selectedConvertsState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 
 interface FacilityGroup {
@@ -21,7 +21,7 @@ interface FacilityGroup {
 export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [groups, setGroups] = React.useState<FacilityGroup[]>([]);
-  const [selectedFiles, setSelectedFiles] = React.useState<number[]>([]);
+  const [selectedConverts, setSelectedConverts] = useRecoilState(selectedConvertsState);
   const [selectAll, setSelectAll] = React.useState(false);
 
   React.useEffect(() => {
@@ -29,6 +29,16 @@ export default function BasicTable() {
       getFacilityGroups(currentFactory);
     }
   }, [currentFactory]);
+
+  React.useEffect(() => {
+    if (selectedConverts.length === 0) {
+      setSelectAll(false);
+    } else if (selectedConverts.length === groups.length) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedConverts, groups]);
 
   const getFacilityGroups = async (fc_idx: number) => {
     try {
@@ -42,7 +52,6 @@ export default function BasicTable() {
 
       const data: FacilityGroup[] = await response.json();
       setGroups(data);
-      console.log(data);
     } catch (err: any) {
       console.log(err.message);
     }
@@ -52,18 +61,18 @@ export default function BasicTable() {
     const checked = event.target.checked;
     setSelectAll(checked);
     if (checked) {
-      setSelectedFiles(groups.map((group) => group.fg_idx));
+      setSelectedConverts(groups.map((group) => group.fg_idx));
     } else {
-      setSelectedFiles([]);
+      setSelectedConverts([]);
     }
   };
 
-  const handleCheckboxChange = (fileIdx: number) => {
-    setSelectedFiles((prevSelected) => {
-      if (prevSelected.includes(fileIdx)) {
-        return prevSelected.filter((idx) => idx !== fileIdx);
+  const handleCheckboxChange = (convertsIdx: number) => {
+    setSelectedConverts((prevSelected) => {
+      if (prevSelected.includes(convertsIdx)) {
+        return prevSelected.filter((idx) => idx !== convertsIdx);
       } else {
-        return [...prevSelected, fileIdx];
+        return [...prevSelected, convertsIdx];
       }
     });
   };
@@ -88,7 +97,7 @@ export default function BasicTable() {
                 <TableRow key={group.fg_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>
                     <Checkbox
-                      checked={selectedFiles.includes(group.fg_idx)}
+                      checked={selectedConverts.includes(group.fg_idx)}
                       onChange={() => handleCheckboxChange(group.fg_idx)}
                     />
                   </TableCell>

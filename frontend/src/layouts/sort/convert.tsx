@@ -4,13 +4,12 @@ import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
-import SelectFacilityGroup from '../../components/select/facility_group';
-import SelectPeriod from '../../components/select/period';
-import TextField from '../../components/input';
-import Checkbox from '../../components/checkbox';
 import BasicDatePicker from '../../components/datepicker';
+import { Dayjs } from 'dayjs';
 
 import styled from '@mui/system/styled';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { currentFactoryState, selectedConvertsState } from '../../recoil/atoms';
 
 const Item = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
@@ -26,6 +25,52 @@ const Item = styled('div')(({ theme }) => ({
 }));
 
 export default function Sort() {
+  const [selectedConverts, setSelectedConverts] = useRecoilState(selectedConvertsState);
+  const currentFactory = useRecoilValue(currentFactoryState);
+
+  const [startDate, setStartDate] = React.useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = React.useState<Dayjs | null>(null);
+  const [resetTrigger, setResetTrigger] = React.useState(false);
+
+  const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+  };
+
+  const handleAdd = async () => {
+    if (!startDate || !endDate) {
+      console.log('시작 날짜와 종료 날짜를 모두 선택해야 합니다.');
+      return;
+    }
+
+    const formattedStartDate = startDate.format('YYMMDD');
+    const formattedEndDate = endDate.format('YYMMDD');
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/convert?fc_idx=${currentFactory}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // body: JSON.stringify({ ids: selectedConverts }),
+        body: JSON.stringify({ start: formattedStartDate, end: formattedEndDate }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to insert converts');
+      }
+
+      alert('성공적으로 json파일을 생성하였습니다.\n파일 위치: /src/files/front');
+
+      setStartDate(null);
+      setEndDate(null);
+      setResetTrigger((prev) => !prev);
+      setSelectedConverts([]);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
@@ -34,11 +79,10 @@ export default function Sort() {
             <Grid size={10}>
               <Grid container spacing={1}>
                 <Grid size={1} className='d-flex gap-5'>
-                  {/* <Checkbox /> */}
                   <div>날짜</div>
                 </Grid>
                 <Grid size={8}>
-                  <BasicDatePicker />
+                  <BasicDatePicker onDateChange={handleDateChange} resetDates={resetTrigger} />
                 </Grid>
               </Grid>
             </Grid>
@@ -47,8 +91,7 @@ export default function Sort() {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            {/* 기초코드 버튼 */}
-            <Button variant='contained' color='success'>
+            <Button variant='contained' color='success' onClick={handleAdd} disabled={selectedConverts.length === 0}>
               등록
             </Button>
           </Stack>

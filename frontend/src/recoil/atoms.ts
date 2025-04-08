@@ -19,3 +19,8 @@ export const edgeGatewayRefreshState = atom<number>({
   key: 'edgeGatewayRefreshState',
   default: 0,
 });
+
+export const selectedConvertsState = atom<number[]>({
+  key: 'selectedConvertsState',
+  default: [],
+});
