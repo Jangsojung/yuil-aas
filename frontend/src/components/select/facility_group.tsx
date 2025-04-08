@@ -1,10 +1,11 @@
 import * as React from 'react';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentFacilityGroupState, currentFactoryState } from '../../recoil/atoms';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 
 interface FacilityGroup {
   fg_idx: number;
@@ -52,12 +53,10 @@ export default function SelectSmall() {
 
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }} size='small'>
-      <InputLabel id='demo-select-small-label'>Facility Group</InputLabel>
       <Select
-        labelId='demo-select-small-label'
-        id='demo-select-small'
         value={currentFacilityGroup}
         onChange={handleChange}
+        IconComponent = {ExpandMoreIcon}
       >
         {groups &&
           groups.map((group) => (
