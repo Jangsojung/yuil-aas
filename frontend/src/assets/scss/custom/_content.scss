@@ -22,7 +22,7 @@ main {
     .MuiTypography-h4 {
       font-weight: bold;
       font-size: 20px;
-      color: #637381;
+      color: #607d8b;
     }
 
     //검색영역
@@ -36,15 +36,20 @@ main {
         align-items: center;
       }
 
+      .MuiFormControl-root {
+        // min-width: 200px;
+      }
+
       .w-100 .MuiFormControl-root{
         width: 100%;
       }
 
     }
     .MuiFormControl-root {
-      // margin: 0;
+      
       .MuiInputBase-root.MuiOutlinedInput-root {
-        background-color: #fff;
+        border-radius: 0;
+        
       }
     }
 
@@ -53,6 +58,7 @@ main {
       padding: 5px 5px;
       min-width: 55px;
       line-height: 1.4;
+      font-weight: bold;
     }
 
     .MuiButton-containedSuccess {
@@ -115,10 +121,24 @@ main {
     }
 
     //데이트피커
+    .datepicker-wrap {
+      span {
+        display: flex;
+        align-items: center;
+
+        svg {
+          font-size: 0.75rem;
+        }
+      }
+    }
     .MuiFormControl-root.MuiTextField-root {
+      label {
+        // line-height: 1;
+      }
+      
       .MuiInputBase-input {
         padding: 9px;
-        line-height: 1;
+        
       }
     }
 

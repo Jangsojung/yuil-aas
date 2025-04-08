@@ -45,10 +45,10 @@ input,
 select,
 table,
 textarea {
-  font-family: var(--mainEng-font), var(--mainKor-font), 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', helvetica,
-    sans-serif;
-  letter-spacing: -0.03em !important;
+  font-family: 'Malgun Gothic', '맑은 고딕', helvetica, sans-serif;
+  letter-spacing: -0.03em;
 }
+
 
 // 링크 초기화
 a,
@@ -107,6 +107,9 @@ img {
 }
 .align-flex-end {
   align-items: flex-end;
+}
+.align-center {
+  align-items: center;
 }
 .space-between {
   justify-content: space-between;

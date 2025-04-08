@@ -18,7 +18,7 @@ export default function Sort() {
           <Grid container spacing={1}>
             <Grid size={4}>
               <Grid container spacing={1}>
-                <Grid size={4}>
+                <Grid size={3}>
                   <div>공장</div>
                 </Grid>
                 <Grid size={8}>
@@ -28,7 +28,7 @@ export default function Sort() {
             </Grid>
             <Grid size={4}>
               <Grid container spacing={1}>
-                <Grid size={4}>
+                <Grid size={3}>
                   <div>사출기</div>
                 </Grid>
                 <Grid size={8}>
@@ -38,15 +38,14 @@ export default function Sort() {
             </Grid>
             <Grid size={4}>
               <Grid container spacing={1}>
-                <Grid size={4}>
+                <Grid size={3}>
                   <div>주기</div>
                 </Grid>
-                <Grid size={4}>
+                <Grid size={8} className="d-flex align-center">
                   <TextField />
-                </Grid>
-                <Grid size={4}>
                   <SelectPeriod />
                 </Grid>
+                
               </Grid>
             </Grid>
           </Grid>
