@@ -28,7 +28,6 @@ export default function BasicTable() {
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useRecoilState(selectedEdgeGatewaysState);
   const [selectAll, setSelectAll] = React.useState(false);
 
-  // 모달 상태 관리
   const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
   const [selectedEdgeGateway, setSelectedEdgeGateway] = React.useState<EdgeGateway | null>(null);
 
@@ -50,8 +49,6 @@ export default function BasicTable() {
 
       const data: EdgeGateway[] = await response.json();
       setEdgeGateways(data);
-
-      console.log(data);
     } catch (err: any) {
       console.log(err.message);
     }

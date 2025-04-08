@@ -43,8 +43,6 @@ export default function BasicTable() {
 
       const data: File[] = await response.json();
       setFiles(data);
-
-      console.log(data);
     } catch (err: any) {
       console.log(err.message);
     }

@@ -37,7 +37,6 @@ export default function SelectSmall() {
 
       const data: FacilityGroup[] = await response.json();
       setGroups(data);
-      console.log(data);
 
       if (data.length > 0) {
         setCurrentFacilityGroup(data[0].fg_idx);
