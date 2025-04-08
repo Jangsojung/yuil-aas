@@ -8,7 +8,7 @@ import SelectFactory from '../../components/select/factory';
 import SelectPeriod from '../../components/select/period';
 import TextField from '../../components/input';
 import ModalBasic from '../../components/modal';
-
+import SelectFacilityGroup from '../../components/select/facility_group';
 
 export default function Sort() {
   return (
@@ -29,10 +29,10 @@ export default function Sort() {
             <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={3}>
-                  <div>사출기</div>
+                  <div>설비 그룹</div>
                 </Grid>
                 <Grid size={8}>
-                  <SelectFactory />
+                  <SelectFacilityGroup />
                 </Grid>
               </Grid>
             </Grid>
@@ -41,11 +41,10 @@ export default function Sort() {
                 <Grid size={3}>
                   <div>주기</div>
                 </Grid>
-                <Grid size={8} className="d-flex align-center">
+                <Grid size={8} className='d-flex align-center'>
                   <TextField />
                   <SelectPeriod />
                 </Grid>
-                
               </Grid>
             </Grid>
           </Grid>
@@ -53,14 +52,13 @@ export default function Sort() {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <ModalBasic/>
+            <ModalBasic />
             {/* <Button variant='outlined' color='success'>
               수정
             </Button> */}
             <Button variant='contained' color='error'>
               삭제
             </Button>
-            
           </Stack>
         </Grid>
       </Grid>
