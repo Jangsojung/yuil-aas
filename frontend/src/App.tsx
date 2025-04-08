@@ -32,10 +32,10 @@ const NAVIGATION: Navigation = [
         segment: 'transmit',
         title: 'DATA 송신',
       },
-      {
-        segment: 'monitoring',
-        title: 'KAMP 송신 모니터링',
-      },
+      //{
+      //  segment: 'monitoring',
+      //  title: 'KAMP 송신 모니터링',
+      //},
     ],
   },
   {
