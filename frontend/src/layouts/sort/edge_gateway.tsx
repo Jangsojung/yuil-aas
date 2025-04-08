@@ -28,8 +28,8 @@ const Item = styled('div')(({ theme }) => ({
 }));
 
 export default function Sort() {
-  const selectedEdgeGateways = useRecoilValue(selectedEdgeGatewaysState);
-  const setSelectedEdgeGateways = useSetRecoilState(selectedEdgeGatewaysState);
+  const [selectedEdgeGateways, setSelectedEdgeGateways] = useRecoilState(selectedEdgeGatewaysState);
+
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
   const [openInsertModal, setOpenInsertModal] = React.useState(false);
 
