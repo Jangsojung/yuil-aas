@@ -28,7 +28,7 @@ export default function Sort() {
       <Grid container spacing={1}>
         <Grid size={8}>
           <Grid container spacing={1}>
-            <Grid size={4}>
+            {/* <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={4}>
                   <div>설비 그룹</div>
@@ -37,7 +37,7 @@ export default function Sort() {
                   <SelectFacilityGroup />
                 </Grid>
               </Grid>
-            </Grid>
+            </Grid> */}
 
             <Grid size={4}>
               <Grid container spacing={1}>
@@ -45,7 +45,7 @@ export default function Sort() {
                   <div>날짜</div>
                 </Grid>
                 <Grid size={8}>
-                  <BasicDatePicker />
+                  <BasicDatePicker isDefault={true} />
                 </Grid>
               </Grid>
             </Grid>
