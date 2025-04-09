@@ -1,3 +1,4 @@
+import { log } from 'console';
 import { pool } from '../../index.js';
 import fs from 'fs';
 import path from 'path';
@@ -7,8 +8,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
-  const startDateTime = `${start} 00:00:00`;
-  const endDateTime = `${end} 23:59:59`;
+  const formattedStart = start.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
+  const formattedEnd = end.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
+  const startDateTime = `${formattedStart} 00:00:00`;
+  const endDateTime = `${formattedEnd} 23:59:59`;
   try {
     const facilityGroupsQuery = `select fg_idx, fg_name from tb_aasx_data_aas where fg_idx in (?)`;
     const [facilityGroups] = await pool.promise().query(facilityGroupsQuery, [ids]);
@@ -48,14 +51,18 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
           const sensorNameEn = snAliases[0]?.as_en || sensor.sn_name;
 
           const [sensorDataRecords] = await pool.promise().query(
-            `select sn_compute_data, sd_createdAt 
+            `select ROUND(sn_compute_data, 2) as sn_compute_data, sd_createdAt 
             from tb_aasx_sensor_data 
             where mt_idx = ? and sd_createdAt between ? and ?
-            order by sd_createdAt asc`,
+            order by sd_createdAt`,
             [sensor.mt_idx, startDateTime, endDateTime]
           );
 
-          const snData = sensorDataRecords.map((record) => {
+          console.log(sensor.mt_idx, startDateTime, endDateTime);
+
+          const snData = sensorDataRecords.map((record, idx) => {
+            console.log(111111111111111111111111);
+
             const timestamp = new Date(record.sd_createdAt);
 
             const formattedTimestamp =
@@ -67,15 +74,14 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
               String(timestamp.getMinutes()).padStart(2, '0') +
               String(timestamp.getSeconds()).padStart(2, '0');
 
-            const roundedValue = parseFloat(parseFloat(record.sn_compute_data).toFixed(2));
-
+            console.log(record.sn_compute_data + timestamp);
             return {
-              Value: roundedValue,
+              Value: record.sn_compute_data,
               Timestamp: formattedTimestamp,
             };
           });
 
-          if (snData.length === 0) {
+          if (!sensorDataRecords || snData.length === 0) {
             const now = new Date();
             const formattedNow =
               now.getFullYear() +
