@@ -58,11 +58,7 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
             [sensor.mt_idx, startDateTime, endDateTime]
           );
 
-          console.log(sensor.mt_idx, startDateTime, endDateTime);
-
           const snData = sensorDataRecords.map((record, idx) => {
-            console.log(111111111111111111111111);
-
             const timestamp = new Date(record.sd_createdAt);
 
             const formattedTimestamp =
@@ -73,8 +69,6 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
               String(timestamp.getHours()).padStart(2, '0') +
               String(timestamp.getMinutes()).padStart(2, '0') +
               String(timestamp.getSeconds()).padStart(2, '0');
-
-            console.log(record.sn_compute_data + timestamp);
             return {
               Value: record.sn_compute_data,
               Timestamp: formattedTimestamp,
