@@ -1,7 +1,7 @@
 import Grid from '@mui/system/Grid';
 import Table from '../../../../components/table/basic_code';
-import { useRecoilValue } from 'recoil';
-import { currentFacilityGroupState } from '../../../../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { currentFacilityGroupState, hasBasicsState } from '../../../../recoil/atoms';
 import React from 'react';
 
 interface Basic {
@@ -12,6 +12,7 @@ interface Basic {
 export default function BasicCode() {
   const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
   const [basics, setBasics] = React.useState<Basic[]>([]);
+  const [hasBasics, setHasBasics] = useRecoilState(hasBasicsState);
 
   React.useEffect(() => {
     if (currentFacilityGroup !== null) {
@@ -30,7 +31,10 @@ export default function BasicCode() {
       }
 
       const data: Basic[] = await response.json();
+      console.log(data);
+
       setBasics(data);
+      setHasBasics(data !== null);
     } catch (err: any) {
       console.log(err.message);
     }

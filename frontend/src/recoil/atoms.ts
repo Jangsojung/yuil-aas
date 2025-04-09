@@ -10,6 +10,11 @@ export const currentFacilityGroupState = atom<number | null>({
   default: null,
 });
 
+export const hasBasicsState = atom<boolean>({
+  key: 'hasBasicsState',
+  default: false,
+});
+
 export const selectedEdgeGatewaysState = atom<number[]>({
   key: 'selectedEdgeGatewaysState',
   default: [],
