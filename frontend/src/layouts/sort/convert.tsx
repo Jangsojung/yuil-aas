@@ -24,7 +24,7 @@ const Item = styled('div')(({ theme }) => ({
   }),
 }));
 
-export default function Sort() {
+export default function Sort({ startLoading, endLoading }) {
   const [selectedConverts, setSelectedConverts] = useRecoilState(selectedConvertsState);
   const currentFactory = useRecoilValue(currentFactoryState);
 
@@ -38,6 +38,7 @@ export default function Sort() {
   };
 
   const handleAdd = async () => {
+    startLoading();
     if (!startDate || !endDate) {
       console.log('시작 날짜와 종료 날짜를 모두 선택해야 합니다.');
       return;
@@ -52,8 +53,7 @@ export default function Sort() {
         headers: {
           'Content-Type': 'application/json',
         },
-        // body: JSON.stringify({ ids: selectedConverts }),
-        body: JSON.stringify({ start: formattedStartDate, end: formattedEndDate }),
+        body: JSON.stringify({ start: formattedStartDate, end: formattedEndDate, ids: selectedConverts }),
       });
 
       if (!response.ok) {
@@ -61,6 +61,8 @@ export default function Sort() {
       }
 
       alert('성공적으로 json파일을 생성하였습니다.\n파일 위치: /src/files/front');
+
+      endLoading();
 
       setStartDate(null);
       setEndDate(null);

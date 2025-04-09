@@ -123,7 +123,7 @@ interface CustomizedDialogsProps {
   modalType?: 'insert' | 'update';
   open: boolean;
   handleClose: () => void;
-  edgeGatewayData: EdgeGateway | null; // EdgeGateway 타입으로 명시
+  edgeGatewayData: EdgeGateway | null;
 }
 
 export default function CustomizedDialogs({
@@ -140,7 +140,6 @@ export default function CustomizedDialogs({
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
   const [edgeGatewayId, setEdgeGatewayId] = React.useState<number | null>(null);
 
-  // 데이터가 변경될 때 폼 필드 업데이트
   React.useEffect(() => {
     if (modalType === 'update' && edgeGatewayData) {
       setEdgeGatewayId(edgeGatewayData.eg_idx);
@@ -148,7 +147,6 @@ export default function CustomizedDialogs({
       setNetworkStatus(edgeGatewayData.eg_network === 1);
       setPcTemp(edgeGatewayData.eg_pc_temp.toString());
 
-      // IP:PORT 분리
       const ipPortParts = edgeGatewayData.eg_ip_port.split(':');
       if (ipPortParts.length === 2) {
         setPcIp(ipPortParts[0]);
@@ -158,7 +156,6 @@ export default function CustomizedDialogs({
         setPcPort('');
       }
     } else {
-      // 등록 모달의 경우 초기화
       handleReset();
     }
   }, [modalType, edgeGatewayData, open]);
