@@ -14,6 +14,8 @@ import Checkbox from '../../components/checkbox';
 import BasicDatePicker from '../../components/datepicker';
 
 import styled from '@mui/system/styled';
+import { useRecoilValue } from 'recoil';
+import { hasBasicsState } from '../../recoil/atoms';
 
 const Item = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
@@ -29,6 +31,10 @@ const Item = styled('div')(({ theme }) => ({
 }));
 
 export default function Sort() {
+  const hasBasics = useRecoilValue(hasBasicsState);
+
+  const handleEdit = () => {};
+
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
@@ -85,6 +91,7 @@ export default function Sort() {
 
         <Grid size={4} direction='row' style={{ justifyContent: 'flex-end' }}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+<<<<<<< HEAD
             <Button variant='contained' color='success'>
               조회
             </Button>
@@ -107,6 +114,34 @@ export default function Sort() {
             <Button variant='contained' color='error'>
               <RemoveIcon /> 장비삭제
             </Button>
+=======
+            {/* 기초코드 버튼 */}
+            {!hasBasics && (
+              <Button variant='contained' color='success'>
+                등록
+              </Button>
+            )}
+            {hasBasics && (
+              <Button variant='outlined' color='success' onClick={handleEdit}>
+                수정
+              </Button>
+            )}
+            {hasBasics && (
+              <Button variant='contained' color='error'>
+                삭제
+              </Button>
+            )}
+            {/* 기초코드 버튼 */}
+
+            {/* 기초코드 등록화면버튼 */}
+            {/* <Button variant='contained' color='success'>
+              센서추가
+            </Button>
+            <Button variant='contained' color='primary'>
+              저장
+            </Button> */}
+            {/* 기초코드 등록화면버튼 */}
+>>>>>>> 69bb4d0d1df8258bcebd5bc90ba4b8d7165f8f4d
           </Stack>
         </Grid>
       </Grid>

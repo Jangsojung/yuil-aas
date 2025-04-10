@@ -29,9 +29,9 @@ const theme = createTheme({
   },
 });
 
-export default function BasicDatePicker({ onDateChange, resetDates }) {
-  const [startDate, setStartDate] = React.useState(null);
-  const [endDate, setEndDate] = React.useState(null);
+export default function BasicDatePicker({ onDateChange, resetDates, isDefault }) {
+  const [startDate, setStartDate] = React.useState(isDefault ? dayjs() : null);
+  const [endDate, setEndDate] = React.useState(isDefault ? dayjs() : null);
 
   const handleStartDateChange = (newDate) => {
     setStartDate(newDate);
@@ -49,13 +49,14 @@ export default function BasicDatePicker({ onDateChange, resetDates }) {
 
   React.useEffect(() => {
     if (resetDates) {
-      setStartDate(null);
-      setEndDate(null);
+      setStartDate(isDefault ? dayjs() : null);
+      setEndDate(isDefault ? dayjs() : null);
     }
   }, [resetDates]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={ko}>
+<<<<<<< HEAD
       <ThemeProvider theme={theme}>
         <div components={['DatePicker']} className='datepicker-wrap d-flex gap-5'>
           {/* defaultValue={dayjs('')} */}
@@ -80,6 +81,26 @@ export default function BasicDatePicker({ onDateChange, resetDates }) {
           />
         </div>
       </ThemeProvider>
+=======
+      <div components={['DatePicker']} className='datepicker-wrap d-flex gap-5'>
+        <DatePicker
+          label='시작 날짜'
+          value={startDate}
+          format='YYYY-MM-DD'
+          onChange={handleStartDateChange}
+          maxDate={endDate}
+          slots={{ openPickerIcon: CalendarTodayIcon }}
+        />
+        <DatePicker
+          label='종료 날짜'
+          value={endDate}
+          format='YYYY-MM-DD'
+          onChange={handleEndDateChange}
+          minDate={startDate}
+          slots={{ openPickerIcon: CalendarTodayIcon }}
+        />
+      </div>
+>>>>>>> 69bb4d0d1df8258bcebd5bc90ba4b8d7165f8f4d
     </LocalizationProvider>
   );
 }
