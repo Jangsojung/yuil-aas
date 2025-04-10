@@ -34,11 +34,6 @@ export default function Sort() {
   const [openInsertModal, setOpenInsertModal] = React.useState(false);
 
   const handleDelete = async () => {
-    if (selectedEdgeGateways.length === 0) {
-      alert('삭제할 항목을 선택해주세요.');
-      return;
-    }
-
     if (!window.confirm(`선택한 ${selectedEdgeGateways.length}개 항목을 삭제하시겠습니까?`)) {
       return;
     }
@@ -69,12 +64,10 @@ export default function Sort() {
     }
   };
 
-  // 등록 모달 열기
   const handleOpenInsertModal = () => {
     setOpenInsertModal(true);
   };
 
-  // 모달 닫기 핸들러
   const handleCloseInsertModal = () => {
     setOpenInsertModal(false);
   };

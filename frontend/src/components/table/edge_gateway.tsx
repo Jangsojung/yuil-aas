@@ -74,7 +74,6 @@ export default function BasicTable() {
     });
   };
 
-  // 더블클릭 시 업데이트 모달 열기
   const handleDoubleClick = (edgeGateway: EdgeGateway) => {
     setSelectedEdgeGateway(edgeGateway);
     setOpenUpdateModal(true);
