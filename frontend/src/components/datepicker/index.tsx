@@ -56,7 +56,6 @@ export default function BasicDatePicker({ onDateChange, resetDates, isDefault })
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={ko}>
-<<<<<<< HEAD
       <ThemeProvider theme={theme}>
         <div components={['DatePicker']} className='datepicker-wrap d-flex gap-5'>
           {/* defaultValue={dayjs('')} */}
@@ -81,26 +80,6 @@ export default function BasicDatePicker({ onDateChange, resetDates, isDefault })
           />
         </div>
       </ThemeProvider>
-=======
-      <div components={['DatePicker']} className='datepicker-wrap d-flex gap-5'>
-        <DatePicker
-          label='시작 날짜'
-          value={startDate}
-          format='YYYY-MM-DD'
-          onChange={handleStartDateChange}
-          maxDate={endDate}
-          slots={{ openPickerIcon: CalendarTodayIcon }}
-        />
-        <DatePicker
-          label='종료 날짜'
-          value={endDate}
-          format='YYYY-MM-DD'
-          onChange={handleEndDateChange}
-          minDate={startDate}
-          slots={{ openPickerIcon: CalendarTodayIcon }}
-        />
-      </div>
->>>>>>> 69bb4d0d1df8258bcebd5bc90ba4b8d7165f8f4d
     </LocalizationProvider>
   );
 }

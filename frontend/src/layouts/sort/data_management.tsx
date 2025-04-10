@@ -63,13 +63,8 @@ export default function Sort() {
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
         <Grid size={8}>
-<<<<<<< HEAD
-          <Grid container spacing={1} style={{gap: '20px'}}>
-            <Grid>
-=======
-          <Grid container spacing={1}>
-            {/* <Grid size={4}>
->>>>>>> 69bb4d0d1df8258bcebd5bc90ba4b8d7165f8f4d
+          <Grid container spacing={1} style={{ gap: '20px' }}>
+            {/* <Grid>
               <Grid container spacing={1}>
                 <Grid>
                   <div className="sort-title">설비 그룹</div>
@@ -83,15 +78,10 @@ export default function Sort() {
             <Grid>
               <Grid container spacing={1}>
                 <Grid className='d-flex gap-5'>
-                  <div className="sort-title">날짜</div>
+                  <div className='sort-title'>날짜</div>
                 </Grid>
-<<<<<<< HEAD
                 <Grid>
-                  <BasicDatePicker />
-=======
-                <Grid size={8}>
                   <BasicDatePicker isDefault={true} />
->>>>>>> 69bb4d0d1df8258bcebd5bc90ba4b8d7165f8f4d
                 </Grid>
               </Grid>
             </Grid>

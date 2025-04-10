@@ -1,7 +1,6 @@
 import React from 'react';
 import Grid from '@mui/system/Grid';
 import Table from '../../../../components/table/basic_code';
-<<<<<<< HEAD
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -13,8 +12,8 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import RemoveIcon from '@mui/icons-material/Remove';
 
-import { useRecoilValue } from 'recoil';
-import { currentFacilityGroupState } from '../../../../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { currentFacilityGroupState, hasBasicsState } from '../../../../recoil/atoms';
 
 const style = {
   py: 0,
@@ -25,12 +24,6 @@ const style = {
   borderColor: 'divider',
   backgroundColor: 'background.paper',
 };
-
-=======
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { currentFacilityGroupState, hasBasicsState } from '../../../../recoil/atoms';
-import React from 'react';
->>>>>>> 69bb4d0d1df8258bcebd5bc90ba4b8d7165f8f4d
 
 interface Basic {
   fa_idx: number;
@@ -68,17 +61,18 @@ export default function BasicCode() {
     }
   };
   return (
-    <div className="sensor-list-wrap">
-      <div className="sensor-list">
+    <div className='sensor-list-wrap'>
+      <div className='sensor-list'>
         <div>
           <Grid container spacing={1} className='sensor-tit'>
-            <div className="d-flex align-flex-end gap-10">
-                온조기
-                <span>Sub Modal 1.1</span>
+            <div className='d-flex align-flex-end gap-10'>
+              온조기
+              <span>Sub Modal 1.1</span>
             </div>
             <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
               <Button variant='outlined' color='primary'>
-                <AddIcon />센서등록
+                <AddIcon />
+                센서등록
               </Button>
               <Button variant='outlined' color='warning'>
                 <EditIcon /> 센서수정
@@ -92,66 +86,66 @@ export default function BasicCode() {
             <Grid size={2}>
               <List sx={style}>
                 <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
+                  <ListItemText secondary='온조기 현재온도(PV)' />
                 </ListItem>
-                <Divider variant="middle" component="li" />
+                <Divider variant='middle' component='li' />
                 <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
-                </ListItem>
-              </List>
-            </Grid>
-            <Grid size={2}>
-              <List sx={style}>
-                <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
-                </ListItem>
-                <Divider variant="middle" component="li" />
-                <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
+                  <ListItemText secondary='Prop 1.1.1' />
                 </ListItem>
               </List>
             </Grid>
             <Grid size={2}>
               <List sx={style}>
                 <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
+                  <ListItemText secondary='온조기 현재온도(PV)' />
                 </ListItem>
-                <Divider variant="middle" component="li" />
+                <Divider variant='middle' component='li' />
                 <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
-                </ListItem>
-              </List>
-            </Grid>
-            <Grid size={2}>
-              <List sx={style}>
-                <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
-                </ListItem>
-                <Divider variant="middle" component="li" />
-                <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
+                  <ListItemText secondary='Prop 1.1.1' />
                 </ListItem>
               </List>
             </Grid>
             <Grid size={2}>
               <List sx={style}>
                 <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
+                  <ListItemText secondary='온조기 현재온도(PV)' />
                 </ListItem>
-                <Divider variant="middle" component="li" />
+                <Divider variant='middle' component='li' />
                 <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
+                  <ListItemText secondary='Prop 1.1.1' />
                 </ListItem>
               </List>
             </Grid>
             <Grid size={2}>
               <List sx={style}>
                 <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
+                  <ListItemText secondary='온조기 현재온도(PV)' />
                 </ListItem>
-                <Divider variant="middle" component="li" />
+                <Divider variant='middle' component='li' />
                 <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
+                  <ListItemText secondary='Prop 1.1.1' />
+                </ListItem>
+              </List>
+            </Grid>
+            <Grid size={2}>
+              <List sx={style}>
+                <ListItem>
+                  <ListItemText secondary='온조기 현재온도(PV)' />
+                </ListItem>
+                <Divider variant='middle' component='li' />
+                <ListItem>
+                  <ListItemText secondary='Prop 1.1.1' />
+                </ListItem>
+              </List>
+            </Grid>
+            <Grid size={2}>
+              <List sx={style}>
+                <ListItem>
+                  <ListItemText secondary='온조기 현재온도(PV)' />
+                </ListItem>
+                <Divider variant='middle' component='li' />
+                <ListItem>
+                  <ListItemText secondary='Prop 1.1.1' />
                 </ListItem>
               </List>
             </Grid>
@@ -160,66 +154,66 @@ export default function BasicCode() {
             <Grid size={2}>
               <List sx={style}>
                 <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
+                  <ListItemText secondary='온조기 현재온도(PV)' />
                 </ListItem>
-                <Divider variant="middle" component="li" />
+                <Divider variant='middle' component='li' />
                 <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
-                </ListItem>
-              </List>
-            </Grid>
-            <Grid size={2}>
-              <List sx={style}>
-                <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
-                </ListItem>
-                <Divider variant="middle" component="li" />
-                <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
+                  <ListItemText secondary='Prop 1.1.1' />
                 </ListItem>
               </List>
             </Grid>
             <Grid size={2}>
               <List sx={style}>
                 <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
+                  <ListItemText secondary='온조기 현재온도(PV)' />
                 </ListItem>
-                <Divider variant="middle" component="li" />
+                <Divider variant='middle' component='li' />
                 <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
-                </ListItem>
-              </List>
-            </Grid>
-            <Grid size={2}>
-              <List sx={style}>
-                <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
-                </ListItem>
-                <Divider variant="middle" component="li" />
-                <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
+                  <ListItemText secondary='Prop 1.1.1' />
                 </ListItem>
               </List>
             </Grid>
             <Grid size={2}>
               <List sx={style}>
                 <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
+                  <ListItemText secondary='온조기 현재온도(PV)' />
                 </ListItem>
-                <Divider variant="middle" component="li" />
+                <Divider variant='middle' component='li' />
                 <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
+                  <ListItemText secondary='Prop 1.1.1' />
                 </ListItem>
               </List>
             </Grid>
             <Grid size={2}>
               <List sx={style}>
                 <ListItem>
-                  <ListItemText secondary="온조기 현재온도(PV)" />
+                  <ListItemText secondary='온조기 현재온도(PV)' />
                 </ListItem>
-                <Divider variant="middle" component="li" />
+                <Divider variant='middle' component='li' />
                 <ListItem>
-                  <ListItemText secondary="Prop 1.1.1" />
+                  <ListItemText secondary='Prop 1.1.1' />
+                </ListItem>
+              </List>
+            </Grid>
+            <Grid size={2}>
+              <List sx={style}>
+                <ListItem>
+                  <ListItemText secondary='온조기 현재온도(PV)' />
+                </ListItem>
+                <Divider variant='middle' component='li' />
+                <ListItem>
+                  <ListItemText secondary='Prop 1.1.1' />
+                </ListItem>
+              </List>
+            </Grid>
+            <Grid size={2}>
+              <List sx={style}>
+                <ListItem>
+                  <ListItemText secondary='온조기 현재온도(PV)' />
+                </ListItem>
+                <Divider variant='middle' component='li' />
+                <ListItem>
+                  <ListItemText secondary='Prop 1.1.1' />
                 </ListItem>
               </List>
             </Grid>

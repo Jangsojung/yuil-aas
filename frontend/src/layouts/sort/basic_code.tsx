@@ -39,7 +39,7 @@ export default function Sort() {
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
         <Grid size={8}>
-          <Grid container spacing={1} style={{gap: '20px'}}>
+          <Grid container spacing={1} style={{ gap: '20px' }}>
             {/* <Grid size={4}>
               <Grid container spacing={1}>
                 <Grid size={3}>
@@ -53,7 +53,7 @@ export default function Sort() {
             <Grid>
               <Grid container spacing={1}>
                 <Grid>
-                  <div className="sort-title">설비 그룹</div>
+                  <div className='sort-title'>설비 그룹</div>
                 </Grid>
                 <Grid>
                   <SelectFacilityGroup />
@@ -79,9 +79,9 @@ export default function Sort() {
               <Grid container spacing={1}>
                 <Grid>
                   {/* <Checkbox /> */}
-                  <div className="sort-title">날짜</div>
+                  <div className='sort-title'>날짜</div>
                 </Grid>
-                <Grid  className='d-flex gap-5'>
+                <Grid className='d-flex gap-5'>
                   <BasicDatePicker />
                 </Grid>
               </Grid>
@@ -91,7 +91,6 @@ export default function Sort() {
 
         <Grid size={4} direction='row' style={{ justifyContent: 'flex-end' }}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-<<<<<<< HEAD
             <Button variant='contained' color='success'>
               조회
             </Button>
@@ -99,39 +98,27 @@ export default function Sort() {
               초기화
             </Button>
           </Stack>
-          
         </Grid>
       </Grid>
       <Grid container spacing={1}>
-      <Grid size={12}>
+        <Grid size={12}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <Button variant='contained' color='primary'>
-              <AddIcon />장비등록
-            </Button>
-            <Button variant='contained' color='warning'>
-              <EditIcon /> 장비수정
-            </Button>
-            <Button variant='contained' color='error'>
-              <RemoveIcon /> 장비삭제
-            </Button>
-=======
-            {/* 기초코드 버튼 */}
             {!hasBasics && (
-              <Button variant='contained' color='success'>
-                등록
+              <Button variant='contained' color='primary'>
+                <AddIcon />
+                장비등록
               </Button>
             )}
             {hasBasics && (
-              <Button variant='outlined' color='success' onClick={handleEdit}>
-                수정
+              <Button variant='contained' color='warning'>
+                <EditIcon /> 장비수정
               </Button>
             )}
             {hasBasics && (
               <Button variant='contained' color='error'>
-                삭제
+                <RemoveIcon /> 장비삭제
               </Button>
             )}
-            {/* 기초코드 버튼 */}
 
             {/* 기초코드 등록화면버튼 */}
             {/* <Button variant='contained' color='success'>
@@ -141,7 +128,6 @@ export default function Sort() {
               저장
             </Button> */}
             {/* 기초코드 등록화면버튼 */}
->>>>>>> 69bb4d0d1df8258bcebd5bc90ba4b8d7165f8f4d
           </Stack>
         </Grid>
       </Grid>
