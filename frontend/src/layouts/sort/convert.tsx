@@ -38,11 +38,12 @@ export default function Sort({ startLoading, endLoading }) {
   };
 
   const handleAdd = async () => {
-    startLoading();
     if (!startDate || !endDate) {
       console.log('시작 날짜와 종료 날짜를 모두 선택해야 합니다.');
       return;
     }
+
+    startLoading();
 
     const formattedStartDate = startDate.format('YYMMDD');
     const formattedEndDate = endDate.format('YYMMDD');
