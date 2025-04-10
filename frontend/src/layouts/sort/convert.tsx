@@ -78,10 +78,10 @@ export default function Sort() {
           <Grid container spacing={1}>
             <Grid size={10}>
               <Grid container spacing={1}>
-                <Grid size={1} className='d-flex gap-5'>
-                  <div>날짜</div>
+                <Grid className='d-flex gap-5'>
+                  <div className="sort-title">날짜</div>
                 </Grid>
-                <Grid size={8}>
+                <Grid>
                   <BasicDatePicker onDateChange={handleDateChange} resetDates={resetTrigger} />
                 </Grid>
               </Grid>

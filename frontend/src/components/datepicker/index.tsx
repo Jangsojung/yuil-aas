@@ -21,7 +21,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: '#546e7a',
-          width: '150px',
+          width: '160px',
           letterSpacing: '0.01em',
         },
       },
@@ -56,25 +56,30 @@ export default function BasicDatePicker({ onDateChange, resetDates }) {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={ko}>
-      <div components={['DatePicker']} className='datepicker-wrap d-flex gap-5'>
-        {/* defaultValue={dayjs('')} */}
-        <DatePicker
-          label='시작 날짜'
-          value={startDate}
-          format='YYYY-MM-DD'
-          onChange={handleStartDateChange}
-          maxDate={endDate}
-          slots={{ openPickerIcon: CalendarTodayIcon }}
-        />
-        <DatePicker
-          label='종료 날짜'
-          value={endDate}
-          format='YYYY-MM-DD'
-          onChange={handleEndDateChange}
-          minDate={startDate}
-          slots={{ openPickerIcon: CalendarTodayIcon }}
-        />
-      </div>
+      <ThemeProvider theme={theme}>
+        <div components={['DatePicker']} className='datepicker-wrap d-flex gap-5'>
+          {/* defaultValue={dayjs('')} */}
+          <DatePicker
+            label='시작 날짜'
+            value={startDate}
+            format='YYYY-MM-DD'
+            onChange={handleStartDateChange}
+            maxDate={endDate}
+            slots={{ openPickerIcon: CalendarTodayIcon }}
+          />
+          <span>
+            <RemoveIcon />
+          </span>
+          <DatePicker
+            label='종료 날짜'
+            value={endDate}
+            format='YYYY-MM-DD'
+            onChange={handleEndDateChange}
+            minDate={startDate}
+            slots={{ openPickerIcon: CalendarTodayIcon }}
+          />
+        </div>
+      </ThemeProvider>
     </LocalizationProvider>
   );
 }

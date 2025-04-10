@@ -30,10 +30,10 @@ export default function Sort() {
           <Grid container spacing={1}>
             <Grid size={12}>
               <Grid container spacing={1}>
-                <Grid size={1}>
-                  <div>AASX 파일</div>
+                <Grid>
+                  <div className="sort-title">AASX 파일</div>
                 </Grid>
-                <Grid size={11} className="w-100">
+                <Grid>
                   <SelectFactory />
                 </Grid>
               </Grid>

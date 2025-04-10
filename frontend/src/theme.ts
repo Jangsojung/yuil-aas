@@ -14,8 +14,9 @@ const theme = createTheme({
     secondary: {
       main: '#19857b',
     },
+     
     error: {
-      main: '#C03221',
+      main: '#FF5630',
     },
   },
   breakpoints: {

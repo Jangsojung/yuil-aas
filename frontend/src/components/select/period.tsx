@@ -3,6 +3,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default function SelectSmall() {
   const [currentPeriod, setCurrentPeriod] = React.useState<String>('');
@@ -20,6 +21,7 @@ export default function SelectSmall() {
         value={currentPeriod}
         label='Period'
         onChange={handleChange}
+        IconComponent = {ExpandMoreIcon}
       >
         {periods && periods.map((period, idx) => <MenuItem value={idx}>{period}</MenuItem>)}
       </Select>

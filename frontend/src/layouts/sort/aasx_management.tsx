@@ -15,33 +15,33 @@ export default function Sort() {
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
         <Grid size={8}>
-          <Grid container spacing={1}>
-            <Grid size={4}>
+          <Grid container spacing={1}  style={{gap: '20px'}}>
+            <Grid>
               <Grid container spacing={1}>
-                <Grid size={3}>
-                  <div>공장</div>
+                <Grid>
+                  <div className="sort-title">공장</div>
                 </Grid>
-                <Grid size={8}>
+                <Grid>
                   <SelectFactory />
                 </Grid>
               </Grid>
             </Grid>
-            <Grid size={4}>
+            <Grid>
               <Grid container spacing={1}>
-                <Grid size={3}>
-                  <div>설비 그룹</div>
+                <Grid>
+                  <div className="sort-title">설비 그룹</div>
                 </Grid>
-                <Grid size={8}>
+                <Grid>
                   <SelectFacilityGroup />
                 </Grid>
               </Grid>
             </Grid>
-            <Grid size={4}>
+            <Grid>
               <Grid container spacing={1}>
-                <Grid size={3}>
-                  <div>주기</div>
+                <Grid>
+                  <div className="sort-title">주기</div>
                 </Grid>
-                <Grid size={8} className='d-flex align-center'>
+                <Grid className='d-flex align-center'>
                   <TextField />
                   <SelectPeriod />
                 </Grid>

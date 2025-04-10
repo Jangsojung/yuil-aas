@@ -32,7 +32,7 @@ export default function Sort() {
             <Grid size={6}>
               <Grid container spacing={1}>
                 <Grid size={4}>
-                  <div>공장이름</div>
+                  <div className="sort-title">공장이름</div>
                 </Grid>
                 <Grid size={8}>
                   <SelectFactory />

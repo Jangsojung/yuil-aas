@@ -27,24 +27,24 @@ export default function Sort() {
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
         <Grid size={8}>
-          <Grid container spacing={1}>
-            <Grid size={4}>
+          <Grid container spacing={1} style={{gap: '20px'}}>
+            <Grid>
               <Grid container spacing={1}>
-                <Grid size={4}>
-                  <div>설비 그룹</div>
+                <Grid>
+                  <div className="sort-title">설비 그룹</div>
                 </Grid>
-                <Grid size={8}>
+                <Grid>
                   <SelectFacilityGroup />
                 </Grid>
               </Grid>
             </Grid>
 
-            <Grid size={4}>
+            <Grid>
               <Grid container spacing={1}>
-                <Grid size={4} className='d-flex gap-5'>
-                  <div>날짜</div>
+                <Grid className='d-flex gap-5'>
+                  <div className="sort-title">날짜</div>
                 </Grid>
-                <Grid size={8}>
+                <Grid>
                   <BasicDatePicker />
                 </Grid>
               </Grid>

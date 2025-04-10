@@ -2,6 +2,7 @@ import * as React from 'react';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Select from '@mui/material/Select';
 import { useRecoilState } from 'recoil';
 import { currentFactoryState } from '../../recoil/atoms';
@@ -44,7 +45,13 @@ export default function SelectSmall() {
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }} size='small'>
       <InputLabel id='demo-select-small-label'>Factory</InputLabel>
-      <Select labelId='demo-select-small-label' id='demo-select-small' value={currentFactory} onChange={handleChange}>
+      <Select 
+        labelId='demo-select-small-label' 
+        id='demo-select-small' 
+        value={currentFactory} 
+        onChange={handleChange}
+        IconComponent = {ExpandMoreIcon}
+      >
         {factories && factories.map((factory) => <MenuItem value={factory.fc_idx}>{factory.fc_name}</MenuItem>)}
       </Select>
     </FormControl>

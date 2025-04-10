@@ -32,12 +32,13 @@ main {
       padding: 10px;
       background-color: #ececec;
 
-      .MuiGrid-root.MuiGrid-container {
-        align-items: center;
+      .sort-title {
+        color: #37474f;
+        font-weight: bold;
       }
 
-      .MuiFormControl-root {
-        // min-width: 200px;
+      .MuiGrid-root.MuiGrid-container {
+        align-items: center;
       }
 
       .w-100 .MuiFormControl-root{
@@ -46,19 +47,29 @@ main {
 
     }
     .MuiFormControl-root {
-      
       .MuiInputBase-root.MuiOutlinedInput-root {
         border-radius: 0;
-        
+      }
+
+      //셀렉트
+      .MuiSelect-select {
+        padding: 6px 14px;
       }
     }
 
     //버튼
     .MuiButtonBase-root.MuiButton-root {
-      padding: 5px 5px;
+      padding: 4px 5px;
       min-width: 55px;
+      font-size: 0.875rem;
       line-height: 1.4;
       font-weight: bold;
+      box-shadow: none;
+      
+      svg {
+        font-size: 1rem;
+        margin-right: 3px;
+      }
     }
 
     .MuiButton-containedSuccess {
@@ -66,18 +77,32 @@ main {
     }    
 
     //센서리스트
+    .sensor-list-wrap {
+      border-top: 2px solid #787878;
+    }
     .sensor-list > div {
-      border: 1px solid #ccc;
-      margin: 10px;
+      border-bottom: 2px solid #ccc;
     }
     .sensor-list .MuiGrid-container {
-      padding: 15px;
+      padding: 15px 15px;
+    }
+    .sensor-list .MuiGrid-container.sensor-tit {
+      padding: 8px 15px;
     }
     .sensor-tit {
       border-bottom: 1px solid #ccc;
-      margin-bottom: 10px;
-      
+      background-color: #efefef;
+      color: #607d8b;
+      font-weight: 500;
+      justify-content: space-between;
     }
+    .sensor-tit span {
+      font-weight: normal;
+    }
+    .sensor-list .MuiListItemText-secondary {
+      color: var(--mui-palette-text-primary);
+    }
+    
     
 
     //체크박스
@@ -106,8 +131,10 @@ main {
       border-top: 2px solid #787878;
       th {
         text-align: center;
-        padding: 0px;
+        padding: 3px 0px;
         background-color: #efefef;
+        color: #607d8b;
+        font-weight: bold;
       }
       td {
         text-align: center;
@@ -122,22 +149,30 @@ main {
 
     //데이트피커
     .datepicker-wrap {
+
+      .MuiInputLabel-formControl {
+        transform: translate(14px, 7px) scale(1);
+        color: #90a4ae;
+        font-size: 1rem;
+      }
+      .MuiInputLabel-formControl.MuiInputLabel-shrink {
+        transform: translate(14px, -9px) scale(0.75);
+      }
       span {
         display: flex;
         align-items: center;
-
         svg {
           font-size: 0.75rem;
         }
       }
-    }
-    .MuiFormControl-root.MuiTextField-root {
-      label {
-        // line-height: 1;
+      svg {
+        font-size: 1rem;
       }
       
+    }
+    .MuiFormControl-root.MuiTextField-root {
       .MuiInputBase-input {
-        padding: 9px;
+        padding: 6px 9px;
         
       }
     }
