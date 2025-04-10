@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 
 import SelectFacilityGroup from '../../components/select/facility_group';
 import BasicDatePicker from '../../components/datepicker';
+import ModalBasic from '../../components/modal';
 
 import styled from '@mui/system/styled';
 
@@ -54,9 +55,10 @@ export default function Sort() {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <Button variant='contained' color='success'>
+            {/* <Button variant='contained' color='success'>
               등록
-            </Button>
+            </Button> */}
+            <ModalBasic />
             {/* <Button variant='outlined' color='success'>
               수정
             </Button> */}

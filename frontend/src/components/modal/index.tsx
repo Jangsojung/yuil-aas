@@ -11,27 +11,27 @@ import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import { grey } from '@mui/material/colors';
 
-import { FileUpload, FileUploadProps } from '../../components/fileupload'
-
+import { FileUpload, FileUploadProps } from '../../components/fileupload';
+import { useRecoilValue } from 'recoil';
+import { currentFactoryState } from '../../recoil/atoms';
+import { CircularProgress } from '@mui/material';
 
 const DeleteIcon = styled(ClearIcon)<IconProps>(() => ({
-  fontSize:'1rem',
+  fontSize: '1rem',
   color: '#637381',
   verticalAlign: 'top',
   cursor: 'pointer',
 }));
 
 const GreyButton = styled(Button)<ButtonProps>(() => ({
-    color: '#637381',
-    fontWeight: 'bold',
-    backgroundColor: '#ffffff',
-    borderColor: grey[300],
-    '&:hover': {
-      backgroundColor: grey[300],
-    },
-    
+  color: '#637381',
+  fontWeight: 'bold',
+  backgroundColor: '#ffffff',
+  borderColor: grey[300],
+  '&:hover': {
+    backgroundColor: grey[300],
+  },
 }));
-
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '.MuiDialog-paper': {
@@ -54,47 +54,103 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const fileUploadProp: FileUploadProps = {
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (
-          event.target.files !== null &&
-          event.target?.files?.length > 0
-      ) {
-          console.log(`Saving ${event.target.value}`)
-      }
-  },
-  onDrop: (event: React.DragEvent<HTMLElement>) => {
-      console.log(`Drop ${event.dataTransfer.files[0].name}`)
-  },
-}
-
-
 export default function CustomizedDialogs() {
   const [open, setOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const currentFactory = useRecoilValue(currentFactoryState);
 
   const handleClickOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
+    setSelectedFile(null);
+  };
+
+  const fileUploadProp: FileUploadProps = {
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files !== null && event.target?.files?.length > 0) {
+        const file = event.target.files[0];
+        setSelectedFile(file);
+      }
+    },
+    onDrop: (event: React.DragEvent<HTMLElement>) => {
+      const file = event.dataTransfer.files[0];
+      setSelectedFile(file);
+    },
+  };
+
+  const handleAdd = async () => {
+    if (!selectedFile) {
+      alert('파일을 선택해주세요.');
+      return;
+    }
+
+    if (!selectedFile.name.toLowerCase().endsWith('.json')) {
+      alert('JSON 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const response = await fetch(`http://localhost:5001/api/file?fc_idx=${currentFactory}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('파일 업로드 실패');
+      }
+
+      const result = await response.json();
+      console.log('업로드 결과:', result);
+
+      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /src/files/python');
+      handleClose();
+    } catch (err) {
+      console.error(err.message);
+      alert('업로드 중 오류 발생: ' + err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <React.Fragment>
-        <Button variant='contained' color='success' onClick={handleClickOpen}>
-            등록
-        </Button>
-      
-      <BootstrapDialog
-        onClose={handleClose}
-        aria-labelledby="customized-dialog-title"
-        open={open}
-      >
-        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+      <Button variant='contained' color='success' onClick={handleClickOpen}>
+        등록
+      </Button>
+      {isLoading && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+            pointerEvents: 'none',
+          }}
+        >
+          <CircularProgress />
+        </div>
+      )}
+
+      <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
+        <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
           제1공장 AASX 등록
         </DialogTitle>
         <IconButton
-          aria-label="close"
+          aria-label='close'
           onClick={handleClose}
           sx={(theme) => ({
             position: 'absolute',
@@ -105,21 +161,23 @@ export default function CustomizedDialogs() {
         >
           <CloseIcon />
         </IconButton>
-        <DialogContent dividers className="file-upload">
+        <DialogContent dividers className='file-upload'>
           <Box sx={{ typography: 'subtitle2' }}>json 파일</Box>
           <FileUpload {...fileUploadProp} />
-          <div className="file-list">
-            <Box sx={{ typography: 'body2' }}>업로드 파일 목록 <DeleteIcon /></Box>
-          </div>
+          {/* <div className='file-list'>
+            <Box sx={{ typography: 'body2' }}>
+              업로드 파일 목록 <DeleteIcon />
+            </Box>
+          </div> */}
         </DialogContent>
         <DialogActions>
-          <Button variant='contained' color='primary'>
+          {/* <Button variant='outlined' color='primary'>
             변환
-          </Button>
-          <Button autoFocus onClick={handleClose} variant="outlined" color='primary'>
+          </Button> */}
+          <Button autoFocus onClick={handleAdd} variant='contained' color='primary'>
             등록
           </Button>
-          <GreyButton variant="outlined" color='grey'>
+          <GreyButton variant='outlined' color='grey' onClick={handleClose}>
             취소
           </GreyButton>
         </DialogActions>
