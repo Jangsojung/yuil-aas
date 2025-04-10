@@ -8,7 +8,6 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
-// import Checkbox from '../../components/checkbox';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentFactoryState, selectedConvertsState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';

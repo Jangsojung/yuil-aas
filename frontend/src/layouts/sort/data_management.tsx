@@ -9,6 +9,8 @@ import BasicDatePicker from '../../components/datepicker';
 import ModalBasic from '../../components/modal';
 
 import styled from '@mui/system/styled';
+import { selectedDataFilesState } from '../../recoil/atoms';
+import { useRecoilState } from 'recoil';
 
 const Item = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
@@ -24,6 +26,39 @@ const Item = styled('div')(({ theme }) => ({
 }));
 
 export default function Sort() {
+  const [selectedFiles, setSelectedFiles] = useRecoilState(selectedDataFilesState);
+
+  const handleDelete = async () => {
+    if (!window.confirm(`선택한 ${selectedFiles.length}개 항목을 삭제하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/file`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ids: selectedFiles,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete items');
+      }
+
+      setSelectedFiles([]);
+
+      // setRefreshTrigger((prev) => prev + 1);
+
+      alert('선택한 항목이 삭제되었습니다.');
+    } catch (err: any) {
+      console.error('삭제 중 오류가 발생했습니다:', err.message);
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
@@ -62,7 +97,7 @@ export default function Sort() {
             {/* <Button variant='outlined' color='success'>
               수정
             </Button> */}
-            <Button variant='contained' color='error'>
+            <Button variant='contained' color='error' onClick={handleDelete} disabled={selectedFiles.length === 0}>
               삭제
             </Button>
           </Stack>

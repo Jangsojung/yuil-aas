@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { insertFile } from '../../controller/file/FileController.js';
+import { insertFile, deleteFiles } from '../../controller/file/FileController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,7 +13,6 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// multer 스토리지 설정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadsDir);
@@ -23,7 +22,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// multer 업로드 설정
 const upload = multer({ storage: storage });
 
 const router = express.Router();
@@ -33,6 +31,12 @@ export default () => {
     const { fc_idx } = req.query;
 
     insertFile(fc_idx, req.file, res);
+  });
+
+  router.delete('/', (req, res) => {
+    const { ids } = req.body;
+
+    deleteFiles(ids, res);
   });
 
   return router;

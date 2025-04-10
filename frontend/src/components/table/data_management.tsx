@@ -8,8 +8,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
-import { useRecoilValue } from 'recoil';
-import { currentFactoryState } from '../../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { currentFactoryState, selectedDataFilesState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 
 interface File {
@@ -21,7 +21,7 @@ interface File {
 export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [files, setFiles] = React.useState<File[]>([]);
-  const [selectedFiles, setSelectedFiles] = React.useState<number[]>([]);
+  const [selectedFiles, setSelectedFiles] = useRecoilState(selectedDataFilesState);
   const [selectAll, setSelectAll] = React.useState(false);
 
   React.useEffect(() => {
@@ -29,6 +29,16 @@ export default function BasicTable() {
       getFiles(currentFactory);
     }
   }, [currentFactory]);
+
+  React.useEffect(() => {
+    if (selectedFiles.length === 0) {
+      setSelectAll(false);
+    } else if (selectedFiles.length === files.length) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedFiles, files]);
 
   const getFiles = async (fc_idx: number) => {
     try {
@@ -84,7 +94,10 @@ export default function BasicTable() {
           <TableBody>
             {files &&
               files.map((file) => (
-                <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableRow
+                  key={file.af_idx}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                >
                   <TableCell>
                     <Checkbox
                       checked={selectedFiles.includes(file.af_idx)}

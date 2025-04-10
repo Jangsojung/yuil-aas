@@ -26,3 +26,15 @@ export const insertFileToDB = async (fc_idx, file) => {
     throw err;
   }
 };
+
+export const deleteFilesFromDB = async (ids) => {
+  try {
+    const query = `delete from tb_aasx_file where af_idx in (?)`;
+    await pool.promise().query(query, [ids]);
+
+    console.log('Python JSON Files deleted successfully');
+  } catch (err) {
+    console.log('Failed to delete Python JSON Files: ', err);
+    throw err;
+  }
+};
