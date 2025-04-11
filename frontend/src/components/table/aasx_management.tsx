@@ -10,8 +10,9 @@ import Checkbox from '@mui/material/Checkbox';
 
 // import Checkbox from '../../components/checkbox';
 import { useRecoilValue } from 'recoil';
-import { currentFactoryState } from '../../recoil/atoms';
+import { currentFactoryState, dataTableRefreshTriggerState, dateRangeAASXState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface File {
   af_idx: number;
@@ -23,25 +24,45 @@ export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [files, setFiles] = React.useState<File[]>([]);
   const [selectedFiles, setSelectedFiles] = React.useState<number[]>([]);
+  const refreshTrigger = useRecoilValue(dataTableRefreshTriggerState);
   const [selectAll, setSelectAll] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const dateRange = useRecoilValue(dateRangeAASXState);
 
   React.useEffect(() => {
     if (currentFactory !== null) {
-      getFiles(currentFactory);
+      getFiles();
     }
-  }, [currentFactory]);
+  }, [refreshTrigger, currentFactory]);
 
-  const getFiles = async (fc_idx: number) => {
+  React.useEffect(() => {
+    if (selectedFiles.length === 0) {
+      setSelectAll(false);
+    } else if (selectedFiles.length === files.length) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedFiles, files]);
+
+  const getFiles = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/kamp_monitoring/AASXfiles?af_kind=3&fc_idx=${fc_idx}`, {
-        method: 'GET',
-      });
+      const startDateStr = dateRange.startDate ? dayjs(dateRange.startDate).format('YYYY-MM-DD') : '';
+      const endDateStr = dateRange.endDate ? dayjs(dateRange.endDate).format('YYYY-MM-DD') : '';
+
+      const response = await fetch(
+        `http://localhost:5001/api/kamp_monitoring/AASXfiles?af_kind=3&fc_idx=3&startDate=${startDateStr}&endDate=${endDateStr}`,
+        {
+          method: 'GET',
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch detections');
       }
 
       const data: File[] = await response.json();
+
       setFiles(data);
     } catch (err: any) {
       console.log(err.message);
@@ -83,7 +104,7 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {files &&
+            {files.length > 0 ? (
               files.map((file) => (
                 <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>
@@ -96,7 +117,14 @@ export default function BasicTable() {
                   <TableCell>{file.af_name}</TableCell>
                   <TableCell>{new Date(file.createdAt).toLocaleDateString()}</TableCell>
                 </TableRow>
-              ))}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={cells.length + 1} align='center'>
+                  데이터가 없습니다.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>

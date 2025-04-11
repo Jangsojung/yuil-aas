@@ -6,10 +6,13 @@ import { RecoilRoot } from 'recoil';
 import App from './App';
 import theme from './theme';
 import './assets/scss/style.scss';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 
 const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement!);
 
+dayjs.locale('ko');
 root.render(
   <RecoilRoot>
     <ThemeProvider theme={theme}>

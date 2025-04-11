@@ -7,6 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
+import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import { grey } from '@mui/material/colors';
@@ -79,6 +80,7 @@ export default function CustomizedDialogs() {
       const file = event.dataTransfer.files[0];
       setSelectedFile(file);
     },
+    selectedFileName: selectedFile?.name || '',
   };
 
   const handleAdd = async () => {
@@ -122,8 +124,9 @@ export default function CustomizedDialogs() {
 
   return (
     <React.Fragment>
-      <Button variant='contained' color='success' onClick={handleClickOpen}>
-        등록
+      <Button variant='contained' color='primary' onClick={handleClickOpen}>
+        <AddIcon />
+        파일등록
       </Button>
       {isLoading && (
         <div

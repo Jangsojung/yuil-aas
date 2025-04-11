@@ -1,5 +1,6 @@
 import * as React from 'react';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/ko';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -29,36 +30,29 @@ const theme = createTheme({
   },
 });
 
-export default function BasicDatePicker({ onDateChange, resetDates, isDefault }) {
-  const [startDate, setStartDate] = React.useState(isDefault ? dayjs() : null);
-  const [endDate, setEndDate] = React.useState(isDefault ? dayjs() : null);
+interface Props {
+  onDateChange?: (start: Dayjs | null, end: Dayjs | null) => void;
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
+}
 
-  const handleStartDateChange = (newDate) => {
-    setStartDate(newDate);
+export default function BasicDatePicker({ onDateChange, startDate, endDate }: Props) {
+  const handleStartDateChange = (newDate: Dayjs | null) => {
     if (onDateChange) {
       onDateChange(newDate, endDate);
     }
   };
 
-  const handleEndDateChange = (newDate) => {
-    setEndDate(newDate);
+  const handleEndDateChange = (newDate: Dayjs | null) => {
     if (onDateChange) {
       onDateChange(startDate, newDate);
     }
   };
 
-  React.useEffect(() => {
-    if (resetDates) {
-      setStartDate(isDefault ? dayjs() : null);
-      setEndDate(isDefault ? dayjs() : null);
-    }
-  }, [resetDates]);
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={ko}>
       <ThemeProvider theme={theme}>
-        <div components={['DatePicker']} className='datepicker-wrap d-flex gap-5'>
-          {/* defaultValue={dayjs('')} */}
+        <div className='datepicker-wrap d-flex gap-5'>
           <DatePicker
             label='시작 날짜'
             value={startDate}

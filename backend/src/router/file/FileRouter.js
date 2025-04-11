@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { insertFile, deleteFiles } from '../../controller/file/FileController.js';
+import { insertFile, updateFile, deleteFiles, getAASXFiles } from '../../controller/file/FileController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,15 +28,22 @@ const router = express.Router();
 
 export default () => {
   router.post('/', upload.single('file'), (req, res) => {
-    const { fc_idx } = req.query;
-
-    insertFile(fc_idx, req.file, res);
+    const { fc_idx, af_idx } = req.query;
+    if (af_idx) {
+      updateFile(af_idx, req.file, res);
+    } else {
+      insertFile(fc_idx, req.file, res);
+    }
   });
 
   router.delete('/', (req, res) => {
     const { ids } = req.body;
 
     deleteFiles(ids, res);
+  });
+
+  router.get('/aasxFiles', (req, res) => {
+    getAASXFiles(res);
   });
 
   return router;

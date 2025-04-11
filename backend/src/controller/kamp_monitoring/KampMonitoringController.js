@@ -11,9 +11,9 @@ export const getFiles = async (fc_idx, res) => {
   }
 };
 
-export const getAASXFiles = async (af_kind, fc_idx, res) => {
+export const getAASXFiles = async (af_kind, fc_idx, startDate, endDate, res) => {
   try {
-    const result = await getAASXFilesFromDB(af_kind, fc_idx);
+    const result = await getAASXFilesFromDB(af_kind, fc_idx, startDate, endDate);
 
     res.status(200).json(result);
   } catch (err) {
