@@ -75,7 +75,7 @@ export default function BasicTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagenation count={files.length} />
+      <Pagenation count={files ? files.length : 0} />
     </>
   );
 }

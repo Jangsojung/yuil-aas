@@ -163,7 +163,7 @@ export default function BasicTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      {files && <Pagenation count={files.length} />}
+      <Pagenation count={files ? files.length : 0} />
 
       <CustomizedDialogs open={openUpdateModal} handleClose={handleCloseUpdateModal} fileData={selectedFile} />
     </>

@@ -132,7 +132,7 @@ export default function BasicTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagenation count={edgeGateways.length} />
+      <Pagenation count={edgeGateways ? edgeGateways.length : 0} />
 
       {/* 수정 모달 */}
       <CustomizedDialogs

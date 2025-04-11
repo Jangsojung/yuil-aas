@@ -107,7 +107,7 @@ export default function BasicTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagenation count={groups.length} />
+      <Pagenation count={groups ? groups.length : 0} />
     </>
   );
 }

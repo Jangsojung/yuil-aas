@@ -20,6 +20,7 @@ interface File {
   createdAt: Date;
 }
 
+const cells = ['파일 IDX', '파일 이름', '생성 날짜'];
 export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [files, setFiles] = React.useState<File[]>([]);
@@ -63,6 +64,8 @@ export default function BasicTable() {
 
       const data: File[] = await response.json();
 
+      console.log(data);
+
       setFiles(data);
     } catch (err: any) {
       console.log(err.message);
@@ -104,7 +107,7 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {files.length > 0 ? (
+            {files ? (
               files.map((file) => (
                 <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>
@@ -128,9 +131,7 @@ export default function BasicTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagenation count={files.length} />
+      <Pagenation count={files ? files.length : 0} />
     </>
   );
 }
-
-const cells = ['파일 IDX', '파일 이름', '생성 날짜'];
