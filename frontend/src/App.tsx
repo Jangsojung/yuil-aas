@@ -85,69 +85,72 @@ function App() {
 export default function ReactRouter() {
   const router = React.useMemo(
     () =>
-      createMemoryRouter([
-        {
-          Component: App,
-          children: [
-            {
-              path: '/',
-              Component: Layout,
-              children: [
-                {
-                  path: '/aas/dashboard',
-                  Component: DashboardPage,
-                },
-                {
-                  path: '/aas/convert',
-                  Component: ConvertPage,
-                },
-                {
-                  path: '/aas/transmit',
-                  Component: TransmitPage,
-                },
-                {
-                  path: '/aas/monitoring',
-                  Component: MonitoringPage,
-                },
-              ],
-            },
-            {
-              path: '/',
-              Component: Layout,
-              children: [
-                {
-                  path: '/aasx/aasxManager',
-                  Component: aasxManagerPage,
-                },
-                {
-                  path: '/aasx/dataManager',
-                  Component: dataManagerPage,
-                },
-              ],
-            },
-            {
-              path: '/',
-              Component: Layout,
-              children: [
-                {
-                  path: '/edge/edge',
-                  Component: edgePage,
-                },
-              ],
-            },
-            {
-              path: '/',
-              Component: authLayout,
-              children: [
-                {
-                  path: '/signIn/sign',
-                  Component: SignInPage,
-                },
-              ],
-            },
-          ],
-        },
-      ]),
+      createMemoryRouter(
+        [
+          {
+            Component: App,
+            children: [
+              {
+                path: '/',
+                Component: authLayout,
+                children: [
+                  {
+                    path: '/signIn/sign',
+                    Component: SignInPage,
+                  },
+                ],
+              },
+              {
+                path: '/',
+                Component: Layout,
+                children: [
+                  {
+                    path: '/aas/dashboard',
+                    Component: DashboardPage,
+                  },
+                  {
+                    path: '/aas/convert',
+                    Component: ConvertPage,
+                  },
+                  {
+                    path: '/aas/transmit',
+                    Component: TransmitPage,
+                  },
+                  // {
+                  //   path: '/aas/monitoring',
+                  //   Component: MonitoringPage,
+                  // },
+                ],
+              },
+              {
+                path: '/',
+                Component: Layout,
+                children: [
+                  {
+                    path: '/aasx/aasxManager',
+                    Component: aasxManagerPage,
+                  },
+                  {
+                    path: '/aasx/dataManager',
+                    Component: dataManagerPage,
+                  },
+                ],
+              },
+              {
+                path: '/',
+                Component: Layout,
+                children: [
+                  {
+                    path: '/edge/edge',
+                    Component: edgePage,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        { initialEntries: ['/signIn/sign'] }
+      ),
     []
   );
 
