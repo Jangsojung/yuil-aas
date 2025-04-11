@@ -11,6 +11,7 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import RemoveIcon from '@mui/icons-material/Remove';
+import Checkbox from '@mui/material/Checkbox';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentFacilityGroupState, hasBasicsState } from '../../../../recoil/atoms';
@@ -30,10 +31,16 @@ interface Basic {
   fa_name: string;
 }
 
+interface Sensor {
+  sn_idx: number;
+  sn_name: string;
+}
+
 export default function BasicCode() {
   const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
   const [basics, setBasics] = React.useState<Basic[]>([]);
   const [hasBasics, setHasBasics] = useRecoilState(hasBasicsState);
+  const [sensors, setSensors] = React.useState<Sensor[]>([]);
 
   React.useEffect(() => {
     if (currentFacilityGroup !== null) {
@@ -60,10 +67,11 @@ export default function BasicCode() {
       console.log(err.message);
     }
   };
+
   return (
     <div className='sensor-list-wrap'>
       <div className='sensor-list'>
-        <div>
+        {/* <div>
           <Grid container spacing={1} className='sensor-tit'>
             <div className='d-flex align-flex-end gap-10'>
               온조기
@@ -138,17 +146,6 @@ export default function BasicCode() {
                 </ListItem>
               </List>
             </Grid>
-            <Grid size={2}>
-              <List sx={style}>
-                <ListItem>
-                  <ListItemText secondary='온조기 현재온도(PV)' />
-                </ListItem>
-                <Divider variant='middle' component='li' />
-                <ListItem>
-                  <ListItemText secondary='Prop 1.1.1' />
-                </ListItem>
-              </List>
-            </Grid>
           </Grid>
           <Grid container spacing={1}>
             <Grid size={2}>
@@ -218,21 +215,37 @@ export default function BasicCode() {
               </List>
             </Grid>
           </Grid>
-        </div>
+        </div> */}
       </div>
       <div className='sensor-list'>
         {basics &&
           basics.map((basic, idx) => (
             <div>
               <Grid container spacing={1} className='sensor-tit'>
-                <Grid size={2}>{basic.fa_name}</Grid>
-                <Grid size={10}>Sub Modal 1.{idx + 1}</Grid>
+                <div className='d-flex align-flex-end gap-10'>
+                  <Checkbox />
+                  {basic.fa_name}
+                  <span>Sub Modal 1.{idx + 1}</span>
+                </div>
+
+                <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+                  <Button variant='outlined' color='primary'>
+                    <AddIcon />
+                    센서등록
+                  </Button>
+                  <Button variant='outlined' color='warning'>
+                    <EditIcon /> 센서수정
+                  </Button>
+                  <Button variant='outlined' color='error'>
+                    <RemoveIcon /> 센서삭제
+                  </Button>
+                </Stack>
               </Grid>
-              <Grid container spacing={1}>
-                <Grid size={12}>
-                  <Table sm_idx={idx + 1} fa_idx={basic.fa_idx} />
-                </Grid>
-              </Grid>
+              {/* <Grid container spacing={1}> */}
+              {/* <Grid size={12}> */}
+              <Table sm_idx={idx + 1} fa_idx={basic.fa_idx} />
+              {/* </Grid> */}
+              {/* </Grid> */}
             </div>
           ))}
       </div>

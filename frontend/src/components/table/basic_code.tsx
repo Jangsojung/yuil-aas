@@ -6,8 +6,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-
-import Checkbox from '../../components/checkbox';
+import Grid from '@mui/material/Grid'; // 올바른 import 경로
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import Checkbox from '@mui/material/Checkbox';
+import { useRecoilState } from 'recoil';
+import { selectedSensorsState } from '../../recoil/atoms';
 
 interface Sensor {
   sn_idx: number;
@@ -16,10 +22,30 @@ interface Sensor {
 
 export default function BasicTable({ sm_idx, fa_idx }) {
   const [sensors, setSensors] = React.useState<Sensor[]>([]);
+  const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
+  const [selectAll, setSelectAll] = React.useState(false);
+
+  // style 변수 추가
+  const style = {
+    width: '100%',
+    bgcolor: 'background.paper',
+    border: '1px solid #e0e0e0',
+    borderRadius: 1,
+  };
 
   React.useEffect(() => {
     getSensors(fa_idx);
-  }, []);
+  }, [fa_idx]);
+
+  React.useEffect(() => {
+    if (selectedSensors.length === 0) {
+      setSelectAll(false);
+    } else if (selectedSensors.length === sensors.length) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedSensors, sensors]);
 
   const getSensors = async (fa_idx: number) => {
     try {
@@ -37,30 +63,67 @@ export default function BasicTable({ sm_idx, fa_idx }) {
       console.log(err.message);
     }
   };
+
+  const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked;
+    setSelectAll(checked);
+    if (checked) {
+      setSelectedSensors(sensors.map((sensor) => sensor.sn_idx));
+    } else {
+      setSelectedSensors([]);
+    }
+  };
+
+  const handleCheckboxChange = (fileIdx: number) => {
+    setSelectedSensors((prevSelected) => {
+      if (prevSelected.includes(fileIdx)) {
+        return prevSelected.filter((idx) => idx !== fileIdx);
+      } else {
+        return [...prevSelected, fileIdx];
+      }
+    });
+  };
+
+  const rows = [];
+  for (let i = 0; i < sensors.length; i += 6) {
+    const rowSensors = sensors.slice(i, i + 6);
+    rows.push(rowSensors);
+  }
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-        <TableHead>
-          <TableRow>
-            {cells.map((cell) => (
-              <TableCell>{cell}</TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
         <TableBody>
-          {sensors &&
-            sensors.map((sensor, idx) => (
-              <TableRow key={sensor.sn_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell>
-                  Prop 1.{sm_idx}.{idx + 1}
-                </TableCell>
-                <TableCell>{sensor.sn_name}</TableCell>
-              </TableRow>
-            ))}
+          {rows.map((rowSensors, rowIndex) => (
+            <TableRow key={rowIndex}>
+              <TableCell colSpan={3}>
+                <Grid container spacing={1}>
+                  {rowSensors &&
+                    rowSensors.map((sensor, idx) => (
+                      <Grid item xs={2} key={sensor.sn_idx}>
+                        <List sx={style}>
+                          <ListItem>
+                            <Checkbox
+                              checked={selectedSensors.includes(sensor.sn_idx)}
+                              onChange={() => handleCheckboxChange(sensor.sn_idx)}
+                            />
+                          </ListItem>
+                          <ListItem>
+                            <ListItemText secondary={sensor.sn_name} />
+                          </ListItem>
+                          <Divider variant='middle' component='li' />
+                          <ListItem>
+                            <ListItemText secondary={'Prop 1.' + sm_idx + '.' + (idx + 1)} />
+                          </ListItem>
+                        </List>
+                      </Grid>
+                    ))}
+                </Grid>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
 }
-
-const cells = ['Prop Num', '센서명'];

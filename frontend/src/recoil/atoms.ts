@@ -41,6 +41,11 @@ export const selectedConvertsState = atom<number[]>({
   default: [],
 });
 
+export const selectedSensorsState = atom<number[]>({
+  key: 'selectedSensorsState',
+  default: [],
+});
+
 export const selectedDataFilesState = atom<number[]>({
   key: 'selectedDataFilesState',
   default: [],
