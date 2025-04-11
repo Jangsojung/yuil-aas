@@ -90,16 +90,37 @@ export default function Sort() {
 
         <Grid size={4} direction='row' style={{ justifyContent: 'flex-end' }}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <Button variant='contained' color='success'>
-              조회
+            <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+              {!hasBasics && (
+                <Button variant='contained' color='primary'>
+                  <AddIcon />
+                  장비등록
+                </Button>
+              )}
+              {hasBasics && (
+                <Button variant='contained' color='warning'>
+                  <EditIcon /> 장비수정
+                </Button>
+              )}
+              {hasBasics && (
+                <Button variant='contained' color='error'>
+                  <RemoveIcon /> 장비삭제
+                </Button>
+              )}
+
+              {/* 기초코드 등록화면버튼 */}
+              {/* <Button variant='contained' color='success'>
+              센서추가
             </Button>
-            <Button variant='contained' color='success'>
-              초기화
-            </Button>
+            <Button variant='contained' color='primary'>
+              저장
+            </Button> */}
+              {/* 기초코드 등록화면버튼 */}
+            </Stack>
           </Stack>
         </Grid>
       </Grid>
-      <Grid container spacing={1}>
+      {/* <Grid container spacing={1}>
         <Grid size={12}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
             {!hasBasics && (
@@ -118,18 +139,9 @@ export default function Sort() {
                 <RemoveIcon /> 장비삭제
               </Button>
             )}
-
-            {/* 기초코드 등록화면버튼 */}
-            {/* <Button variant='contained' color='success'>
-              센서추가
-            </Button>
-            <Button variant='contained' color='primary'>
-              저장
-            </Button> */}
-            {/* 기초코드 등록화면버튼 */}
           </Stack>
         </Grid>
-      </Grid>
+      </Grid> */}
     </Box>
   );
 }
