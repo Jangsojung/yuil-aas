@@ -74,6 +74,14 @@ export default function Sort({ startLoading, endLoading }) {
     }
   };
 
+  // resetTrigger가 변경될 때 날짜를 초기화하는 효과
+  React.useEffect(() => {
+    if (resetTrigger) {
+      setStartDate(null);
+      setEndDate(null);
+    }
+  }, [resetTrigger]);
+
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
@@ -82,10 +90,15 @@ export default function Sort({ startLoading, endLoading }) {
             <Grid size={10}>
               <Grid container spacing={1}>
                 <Grid className='d-flex gap-5'>
-                  <div className="sort-title">날짜</div>
+                  <div className='sort-title'>날짜</div>
                 </Grid>
                 <Grid>
-                  <BasicDatePicker onDateChange={handleDateChange} resetDates={resetTrigger} />
+                  <BasicDatePicker
+                    onDateChange={handleDateChange}
+                    // resetDates={resetTrigger}
+                    startDate={startDate}
+                    endDate={endDate}
+                  />
                 </Grid>
               </Grid>
             </Grid>

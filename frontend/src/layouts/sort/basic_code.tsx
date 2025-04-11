@@ -75,17 +75,16 @@ export default function Sort() {
               </Grid>
             </Grid> */}
 
-            <Grid>
+            {/* <Grid>
               <Grid container spacing={1}>
                 <Grid>
-                  {/* <Checkbox /> */}
                   <div className='sort-title'>날짜</div>
                 </Grid>
                 <Grid className='d-flex gap-5'>
                   <BasicDatePicker />
                 </Grid>
               </Grid>
-            </Grid>
+            </Grid> */}
           </Grid>
         </Grid>
 
