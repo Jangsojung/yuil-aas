@@ -36,7 +36,7 @@ export default () => {
     editBaseCode(fg_idx, fa_idx, fa_name, res);
   });
 
-  router.put('/sensor', (req, res) => {
+  router.put('/sensors', (req, res) => {
     const { sn_idx, sn_name } = req.body;
     editSensorBaseCode(sn_idx, sn_name, res);
   });

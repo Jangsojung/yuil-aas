@@ -64,7 +64,7 @@ export const editBaseCode = async (fg_idx, fa_idx, fa_name, res) => {
 
 export const editSensorBaseCode = async (sn_idx, sn_name, res) => {
   try {
-    const result = await editSensorBaseCodeFromDB(fsn_idx, sn_name);
+    const result = await editSensorBaseCodeFromDB(sn_idx, sn_name);
 
     res.status(200).json(result);
   } catch (err) {

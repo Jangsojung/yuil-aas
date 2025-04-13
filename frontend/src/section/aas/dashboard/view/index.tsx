@@ -46,6 +46,7 @@ export default function BasicCode() {
   const [hasBasics, setHasBasics] = useRecoilState(hasBasicsState);
   const [selectedFacilities, setSelectedFacilities] = useRecoilState(selectedFacilitiesState);
   const [shouldSaveChanges, setShouldSaveChanges] = useRecoilState(shouldSaveChangesState);
+  const [editSensorStates, setEditSensorStates] = React.useState<{ [key: number]: boolean }>({});
 
   const isEditing = useRecoilValue(isEditModeState);
   const [editedBasics, setEditedBasics] = React.useState<Basic[]>([]);
@@ -124,6 +125,17 @@ export default function BasicCode() {
     );
   };
 
+  const toggleEditSensor = (fa_idx: number) => {
+    setEditSensorStates((prevState) => {
+      const newState = {
+        ...prevState,
+        [fa_idx]: !prevState[fa_idx],
+      };
+
+      return newState;
+    });
+  };
+
   const handleCheckboxChange = (fileIdx: number) => {
     setSelectedFacilities((prevSelected) => {
       if (prevSelected.includes(fileIdx)) {
@@ -165,15 +177,21 @@ export default function BasicCode() {
                     <AddIcon />
                     센서등록
                   </Button>
-                  <Button variant='outlined' color='warning'>
-                    <EditIcon /> 센서수정
-                  </Button>
+                  {!editSensorStates[basic.fa_idx] ? (
+                    <Button variant='outlined' color='warning' onClick={() => toggleEditSensor(basic.fa_idx)}>
+                      <EditIcon /> 센서수정
+                    </Button>
+                  ) : (
+                    <Button variant='outlined' color='success' onClick={() => toggleEditSensor(basic.fa_idx)}>
+                      <SaveIcon /> 수정완료
+                    </Button>
+                  )}
                   <Button variant='outlined' color='error'>
                     <RemoveIcon /> 센서삭제
                   </Button>
                 </Stack>
               </Grid>
-              <Table sm_idx={idx + 1} fa_idx={basic.fa_idx} />
+              <Table sm_idx={idx + 1} fa_idx={basic.fa_idx} isEditMode={editSensorStates[basic.fa_idx] || false} />
             </div>
           ))}
       </div>

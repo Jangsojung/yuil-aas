@@ -60,12 +60,10 @@ export default function Sort() {
         <Grid size={4} direction='row' style={{ justifyContent: 'flex-end' }}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
             <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              {!hasBasics && (
-                <Button variant='contained' color='primary'>
-                  <AddIcon />
-                  장비등록
-                </Button>
-              )}
+              <Button variant='contained' color='primary'>
+                <AddIcon />
+                장비등록
+              </Button>
               {hasBasics && !isEditMode && (
                 <Button variant='contained' color='warning' onClick={handleEditToggle}>
                   <EditIcon /> 장비수정

@@ -11,6 +11,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
 import { useRecoilState } from 'recoil';
 import { selectedSensorsState } from '../../recoil/atoms';
 
@@ -19,9 +20,10 @@ interface Sensor {
   sn_name: string;
 }
 
-export default function BasicTable({ sm_idx, fa_idx }) {
+export default function BasicTable({ sm_idx, fa_idx, isEditMode = false }) {
   const [sensors, setSensors] = React.useState<Sensor[]>([]);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
+  const [editedSensors, setEditedSensors] = React.useState<Sensor[]>([]);
 
   const style = {
     width: '100%',
@@ -33,6 +35,10 @@ export default function BasicTable({ sm_idx, fa_idx }) {
   React.useEffect(() => {
     getSensors(fa_idx);
   }, [fa_idx]);
+
+  React.useEffect(() => {
+    setEditedSensors([...sensors]);
+  }, [sensors]);
 
   const getSensors = async (fa_idx: number) => {
     try {
@@ -51,6 +57,41 @@ export default function BasicTable({ sm_idx, fa_idx }) {
     }
   };
 
+  const handleSaveSensors = async () => {
+    try {
+      const updatePromises = editedSensors.map(async (sensor) => {
+        const response = await fetch(`http://localhost:5001/api/base_code/sensors`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sn_idx: sensor.sn_idx,
+            sn_name: sensor.sn_name,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to edit Sensor: ${sensor.sn_idx}`);
+        }
+
+        return response;
+      });
+
+      await Promise.all(updatePromises);
+      setSensors([...editedSensors]);
+      console.log('Sensors updated successfully');
+    } catch (err: any) {
+      console.log('Error updating sensors:', err.message);
+    }
+  };
+
+  const handleSensorNameChange = (sn_idx: number, newName: string) => {
+    setEditedSensors((prev) =>
+      prev.map((sensor) => (sensor.sn_idx === sn_idx ? { ...sensor, sn_name: newName } : sensor))
+    );
+  };
+
   const handleCheckboxChange = (fileIdx: number) => {
     setSelectedSensors((prevSelected) => {
       if (prevSelected.includes(fileIdx)) {
@@ -66,6 +107,13 @@ export default function BasicTable({ sm_idx, fa_idx }) {
     const rowSensors = sensors.slice(i, i + 6);
     rows.push(rowSensors);
   }
+
+  React.useEffect(() => {
+    // If parent component signals to save changes
+    if (isEditMode === false) {
+      handleSaveSensors();
+    }
+  }, [isEditMode]);
 
   return (
     <TableContainer component={Paper}>
@@ -86,7 +134,16 @@ export default function BasicTable({ sm_idx, fa_idx }) {
                             />
                           </ListItem>
                           <ListItem>
-                            <ListItemText secondary={sensor.sn_name} />
+                            {isEditMode ? (
+                              <TextField
+                                size='small'
+                                fullWidth
+                                value={editedSensors.find((s) => s.sn_idx === sensor.sn_idx)?.sn_name || ''}
+                                onChange={(e) => handleSensorNameChange(sensor.sn_idx, e.target.value)}
+                              />
+                            ) : (
+                              <ListItemText secondary={sensor.sn_name} />
+                            )}
                           </ListItem>
                           <Divider variant='middle' component='li' />
                           <ListItem>
