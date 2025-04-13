@@ -4,6 +4,8 @@ import {
   getFacilityGroups,
   getSensors,
   getBaseCode,
+  editBaseCode,
+  editSensorBaseCode,
 } from '../../controller/basic_code/BasicCodeController.js';
 
 const router = express.Router();
@@ -26,6 +28,17 @@ export default () => {
   router.get('/', (req, res) => {
     const { fg_idx } = req.query;
     getBaseCode(fg_idx, res);
+  });
+
+  router.put('/', (req, res) => {
+    const { fg_idx } = req.query;
+    const { fa_idx, fa_name } = req.body;
+    editBaseCode(fg_idx, fa_idx, fa_name, res);
+  });
+
+  router.put('/sensor', (req, res) => {
+    const { sn_idx, sn_name } = req.body;
+    editSensorBaseCode(sn_idx, sn_name, res);
   });
 
   return router;

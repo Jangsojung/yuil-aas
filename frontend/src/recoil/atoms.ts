@@ -11,6 +11,11 @@ export const currentFileState = atom<number | null>({
   default: null,
 });
 
+export const isEditModeState = atom({
+  key: 'isEditModeState',
+  default: false,
+});
+
 export const currentFacilityGroupState = atom<number | null>({
   key: 'currentFacilityGroupState',
   default: null,
@@ -23,6 +28,11 @@ export const hasBasicsState = atom<boolean>({
 
 export const selectedEdgeGatewaysState = atom<number[]>({
   key: 'selectedEdgeGatewaysState',
+  default: [],
+});
+
+export const selectedFacilitiesState = atom<number[]>({
+  key: 'selectedFacilitiesState',
   default: [],
 });
 
@@ -87,4 +97,9 @@ export const dateRangeAASXState = atom<{
     startDate: dayjs().subtract(1, 'month'),
     endDate: dayjs(),
   },
+});
+
+export const shouldSaveChangesState = atom({
+  key: 'shouldSaveChangesState',
+  default: false,
 });

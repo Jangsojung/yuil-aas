@@ -6,16 +6,13 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import RemoveIcon from '@mui/icons-material/Remove';
+import SaveIcon from '@mui/icons-material/Save';
 
 import SelectFacilityGroup from '../../components/select/facility_group';
-import SelectPeriod from '../../components/select/period';
-import TextField from '../../components/input';
-import Checkbox from '../../components/checkbox';
-import BasicDatePicker from '../../components/datepicker';
 
 import styled from '@mui/system/styled';
-import { useRecoilValue } from 'recoil';
-import { hasBasicsState } from '../../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { hasBasicsState, isEditModeState, shouldSaveChangesState } from '../../recoil/atoms';
 
 const Item = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
@@ -32,24 +29,21 @@ const Item = styled('div')(({ theme }) => ({
 
 export default function Sort() {
   const hasBasics = useRecoilValue(hasBasicsState);
+  const [isEditMode, setIsEditMode] = useRecoilState(isEditModeState);
+  const [shouldSaveChanges, setShouldSaveChanges] = useRecoilState(shouldSaveChangesState);
 
-  const handleEdit = () => {};
+  const handleEditToggle = () => {
+    if (isEditMode) {
+      setShouldSaveChanges(true);
+    }
+    setIsEditMode(!isEditMode);
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
         <Grid size={8}>
           <Grid container spacing={1} style={{ gap: '20px' }}>
-            {/* <Grid size={4}>
-              <Grid container spacing={1}>
-                <Grid size={3}>
-                  <div>공장</div>
-                </Grid>
-                <Grid size={8}>
-                  <SelectFactory />
-                </Grid>
-              </Grid>
-            </Grid> */}
             <Grid>
               <Grid container spacing={1}>
                 <Grid>
@@ -60,31 +54,6 @@ export default function Sort() {
                 </Grid>
               </Grid>
             </Grid>
-            {/* <Grid size={4}>
-              <Grid container spacing={1}>
-                <Grid size={3} className='d-flex gap-5'>
-                  <Checkbox />
-                  <div>주기</div>
-                </Grid>
-                <Grid size={4}>
-                  <TextField />
-                </Grid>
-                <Grid size={4}>
-                  <SelectPeriod />
-                </Grid>
-              </Grid>
-            </Grid> */}
-
-            {/* <Grid>
-              <Grid container spacing={1}>
-                <Grid>
-                  <div className='sort-title'>날짜</div>
-                </Grid>
-                <Grid className='d-flex gap-5'>
-                  <BasicDatePicker />
-                </Grid>
-              </Grid>
-            </Grid> */}
           </Grid>
         </Grid>
 
@@ -97,9 +66,14 @@ export default function Sort() {
                   장비등록
                 </Button>
               )}
-              {hasBasics && (
-                <Button variant='contained' color='warning'>
+              {hasBasics && !isEditMode && (
+                <Button variant='contained' color='warning' onClick={handleEditToggle}>
                   <EditIcon /> 장비수정
+                </Button>
+              )}
+              {hasBasics && isEditMode && (
+                <Button variant='contained' color='success' onClick={handleEditToggle}>
+                  <SaveIcon /> 수정완료
                 </Button>
               )}
               {hasBasics && (
@@ -107,41 +81,10 @@ export default function Sort() {
                   <RemoveIcon /> 장비삭제
                 </Button>
               )}
-
-              {/* 기초코드 등록화면버튼 */}
-              {/* <Button variant='contained' color='success'>
-              센서추가
-            </Button>
-            <Button variant='contained' color='primary'>
-              저장
-            </Button> */}
-              {/* 기초코드 등록화면버튼 */}
             </Stack>
           </Stack>
         </Grid>
       </Grid>
-      {/* <Grid container spacing={1}>
-        <Grid size={12}>
-          <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            {!hasBasics && (
-              <Button variant='contained' color='primary'>
-                <AddIcon />
-                장비등록
-              </Button>
-            )}
-            {hasBasics && (
-              <Button variant='contained' color='warning'>
-                <EditIcon /> 장비수정
-              </Button>
-            )}
-            {hasBasics && (
-              <Button variant='contained' color='error'>
-                <RemoveIcon /> 장비삭제
-              </Button>
-            )}
-          </Stack>
-        </Grid>
-      </Grid> */}
     </Box>
   );
 }

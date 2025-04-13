@@ -3,10 +3,9 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid'; // 올바른 import 경로
+import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -23,9 +22,7 @@ interface Sensor {
 export default function BasicTable({ sm_idx, fa_idx }) {
   const [sensors, setSensors] = React.useState<Sensor[]>([]);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
-  const [selectAll, setSelectAll] = React.useState(false);
 
-  // style 변수 추가
   const style = {
     width: '100%',
     bgcolor: 'background.paper',
@@ -36,16 +33,6 @@ export default function BasicTable({ sm_idx, fa_idx }) {
   React.useEffect(() => {
     getSensors(fa_idx);
   }, [fa_idx]);
-
-  React.useEffect(() => {
-    if (selectedSensors.length === 0) {
-      setSelectAll(false);
-    } else if (selectedSensors.length === sensors.length) {
-      setSelectAll(true);
-    } else {
-      setSelectAll(false);
-    }
-  }, [selectedSensors, sensors]);
 
   const getSensors = async (fa_idx: number) => {
     try {
@@ -61,16 +48,6 @@ export default function BasicTable({ sm_idx, fa_idx }) {
       setSensors(data);
     } catch (err: any) {
       console.log(err.message);
-    }
-  };
-
-  const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = event.target.checked;
-    setSelectAll(checked);
-    if (checked) {
-      setSelectedSensors(sensors.map((sensor) => sensor.sn_idx));
-    } else {
-      setSelectedSensors([]);
     }
   };
 

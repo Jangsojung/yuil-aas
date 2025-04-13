@@ -111,3 +111,23 @@ export const getBaseCodeFromDB = async (fg_idx) => {
     });
   });
 };
+
+export const editBaseCodeFromDB = async (fg_idx, fa_idx, fa_name) => {
+  try {
+    const query = `update tb_aasx_data_sm set fa_name = ? where fa_idx = ?;`;
+    await pool.promise().query(query, [fa_name, fa_idx]);
+  } catch (err) {
+    console.log('Failed to update Facility: ', err);
+    throw err;
+  }
+};
+
+export const editSensorBaseCodeFromDB = async (sn_idx, sn_name) => {
+  try {
+    const query = `update tb_aasx_data_prop set sn_name = ? where sn_idx = ?;`;
+    await pool.promise().query(query, [sn_name, sn_idx]);
+  } catch (err) {
+    console.log('Failed to update Facility: ', err);
+    throw err;
+  }
+};
