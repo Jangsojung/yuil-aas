@@ -122,12 +122,22 @@ export const editBaseCodeFromDB = async (fg_idx, fa_idx, fa_name) => {
   }
 };
 
+export const insertSensorBaseCodeFromDB = async (sn_idx, fa_idx, sn_name) => {
+  try {
+    const query = `insert into tb_aasx_data_prop (sn_idx,fa_idx, sn_name) values (?, ?, ?);`;
+    await pool.promise().query(query, [sn_idx, fa_idx, sn_name]);
+  } catch (err) {
+    console.log('Failed to insert Sensor: ', err);
+    throw err;
+  }
+};
+
 export const editSensorBaseCodeFromDB = async (sn_idx, sn_name) => {
   try {
     const query = `update tb_aasx_data_prop set sn_name = ? where sn_idx = ?;`;
     await pool.promise().query(query, [sn_name, sn_idx]);
   } catch (err) {
-    console.log('Failed to update Facility: ', err);
+    console.log('Failed to update Sensor: ', err);
     throw err;
   }
 };

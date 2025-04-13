@@ -20,10 +20,12 @@ interface Sensor {
   sn_name: string;
 }
 
-export default function BasicTable({ sm_idx, fa_idx, isEditMode = false }) {
+export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMode = false, onSensorAdded }) {
   const [sensors, setSensors] = React.useState<Sensor[]>([]);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const [editedSensors, setEditedSensors] = React.useState<Sensor[]>([]);
+  const [newSensor, setNewSensor] = React.useState<string>('');
+  const [newSensorIdx, setNewSensorIdx] = React.useState<number>();
 
   const style = {
     width: '100%',
@@ -39,6 +41,26 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false }) {
   React.useEffect(() => {
     setEditedSensors([...sensors]);
   }, [sensors]);
+
+  React.useEffect(() => {
+    if (isEditMode === false) {
+      handleSaveSensors();
+    }
+  }, [isEditMode]);
+
+  React.useEffect(() => {
+    const addSensorHandler = () => {
+      if (isAddMode) {
+        handleAddSensor();
+      }
+    };
+
+    document.addEventListener(`add-sensor-${fa_idx}`, addSensorHandler);
+
+    return () => {
+      document.removeEventListener(`add-sensor-${fa_idx}`, addSensorHandler);
+    };
+  }, [fa_idx, isAddMode, newSensor, newSensorIdx]);
 
   const getSensors = async (fa_idx: number) => {
     try {
@@ -86,6 +108,45 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false }) {
     }
   };
 
+  const handleAddSensor = async () => {
+    if (!newSensor.trim() || newSensorIdx === -1 || isNaN(Number(newSensorIdx))) {
+      alert('센서 이름과 인덱스를 모두 입력해주세요');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/base_code/sensors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sn_idx: Number(newSensorIdx),
+          fa_idx: fa_idx,
+          sn_name: newSensor,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add new sensor');
+      }
+
+      const addedSensor = await response.json();
+
+      setSensors((prev) => [...prev, addedSensor]);
+      setNewSensor('');
+      setNewSensorIdx(-1);
+
+      if (onSensorAdded) {
+        onSensorAdded();
+      }
+
+      console.log('Sensor added successfully');
+    } catch (err: any) {
+      console.log('Error adding sensor:', err.message);
+    }
+  };
+
   const handleSensorNameChange = (sn_idx: number, newName: string) => {
     setEditedSensors((prev) =>
       prev.map((sensor) => (sensor.sn_idx === sn_idx ? { ...sensor, sn_name: newName } : sensor))
@@ -107,13 +168,6 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false }) {
     const rowSensors = sensors.slice(i, i + 6);
     rows.push(rowSensors);
   }
-
-  React.useEffect(() => {
-    // If parent component signals to save changes
-    if (isEditMode === false) {
-      handleSaveSensors();
-    }
-  }, [isEditMode]);
 
   return (
     <TableContainer component={Paper}>
@@ -156,6 +210,40 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false }) {
               </TableCell>
             </TableRow>
           ))}
+          {isAddMode && (
+            <TableRow>
+              <TableCell colSpan={3}>
+                <Grid container spacing={1}>
+                  <Grid item xs={2}>
+                    <List sx={style}>
+                      <ListItem>
+                        <Checkbox disabled />
+                      </ListItem>
+                      <ListItem>
+                        <TextField
+                          size='small'
+                          fullWidth
+                          placeholder='새 센서 이름'
+                          value={newSensor}
+                          onChange={(e) => setNewSensor(e.target.value)}
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <TextField
+                          size='small'
+                          type='number'
+                          fullWidth
+                          placeholder='새 센서 인덱스'
+                          value={newSensorIdx}
+                          onChange={(e) => setNewSensorIdx(Number(e.target.value))}
+                        />
+                      </ListItem>
+                    </List>
+                  </Grid>
+                </Grid>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>

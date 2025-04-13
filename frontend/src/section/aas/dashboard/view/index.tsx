@@ -35,11 +35,6 @@ interface Basic {
   fa_name: string;
 }
 
-interface Facility {
-  fa_idx: number;
-  fa_name: string;
-}
-
 export default function BasicCode() {
   const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
   const [basics, setBasics] = React.useState<Basic[]>([]);
@@ -47,9 +42,11 @@ export default function BasicCode() {
   const [selectedFacilities, setSelectedFacilities] = useRecoilState(selectedFacilitiesState);
   const [shouldSaveChanges, setShouldSaveChanges] = useRecoilState(shouldSaveChangesState);
   const [editSensorStates, setEditSensorStates] = React.useState<{ [key: number]: boolean }>({});
+  const [addSensorStates, setAddSensorStates] = React.useState<{ [key: number]: boolean }>({});
 
   const isEditing = useRecoilValue(isEditModeState);
   const [editedBasics, setEditedBasics] = React.useState<Basic[]>([]);
+  const tableRefs = React.useRef({});
 
   React.useEffect(() => {
     if (currentFacilityGroup !== null) {
@@ -67,6 +64,13 @@ export default function BasicCode() {
       setShouldSaveChanges(false);
     }
   }, [shouldSaveChanges]);
+  const handleAddSensorComplete = (fa_idx: number) => {
+    document.dispatchEvent(new CustomEvent(`add-sensor-${fa_idx}`));
+
+    setTimeout(() => {
+      toggleAddSensor(fa_idx);
+    }, 100);
+  };
 
   const getBasicCode = async (fg_idx: number) => {
     try {
@@ -126,7 +130,22 @@ export default function BasicCode() {
   };
 
   const toggleEditSensor = (fa_idx: number) => {
-    setEditSensorStates((prevState) => {
+    setAddSensorStates((prevState) => {
+      const newState = {
+        ...prevState,
+        [fa_idx]: !prevState[fa_idx],
+      };
+
+      if (prevState[fa_idx] && tableRefs.current[fa_idx]) {
+        tableRefs.current[fa_idx].handleAddSensor();
+      }
+
+      return newState;
+    });
+  };
+
+  const toggleAddSensor = (fa_idx: number) => {
+    setAddSensorStates((prevState) => {
       const newState = {
         ...prevState,
         [fa_idx]: !prevState[fa_idx],
@@ -134,6 +153,10 @@ export default function BasicCode() {
 
       return newState;
     });
+  };
+
+  const handleSensorAdded = (fa_idx: number) => {
+    toggleAddSensor(fa_idx);
   };
 
   const handleCheckboxChange = (fileIdx: number) => {
@@ -173,10 +196,21 @@ export default function BasicCode() {
                 </div>
 
                 <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                  <Button variant='outlined' color='primary'>
-                    <AddIcon />
-                    센서등록
-                  </Button>
+                  {!addSensorStates[basic.fa_idx] ? (
+                    <Button
+                      variant='outlined'
+                      color='primary'
+                      onClick={() => toggleAddSensor(basic.fa_idx)}
+                      disabled={editSensorStates[basic.fa_idx]}
+                    >
+                      <AddIcon />
+                      센서등록
+                    </Button>
+                  ) : (
+                    <Button variant='outlined' color='success' onClick={() => handleAddSensorComplete(basic.fa_idx)}>
+                      <SaveIcon /> 등록완료
+                    </Button>
+                  )}
                   {!editSensorStates[basic.fa_idx] ? (
                     <Button variant='outlined' color='warning' onClick={() => toggleEditSensor(basic.fa_idx)}>
                       <EditIcon /> 센서수정
@@ -191,7 +225,13 @@ export default function BasicCode() {
                   </Button>
                 </Stack>
               </Grid>
-              <Table sm_idx={idx + 1} fa_idx={basic.fa_idx} isEditMode={editSensorStates[basic.fa_idx] || false} />
+              <Table
+                sm_idx={idx + 1}
+                fa_idx={basic.fa_idx}
+                isEditMode={editSensorStates[basic.fa_idx] || false}
+                isAddMode={addSensorStates[basic.fa_idx] || false}
+                onSensorAdded={() => handleSensorAdded(basic.fa_idx)}
+              />
             </div>
           ))}
       </div>

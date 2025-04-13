@@ -5,6 +5,7 @@ import {
   getSensors,
   getBaseCode,
   editBaseCode,
+  insertSensorBaseCode,
   editSensorBaseCode,
 } from '../../controller/basic_code/BasicCodeController.js';
 
@@ -34,6 +35,11 @@ export default () => {
     const { fg_idx } = req.query;
     const { fa_idx, fa_name } = req.body;
     editBaseCode(fg_idx, fa_idx, fa_name, res);
+  });
+
+  router.post('/sensors', (req, res) => {
+    const { sn_idx, fa_idx, sn_name } = req.body;
+    insertSensorBaseCode(sn_idx, fa_idx, sn_name, res);
   });
 
   router.put('/sensors', (req, res) => {
