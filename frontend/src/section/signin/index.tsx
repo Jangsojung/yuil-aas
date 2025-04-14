@@ -3,17 +3,17 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 import { useRecoilState } from 'recoil';
-import { userState } from '../../recoil/atoms';
+import { User, userState } from '../../recoil/atoms';
 import { useNavigate, NavigateFunction } from 'react-router';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
-const signIn: (
+const signIn = async (
   provider: AuthProvider,
   formData: FormData,
-  setUser: React.Dispatch<React.SetStateAction<string | null>>,
+  setUser: React.Dispatch<React.SetStateAction<User | null>>,
   nav: NavigateFunction
-) => void = async (provider, formData, setUser, nav) => {
+) => {
   const email = formData.get('email');
   const password = formData.get('password');
 
@@ -28,15 +28,23 @@ const signIn: (
 
     const data = await response.json();
 
-    if (response.ok) {
-      setUser(`${data.user_name}님(${email})`);
+    if (response.ok && data.success) {
+      const user: User = {
+        user_id: data.user_id,
+        user_name: data.user_name,
+      };
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
       nav('/aas/dashboard');
+      return true;
     } else {
       alert(`로그인 실패: ${data.message}`);
+      return false;
     }
   } catch (error) {
     console.error('로그인 에러:', error);
     alert('서버 오류 발생');
+    return false;
   }
 };
 

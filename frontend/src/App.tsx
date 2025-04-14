@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { createMemoryRouter, RouterProvider, Outlet } from 'react-router';
+import { createMemoryRouter, RouterProvider, Outlet, useNavigate } from 'react-router';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
 
@@ -14,6 +14,8 @@ import aasxManagerPage from './pages/aasx/aasxManager';
 import dataManagerPage from './pages/aasx/dataManager';
 import edgePage from './pages/edge/edge';
 import SignInPage from './pages/signIn/sign';
+import { useSetRecoilState } from 'recoil';
+import { userState } from './recoil/atoms';
 
 const NAVIGATION: Navigation = [
   {
@@ -75,6 +77,24 @@ const NAVIGATION: Navigation = [
 ];
 
 function App() {
+  const setUser = useSetRecoilState(userState);
+  const user = React.useRef(localStorage.getItem('user'));
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem('user');
+        navigate('/signIn/sign');
+      }
+    } else {
+      navigate('/signIn/sign');
+    }
+  }, [setUser, navigate]);
+
   return (
     <ReactRouterAppProvider navigation={NAVIGATION}>
       <Outlet />

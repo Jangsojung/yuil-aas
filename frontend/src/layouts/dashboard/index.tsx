@@ -26,7 +26,7 @@ export default function Layout() {
       disableCollapsibleSidebar
       slots={{
         appTitle: CustomAppTitle,
-        toolbarActions: () => <ToolbarActionsAdmin user={user} />,
+        toolbarActions: () => <ToolbarActionsAdmin user={`${user?.user_name}님(${user?.user_id})`} />,
       }}
     >
       <PageContainer>

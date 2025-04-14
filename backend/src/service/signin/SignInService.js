@@ -1,5 +1,8 @@
 import { pool } from '../../index.js';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export const getUserFromDB = async (email, password) => {
   return new Promise((resolve, reject) => {
@@ -17,11 +20,10 @@ export const getUserFromDB = async (email, password) => {
       }
 
       const user = results[0];
-
       const hashedPassword = crypto.createHash('md5').update(password).digest('hex');
 
       if (hashedPassword === user.user_pw) {
-        resolve({ success: true, user_name: user.user_name });
+        resolve({ success: true, user_id: user.user_id, user_name: user.user_name });
       } else {
         resolve({ success: false, message: '비밀번호가 틀렸습니다.' });
       }
