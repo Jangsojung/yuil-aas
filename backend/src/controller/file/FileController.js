@@ -5,9 +5,9 @@ import {
   getAASXFilesFromDB,
 } from '../../service/file/FileService.js';
 
-export const insertFile = async (fc_idx, file, res) => {
+export const insertFile = async (fc_idx, fileName, res) => {
   try {
-    const result = await insertFileToDB(fc_idx, file);
+    const result = await insertFileToDB(fc_idx, fileName);
 
     res.status(200).json(result);
   } catch (err) {

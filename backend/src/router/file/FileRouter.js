@@ -5,34 +5,43 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { insertFile, updateFile, deleteFiles, getAASXFiles } from '../../controller/file/FileController.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-const uploadsDir = path.join(__dirname, '..', '..', '..', '..', 'files', 'python');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// const uploadsDir = path.join(__dirname, '..', '..', '..', '..', 'files', 'python');
+// if (!fs.existsSync(uploadsDir)) {
+//   fs.mkdirSync(uploadsDir, { recursive: true });
+// }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, uploadsDir);
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.originalname);
+//   },
+// });
 
-const upload = multer({ storage: storage });
+// const upload = multer({ storage: storage });
 
 const router = express.Router();
 
 export default () => {
-  router.post('/', upload.single('file'), (req, res) => {
+  // router.post('/', upload.single('file'), (req, res) => {
+  //   const { fc_idx, af_idx } = req.query;
+  //   if (af_idx) {
+  //     updateFile(af_idx, req.file, res);
+  //   } else {
+  //     insertFile(fc_idx, req.file, res);
+  //   }
+  // });
+  router.post('/', (req, res) => {
     const { fc_idx, af_idx } = req.query;
+    const { fileName } = req.body;
     if (af_idx) {
-      updateFile(af_idx, req.file, res);
+      updateFile(af_idx, fileName, res);
     } else {
-      insertFile(fc_idx, req.file, res);
+      insertFile(fc_idx, fileName, res);
     }
   });
 

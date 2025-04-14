@@ -97,12 +97,14 @@ export default function CustomizedDialogs() {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
+      const fileName = selectedFile.name;
 
       const response = await fetch(`http://localhost:5001/api/file?fc_idx=${currentFactory}`, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileName }),
       });
 
       if (!response.ok) {
@@ -112,7 +114,7 @@ export default function CustomizedDialogs() {
       const result = await response.json();
       console.log('업로드 결과:', result);
 
-      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/python');
+      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aas');
       handleClose();
     } catch (err) {
       console.error(err.message);

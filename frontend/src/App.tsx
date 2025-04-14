@@ -59,16 +59,16 @@ const NAVIGATION: Navigation = [
       },
     ],
   },
-  {
-    segment: 'signIn',
-    title: 'signIn',
-    children: [
-      {
-        segment: 'sign',
-        title: 'signIn',
-      },
-    ],
-  },
+  // {
+  //   segment: 'signIn',
+  //   title: 'signIn',
+  //   children: [
+  //     {
+  //       segment: 'sign',
+  //       title: 'signIn',
+  //     },
+  //   ],
+  // },
 ];
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

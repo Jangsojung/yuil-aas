@@ -255,7 +255,7 @@ export default function BasicCode() {
 
   const handleSaveNewEquipment = async () => {
     if (!newEquipment.fa_name.trim() || !newEquipment.fa_idx || isNaN(Number(newEquipment.fa_idx))) {
-      alert('시설설 이름과 인덱스를 모두 올바르게 입력해주세요');
+      alert('시설 이름과 인덱스를 모두 올바르게 입력해주세요');
       return;
     }
 
