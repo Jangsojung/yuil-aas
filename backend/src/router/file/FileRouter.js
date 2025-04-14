@@ -8,7 +8,7 @@ import { insertFile, updateFile, deleteFiles, getAASXFiles } from '../../control
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const uploadsDir = path.join(__dirname, '..', '..', 'files', 'python');
+const uploadsDir = path.join(__dirname, '..', '..', '..', '..', 'files', 'python');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }

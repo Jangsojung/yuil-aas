@@ -112,7 +112,7 @@ export default function CustomizedDialogs() {
       const result = await response.json();
       console.log('업로드 결과:', result);
 
-      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /src/files/python');
+      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/python');
       handleClose();
     } catch (err) {
       console.error(err.message);

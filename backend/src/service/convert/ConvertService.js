@@ -103,8 +103,8 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
     }
 
     const jsonContent = JSON.stringify(jsonStructure, null, 2);
-    const file_name = `제1공장-${start}-${end}.json`;
-    const filePath = path.join(__dirname, '..', '..', 'files', 'front', file_name);
+    const file_name = `${start}-${end}.json`;
+    const filePath = path.join(__dirname, '..', '..', '..', '..', 'files', 'front', file_name);
 
     const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) {
@@ -113,11 +113,11 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
 
     fs.writeFileSync(filePath, jsonContent);
 
-    const query = `insert into tb_aasx_file (fc_idx, af_kind, af_name, af_path) values (?, 1, ?, '/src/files/front')`;
+    const query = `insert into tb_aasx_file (fc_idx, af_kind, af_name, af_path) values (?, 1, ?, '/files/front')`;
     await pool.promise().query(query, [fc_idx, file_name]);
     console.log('JSON 파일 생성 및 DB 저장 완료');
 
-    return { success: true, fileName: file_name, filePath: '/src/files/front' };
+    return { success: true, fileName: file_name, filePath: '/files/front' };
   } catch (err) {
     console.log('Failed to insert Edge Gateway: ', err);
     throw err;

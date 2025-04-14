@@ -61,7 +61,7 @@ export default function Sort({ startLoading, endLoading }) {
         throw new Error('Failed to insert converts');
       }
 
-      alert('성공적으로 json파일을 생성하였습니다.\n파일 위치: /src/files/front');
+      alert('성공적으로 json파일을 생성하였습니다.\n파일 위치: /files/front');
 
       endLoading();
 
