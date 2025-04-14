@@ -99,7 +99,7 @@ export default function CustomizedDialogs() {
     try {
       const fileName = selectedFile.name;
 
-      const response = await fetch(`http://localhost:5001/api/file?fc_idx=${currentFactory}`, {
+      const response = await fetch(`http://localhost:5001/api/file/aasx?fc_idx=${currentFactory}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export default function CustomizedDialogs() {
       const result = await response.json();
       console.log('업로드 결과:', result);
 
-      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aas');
+      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aasx');
       handleClose();
     } catch (err) {
       console.error(err.message);
@@ -152,7 +152,7 @@ export default function CustomizedDialogs() {
 
       <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
-          제1공장 AAS 등록
+          제1공장 AASX 등록
         </DialogTitle>
         <IconButton
           aria-label='close'

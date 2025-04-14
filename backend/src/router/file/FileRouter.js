@@ -3,7 +3,14 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { insertFile, updateFile, deleteFiles, getAASXFiles } from '../../controller/file/FileController.js';
+import {
+  insertFile,
+  updateFile,
+  deleteFiles,
+  getAASXFiles,
+  insertAASXFile,
+  updateAASXFile,
+} from '../../controller/file/FileController.js';
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
@@ -42,6 +49,16 @@ export default () => {
       updateFile(af_idx, fileName, res);
     } else {
       insertFile(fc_idx, fileName, res);
+    }
+  });
+
+  router.post('/aasx', (req, res) => {
+    const { fc_idx, af_idx } = req.query;
+    const { fileName } = req.body;
+    if (af_idx) {
+      updateAASXFile(af_idx, fileName, res);
+    } else {
+      insertAASXFile(fc_idx, fileName, res);
     }
   });
 

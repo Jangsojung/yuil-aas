@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import dayjs from 'dayjs';
 
 import BasicDatePicker from '../../components/datepicker';
-import ModalBasic from '../../components/modal';
+import ModalBasic from '../../components/modal/aasx_management';
 
 import styled from '@mui/system/styled';
 import { useRecoilState, useRecoilValue } from 'recoil';
