@@ -12,7 +12,13 @@ import SelectFacilityGroup from '../../components/select/facility_group';
 
 import styled from '@mui/system/styled';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { hasBasicsState, isEditModeState, shouldSaveChangesState } from '../../recoil/atoms';
+import {
+  hasBasicsState,
+  isEditModeState,
+  shouldSaveChangesState,
+  currentFacilityGroupState,
+  selectedFacilitiesState,
+} from '../../recoil/atoms';
 
 const Item = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
@@ -27,10 +33,16 @@ const Item = styled('div')(({ theme }) => ({
   }),
 }));
 
+const ADD_EQUIPMENT_EVENT = 'add-new-equipment';
+const DELETE_EQUIPMENT_EVENT = 'delete-equipment';
+
 export default function Sort() {
   const hasBasics = useRecoilValue(hasBasicsState);
   const [isEditMode, setIsEditMode] = useRecoilState(isEditModeState);
   const [shouldSaveChanges, setShouldSaveChanges] = useRecoilState(shouldSaveChangesState);
+  const [isAddingEquipment, setIsAddingEquipment] = React.useState(false);
+  const selectedFacilities = useRecoilValue(selectedFacilitiesState);
+  const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
 
   const handleEditToggle = () => {
     if (isEditMode) {
@@ -38,6 +50,31 @@ export default function Sort() {
     }
     setIsEditMode(!isEditMode);
   };
+
+  const handleAddEquipment = () => {
+    document.dispatchEvent(new CustomEvent(ADD_EQUIPMENT_EVENT));
+    setIsAddingEquipment(true);
+  };
+
+  const handleDeleteEquipment = () => {
+    if (selectedFacilities.length === 0) return;
+
+    if (window.confirm(`선택한 ${selectedFacilities.length}개의 장비를 삭제하시겠습니까?`)) {
+      document.dispatchEvent(new CustomEvent(DELETE_EQUIPMENT_EVENT));
+    }
+  };
+
+  React.useEffect(() => {
+    const handleEquipmentAdded = () => {
+      setIsAddingEquipment(false);
+    };
+
+    document.addEventListener('equipment-added', handleEquipmentAdded);
+
+    return () => {
+      document.removeEventListener('equipment-added', handleEquipmentAdded);
+    };
+  }, []);
 
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
@@ -60,10 +97,17 @@ export default function Sort() {
         <Grid size={4} direction='row' style={{ justifyContent: 'flex-end' }}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
             <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              <Button variant='contained' color='primary'>
-                <AddIcon />
-                장비등록
-              </Button>
+              {!isAddingEquipment ? (
+                <Button variant='contained' color='primary' onClick={handleAddEquipment}>
+                  <AddIcon />
+                  장비등록
+                </Button>
+              ) : (
+                <Button variant='contained' color='primary' disabled>
+                  <AddIcon />
+                  장비등록
+                </Button>
+              )}
               {hasBasics && !isEditMode && (
                 <Button variant='contained' color='warning' onClick={handleEditToggle}>
                   <EditIcon /> 장비수정
@@ -75,7 +119,12 @@ export default function Sort() {
                 </Button>
               )}
               {hasBasics && (
-                <Button variant='contained' color='error'>
+                <Button
+                  variant='contained'
+                  color='error'
+                  onClick={handleDeleteEquipment}
+                  disabled={selectedFacilities.length === 0}
+                >
                   <RemoveIcon /> 장비삭제
                 </Button>
               )}
@@ -86,3 +135,5 @@ export default function Sort() {
     </Box>
   );
 }
+
+export { ADD_EQUIPMENT_EVENT, DELETE_EQUIPMENT_EVENT };

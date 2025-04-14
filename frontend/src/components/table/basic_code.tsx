@@ -14,6 +14,7 @@ import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
 import { useRecoilState } from 'recoil';
 import { selectedSensorsState } from '../../recoil/atoms';
+import { DELETE_SENSOR_EVENT } from '../../section/aas/dashboard/view';
 
 interface Sensor {
   sn_idx: number;
@@ -25,7 +26,7 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const [editedSensors, setEditedSensors] = React.useState<Sensor[]>([]);
   const [newSensor, setNewSensor] = React.useState<string>('');
-  const [newSensorIdx, setNewSensorIdx] = React.useState<number>();
+  const [newSensorIdx, setNewSensorIdx] = React.useState<number>(-1);
 
   const style = {
     width: '100%',
@@ -39,7 +40,9 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
   }, [fa_idx]);
 
   React.useEffect(() => {
-    setEditedSensors([...sensors]);
+    if (sensors) {
+      setEditedSensors([...sensors]);
+    }
   }, [sensors]);
 
   React.useEffect(() => {
@@ -47,6 +50,17 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
       handleSaveSensors();
     }
   }, [isEditMode]);
+
+  React.useEffect(() => {
+    setSensors([]);
+    setEditedSensors([]);
+    setNewSensor('');
+    setNewSensorIdx(-1);
+
+    if (fa_idx) {
+      getSensors(fa_idx);
+    }
+  }, [fa_idx]);
 
   React.useEffect(() => {
     const addSensorHandler = () => {
@@ -60,7 +74,61 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
     return () => {
       document.removeEventListener(`add-sensor-${fa_idx}`, addSensorHandler);
     };
-  }, [fa_idx, isAddMode, newSensor, newSensorIdx]);
+  }, [fa_idx, isAddMode]);
+
+  React.useEffect(() => {
+    const handleDeleteSensorEvent = (event) => {
+      const eventFaIdx = event.detail?.fa_idx;
+
+      if (eventFaIdx === fa_idx) {
+        deleteSelectedSensors();
+      }
+    };
+
+    document.addEventListener(DELETE_SENSOR_EVENT, handleDeleteSensorEvent);
+
+    return () => {
+      document.removeEventListener(DELETE_SENSOR_EVENT, handleDeleteSensorEvent);
+    };
+  }, [fa_idx, selectedSensors]);
+
+  const deleteSelectedSensors = async () => {
+    if (selectedSensors.length === 0) return;
+
+    try {
+      const deletePromises = selectedSensors.map(async (sn_idx) => {
+        const response = await fetch(`http://localhost:5001/api/base_code/sensors`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sn_idx: sn_idx,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to delete Sensor: ${sn_idx}`);
+        }
+
+        return sn_idx;
+      });
+
+      const deletedIds = await Promise.all(deletePromises);
+      console.log('Deleted sensor IDs:', deletedIds);
+
+      const sensorIdsToRemove = selectedSensors.filter((id) => sensors.some((sensor) => sensor.sn_idx === id));
+
+      setSensors((prev) => prev.filter((sensor) => !sensorIdsToRemove.includes(sensor.sn_idx)));
+
+      setSelectedSensors((prev) => prev.filter((id) => !sensorIdsToRemove.includes(id)));
+
+      console.log('센서가 성공적으로 삭제되었습니다.');
+    } catch (err: any) {
+      console.error('Error deleting sensors:', err.message);
+      alert('센서 삭제 중 오류가 발생했습니다: ' + err.message);
+    }
+  };
 
   const getSensors = async (fa_idx: number) => {
     try {
@@ -72,10 +140,12 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
         throw new Error('Failed to fetch detections');
       }
 
-      const data: Sensor[] = await response.json();
-      setSensors(data);
+      const data = await response.json();
+
+      setSensors(Array.isArray(data) ? data : []);
     } catch (err: any) {
       console.log(err.message);
+      setSensors([]);
     }
   };
 
@@ -109,7 +179,14 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
   };
 
   const handleAddSensor = async () => {
-    if (!newSensor.trim() || newSensorIdx === -1 || isNaN(Number(newSensorIdx))) {
+    console.log('센서 추가 시도:', {
+      name: newSensor,
+      nameType: typeof newSensor,
+      idx: newSensorIdx,
+      idxType: typeof newSensorIdx,
+    });
+
+    if (!newSensor.trim() || newSensorIdx < 0 || isNaN(Number(newSensorIdx))) {
       alert('센서 이름과 인덱스를 모두 입력해주세요');
       return;
     }
@@ -132,16 +209,22 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
       }
 
       const addedSensor = await response.json();
+      console.log('Added sensor:', addedSensor);
 
-      setSensors((prev) => [...prev, addedSensor]);
-      setNewSensor('');
-      setNewSensorIdx(-1);
+      if (addedSensor && addedSensor.sn_idx && addedSensor.sn_name) {
+        setSensors((prev) => (Array.isArray(prev) ? [...prev, addedSensor] : [addedSensor]));
+        setNewSensor('');
+        setNewSensorIdx(-1);
 
-      if (onSensorAdded) {
-        onSensorAdded();
+        if (onSensorAdded) {
+          onSensorAdded();
+        }
+
+        console.log('Sensor added successfully');
+      } else {
+        console.error('Invalid sensor data received from server:', addedSensor);
+        alert('센서 데이터가 유효하지 않습니다. 다시 시도해주세요.');
       }
-
-      console.log('Sensor added successfully');
     } catch (err: any) {
       console.log('Error adding sensor:', err.message);
     }
@@ -164,9 +247,11 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
   };
 
   const rows = [];
-  for (let i = 0; i < sensors.length; i += 6) {
-    const rowSensors = sensors.slice(i, i + 6);
-    rows.push(rowSensors);
+  if (sensors) {
+    for (let i = 0; i < sensors.length; i += 6) {
+      const rowSensors = sensors.slice(i, i + 6);
+      rows.push(rowSensors);
+    }
   }
 
   return (
