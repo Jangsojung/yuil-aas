@@ -1,20 +1,19 @@
 import * as React from 'react';
-import { createMemoryRouter, RouterProvider, Outlet, useNavigate } from 'react-router';
+import { createBrowserRouter, RouterProvider, Outlet, useNavigate, Navigate } from 'react-router-dom';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
 
 import Layout from './layouts/dashboard';
-import authLayout from './layouts/auth';
+import AuthLayout from './layouts/auth';
 
 import DashboardPage from './pages/aas/dashboard';
 import ConvertPage from './pages/aas/convert';
 import TransmitPage from './pages/aas/transmit';
-import MonitoringPage from './pages/aas/monitoring';
-import aasxManagerPage from './pages/aasx/aasxManager';
-import dataManagerPage from './pages/aasx/dataManager';
-import edgePage from './pages/edge/edge';
+import AasxManagerPage from './pages/aasx/aasxManager';
+import DataManagerPage from './pages/aasx/dataManager';
+import EdgePage from './pages/edge/edge';
 import SignInPage from './pages/signIn/sign';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { userState } from './recoil/atoms';
 
 const NAVIGATION: Navigation = [
@@ -34,10 +33,6 @@ const NAVIGATION: Navigation = [
         segment: 'transmit',
         title: 'DATA 송신',
       },
-      //{
-      //  segment: 'monitoring',
-      //  title: 'KAMP 송신 모니터링',
-      //},
     ],
   },
   {
@@ -76,9 +71,8 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-function App() {
-  const setUser = useSetRecoilState(userState);
-  const user = React.useRef(localStorage.getItem('user'));
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useRecoilState(userState);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -86,7 +80,7 @@ function App() {
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
-      } catch {
+      } catch (error) {
         localStorage.removeItem('user');
         navigate('/signIn/sign');
       }
@@ -95,6 +89,14 @@ function App() {
     }
   }, [setUser, navigate]);
 
+  if (!user) {
+    return null;
+  }
+
+  return <>{children}</>;
+};
+
+function App() {
   return (
     <ReactRouterAppProvider navigation={NAVIGATION}>
       <Outlet />
@@ -105,72 +107,82 @@ function App() {
 export default function ReactRouter() {
   const router = React.useMemo(
     () =>
-      createMemoryRouter(
-        [
-          {
-            Component: App,
-            children: [
-              {
-                path: '/',
-                Component: authLayout,
-                children: [
-                  {
-                    path: '/signIn/sign',
-                    Component: SignInPage,
-                  },
-                ],
-              },
-              {
-                path: '/',
-                Component: Layout,
-                children: [
-                  {
-                    path: '/aas/dashboard',
-                    Component: DashboardPage,
-                  },
-                  {
-                    path: '/aas/convert',
-                    Component: ConvertPage,
-                  },
-                  {
-                    path: '/aas/transmit',
-                    Component: TransmitPage,
-                  },
-                  // {
-                  //   path: '/aas/monitoring',
-                  //   Component: MonitoringPage,
-                  // },
-                ],
-              },
-              {
-                path: '/',
-                Component: Layout,
-                children: [
-                  {
-                    path: '/aasx/aasxManager',
-                    Component: aasxManagerPage,
-                  },
-                  {
-                    path: '/aasx/dataManager',
-                    Component: dataManagerPage,
-                  },
-                ],
-              },
-              {
-                path: '/',
-                Component: Layout,
-                children: [
-                  {
-                    path: '/edge/edge',
-                    Component: edgePage,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-        { initialEntries: ['/signIn/sign'] }
-      ),
+      createBrowserRouter([
+        {
+          path: '/',
+          Component: App,
+          children: [
+            {
+              path: '',
+              element: <Navigate to='/aas/dashboard' replace />,
+            },
+            {
+              path: 'signIn',
+              element: <AuthLayout />,
+              children: [
+                {
+                  path: 'sign',
+                  element: <SignInPage />,
+                },
+              ],
+            },
+            {
+              path: 'aas',
+              element: (
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              ),
+              children: [
+                {
+                  path: 'dashboard',
+                  element: <DashboardPage />,
+                },
+                {
+                  path: 'convert',
+                  element: <ConvertPage />,
+                },
+                {
+                  path: 'transmit',
+                  element: <TransmitPage />,
+                },
+              ],
+            },
+            {
+              path: 'aasx',
+              element: (
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              ),
+              children: [
+                {
+                  path: 'aasxManager',
+                  element: <AasxManagerPage />,
+                },
+                {
+                  path: 'dataManager',
+                  element: <DataManagerPage />,
+                },
+              ],
+            },
+            {
+              path: 'edge',
+              element: (
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              ),
+              children: [
+                {
+                  path: 'edge',
+                  element: <EdgePage />,
+                },
+              ],
+            },
+          ],
+        },
+      ]),
     []
   );
 

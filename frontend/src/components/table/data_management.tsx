@@ -55,11 +55,6 @@ export default function BasicTable() {
     }
   }, [selectedFiles, files]);
 
-  // React.useEffect(() => {
-  //   setStartDate(dayjs().subtract(1, 'month'));
-  //   setEndDate(dayjs());
-  // }, [startDate, endDate]);
-
   const getFiles = async () => {
     try {
       const startDateStr = dateRange.startDate ? dayjs(dateRange.startDate).format('YYYY-MM-DD') : '';
@@ -108,25 +103,23 @@ export default function BasicTable() {
     setSelectedFile(null);
   };
 
-  const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
-  };
+  // const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
+  //   setStartDate(newStartDate);
+  //   setEndDate(newEndDate);
+  // };
 
-  // 날짜 검색 핸들러
-  const handleSearch = () => {
-    if (!startDate || !endDate) {
-      alert('날짜를 선택해주세요.');
-      return;
-    }
-    getFiles();
-  };
+  // const handleSearch = () => {
+  //   if (!startDate || !endDate) {
+  //     alert('날짜를 선택해주세요.');
+  //     return;
+  //   }
+  //   getFiles();
+  // };
 
-  // 날짜 초기화 핸들러
-  const handleReset = () => {
-    setStartDate(dayjs().subtract(1, 'month'));
-    setEndDate(dayjs());
-  };
+  // const handleReset = () => {
+  //   setStartDate(dayjs().subtract(1, 'month'));
+  //   setEndDate(dayjs());
+  // };
   return (
     <>
       <TableContainer component={Paper}>

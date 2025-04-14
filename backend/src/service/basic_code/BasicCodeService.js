@@ -112,6 +112,21 @@ export const getBaseCodeFromDB = async (fg_idx) => {
   });
 };
 
+export const insertBaseCodeToDB = async (fa_idx, fg_idx, fa_name) => {
+  try {
+    const query = `insert into tb_aasx_data_sm (fa_idx, fg_idx, fa_name) values (?, ?, ?);`;
+    const [result] = await pool.promise().query(query, [fa_idx, fg_idx, fa_name]);
+
+    return {
+      fa_idx: fa_idx,
+      fa_name: fa_name,
+    };
+  } catch (err) {
+    console.log('Failed to insert new Equipment: ', err);
+    throw err;
+  }
+};
+
 export const editBaseCodeFromDB = async (fg_idx, fa_idx, fa_name) => {
   try {
     const query = `update tb_aasx_data_sm set fa_name = ? where fa_idx = ?;`;
@@ -122,10 +137,25 @@ export const editBaseCodeFromDB = async (fg_idx, fa_idx, fa_name) => {
   }
 };
 
+export const deleteBaseCodeFromDB = async (fa_idx) => {
+  try {
+    const query = `delete from tb_aasx_data_sm where fa_idx = ?;`;
+    await pool.promise().query(query, [fa_idx]);
+  } catch (err) {
+    console.log('Failed to delete Facility: ', err);
+    throw err;
+  }
+};
+
 export const insertSensorBaseCodeFromDB = async (sn_idx, fa_idx, sn_name) => {
   try {
-    const query = `insert into tb_aasx_data_prop (sn_idx,fa_idx, sn_name) values (?, ?, ?);`;
+    const query = `insert into tb_aasx_data_prop (sn_idx, fa_idx, sn_name) values (?, ?, ?);`;
     await pool.promise().query(query, [sn_idx, fa_idx, sn_name]);
+
+    return {
+      sn_idx: sn_idx,
+      sn_name: sn_name,
+    };
   } catch (err) {
     console.log('Failed to insert Sensor: ', err);
     throw err;
@@ -138,6 +168,16 @@ export const editSensorBaseCodeFromDB = async (sn_idx, sn_name) => {
     await pool.promise().query(query, [sn_name, sn_idx]);
   } catch (err) {
     console.log('Failed to update Sensor: ', err);
+    throw err;
+  }
+};
+
+export const deleteSensorBaseCodeFromDB = async (sn_idx) => {
+  try {
+    const query = `delete from tb_aasx_data_prop where sn_idx = ?;`;
+    await pool.promise().query(query, [sn_idx]);
+  } catch (err) {
+    console.log('Failed to delete Sensor: ', err);
     throw err;
   }
 };

@@ -74,7 +74,6 @@ export default function Sort({ startLoading, endLoading }) {
     }
   };
 
-  // resetTrigger가 변경될 때 날짜를 초기화하는 효과
   React.useEffect(() => {
     if (resetTrigger) {
       setStartDate(null);
