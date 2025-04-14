@@ -1,8 +1,7 @@
+import os
 import basyx.aas.model as model
 import basyx.aas.model.datatypes as datatypes
-import basyx.aas.adapter.json as json
-import os
-
+from basyx.aas.adapter import aasx, json as basyx_json
 from datetime import datetime
 
 
@@ -53,11 +52,9 @@ def create_submodel(line_name, machine_name, machine_data):
     return submodel
 
 
-aas_ids = []
-obj_store = model.DictObjectStore()
-
-
 def transform_aas(path, data):
+    aas_ids = []
+    obj_store = model.DictObjectStore()
     basename = os.path.basename(path)
 
     for line_name, line_data in data.items():
@@ -76,4 +73,23 @@ def transform_aas(path, data):
         obj_store.add(aas)
         aas_ids.append(id_)
 
-    json.write_aas_json_file(f'../files/aas/{basename}', obj_store, indent=2)
+    basyx_json.write_aas_json_file(f'../files/aas/{basename}', obj_store, indent=2)
+
+
+def transform_aasx(path):
+    file_store = aasx.DictSupplementaryFileContainer()
+    obj_store = basyx_json.read_aas_json_file(path)
+
+    filename = os.path.splitext(os.path.basename(path))[0]
+
+    aas_ids = [
+        aas.id for aas in obj_store
+        if isinstance(aas, model.AssetAdministrationShell)
+    ]
+
+    with aasx.AASXWriter(f'../files/aasx/{filename}.aasx') as writer:
+        writer.write_aas(
+            aas_ids=aas_ids,
+            object_store=obj_store,
+            file_store=file_store
+        )

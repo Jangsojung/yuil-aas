@@ -1,6 +1,6 @@
 import json
-from flask import Flask, request, jsonify
-from transform import transform_aas
+from flask import Flask, request
+from transform import transform_aas, transform_aasx
 
 app = Flask(__name__)
 
@@ -14,7 +14,16 @@ def create_aas():
 
     transform_aas(path, data)
 
-    return '성공', 201
+    return 'AAS 변환 성공', 201
+
+
+@app.route('/api/aasx', methods=['post'])
+def create_aasx():
+    path = request.get_json()['path']
+
+    transform_aasx(path)
+
+    return 'AASX 변환 성공', 201
 
 
 if __name__ == '__main__':
