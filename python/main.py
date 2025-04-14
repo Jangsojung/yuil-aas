@@ -13,8 +13,11 @@ def create_aas():
     old_path = data.get('old_path')
 
     if old_path and os.path.exists(old_path):
-        os.remove(old_path)
-        print(f'{old_path} 파일 삭제 성공')
+        try:
+            os.remove(old_path)
+            print(f'{old_path} 파일 삭제 성공')
+        except Exception as e:
+            print(f'파일 삭제 실패: {e}')
 
     with open(path, 'rb') as json_file:
         data = orjson.loads(json_file.read())
