@@ -18,7 +18,7 @@ export const isEditModeState = atom({
 
 export const currentFacilityGroupState = atom<number | null>({
   key: 'currentFacilityGroupState',
-  default: null,
+  default: 6,
 });
 
 export const hasBasicsState = atom<boolean>({
@@ -61,14 +61,19 @@ export const selectedDataFilesState = atom<number[]>({
   default: [],
 });
 
-export const userState = atom<string | null>({
+export interface User {
+  user_id: string;
+  user_name: string;
+}
+
+export const userState = atom<User | null>({
   key: 'userState',
-  default: localStorage.getItem('user') || null,
+  default: JSON.parse(localStorage.getItem('user') || 'null'),
   effects: [
     ({ onSet }) => {
       onSet((newUser) => {
         if (newUser) {
-          localStorage.setItem('user', newUser);
+          localStorage.setItem('user', JSON.stringify(newUser));
         } else {
           localStorage.removeItem('user');
         }
