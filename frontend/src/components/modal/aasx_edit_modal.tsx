@@ -66,7 +66,7 @@ interface FileProps {
 }
 
 export default function CustomizedDialogs({ open, handleClose, fileData = null }: FileProps) {
-  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  // const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [uploadFile, setUploadFile] = React.useState<any>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
@@ -92,16 +92,16 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
       const file = event.dataTransfer.files[0];
       setUploadFile(file);
     },
-    selectedFileName: selectedFile?.af_name || '',
+    selectedFileName: uploadFile?.af_name || '',
   };
 
   const handleEdit = async () => {
-    if (!uploadFile && !selectedFile) {
+    if (!uploadFile) {
       alert('파일을 선택해주세요.');
       return;
     }
 
-    const fileToUpload = uploadFile || selectedFile;
+    const fileToUpload = uploadFile;
 
     if (!fileToUpload.name && !fileToUpload.af_name) {
       alert('파일을 선택해주세요.');
@@ -117,16 +117,14 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
     setIsLoading(true);
 
     try {
-      const fileName = uploadFile?.af_name;
+      const fileName = selectedFile.af_name;
 
       const response = await fetch(`http://localhost:5001/api/file?af_idx=${af_idx}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          fileName,
-        }),
+        body: JSON.stringify({ fileName }),
       });
 
       if (!response.ok) {
@@ -136,7 +134,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
       const result = await response.json();
       console.log('업로드 결과:', result);
 
-      alert('성공적으로 json파일을 수정하였습니다.\n파일 위치: /files/python');
+      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /src/files/python');
       setRefreshTrigger((prev) => prev + 1);
       handleClose();
     } catch (err) {

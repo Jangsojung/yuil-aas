@@ -13,8 +13,8 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { grey } from '@mui/material/colors';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
-import { useRecoilValue } from 'recoil';
-import { currentFactoryState } from '../../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { currentFactoryState, dataTableRefreshTriggerState, edgeGatewayRefreshState } from '../../recoil/atoms';
 import { CircularProgress } from '@mui/material';
 
 const DeleteIcon = styled(ClearIcon)<IconProps>(() => ({
@@ -60,6 +60,7 @@ export default function CustomizedDialogs() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const currentFactory = useRecoilValue(currentFactoryState);
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -115,6 +116,7 @@ export default function CustomizedDialogs() {
       console.log('업로드 결과:', result);
 
       alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aas');
+      setRefreshTrigger((prev) => prev + 1);
       handleClose();
     } catch (err) {
       console.error(err.message);

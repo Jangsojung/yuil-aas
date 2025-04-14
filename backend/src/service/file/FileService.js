@@ -44,7 +44,9 @@ export const updateFileToDB = async (af_idx, fileName) => {
     }
 
     const oldFileName = rows[0].af_name;
-    const newFileName = file.originalname;
+    console.log('>>>>>' + oldFileName);
+
+    const newFileName = fileName;
     const file_path = '/files/aas';
 
     const query = `UPDATE tb_aasx_file SET af_name = ? WHERE af_idx = ?`;

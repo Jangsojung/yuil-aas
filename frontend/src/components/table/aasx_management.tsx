@@ -12,6 +12,7 @@ import { useRecoilValue } from 'recoil';
 import { currentFactoryState, dataTableRefreshTriggerState, dateRangeAASXState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 import dayjs, { Dayjs } from 'dayjs';
+import CustomizedDialogs from '../modal/aasx_edit_modal';
 
 interface File {
   af_idx: number;
@@ -28,6 +29,7 @@ export default function BasicTable() {
   const [selectAll, setSelectAll] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const dateRange = useRecoilValue(dateRangeAASXState);
+  const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
 
   React.useEffect(() => {
     if (currentFactory !== null) {
@@ -91,6 +93,15 @@ export default function BasicTable() {
     });
   };
 
+  const handleDoubleClick = (file: File) => {
+    setSelectedFile(file);
+    setOpenUpdateModal(true);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+    setSelectedFile(null);
+  };
   return (
     <>
       <TableContainer component={Paper}>
@@ -108,7 +119,11 @@ export default function BasicTable() {
           <TableBody>
             {files ? (
               files.map((file) => (
-                <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableRow
+                  key={file.af_idx}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                  onDoubleClick={() => handleDoubleClick(file)}
+                >
                   <TableCell>
                     <Checkbox
                       checked={selectedFiles.includes(file.af_idx)}
@@ -131,6 +146,7 @@ export default function BasicTable() {
         </Table>
       </TableContainer>
       <Pagenation count={files ? files.length : 0} />
+      <CustomizedDialogs open={openUpdateModal} handleClose={handleCloseUpdateModal} fileData={selectedFile} />
     </>
   );
 }
