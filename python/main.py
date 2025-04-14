@@ -1,4 +1,4 @@
-import json
+import orjson
 from flask import Flask, request
 from transform import transform_aas, transform_aasx
 
@@ -9,8 +9,8 @@ app = Flask(__name__)
 def create_aas():
     path = request.get_json()['path']
 
-    with open(path, 'r', encoding='utf-8-sig') as json_file:
-        data = json.load(json_file)
+    with open(path, 'rb') as json_file:
+        data = orjson.loads(json_file.read())
 
     transform_aas(path, data)
 
