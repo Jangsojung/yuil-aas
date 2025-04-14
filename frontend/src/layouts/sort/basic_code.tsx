@@ -18,7 +18,9 @@ import {
   shouldSaveChangesState,
   currentFacilityGroupState,
   selectedFacilitiesState,
+  selectedSensorsState,
 } from '../../recoil/atoms';
+import { TextField } from '@mui/material';
 
 const Item = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
@@ -36,24 +38,26 @@ const Item = styled('div')(({ theme }) => ({
 const ADD_EQUIPMENT_EVENT = 'add-new-equipment';
 const DELETE_EQUIPMENT_EVENT = 'delete-equipment';
 
-export default function Sort() {
+interface Props {
+  insertMode: boolean;
+  setInsertMode: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function Sort({ insertMode, setInsertMode }: Props) {
   const hasBasics = useRecoilValue(hasBasicsState);
   const [isEditMode, setIsEditMode] = useRecoilState(isEditModeState);
   const [shouldSaveChanges, setShouldSaveChanges] = useRecoilState(shouldSaveChangesState);
   const [isAddingEquipment, setIsAddingEquipment] = React.useState(false);
   const selectedFacilities = useRecoilValue(selectedFacilitiesState);
   const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
+  const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
+  const [name, setName] = React.useState('');
 
   const handleEditToggle = () => {
     if (isEditMode) {
       setShouldSaveChanges(true);
     }
     setIsEditMode(!isEditMode);
-  };
-
-  const handleAddEquipment = () => {
-    document.dispatchEvent(new CustomEvent(ADD_EQUIPMENT_EVENT));
-    setIsAddingEquipment(true);
   };
 
   const handleDeleteEquipment = () => {
@@ -64,17 +68,35 @@ export default function Sort() {
     }
   };
 
-  React.useEffect(() => {
-    const handleEquipmentAdded = () => {
-      setIsAddingEquipment(false);
-    };
+  const handleAdd = async () => {
+    if (!name) {
+      console.log('이름을 입력해주세요.');
+      return;
+    }
 
-    document.addEventListener('equipment-added', handleEquipmentAdded);
+    // startLoading();
 
-    return () => {
-      document.removeEventListener('equipment-added', handleEquipmentAdded);
-    };
-  }, []);
+    try {
+      const response = await fetch(`http://localhost:5001/api/base_code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ids: selectedSensors }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to insert base');
+      }
+
+      alert('성공적으로 json파일을 생성하였습니다.\n파일 위치: /files/front');
+
+      // endLoading();
+      setSelectedSensors([]);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
@@ -83,6 +105,12 @@ export default function Sort() {
           <Grid container spacing={1} style={{ gap: '20px' }}>
             <Grid>
               <Grid container spacing={1}>
+                <Grid className='d-flex gap-5'>
+                  <div className='sort-title'>제목</div>
+                </Grid>
+                <Grid>
+                  <TextField onChange={(e) => setName(e.target.value)} />
+                </Grid>
                 <Grid>
                   <div className='sort-title'>설비 그룹</div>
                 </Grid>
@@ -97,37 +125,14 @@ export default function Sort() {
         <Grid size={4} direction='row' style={{ justifyContent: 'flex-end' }}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
             <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              {!isAddingEquipment ? (
-                <Button variant='contained' color='primary' onClick={handleAddEquipment}>
-                  <AddIcon />
-                  장비등록
-                </Button>
-              ) : (
-                <Button variant='contained' color='primary' disabled>
-                  <AddIcon />
-                  장비등록
-                </Button>
-              )}
-              {hasBasics && !isEditMode && (
-                <Button variant='contained' color='warning' onClick={handleEditToggle}>
-                  <EditIcon /> 장비수정
-                </Button>
-              )}
-              {hasBasics && isEditMode && (
-                <Button variant='contained' color='success' onClick={handleEditToggle}>
-                  <SaveIcon /> 수정완료
-                </Button>
-              )}
-              {hasBasics && (
-                <Button
-                  variant='contained'
-                  color='error'
-                  onClick={handleDeleteEquipment}
-                  disabled={selectedFacilities.length === 0}
-                >
-                  <RemoveIcon /> 장비삭제
-                </Button>
-              )}
+              <Button variant='contained' color='success' onClick={handleAdd} disabled={selectedSensors.length === 0}>
+                <SaveIcon />
+                등록완료
+              </Button>
+
+              <Button variant='contained' color='error' onClick={() => setInsertMode(false)}>
+                <RemoveIcon /> 취소
+              </Button>
             </Stack>
           </Stack>
         </Grid>

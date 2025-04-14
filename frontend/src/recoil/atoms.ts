@@ -36,6 +36,11 @@ export const selectedFacilitiesState = atom<number[]>({
   default: [],
 });
 
+export const selectedBasesState = atom<number[]>({
+  key: 'selectedBasesState',
+  default: [],
+});
+
 export const edgeGatewayRefreshState = atom<number>({
   key: 'edgeGatewayRefreshState',
   default: 0,
@@ -107,4 +112,9 @@ export const dateRangeAASXState = atom<{
 export const shouldSaveChangesState = atom({
   key: 'shouldSaveChangesState',
   default: false,
+});
+
+export const addSensorTriggerState = atom<number>({
+  key: 'addSensorTriggerState',
+  default: -1,
 });

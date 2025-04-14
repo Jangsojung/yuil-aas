@@ -1,5 +1,6 @@
 import {
   getFactoriesFromDB,
+  getBasesFromDB,
   getFacilityGroupsFromDB,
   getSensorsFromDB,
   getBaseCodeFromDB,
@@ -14,6 +15,17 @@ import {
 export const getFactories = async (res) => {
   try {
     const result = await getFactoriesFromDB();
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const getBases = async (res) => {
+  try {
+    const result = await getBasesFromDB();
 
     res.status(200).json(result);
   } catch (err) {

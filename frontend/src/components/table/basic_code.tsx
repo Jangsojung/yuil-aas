@@ -186,7 +186,7 @@ export default function BasicTable({ sm_idx, fa_idx, isEditMode = false, isAddMo
       idxType: typeof newSensorIdx,
     });
 
-    if (!newSensor.trim() || newSensorIdx < 0 || isNaN(Number(newSensorIdx))) {
+    if (!newSensor.trim() || !newSensorIdx || isNaN(Number(newSensorIdx))) {
       alert('센서 이름과 인덱스를 모두 입력해주세요');
       return;
     }

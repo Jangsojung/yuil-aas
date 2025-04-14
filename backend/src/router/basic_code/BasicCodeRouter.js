@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getFactories,
+  getBases,
   getFacilityGroups,
   getSensors,
   getBaseCode,
@@ -17,6 +18,10 @@ const router = express.Router();
 export default () => {
   router.get('/factories', (req, res) => {
     getFactories(res);
+  });
+
+  router.get('/bases', (req, res) => {
+    getBases(res);
   });
 
   router.get('/facilityGroups', (req, res) => {

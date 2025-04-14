@@ -26,6 +26,32 @@ export const getFactoriesFromDB = async () => {
   });
 };
 
+export const getBasesFromDB = async () => {
+  return new Promise((resolve, reject) => {
+    const query = 'select ab_idx, ab_name from tb_aasx_base';
+
+    pool.query(query, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        const bases = results.map((base) => {
+          return {
+            ab_idx: base.ab_idx,
+            ab_name: base.ab_name,
+          };
+        });
+
+        resolve(bases);
+      }
+    });
+  });
+};
+
 export const getFacilityGroupsFromDB = async (fc_idx = 3, order = 'asc') => {
   return new Promise((resolve, reject) => {
     const validOrder = order;

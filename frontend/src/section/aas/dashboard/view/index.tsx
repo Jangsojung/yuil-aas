@@ -326,7 +326,7 @@ export default function BasicCode() {
                   <span>Sub Modal 1.{idx + 1}</span>
                 </div>
 
-                <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+                {/* <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
                   {!addSensorStates[basic.fa_idx] ? (
                     <Button
                       variant='outlined'
@@ -359,7 +359,7 @@ export default function BasicCode() {
                   >
                     <RemoveIcon /> 센서삭제
                   </Button>
-                </Stack>
+                </Stack> */}
               </Grid>
               <Table
                 sm_idx={idx + 1}
