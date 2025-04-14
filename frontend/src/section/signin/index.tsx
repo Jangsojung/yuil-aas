@@ -4,7 +4,7 @@ import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 import { useRecoilState } from 'recoil';
 import { User, userState } from '../../recoil/atoms';
-import { useNavigate, NavigateFunction } from 'react-router';
+import { useNavigate, NavigateFunction } from 'react-router-dom';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
@@ -52,6 +52,12 @@ export default function SignInView() {
   const theme = useTheme();
   const [user, setUser] = useRecoilState(userState);
   const nav = useNavigate();
+
+  React.useEffect(() => {
+    if (user) {
+      nav('/aas/dashboard');
+    }
+  }, [user, nav]);
 
   return (
     <AppProvider theme={theme}>
