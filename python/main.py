@@ -1,4 +1,5 @@
 import orjson
+import os
 from flask import Flask, request
 from transform import transform_aas, transform_aasx
 
@@ -7,7 +8,13 @@ app = Flask(__name__)
 
 @app.route('/api/aas', methods=['post'])
 def create_aas():
-    path = request.get_json()['path']
+    data = request.get_json()
+    path = data['path']
+    old_path = data.get('old_path')
+
+    if old_path and os.path.exists(old_path):
+        os.remove(old_path)
+        print(f'{old_path} 파일 삭제 성공')
 
     with open(path, 'rb') as json_file:
         data = orjson.loads(json_file.read())
