@@ -87,10 +87,29 @@ export const updateFileToDB = async (af_idx, fileName) => {
 
 export const deleteFilesFromDB = async (ids) => {
   try {
-    const query = `delete from tb_aasx_file where af_idx in (?)`;
-    await pool.promise().query(query, [ids]);
+    const query = `select af_name from tb_aasx_file where af_idx in (?)`;
+    const [results] = await pool.promise().query(query, [ids]);
+
+    const fileNames = results.map((row) => row.af_name);
+
+    const query2 = `delete from tb_aasx_file where af_idx in (?)`;
+    await pool.promise().query(query2, [ids]);
 
     console.log('Python JSON Files deleted successfully');
+
+    const filePaths = fileNames.map((name) => `../files/aas/${name}`);
+
+    const pythonResponse = await fetch('http://localhost:5000/api/aas', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        paths: filePaths,
+      }),
+    });
+
+    console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
   } catch (err) {
     console.log('Failed to delete Python JSON Files: ', err);
     throw err;
@@ -198,6 +217,37 @@ export const updateAASXFileToDB = async (af_idx, fileName) => {
     };
   } catch (err) {
     console.log('Failed to update JSON File: ', err);
+    throw err;
+  }
+};
+
+export const deleteAASXFilesFromDB = async (ids) => {
+  try {
+    const query = `select af_name from tb_aasx_file where af_idx in (?)`;
+    const [results] = await pool.promise().query(query, [ids]);
+
+    const fileNames = results.map((row) => row.af_name);
+
+    const query2 = `delete from tb_aasx_file where af_idx in (?)`;
+    await pool.promise().query(query2, [ids]);
+
+    console.log('Python JSON Files deleted successfully');
+
+    const filePaths = fileNames.map((name) => `../files/aasx/${name}`);
+
+    const pythonResponse = await fetch('http://localhost:5000/api/aas', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        paths: filePaths,
+      }),
+    });
+
+    console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
+  } catch (err) {
+    console.log('Failed to delete Python JSON Files: ', err);
     throw err;
   }
 };

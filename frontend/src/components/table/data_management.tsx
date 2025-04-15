@@ -36,11 +36,9 @@ export default function BasicTable() {
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const dateRange = useRecoilValue(dateRangeState);
 
-  const [startDate, setStartDate] = React.useState<Dayjs | null>(dayjs().subtract(1, 'month'));
-  const [endDate, setEndDate] = React.useState<Dayjs | null>(dayjs());
-
   React.useEffect(() => {
     if (currentFactory !== null) {
+      setSelectedFiles([]);
       getFiles();
     }
   }, [refreshTrigger, currentFactory]);
@@ -61,7 +59,10 @@ export default function BasicTable() {
       const endDateStr = dateRange.endDate ? dayjs(dateRange.endDate).format('YYYY-MM-DD') : '';
 
       const response = await fetch(
-        `http://localhost:5001/api/kamp_monitoring/AASXfiles?af_kind=2&fc_idx=${currentFactory}&startDate=${startDateStr}&endDate=${endDateStr}`
+        `http://localhost:5001/api/kamp_monitoring/AASXfiles?af_kind=2&fc_idx=${currentFactory}&startDate=${startDateStr}&endDate=${endDateStr}`,
+        {
+          method: 'GET',
+        }
       );
 
       if (!response.ok) throw new Error('Failed to fetch detections');
@@ -135,7 +136,7 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {files &&
+            {files ? (
               files.map((file) => (
                 <TableRow
                   key={file.af_idx}
@@ -152,7 +153,14 @@ export default function BasicTable() {
                   <TableCell>{file.af_name}</TableCell>
                   <TableCell>{new Date(file.createdAt).toLocaleDateString()}</TableCell>
                 </TableRow>
-              ))}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={cells.length + 1} align='center'>
+                  데이터가 없습니다.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -163,4 +171,4 @@ export default function BasicTable() {
   );
 }
 
-const cells = ['파일 IDX', '파일 이름', '생성 날짜'];
+const cells = ['파일 번호', '파일 이름', '생성 날짜'];

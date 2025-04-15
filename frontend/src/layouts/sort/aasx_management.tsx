@@ -45,7 +45,7 @@ export default function Sort() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/file`, {
+      const response = await fetch(`http://localhost:5001/api/file/aasx`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

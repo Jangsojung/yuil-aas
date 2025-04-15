@@ -5,6 +5,7 @@ import {
   getAASXFilesFromDB,
   insertAASXFileToDB,
   updateAASXFileToDB,
+  deleteAASXFilesFromDB,
 } from '../../service/file/FileService.js';
 
 export const insertFile = async (fc_idx, fileName, res) => {
@@ -70,5 +71,16 @@ export const updateAASXFile = async (af_idx, fileName, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const deleteAASXFiles = async (ids, res) => {
+  try {
+    const result = await deleteAASXFilesFromDB(ids);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
   }
 };

@@ -8,8 +8,13 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
-import { useRecoilValue } from 'recoil';
-import { currentFactoryState, dataTableRefreshTriggerState, dateRangeAASXState } from '../../recoil/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import {
+  currentFactoryState,
+  dataTableRefreshTriggerState,
+  dateRangeAASXState,
+  selectedDataFilesState,
+} from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 import dayjs, { Dayjs } from 'dayjs';
 import CustomizedDialogs from '../modal/aasx_edit_modal';
@@ -20,19 +25,21 @@ interface File {
   createdAt: Date;
 }
 
-const cells = ['파일 IDX', '파일 이름', '생성 날짜'];
+const cells = ['파일 번호', '파일 이름', '생성 날짜'];
 export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [files, setFiles] = React.useState<File[]>([]);
-  const [selectedFiles, setSelectedFiles] = React.useState<number[]>([]);
+  const [selectedFiles, setSelectedFiles] = useRecoilState(selectedDataFilesState);
   const refreshTrigger = useRecoilValue(dataTableRefreshTriggerState);
   const [selectAll, setSelectAll] = React.useState(false);
+
+  const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const dateRange = useRecoilValue(dateRangeAASXState);
-  const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
 
   React.useEffect(() => {
     if (currentFactory !== null) {
+      setSelectedFiles([]);
       getFiles();
     }
   }, [refreshTrigger, currentFactory]);
@@ -64,9 +71,6 @@ export default function BasicTable() {
       }
 
       const data: File[] = await response.json();
-
-      console.log(data);
-
       setFiles(data);
     } catch (err: any) {
       console.log(err.message);
@@ -102,6 +106,7 @@ export default function BasicTable() {
     setOpenUpdateModal(false);
     setSelectedFile(null);
   };
+
   return (
     <>
       <TableContainer component={Paper}>
