@@ -82,11 +82,11 @@ export default function BasicCode() {
             <div key={basic.fa_idx}>
               <Grid container spacing={1} className='sensor-tit'>
                 <div className='d-flex align-flex-end gap-10'>
-                  <Checkbox
+                  {/* <Checkbox
                     checked={selectedFacilities.includes(basic.fa_idx)}
                     onChange={() => handleCheckboxChange(basic.fa_idx)}
-                  />
-                  <TextField size='small' value={basic.fa_name} />
+                  /> */}
+                  <span>{basic.fa_name}</span>
                   <span>Sub Modal 1.{idx + 1}</span>
                 </div>
 

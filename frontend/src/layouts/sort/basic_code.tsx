@@ -111,6 +111,8 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
   };
 
   const handleCancle = () => {
+    setSelectedSensors([]);
+    setName('');
     setInsertMode(false);
     setBaseEditMode(false);
   };
