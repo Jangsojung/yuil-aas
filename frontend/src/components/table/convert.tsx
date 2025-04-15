@@ -12,36 +12,54 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentFactoryState, selectedConvertsState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 
-interface FacilityGroup {
-  fg_idx: number;
-  fg_name: string;
+interface Base {
+  ab_idx: number;
+  ab_name: string;
+  sn_length: number;
 }
 
 export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
-  const [groups, setGroups] = React.useState<FacilityGroup[]>([]);
+  const [bases, setBases] = React.useState<Base[]>([]);
   const [selectedConverts, setSelectedConverts] = useRecoilState(selectedConvertsState);
   const [selectAll, setSelectAll] = React.useState(false);
 
   React.useEffect(() => {
     if (currentFactory !== null) {
-      getFacilityGroups(currentFactory);
+      getBases();
     }
   }, [currentFactory]);
 
   React.useEffect(() => {
     if (selectedConverts.length === 0) {
       setSelectAll(false);
-    } else if (selectedConverts.length === groups.length) {
+    } else if (selectedConverts.length === bases.length) {
       setSelectAll(true);
     } else {
       setSelectAll(false);
     }
-  }, [selectedConverts, groups]);
+  }, [selectedConverts, bases]);
 
-  const getFacilityGroups = async (fc_idx: number) => {
+  // const getFacilityGroups = async (fc_idx: number) => {
+  //   try {
+  //     const response = await fetch(`http://localhost:5001/api/base_code/facilityGroups?fc_idx=${fc_idx}&order=desc`, {
+  //       method: 'GET',
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch detections');
+  //     }
+
+  //     const data: FacilityGroup[] = await response.json();
+  //     setGroups(data);
+  //   } catch (err: any) {
+  //     console.log(err.message);
+  //   }
+  // };
+
+  const getBases = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/facilityGroups?fc_idx=${fc_idx}&order=desc`, {
+      const response = await fetch(`http://localhost:5001/api/base_code/bases`, {
         method: 'GET',
       });
 
@@ -49,8 +67,8 @@ export default function BasicTable() {
         throw new Error('Failed to fetch detections');
       }
 
-      const data: FacilityGroup[] = await response.json();
-      setGroups(data);
+      const data: Base[] = await response.json();
+      setBases(data);
     } catch (err: any) {
       console.log(err.message);
     }
@@ -60,7 +78,7 @@ export default function BasicTable() {
     const checked = event.target.checked;
     setSelectAll(checked);
     if (checked) {
-      setSelectedConverts(groups.map((group) => group.fg_idx));
+      setSelectedConverts(bases.map((base) => base.ab_idx));
     } else {
       setSelectedConverts([]);
     }
@@ -91,25 +109,25 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {groups &&
-              groups.map((group) => (
-                <TableRow key={group.fg_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+            {bases &&
+              bases.map((base) => (
+                <TableRow key={base.ab_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>
                     <Checkbox
-                      checked={selectedConverts.includes(group.fg_idx)}
-                      onChange={() => handleCheckboxChange(group.fg_idx)}
+                      checked={selectedConverts.includes(base.ab_idx)}
+                      onChange={() => handleCheckboxChange(base.ab_idx)}
                     />
                   </TableCell>
-                  <TableCell>{group.fg_idx}</TableCell>
-                  <TableCell>{group.fg_name}</TableCell>
+                  <TableCell>{base.ab_idx}</TableCell>
+                  <TableCell>{base.ab_name}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagenation count={groups ? groups.length : 0} />
+      <Pagenation count={bases ? bases.length : 0} />
     </>
   );
 }
 
-const cells = ['번호', '설비그룹 이름'];
+const cells = ['번호', '기초코드 이름'];

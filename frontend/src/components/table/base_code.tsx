@@ -40,6 +40,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
 
   React.useEffect(() => {
     getBases();
+    setSelectedBases([]);
   }, [refreshTrigger, currentFactory]);
 
   React.useEffect(() => {

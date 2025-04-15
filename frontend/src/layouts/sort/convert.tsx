@@ -39,7 +39,7 @@ export default function Sort({ startLoading, endLoading }) {
 
   const handleAdd = async () => {
     if (!startDate || !endDate) {
-      console.log('시작 날짜와 종료 날짜를 모두 선택해야 합니다.');
+      alert('시작 날짜와 종료 날짜를 모두 선택해야 합니다.');
       return;
     }
 
@@ -71,6 +71,7 @@ export default function Sort({ startLoading, endLoading }) {
       setSelectedConverts([]);
     } catch (err) {
       console.log(err.message);
+      endLoading();
     }
   };
 

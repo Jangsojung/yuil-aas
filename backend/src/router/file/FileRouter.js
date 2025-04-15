@@ -10,6 +10,7 @@ import {
   getAASXFiles,
   insertAASXFile,
   updateAASXFile,
+  deleteAASXFiles,
 } from '../../controller/file/FileController.js';
 
 const router = express.Router();
@@ -39,6 +40,12 @@ export default () => {
     const { ids } = req.body;
 
     deleteFiles(ids, res);
+  });
+
+  router.delete('/aasx', (req, res) => {
+    const { ids } = req.body;
+
+    deleteAASXFiles(ids, res);
   });
 
   router.get('/aasxFiles', (req, res) => {

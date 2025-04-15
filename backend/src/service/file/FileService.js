@@ -147,13 +147,14 @@ export const getAASXFilesFromDB = async () => {
 export const insertAASXFileToDB = async (fc_idx, fileName) => {
   try {
     const file_path = '/files/aasx';
+    const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
 
     const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path) VALUES (?, 3, ?, ?)`;
-    await pool.promise().query(query, [fc_idx, fileName, file_path]);
+    await pool.promise().query(query, [fc_idx, aasxFileName, file_path]);
 
     console.log('JSON 파일 저장 및 DB 등록 완료');
 
-    const pythonFilePath = `../files/aas/${fileName}`;
+    const pythonFilePath = `../files/aas/${aasxFileName}`;
 
     const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
       method: 'POST',
@@ -169,7 +170,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName) => {
 
     return {
       success: true,
-      fileName: fileName,
+      fileName: aasxFileName,
       filePath: file_path,
     };
   } catch (err) {
@@ -187,16 +188,16 @@ export const updateAASXFileToDB = async (af_idx, fileName) => {
     }
 
     const oldFileName = rows[0].af_name;
-    const newFileName = file.originalname;
+    const newFileName = fileName.replace(/\.json$/i, '.aasx');
     const file_path = '/files/aasx';
 
     const query = `UPDATE tb_aasx_file SET af_name = ? WHERE af_idx = ?`;
-    await pool.promise().query(query, [fileName, af_idx]);
+    await pool.promise().query(query, [newFileName, af_idx]);
 
     console.log('JSON 파일 업데이트 및 DB 수정 완료');
 
     const old_pythonFilePath = `../files/aas/${oldFileName}`;
-    const pythonFilePath = `../files/aas/${fileName}`;
+    const pythonFilePath = `../files/aasx/${newFileName}`;
 
     const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
       method: 'POST',

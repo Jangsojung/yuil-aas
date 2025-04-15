@@ -36,7 +36,6 @@ export default function ConvertPage() {
         </div>
       )}
 
-      {/* Content */}
       <div style={{ pointerEvents: isLoading ? 'none' : 'auto' }}>
         <Sort startLoading={startLoading} endLoading={endLoading} />
         <Convert />
