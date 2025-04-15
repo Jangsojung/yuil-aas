@@ -30,7 +30,16 @@ def create_aas():
 
 @app.route('/api/aasx', methods=['post'])
 def create_aasx():
-    path = request.get_json()['path']
+    data = request.get_json()
+    path = data['path']
+    old_path = data.get('old_path')
+
+    if old_path and os.path.exists(old_path):
+        try:
+            os.remove(old_path)
+            print(f'{old_path} 파일 삭제 성공')
+        except Exception as e:
+            print(f'파일 삭제 실패: {e}')
 
     transform_aasx(path)
 
