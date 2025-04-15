@@ -9,23 +9,38 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { currentFactoryState, selectedConvertsState as selectedBasesState } from '../../recoil/atoms';
+import {
+  baseEditModeState,
+  currentFactoryState,
+  edgeGatewayRefreshState,
+  selectedBasesState,
+  selectedBaseState,
+} from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 
 interface Base {
   ab_idx: number;
   ab_name: string;
+  sn_length: number;
 }
 
-export default function BasicTable() {
+interface Props {
+  insertMode: boolean;
+  setInsertMode: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function BasicTable({ insertMode, setInsertMode }: Props) {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [bases, setBases] = React.useState<Base[]>([]);
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
   const [selectAll, setSelectAll] = React.useState(false);
+  const refreshTrigger = useRecoilValue(edgeGatewayRefreshState);
+  const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
+  const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
 
   React.useEffect(() => {
     getBases();
-  }, [currentFactory]);
+  }, [refreshTrigger, currentFactory]);
 
   React.useEffect(() => {
     if (selectedBases.length === 0) {
@@ -54,6 +69,11 @@ export default function BasicTable() {
     }
   };
 
+  const handleDoubleClick = (base: Base) => {
+    setSelectedBase(base);
+    setBaseEditMode(true);
+  };
+
   const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;
     setSelectAll(checked);
@@ -64,12 +84,12 @@ export default function BasicTable() {
     }
   };
 
-  const handleCheckboxChange = (convertsIdx: number) => {
+  const handleCheckboxChange = (baseIdx: number) => {
     setSelectedBases((prevSelected) => {
-      if (prevSelected.includes(convertsIdx)) {
-        return prevSelected.filter((idx) => idx !== convertsIdx);
+      if (prevSelected.includes(baseIdx)) {
+        return prevSelected.filter((idx) => idx !== baseIdx);
       } else {
-        return [...prevSelected, convertsIdx];
+        return [...prevSelected, baseIdx];
       }
     });
   };
@@ -91,7 +111,11 @@ export default function BasicTable() {
           <TableBody>
             {bases ? (
               bases.map((base) => (
-                <TableRow key={base.ab_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableRow
+                  key={base.ab_idx}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                  onDoubleClick={() => handleDoubleClick(base)}
+                >
                   <TableCell>
                     <Checkbox
                       checked={selectedBases.includes(base.ab_idx)}
@@ -100,6 +124,7 @@ export default function BasicTable() {
                   </TableCell>
                   <TableCell>{base.ab_idx}</TableCell>
                   <TableCell>{base.ab_name}</TableCell>
+                  <TableCell>{base.sn_length}</TableCell>
                 </TableRow>
               ))
             ) : (
@@ -117,4 +142,4 @@ export default function BasicTable() {
   );
 }
 
-const cells = ['IDX', '기초코드 이름', 'sensor idx 개수'];
+const cells = ['번호', '기초코드 이름', '센서'];
