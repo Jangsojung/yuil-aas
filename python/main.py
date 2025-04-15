@@ -48,30 +48,46 @@ def create_aasx():
 
 @app.route('/api/aas', methods=['delete'])
 def delete_aas():
-    path = request.get_json()['path']
+    paths = request.get_json()['paths']
 
-    if path and os.path.exists(path):
-        try:
-            os.remove(path)
-            print(f'{path} 파일 삭제 성공')
-        except Exception as e:
-            print(f'파일 삭제 실패: {e}')
+    deleted = []
+    failed = []
 
-    return 'AAS 파일 삭제 성공', 200
+    for path in paths:
+        if path and os.path.exists('path'):
+            try:
+                os.remove(path)
+                print(f'{path} 파일 삭제 성공')
+                deleted.append(path)
+            except Exception as e:
+                print(f'파일 삭제 실패: {e}')
+                failed.append(path)
+        else:
+            print(f'{path} 파일 없음')
+
+    return f'AAS {len(deleted)}개 파일 삭제 성공, {len(failed)}개 실패', 200
 
 
 @app.route('/api/aasx', methods=['delete'])
 def delete_aasx():
-    path = request.get_json()['path']
+    paths = request.get_json()['paths']
 
-    if path and os.path.exists(path):
-        try:
-            os.remove(path)
-            print(f'{path} 파일 삭제 성공')
-        except Exception as e:
-            print(f'파일 삭제 실패: {e}')
+    deleted = []
+    failed = []
 
-    return 'AASX 파일 삭제 성공', 200
+    for path in paths:
+        if path and os.path.exists('path'):
+            try:
+                os.remove(path)
+                print(f'{path} 파일 삭제 성공')
+                deleted.append(path)
+            except Exception as e:
+                print(f'파일 삭제 실패: {e}')
+                failed.append(path)
+        else:
+            print(f'{path} 파일 없음')
+
+    return f'AASX {len(deleted)}개 파일 삭제 성공, {len(failed)}개 실패', 200
 
 
 if __name__ == '__main__':
