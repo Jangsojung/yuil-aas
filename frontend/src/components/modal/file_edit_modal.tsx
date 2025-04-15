@@ -96,36 +96,23 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
   };
 
   const handleEdit = async () => {
-    if (!uploadFile && !selectedFile) {
-      alert('파일을 선택해주세요.');
-      return;
-    }
-
-    const fileToUpload = uploadFile || selectedFile;
-
-    if (!fileToUpload.name && !fileToUpload.af_name) {
-      alert('파일을 선택해주세요.');
-      return;
-    }
-
-    const fileName = fileToUpload.name || fileToUpload.af_name;
-    if (!fileName.toLowerCase().endsWith('.json')) {
+    const { name } = uploadFile;
+    
+    if (!name.toLowerCase().endsWith('.json')) {
       alert('JSON 파일만 업로드 가능합니다.');
       return;
     }
-
+    
     setIsLoading(true);
 
-    try {
-      const fileName = uploadFile?.af_name;
-
+    try {      
       const response = await fetch(`http://localhost:5001/api/file?af_idx=${af_idx}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          fileName,
+          'fileName': name
         }),
       });
 
@@ -140,8 +127,8 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
       setRefreshTrigger((prev) => prev + 1);
       handleClose();
     } catch (err) {
-      console.log(err.message);
       alert('업로드 중 오류 발생: ' + err.message);
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +141,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
   };
 
   const title = selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정';
-
+  
   return (
     <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
       {isLoading && (
@@ -201,7 +188,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
           </div> */}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleEdit} variant='contained' color='primary'>
+        <Button onClick={handleEdit} variant='contained' color='primary' disabled={uploadFile == null}>
           확인
         </Button>
 

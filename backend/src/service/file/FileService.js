@@ -39,35 +39,35 @@ export const updateFileToDB = async (af_idx, fileName) => {
   try {
     const [rows] = await pool.promise().query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ?', [af_idx]);
 
-    if (rows.length === 0) {
+    if (!rows.length) {
       throw new Error('파일을 찾을 수 없습니다.');
     }
 
     const oldFileName = rows[0].af_name;
-    console.log('>>>>>' + oldFileName);
-
     const newFileName = fileName;
-    const file_path = '/files/aas';
 
+    const file_path = '/files/aas';
     const query = `UPDATE tb_aasx_file SET af_name = ? WHERE af_idx = ?`;
     await pool.promise().query(query, [fileName, af_idx]);
 
     console.log('JSON 파일 업데이트 및 DB 수정 완료');
+    console.log(oldFileName, '------->', newFileName);
 
     const old_pythonFilePath = `../files/front/${oldFileName}`;
     const pythonFilePath = `../files/front/${fileName}`;
 
-    const pythonResponse = await axios.post('http://localhost:5000/api/aas', {
+    const pythonResponse = await axios.post('http://127.0.0.1:5000/api/aas', {
       old_path: old_pythonFilePath,
       path: pythonFilePath,
     });
 
     console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
+
     return {
       success: true,
       fileName: newFileName,
       filePath: file_path,
-    };
+    };    
   } catch (err) {
     console.log('Failed to update JSON File: ', err);
     throw err;

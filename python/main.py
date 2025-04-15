@@ -15,7 +15,8 @@ def create_aas():
     if old_path and os.path.exists(old_path):
         try:
             os.remove(old_path)
-            print(f'{old_path} 파일 삭제 성공')
+            os.remove(old_path.replace('front', 'aas'))
+            print(f'{old_path}, {old_path.replace("front", "aas")} 파일 삭제 성공')
         except Exception as e:
             print(f'파일 삭제 실패: {e}')
 
