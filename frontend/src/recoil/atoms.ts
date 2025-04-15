@@ -138,3 +138,13 @@ export const selectedBaseState = atom<Base>({
     sn_length: -1,
   },
 });
+
+export const aasxDataState = atom<any>({
+  key: 'aasxDataState',
+  default: null,
+});
+
+export const isVerifiedState = atom<boolean>({
+  key: 'isVerifiedState',
+  default: false,
+});

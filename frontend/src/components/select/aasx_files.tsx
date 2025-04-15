@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { currentFacilityGroupState, currentFactoryState, currentFileState } from '../../recoil/atoms';
+import { aasxDataState, currentFacilityGroupState, currentFactoryState, currentFileState } from '../../recoil/atoms';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 interface AASXFile {
@@ -15,6 +15,7 @@ interface AASXFile {
 export default function SelectSmall() {
   const [files, setFiles] = React.useState<AASXFile[]>([]);
   const [currentFile, setCurrentFile] = useRecoilState(currentFileState);
+  const [, setAasxData] = useRecoilState(aasxDataState);
 
   React.useEffect(() => {
     getFiles();
