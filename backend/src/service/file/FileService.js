@@ -18,7 +18,13 @@ export const insertFileToDB = async (fc_idx, fileName) => {
     const pythonFilePath = `../files/front/${fileName}`;
 
     const pythonResponse = await fetch('http://localhost:5000/api/aas', {
-      path: pythonFilePath,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        path: pythonFilePath,
+      }),
     });
 
     console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
@@ -55,9 +61,15 @@ export const updateFileToDB = async (af_idx, fileName) => {
     const old_pythonFilePath = `../files/front/${oldFileName}`;
     const pythonFilePath = `../files/front/${fileName}`;
 
-    const pythonResponse = await axios.post('http://127.0.0.1:5000/api/aas', {
-      old_path: old_pythonFilePath,
-      path: pythonFilePath,
+    const pythonResponse = await fetch('http://127.0.0.1:5000/api/aas', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        old_path: old_pythonFilePath,
+        path: pythonFilePath,
+      }),
     });
 
     console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
@@ -66,7 +78,7 @@ export const updateFileToDB = async (af_idx, fileName) => {
       success: true,
       fileName: newFileName,
       filePath: file_path,
-    };    
+    };
   } catch (err) {
     console.log('Failed to update JSON File: ', err);
     throw err;
@@ -125,7 +137,13 @@ export const insertAASXFileToDB = async (fc_idx, fileName) => {
     const pythonFilePath = `../files/aas/${fileName}`;
 
     const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
-      path: pythonFilePath,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        path: pythonFilePath,
+      }),
     });
 
     console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
@@ -162,8 +180,14 @@ export const updateAASXFileToDB = async (af_idx, fileName) => {
     const pythonFilePath = `../files/aas/${fileName}`;
 
     const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
-      old_path: old_pythonFilePath,
-      path: pythonFilePath,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        old_path: old_pythonFilePath,
+        path: pythonFilePath,
+      }),
     });
 
     console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
