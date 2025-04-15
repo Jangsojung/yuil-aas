@@ -46,5 +46,33 @@ def create_aasx():
     return 'AASX 변환 성공', 201
 
 
+@app.route('/api/aas', methods=['delete'])
+def delete_aas():
+    path = request.get_json()['path']
+
+    if path and os.path.exists(path):
+        try:
+            os.remove(path)
+            print(f'{path} 파일 삭제 성공')
+        except Exception as e:
+            print(f'파일 삭제 실패: {e}')
+
+    return 'AAS 파일 삭제 성공', 200
+
+
+@app.route('/api/aasx', methods=['delete'])
+def delete_aasx():
+    path = request.get_json()['path']
+
+    if path and os.path.exists(path):
+        try:
+            os.remove(path)
+            print(f'{path} 파일 삭제 성공')
+        except Exception as e:
+            print(f'파일 삭제 실패: {e}')
+
+    return 'AASX 파일 삭제 성공', 200
+
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
