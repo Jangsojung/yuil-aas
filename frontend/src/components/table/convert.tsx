@@ -112,4 +112,4 @@ export default function BasicTable() {
   );
 }
 
-const cells = ['IDX', '설비그룹 이름'];
+const cells = ['번호', '설비그룹 이름'];

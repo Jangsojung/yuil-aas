@@ -109,7 +109,7 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {edgeGateways &&
+            {edgeGateways ? (
               edgeGateways.map((eg) => (
                 <TableRow
                   key={eg.eg_idx}
@@ -128,7 +128,14 @@ export default function BasicTable() {
                   <TableCell>{eg.eg_pc_temp} °C</TableCell>
                   <TableCell>{eg.eg_ip_port}</TableCell>
                 </TableRow>
-              ))}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={cells.length + 1} align='center'>
+                  데이터가 없습니다.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -145,4 +152,4 @@ export default function BasicTable() {
   );
 }
 
-const cells = ['IDX', '서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT'];
+const cells = ['번호', '서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT'];

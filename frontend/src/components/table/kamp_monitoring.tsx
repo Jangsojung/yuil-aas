@@ -80,4 +80,4 @@ export default function BasicTable() {
   );
 }
 
-const cells = ['IDX', '파일 이름', '데이터 변환 여부', '데이터 송신 여부'];
+const cells = ['번호', '파일 이름', '데이터 변환 여부', '데이터 송신 여부'];
