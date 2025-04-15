@@ -2,7 +2,6 @@ import { pool } from '../../index.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import axios from 'axios';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,7 +17,7 @@ export const insertFileToDB = async (fc_idx, fileName) => {
 
     const pythonFilePath = `../files/front/${fileName}`;
 
-    const pythonResponse = await axios.post('http://localhost:5000/api/aas', {
+    const pythonResponse = await fetch('http://localhost:5000/api/aas', {
       path: pythonFilePath,
     });
 
@@ -57,7 +56,7 @@ export const updateFileToDB = async (af_idx, fileName) => {
     const old_pythonFilePath = `../files/front/${oldFileName}`;
     const pythonFilePath = `../files/front/${fileName}`;
 
-    const pythonResponse = await axios.post('http://localhost:5000/api/aas', {
+    const pythonResponse = await fetch('http://localhost:5000/api/aas', {
       old_path: old_pythonFilePath,
       path: pythonFilePath,
     });
@@ -125,7 +124,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName) => {
 
     const pythonFilePath = `../files/aas/${fileName}`;
 
-    const pythonResponse = await axios.post('http://localhost:5000/api/aasx', {
+    const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
       path: pythonFilePath,
     });
 
@@ -162,7 +161,7 @@ export const updateAASXFileToDB = async (af_idx, fileName) => {
     const old_pythonFilePath = `../files/aas/${oldFileName}`;
     const pythonFilePath = `../files/aas/${fileName}`;
 
-    const pythonResponse = await axios.post('http://localhost:5000/api/aasx', {
+    const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
       old_path: old_pythonFilePath,
       path: pythonFilePath,
     });
