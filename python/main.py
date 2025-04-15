@@ -54,7 +54,7 @@ def delete_aas():
     failed = []
 
     for path in paths:
-        if path and os.path.exists('path'):
+        if path and os.path.exists(path):
             try:
                 os.remove(path)
                 print(f'{path} 파일 삭제 성공')
@@ -76,7 +76,7 @@ def delete_aasx():
     failed = []
 
     for path in paths:
-        if path and os.path.exists('path'):
+        if path and os.path.exists(path):
             try:
                 os.remove(path)
                 print(f'{path} 파일 삭제 성공')
