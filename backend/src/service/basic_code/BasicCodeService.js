@@ -28,7 +28,8 @@ export const getFactoriesFromDB = async () => {
 
 export const getBasesFromDB = async () => {
   return new Promise((resolve, reject) => {
-    const query = 'select ab_idx, ab_name from tb_aasx_base';
+    const query =
+      'select b.ab_idx, b.ab_name, COUNT(bs.sn_idx) as sn_length from tb_aasx_base b, tb_aasx_base_sensor bs where b.ab_idx = bs.ab_idx group by b.ab_idx, b.ab_name order by b.ab_idx desc';
 
     pool.query(query, (err, results) => {
       if (err) {
@@ -43,10 +44,98 @@ export const getBasesFromDB = async () => {
           return {
             ab_idx: base.ab_idx,
             ab_name: base.ab_name,
+            sn_length: base.sn_length,
           };
         });
 
         resolve(bases);
+      }
+    });
+  });
+};
+
+export const insertBasesToDB = async (name, ids) => {
+  try {
+    const query = `insert into tb_aasx_base (ab_name) values (?);`;
+    const [result] = await pool.promise().query(query, [name]);
+
+    const ab_idx = result.insertId;
+
+    const query2 = `insert into tb_aasx_base_sensor (ab_idx, sn_idx) values ?`;
+    const values = ids.map((id) => [ab_idx, id]);
+
+    const [result2] = await pool.promise().query(query2, [values]);
+
+    return {
+      ab_idx,
+      ab_name: name,
+    };
+  } catch (err) {
+    console.log('Failed to insert new Bases: ', err);
+    throw err;
+  }
+};
+
+export const updateBaseToDB = async (ab_idx, name, ids) => {
+  const connection = await pool.promise().getConnection();
+  try {
+    await connection.beginTransaction();
+
+    await connection.query(`update tb_aasx_base set ab_name = ? where ab_idx = ?`, [name, ab_idx]);
+    await connection.query(`delete from tb_aasx_base_sensor where ab_idx = ?`, [ab_idx]);
+
+    if (ids.length > 0) {
+      const values = ids.map((id) => [ab_idx, id]);
+      await connection.query(`insert into tb_aasx_base_sensor (ab_idx, sn_idx) values ?`, [values]);
+    }
+
+    await connection.commit();
+
+    return {
+      ab_idx,
+      ab_name: name,
+    };
+  } catch (err) {
+    await connection.rollback();
+    console.log('Failed to update Bases:', err);
+    throw err;
+  } finally {
+    connection.release();
+  }
+};
+
+export const deleteBasesFromDB = async (ids) => {
+  try {
+    const query = `delete from tb_aasx_base where ab_idx in (?)`;
+    await pool.promise().query(query, [ids]);
+
+    console.log('Bases deleted successfully');
+  } catch (err) {
+    console.log('Failed to delete Bases: ', err);
+    throw err;
+  }
+};
+
+export const getSelectedSensorsFromDB = async (ab_idx) => {
+  return new Promise((resolve, reject) => {
+    const query = 'select sn_idx from tb_aasx_base_sensor where ab_idx = ?';
+
+    pool.query(query, [ab_idx], (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        const sensors = results.map((sensor) => {
+          return {
+            sn_idx: sensor.sn_idx,
+          };
+        });
+
+        resolve(sensors);
       }
     });
   });

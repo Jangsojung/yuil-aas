@@ -118,3 +118,23 @@ export const addSensorTriggerState = atom<number>({
   key: 'addSensorTriggerState',
   default: -1,
 });
+
+export const baseEditModeState = atom<boolean>({
+  key: 'baseEditModeState',
+  default: false,
+});
+
+interface Base {
+  ab_idx: number;
+  ab_name: string;
+  sn_length: number;
+}
+
+export const selectedBaseState = atom<Base>({
+  key: 'selectedBaseState',
+  default: {
+    ab_idx: -1,
+    ab_name: '',
+    sn_length: -1,
+  },
+});

@@ -11,7 +11,7 @@ import ModalBasic from '../../components/modal/edgemodal';
 
 import styled from '@mui/system/styled';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { edgeGatewayRefreshState, selectedEdgeGatewaysState, selectedSensorsState } from '../../recoil/atoms';
+import { edgeGatewayRefreshState, selectedEdgeGatewaysState, selectedBasesState } from '../../recoil/atoms';
 import CustomizedDialogs from '../../components/modal/edgemodal';
 
 const Item = styled('div')(({ theme }) => ({
@@ -33,22 +33,22 @@ interface Props {
 }
 
 export default function Sort({ insertMode, setInsertMode }: Props) {
-  const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
+  const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
 
   const handleDelete = async () => {
-    if (!window.confirm(`선택한 ${selectedSensors.length}개 항목을 삭제하시겠습니까?`)) {
+    if (!window.confirm(`선택한 ${selectedBases.length}개 항목을 삭제하시겠습니까?`)) {
       return;
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/edge_gateway/`, {
+      const response = await fetch(`http://localhost:5001/api/base_code/bases`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ids: selectedSensors,
+          ids: selectedBases,
         }),
       });
 
@@ -56,7 +56,7 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
         throw new Error('Failed to delete items');
       }
 
-      setSelectedSensors([]);
+      setSelectedBases([]);
 
       setRefreshTrigger((prev) => prev + 1);
 
@@ -77,7 +77,7 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
             <Button variant='contained' color='success' onClick={() => setInsertMode(true)}>
               등록
             </Button>
-            <Button variant='contained' color='error' onClick={handleDelete} disabled={selectedSensors.length === 0}>
+            <Button variant='contained' color='error' onClick={handleDelete} disabled={selectedBases.length === 0}>
               삭제
             </Button>
           </Stack>

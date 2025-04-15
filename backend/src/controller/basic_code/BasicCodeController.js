@@ -1,6 +1,10 @@
 import {
   getFactoriesFromDB,
   getBasesFromDB,
+  insertBasesToDB,
+  deleteBasesFromDB,
+  updateBaseToDB,
+  getSelectedSensorsFromDB,
   getFacilityGroupsFromDB,
   getSensorsFromDB,
   getBaseCodeFromDB,
@@ -26,6 +30,50 @@ export const getFactories = async (res) => {
 export const getBases = async (res) => {
   try {
     const result = await getBasesFromDB();
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const insertBases = async (name, ids, res) => {
+  try {
+    const result = await insertBasesToDB(name, ids);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const updateBase = async (ab_idx, name, ids, res) => {
+  try {
+    const result = await updateBaseToDB(ab_idx, name, ids);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const deleteBases = async (ids, res) => {
+  try {
+    const result = await deleteBasesFromDB(ids);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const getSelectedSensors = async (ab_idx, res) => {
+  try {
+    const result = await getSelectedSensorsFromDB(ab_idx);
 
     res.status(200).json(result);
   } catch (err) {

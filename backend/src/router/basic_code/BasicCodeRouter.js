@@ -2,6 +2,10 @@ import express from 'express';
 import {
   getFactories,
   getBases,
+  insertBases,
+  updateBase,
+  deleteBases,
+  getSelectedSensors,
   getFacilityGroups,
   getSensors,
   getBaseCode,
@@ -22,6 +26,26 @@ export default () => {
 
   router.get('/bases', (req, res) => {
     getBases(res);
+  });
+
+  router.post('/bases', (req, res) => {
+    const { name, ids } = req.body;
+    insertBases(name, ids, res);
+  });
+
+  router.put('/bases', (req, res) => {
+    const { ab_idx, name, ids } = req.body;
+    updateBase(ab_idx, name, ids, res);
+  });
+
+  router.delete('/bases', (req, res) => {
+    const { ids } = req.body;
+    deleteBases(ids, res);
+  });
+
+  router.get('/bases/sensors', (req, res) => {
+    const { ab_idx } = req.query;
+    getSelectedSensors(ab_idx, res);
   });
 
   router.get('/facilityGroups', (req, res) => {

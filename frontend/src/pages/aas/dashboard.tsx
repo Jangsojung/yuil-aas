@@ -3,12 +3,15 @@ import Sort from '../../layouts/sort/base_code';
 import Sort2 from '../../layouts/sort/basic_code';
 import BasicCode from '../../section/aas/dashboard/view';
 import BaseCode from '../../section/aas/dashboard/view/base_index';
+import { useRecoilState } from 'recoil';
+import { baseEditModeState } from '../../recoil/atoms';
 
 export default function DashboardPage() {
   const [insertMode, setInsertMode] = useState(false);
+  const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
   return (
     <div>
-      {insertMode ? (
+      {insertMode || baseEditMode ? (
         <>
           <Sort2 insertMode={insertMode} setInsertMode={setInsertMode} />
           <BasicCode />

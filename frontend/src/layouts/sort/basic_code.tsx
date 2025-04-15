@@ -19,6 +19,8 @@ import {
   currentFacilityGroupState,
   selectedFacilitiesState,
   selectedSensorsState,
+  baseEditModeState,
+  selectedBaseState,
 } from '../../recoil/atoms';
 import { TextField } from '@mui/material';
 
@@ -44,58 +46,73 @@ interface Props {
 }
 
 export default function Sort({ insertMode, setInsertMode }: Props) {
-  const hasBasics = useRecoilValue(hasBasicsState);
-  const [isEditMode, setIsEditMode] = useRecoilState(isEditModeState);
-  const [shouldSaveChanges, setShouldSaveChanges] = useRecoilState(shouldSaveChangesState);
-  const [isAddingEquipment, setIsAddingEquipment] = React.useState(false);
-  const selectedFacilities = useRecoilValue(selectedFacilitiesState);
-  const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const [name, setName] = React.useState('');
+  const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
+  const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
 
-  const handleEditToggle = () => {
-    if (isEditMode) {
-      setShouldSaveChanges(true);
-    }
-    setIsEditMode(!isEditMode);
-  };
-
-  const handleDeleteEquipment = () => {
-    if (selectedFacilities.length === 0) return;
-
-    if (window.confirm(`선택한 ${selectedFacilities.length}개의 장비를 삭제하시겠습니까?`)) {
-      document.dispatchEvent(new CustomEvent(DELETE_EQUIPMENT_EVENT));
-    }
-  };
+  React.useEffect(() => {
+    setName(baseEditMode ? selectedBase.ab_name : '');
+    setSelectedSensors([]);
+  }, []);
 
   const handleAdd = async () => {
     if (!name) {
-      console.log('이름을 입력해주세요.');
+      alert('이름을 입력해주세요.');
       return;
     }
 
-    // startLoading();
-
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code`, {
+      const response = await fetch(`http://localhost:5001/api/base_code/bases`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ids: selectedSensors }),
+        body: JSON.stringify({ name: name, ids: selectedSensors }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to insert base');
       }
 
-      alert('성공적으로 json파일을 생성하였습니다.\n파일 위치: /files/front');
-
-      // endLoading();
       setSelectedSensors([]);
+      setName('');
+      setInsertMode(false);
     } catch (err) {
       console.log(err.message);
     }
+  };
+
+  const handleUpdate = async () => {
+    if (!name) {
+      alert('이름을 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/base_code/bases`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ab_idx: selectedBase.ab_idx, name: name, ids: selectedSensors }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to insert base');
+      }
+
+      setSelectedSensors([]);
+      setName('');
+      setBaseEditMode(false);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  const handleCancle = () => {
+    setInsertMode(false);
+    setBaseEditMode(false);
   };
 
   return (
@@ -109,7 +126,7 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
                   <div className='sort-title'>제목</div>
                 </Grid>
                 <Grid>
-                  <TextField onChange={(e) => setName(e.target.value)} />
+                  <TextField value={name} onChange={(e) => setName(e.target.value)} />
                 </Grid>
                 <Grid>
                   <div className='sort-title'>설비 그룹</div>
@@ -125,12 +142,17 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
         <Grid size={4} direction='row' style={{ justifyContent: 'flex-end' }}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
             <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              <Button variant='contained' color='success' onClick={handleAdd} disabled={selectedSensors.length === 0}>
+              <Button
+                variant='contained'
+                color='success'
+                onClick={baseEditMode ? handleUpdate : handleAdd}
+                disabled={selectedSensors.length === 0}
+              >
                 <SaveIcon />
-                등록완료
+                {baseEditMode ? '수정완료' : '등록완료'}
               </Button>
 
-              <Button variant='contained' color='error' onClick={() => setInsertMode(false)}>
+              <Button variant='contained' color='error' onClick={handleCancle}>
                 <RemoveIcon /> 취소
               </Button>
             </Stack>
