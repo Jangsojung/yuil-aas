@@ -1,6 +1,6 @@
-import { pool } from '../../index.js';
 import fs from 'fs';
 import path from 'path';
+import { pool } from '../../index.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,19 +38,20 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
     const jsonStructure = {};
 
     for (const sensor of sensorInfos) {
-      const [[fgAlias]] = await pool
-        .promise()
-        .query(`SELECT as_en FROM tb_aasx_alias WHERE as_kr = ?`, [sensor.fg_name]);
-      const [[faAlias]] = await pool
-        .promise()
-        .query(`SELECT as_en FROM tb_aasx_alias WHERE as_kr = ?`, [sensor.fa_name]);
-      const [[snAlias]] = await pool
-        .promise()
-        .query(`SELECT as_en FROM tb_aasx_alias WHERE as_kr = ?`, [sensor.sn_name]);
+      const [aliases] = await pool.promise().query(
+        `SELECT
+          MAX(CASE WHEN as_kr = ? THEN as_en END) AS fg_alias,
+          MAX(CASE WHEN as_kr = ? THEN as_en END) AS fa_alias,
+          MAX(CASE WHEN as_kr = ? THEN as_en END) AS sn_alias
+        FROM tb_aasx_alias`,
+        [sensor.fg_name, sensor.fa_name, sensor.sn_name]
+      );
 
-      const fgNameEn = fgAlias?.as_en || sensor.fg_name;
-      const faNameEn = faAlias?.as_en || sensor.fa_name;
-      const snNameEn = snAlias?.as_en || sensor.sn_name;
+      const { fg_alias, fa_alias, sn_alias } = aliases[0]
+
+      const fgNameEn = fg_alias?.as_en || sensor.fg_name;
+      const faNameEn = fa_alias?.as_en || sensor.fa_name;
+      const snNameEn = sn_alias?.as_en || sensor.sn_name;  
 
       const [sensorData] = await pool.promise().query(
         `SELECT ROUND(sn_compute_data, 2) AS sn_compute_data, sd_createdAt 
