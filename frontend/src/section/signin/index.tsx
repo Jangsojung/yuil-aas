@@ -64,7 +64,11 @@ export default function SignInView() {
       <SignInPage
         signIn={(provider, formData) => signIn(provider, formData, setUser, nav)}
         providers={providers}
-        slotProps={{ emailField: { autoFocus: false }, form: { noValidate: true } }}
+        slotProps={{
+          emailField: { autoFocus: false },
+          form: { noValidate: true },
+          rememberMe: { style: { display: 'none' }}
+        }}
       />
     </AppProvider>
   );
