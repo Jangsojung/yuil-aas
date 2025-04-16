@@ -3,8 +3,6 @@ import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -12,16 +10,7 @@ import SelectFacilityGroup from '../../components/select/facility_group';
 
 import styled from '@mui/system/styled';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  hasBasicsState,
-  isEditModeState,
-  shouldSaveChangesState,
-  currentFacilityGroupState,
-  selectedFacilitiesState,
-  selectedSensorsState,
-  baseEditModeState,
-  selectedBaseState,
-} from '../../recoil/atoms';
+import { selectedSensorsState, baseEditModeState, selectedBaseState } from '../../recoil/atoms';
 import { TextField } from '@mui/material';
 
 const Item = styled('div')(({ theme }) => ({
@@ -49,11 +38,12 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const [name, setName] = React.useState('');
   const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
-  const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
+  const selectedBase = useRecoilValue(selectedBaseState);
 
   React.useEffect(() => {
     setName(baseEditMode ? selectedBase.ab_name : '');
     setSelectedSensors([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleAdd = async () => {

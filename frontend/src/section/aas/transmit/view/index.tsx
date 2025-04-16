@@ -2,7 +2,6 @@ import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Grid from '@mui/system/Grid';
 import TreeView from '../../../../components/treeview';
-import BasicTabs from '../../../../components/tab';
 import { useRecoilValue } from 'recoil';
 import { isVerifiedState } from '../../../../recoil/atoms';
 import React from 'react';
@@ -35,25 +34,6 @@ export default function TransmitView() {
             </Box>
           )}
         </Grid>
-        {/*<Grid size={6}>
-           {isVerified ? (
-            <BasicTabs />
-          ) : (
-            <Box
-              sx={{
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#f5f5f5',
-                padding: '20px',
-                borderRadius: '4px',
-              }}
-            >
-              검증 버튼을 눌러 AASX 파일을 검증해주세요.
-            </Box>
-          )} 
-        </Grid>*/}
       </Grid>
     </Container>
   );

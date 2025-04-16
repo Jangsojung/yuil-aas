@@ -4,15 +4,9 @@ import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
-import SelectFactory from '../../components/select/factory';
-import SelectPeriod from '../../components/select/period';
-import TextField from '../../components/input';
-import ModalBasic from '../../components/modal/edgemodal';
-
 import styled from '@mui/system/styled';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { edgeGatewayRefreshState, selectedEdgeGatewaysState, selectedBasesState } from '../../recoil/atoms';
-import CustomizedDialogs from '../../components/modal/edgemodal';
+import { useRecoilState } from 'recoil';
+import { edgeGatewayRefreshState, selectedBasesState } from '../../recoil/atoms';
 
 const Item = styled('div')(({ theme }) => ({
   backgroundColor: '#fff',
@@ -34,7 +28,7 @@ interface Props {
 
 export default function Sort({ insertMode, setInsertMode }: Props) {
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
+  const [, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
 
   const handleDelete = async () => {
     if (!window.confirm(`선택한 ${selectedBases.length}개 항목을 삭제하시겠습니까?`)) {

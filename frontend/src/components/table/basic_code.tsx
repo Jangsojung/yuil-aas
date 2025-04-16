@@ -11,7 +11,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { baseEditModeState, selectedBaseState, selectedSensorsState } from '../../recoil/atoms';
 
 interface Sensor {
@@ -28,13 +28,14 @@ interface Base {
 export default function BasicTable({ sm_idx, fa_idx }) {
   const [sensors, setSensors] = React.useState<Sensor[]>([]);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
-  const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
-  const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
+  const baseEditMode = useRecoilValue(baseEditModeState);
+  const selectedBase = useRecoilValue(selectedBaseState);
 
   React.useEffect(() => {
     if (baseEditMode) {
       getSelectedSensors(selectedBase);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBase]);
 
   const getSelectedSensors = async (selectedBase: Base) => {

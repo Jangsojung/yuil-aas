@@ -1,13 +1,8 @@
 import * as React from 'react';
 import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 
 import SelectFactory from '../../components/select/factory';
-import SelectPeriod from '../../components/select/period';
-import TextField from '../../components/input';
-
 import styled from '@mui/system/styled';
 
 const Item = styled('div')(({ theme }) => ({
@@ -32,7 +27,7 @@ export default function Sort() {
             <Grid size={6}>
               <Grid container spacing={1}>
                 <Grid size={4}>
-                  <div className="sort-title">공장이름</div>
+                  <div className='sort-title'>공장이름</div>
                 </Grid>
                 <Grid size={8}>
                   <SelectFactory />

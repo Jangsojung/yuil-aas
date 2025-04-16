@@ -6,7 +6,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentFacilityGroupState, currentFactoryState } from '../../recoil/atoms';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-
 interface FacilityGroup {
   fg_idx: number;
   fg_name: string;
@@ -23,6 +22,7 @@ export default function SelectSmall() {
     } else {
       getFacilityGroups(3);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFactory]);
 
   const getFacilityGroups = async (fc_idx: number) => {
@@ -52,11 +52,7 @@ export default function SelectSmall() {
 
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }} size='small'>
-      <Select
-        value={currentFacilityGroup}
-        onChange={handleChange}
-        IconComponent = {ExpandMoreIcon}
-      >
+      <Select value={currentFacilityGroup} onChange={handleChange} IconComponent={ExpandMoreIcon}>
         {groups &&
           groups.map((group) => (
             <MenuItem key={group.fg_idx} value={group.fg_idx}>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Navigate, Outlet, useNavigate } from 'react-router';
+import { Outlet, useNavigate } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Logo from '../../assets/yuil.png';

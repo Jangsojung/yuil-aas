@@ -9,13 +9,8 @@ import BasicDatePicker from '../../components/datepicker';
 import ModalBasic from '../../components/modal';
 
 import styled from '@mui/system/styled';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  currentFactoryState,
-  dataTableRefreshTriggerState,
-  selectedDataFilesState,
-  dateRangeState,
-} from '../../recoil/atoms';
+import { useRecoilState } from 'recoil';
+import { dataTableRefreshTriggerState, selectedDataFilesState, dateRangeState } from '../../recoil/atoms';
 
 import RemoveIcon from '@mui/icons-material/Remove';
 
@@ -34,8 +29,7 @@ const Item = styled('div')(({ theme }) => ({
 
 export default function Sort() {
   const [selectedFiles, setSelectedFiles] = useRecoilState(selectedDataFilesState);
-  const currentFactory = useRecoilValue(currentFactoryState);
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
+  const [, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
 
   const [dateRange, setDateRange] = useRecoilState(dateRangeState);
 

@@ -17,7 +17,7 @@ import {
 } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 import CustomizedDialogs from '../modal/file_edit_modal';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 interface File {
   af_idx: number;
@@ -41,6 +41,7 @@ export default function BasicTable() {
       setSelectedFiles([]);
       getFiles();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger, currentFactory]);
 
   React.useEffect(() => {
@@ -104,23 +105,6 @@ export default function BasicTable() {
     setSelectedFile(null);
   };
 
-  // const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
-  //   setStartDate(newStartDate);
-  //   setEndDate(newEndDate);
-  // };
-
-  // const handleSearch = () => {
-  //   if (!startDate || !endDate) {
-  //     alert('날짜를 선택해주세요.');
-  //     return;
-  //   }
-  //   getFiles();
-  // };
-
-  // const handleReset = () => {
-  //   setStartDate(dayjs().subtract(1, 'month'));
-  //   setEndDate(dayjs());
-  // };
   return (
     <>
       <TableContainer component={Paper}>

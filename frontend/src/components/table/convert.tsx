@@ -22,30 +22,12 @@ export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [bases, setBases] = React.useState<Base[]>([]);
   const [selectedConvert, setSelectedConvert] = useRecoilState(selectedConvertsState);
-  const [selectAll, setSelectAll] = React.useState(false);
 
   React.useEffect(() => {
     if (currentFactory !== null) {
       getBases();
     }
   }, [currentFactory]);
-
-  // const getFacilityGroups = async (fc_idx: number) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:5001/api/base_code/facilityGroups?fc_idx=${fc_idx}&order=desc`, {
-  //       method: 'GET',
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Failed to fetch detections');
-  //     }
-
-  //     const data: FacilityGroup[] = await response.json();
-  //     setGroups(data);
-  //   } catch (err: any) {
-  //     console.log(err.message);
-  //   }
-  // };
 
   const getBases = async () => {
     try {

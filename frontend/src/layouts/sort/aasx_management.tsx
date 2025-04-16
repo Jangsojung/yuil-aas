@@ -34,8 +34,7 @@ const Item = styled('div')(({ theme }) => ({
 
 export default function Sort() {
   const [selectedFiles, setSelectedFiles] = useRecoilState(selectedDataFilesState);
-  const currentFactory = useRecoilValue(currentFactoryState);
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
+  const [, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
 
   const [dateRange, setDateRange] = useRecoilState(dateRangeAASXState);
 

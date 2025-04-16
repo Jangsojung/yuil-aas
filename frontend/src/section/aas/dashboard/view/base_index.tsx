@@ -4,7 +4,6 @@ export default function BaseView() {
   return (
     <div className='table-wrap'>
       <Table />
-      {/* <Pagenation /> */}
     </div>
   );
 }

@@ -16,7 +16,7 @@ import {
   selectedDataFilesState,
 } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import CustomizedDialogs from '../modal/aasx_edit_modal';
 
 interface File {
@@ -42,6 +42,7 @@ export default function BasicTable() {
       setSelectedFiles([]);
       getFiles();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger, currentFactory]);
 
   React.useEffect(() => {

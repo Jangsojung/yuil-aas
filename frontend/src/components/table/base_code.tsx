@@ -35,12 +35,13 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
   const [selectAll, setSelectAll] = React.useState(false);
   const refreshTrigger = useRecoilValue(edgeGatewayRefreshState);
-  const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
-  const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
+  const [, setSelectedBase] = useRecoilState(selectedBaseState);
+  const [, setBaseEditMode] = useRecoilState(baseEditModeState);
 
   React.useEffect(() => {
     getBases();
     setSelectedBases([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger, currentFactory]);
 
   React.useEffect(() => {

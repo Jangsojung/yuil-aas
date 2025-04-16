@@ -1,10 +1,9 @@
 import * as React from 'react';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { aasxDataState, currentFacilityGroupState, currentFactoryState, currentFileState } from '../../recoil/atoms';
+import { useRecoilState } from 'recoil';
+import { currentFileState } from '../../recoil/atoms';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 interface AASXFile {
@@ -22,6 +21,7 @@ export default function SelectSmall({ setSelectedFile }: Props) {
 
   React.useEffect(() => {
     getFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getFiles = async () => {

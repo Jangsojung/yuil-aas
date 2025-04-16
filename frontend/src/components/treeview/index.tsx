@@ -5,7 +5,7 @@ import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import { styled, alpha } from '@mui/material/styles';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { aasxDataState, isVerifiedState } from '../../recoil/atoms';
 
 const CustomTreeItem = styled(TreeItem)(({ theme }) => ({

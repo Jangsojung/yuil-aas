@@ -93,12 +93,7 @@ export default function Sort({ startLoading, endLoading }) {
                   <div className='sort-title'>날짜</div>
                 </Grid>
                 <Grid>
-                  <BasicDatePicker
-                    onDateChange={handleDateChange}
-                    // resetDates={resetTrigger}
-                    startDate={startDate}
-                    endDate={endDate}
-                  />
+                  <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
                 </Grid>
               </Grid>
             </Grid>

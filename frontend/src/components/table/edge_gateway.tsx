@@ -7,7 +7,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-import Button from '@mui/material/Button';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentFactoryState, edgeGatewayRefreshState, selectedEdgeGatewaysState } from '../../recoil/atoms';
@@ -90,12 +89,6 @@ export default function BasicTable() {
 
   return (
     <>
-      {/* <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-        <Button variant='contained' color='success' onClick={handleOpenInsertModal}>
-          등록
-        </Button>
-      </div> */}
-
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label='simple table'>
           <TableHead>
@@ -141,7 +134,6 @@ export default function BasicTable() {
       </TableContainer>
       <Pagenation count={edgeGateways ? edgeGateways.length : 0} />
 
-      {/* 수정 모달 */}
       <CustomizedDialogs
         modalType='update'
         open={openUpdateModal}

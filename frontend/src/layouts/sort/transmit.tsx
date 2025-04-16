@@ -31,13 +31,14 @@ interface AASXFile {
 export default function Sort() {
   const currentFile = useRecoilValue(currentFileState);
   const [, setAasxData] = useRecoilState(aasxDataState);
-  const [isVerified, setIsVerified] = useRecoilState(isVerifiedState);
+  const [, setIsVerified] = useRecoilState(isVerifiedState);
   const [selectedFile, setSelectedFile] = React.useState<AASXFile | undefined>(undefined);
 
   React.useEffect(() => {
     if (currentFile) {
       setIsVerified(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFile]);
 
   const handleVerify = async () => {
@@ -177,9 +178,6 @@ export default function Sort() {
             <Button variant='contained' color='success' onClick={handleVerify} disabled={!currentFile}>
               검증하기
             </Button>
-            {/* <Button variant='contained' color='primary' onClick={handleRegister} disabled={!currentFile}>
-              등록
-            </Button> */}
           </Stack>
         </Grid>
       </Grid>

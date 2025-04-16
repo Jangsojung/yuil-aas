@@ -4,13 +4,8 @@ import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
-import SelectFactory from '../../components/select/factory';
-import SelectPeriod from '../../components/select/period';
-import TextField from '../../components/input';
-import ModalBasic from '../../components/modal/edgemodal';
-
 import styled from '@mui/system/styled';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { edgeGatewayRefreshState, selectedEdgeGatewaysState } from '../../recoil/atoms';
 import CustomizedDialogs from '../../components/modal/edgemodal';
 
@@ -30,7 +25,7 @@ const Item = styled('div')(({ theme }) => ({
 export default function Sort() {
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useRecoilState(selectedEdgeGatewaysState);
 
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
+  const [, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
   const [openInsertModal, setOpenInsertModal] = React.useState(false);
 
   const handleDelete = async () => {
