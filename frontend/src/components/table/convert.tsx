@@ -21,7 +21,7 @@ interface Base {
 export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [bases, setBases] = React.useState<Base[]>([]);
-  const [selectedConverts, setSelectedConverts] = useRecoilState(selectedConvertsState);
+  const [selectedConvert, setSelectedConvert] = useRecoilState(selectedConvertsState);
   const [selectAll, setSelectAll] = React.useState(false);
 
   React.useEffect(() => {
@@ -29,16 +29,6 @@ export default function BasicTable() {
       getBases();
     }
   }, [currentFactory]);
-
-  React.useEffect(() => {
-    if (selectedConverts.length === 0) {
-      setSelectAll(false);
-    } else if (selectedConverts.length === bases.length) {
-      setSelectAll(true);
-    } else {
-      setSelectAll(false);
-    }
-  }, [selectedConverts, bases]);
 
   // const getFacilityGroups = async (fc_idx: number) => {
   //   try {
@@ -74,24 +64,8 @@ export default function BasicTable() {
     }
   };
 
-  const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = event.target.checked;
-    setSelectAll(checked);
-    if (checked) {
-      setSelectedConverts(bases.map((base) => base.ab_idx));
-    } else {
-      setSelectedConverts([]);
-    }
-  };
-
   const handleCheckboxChange = (convertsIdx: number) => {
-    setSelectedConverts((prevSelected) => {
-      if (prevSelected.includes(convertsIdx)) {
-        return prevSelected.filter((idx) => idx !== convertsIdx);
-      } else {
-        return [...prevSelected, convertsIdx];
-      }
-    });
+    setSelectedConvert((prev) => (prev === convertsIdx ? null : convertsIdx));
   };
 
   return (
@@ -100,9 +74,7 @@ export default function BasicTable() {
         <Table sx={{ minWidth: 650 }} aria-label='simple table'>
           <TableHead>
             <TableRow>
-              <TableCell>
-                <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
-              </TableCell>
+              <TableCell></TableCell>
               {cells.map((cell) => (
                 <TableCell>{cell}</TableCell>
               ))}
@@ -114,7 +86,7 @@ export default function BasicTable() {
                 <TableRow key={base.ab_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>
                     <Checkbox
-                      checked={selectedConverts.includes(base.ab_idx)}
+                      checked={selectedConvert === base.ab_idx}
                       onChange={() => handleCheckboxChange(base.ab_idx)}
                     />
                   </TableCell>

@@ -25,7 +25,7 @@ const Item = styled('div')(({ theme }) => ({
 }));
 
 export default function Sort({ startLoading, endLoading }) {
-  const [selectedConverts, setSelectedConverts] = useRecoilState(selectedConvertsState);
+  const [selectedConvert, setSelectedConvert] = useRecoilState(selectedConvertsState);
   const currentFactory = useRecoilValue(currentFactoryState);
 
   const [startDate, setStartDate] = React.useState<Dayjs | null>(null);
@@ -54,7 +54,7 @@ export default function Sort({ startLoading, endLoading }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ start: formattedStartDate, end: formattedEndDate, ids: selectedConverts }),
+        body: JSON.stringify({ start: formattedStartDate, end: formattedEndDate, ids: selectedConvert }),
       });
 
       if (!response.ok) {
@@ -68,7 +68,7 @@ export default function Sort({ startLoading, endLoading }) {
       setStartDate(null);
       setEndDate(null);
       setResetTrigger((prev) => !prev);
-      setSelectedConverts([]);
+      setSelectedConvert([]);
     } catch (err) {
       console.log(err.message);
       endLoading();
@@ -107,7 +107,7 @@ export default function Sort({ startLoading, endLoading }) {
 
         <Grid size={4}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-            <Button variant='contained' color='success' onClick={handleAdd} disabled={selectedConverts.length === 0}>
+            <Button variant='contained' color='success' onClick={handleAdd} disabled={selectedConvert === null}>
               등록
             </Button>
           </Stack>

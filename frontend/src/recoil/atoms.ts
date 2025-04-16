@@ -51,9 +51,9 @@ export const dataTableRefreshTriggerState = atom<number>({
   default: 0,
 });
 
-export const selectedConvertsState = atom<number[]>({
+export const selectedConvertsState = atom<number | null>({
   key: 'selectedConvertsState',
-  default: [],
+  default: null,
 });
 
 export const selectedSensorsState = atom<number[]>({
