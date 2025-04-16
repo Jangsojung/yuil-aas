@@ -39,166 +39,171 @@ function EndIcon(props: React.PropsWithoutRef<typeof DisabledByDefaultRoundedIco
   return <DisabledByDefaultRoundedIcon {...props} sx={{ opacity: 0.3 }} />;
 }
 
-const createTreeItems = (data: any, parentId: string = '') => {
+const createTreeItems = (data: any) => {
   if (!data) return null;
 
-  if (Array.isArray(data)) {
-    return data.map((item, index) => {
-      const itemId = parentId ? `${parentId}-${index}` : `${index}`;
-      return createTreeItems(item, itemId);
-    });
-  }
+  const result: React.JSX.Element[] = [];
 
-  if (typeof data === 'object') {
-    const keys = Object.keys(data);
-    return keys.map((key, index) => {
-      const itemId = parentId ? `${parentId}-${key}` : `${key}`;
-      const value = data[key];
+  if (data.AAS) {
+    const aasItems = Array.isArray(data.AAS) ? data.AAS : [data.AAS];
 
-      // Handle special cases based on key
-      if (key === 'AAS') {
-        return (
-          <CustomTreeItem
-            key={itemId}
-            itemId={itemId}
-            label={`AAS "${value.AssetInformation?.Unit1 || value.name || key}" [${value.url || 'no url'}]`}
-          >
-            {createTreeItems(value, itemId)}
+    aasItems.forEach((aas, index) => {
+      const aasId = `AAS-${index}`;
+      const aasLabel = `AAS "${aas.AssetInformation?.Unit1 || aas.name}" [${aas.url || 'url 없음'}]`;
+
+      const aasChildren = [];
+
+      if (aas.AssetInformation) {
+        const assetInfoId = `${aasId}-AssetInfo`;
+        const assetInfoItems = [];
+
+        for (const key in aas.AssetInformation) {
+          for (const key in aas) {
+            if (key !== 'name' && key !== 'url' && key !== 'submodelRefs' && key !== 'AssetInformation') {
+              const propId = `${aasId}-${key}`;
+              assetInfoItems.push(<CustomTreeItem key={propId} itemId={propId} label={`kind: ${aas[key]}`} />);
+            }
+          }
+          const assetPropId = `${assetInfoId}-${key}`;
+          assetInfoItems.push(
+            <CustomTreeItem
+              key={assetPropId}
+              itemId={assetPropId}
+              label={`globalAssetId: ${aas.AssetInformation[key]}`}
+            />
+          );
+        }
+
+        aasChildren.push(
+          <CustomTreeItem key={assetInfoId} itemId={assetInfoId} label='AssetInformation'>
+            {assetInfoItems}
           </CustomTreeItem>
         );
-      } else if (key === 'SM') {
-        return (
-          <CustomTreeItem key={itemId} itemId={itemId} label={`SM "${value.name || key}" [${value.url || 'no url'}]`}>
-            {createTreeItems(value, itemId)}
-          </CustomTreeItem>
-        );
-      } else if (key === 'SMC') {
-        return (
-          <CustomTreeItem
-            key={itemId}
-            itemId={itemId}
-            label={`SMC "${value.name || key}" (${value.elements || 0} elements)`}
-          >
-            {createTreeItems(value, itemId)}
-          </CustomTreeItem>
-        );
-      } else if (key === 'Prop') {
-        return <CustomTreeItem key={itemId} itemId={itemId} label={`Prop "${key}" = ${value}`} />;
-      } else if (key === 'Asset') {
-        return (
-          <CustomTreeItem
-            key={itemId}
-            itemId={itemId}
-            label={`Asset ${value.name || 'AssetInformation'} ${value.Unit1 || ''}`}
-          >
-            {createTreeItems(value, itemId)}
-          </CustomTreeItem>
-        );
-      } else if (typeof value === 'object' && value !== null) {
-        return (
-          <CustomTreeItem key={itemId} itemId={itemId} label={key}>
-            {createTreeItems(value, itemId)}
-          </CustomTreeItem>
-        );
-      } else {
-        return <CustomTreeItem key={itemId} itemId={itemId} label={`${key}: ${value}`} />;
       }
+
+      result.push(
+        <CustomTreeItem key={aasId} itemId={aasId} label={aasLabel}>
+          {aasChildren}
+        </CustomTreeItem>
+      );
     });
   }
 
-  return null;
+  if (data.SM) {
+    const smItems = Array.isArray(data.SM) ? data.SM : [data.SM];
+    const smChildren = [];
+
+    smItems.forEach((sm, index) => {
+      const smId = `SM-${index}`;
+      const smLabel = `${sm.name} [${sm.url || 'url 없음'}]`;
+      const smSubItems = [];
+
+      for (const key in sm) {
+        if (key !== 'name' && key !== 'url' && key !== 'SMC' && key !== 'Prop' && key !== 'parentAAS') {
+          const propId = `${smId}-${key}`;
+          smSubItems.push(<CustomTreeItem key={propId} itemId={propId} label={`${key}: ${sm[key]}`} />);
+        }
+      }
+
+      if (sm.SMC) {
+        const smcItems = Array.isArray(sm.SMC) ? sm.SMC : [sm.SMC];
+
+        smcItems.forEach((smc, smcIndex) => {
+          const smcId = `${smId}-SMC-${smcIndex}`;
+          const smcLabel = `SMC "${smc.name}" (${smc.elements || 0} elements)`;
+          const smcSubItems = [];
+
+          if (smc.items && Array.isArray(smc.items)) {
+            smc.items.forEach((item, itemIndex) => {
+              const itemId = `${smcId}-item-${itemIndex}`;
+              const itemLabel = item.name;
+              const itemSubItems = [];
+
+              if (item.Prop && Array.isArray(item.Prop)) {
+                item.Prop.forEach((prop, propIndex) => {
+                  const propId = `${itemId}-prop-${propIndex}`;
+                  itemSubItems.push(
+                    <CustomTreeItem key={propId} itemId={propId} label={`${prop.name}: ${prop.value}`} />
+                  );
+                });
+              }
+
+              smcSubItems.push(
+                <CustomTreeItem key={itemId} itemId={itemId} label={itemLabel}>
+                  {itemSubItems}
+                </CustomTreeItem>
+              );
+            });
+          }
+
+          smSubItems.push(
+            <CustomTreeItem key={smcId} itemId={smcId} label={smcLabel}>
+              {smcSubItems}
+            </CustomTreeItem>
+          );
+        });
+      }
+
+      if (sm.Prop) {
+        const propItems = Array.isArray(sm.Prop) ? sm.Prop : [sm.Prop];
+        const propId = `${smId}-props`;
+        const propSubItems = [];
+
+        if (Array.isArray(propItems)) {
+          propItems.forEach((prop, propIndex) => {
+            const singlePropId = `${propId}-${propIndex}`;
+            propSubItems.push(
+              <CustomTreeItem key={singlePropId} itemId={singlePropId} label={`${prop.name}: ${prop.value}`} />
+            );
+          });
+        } else {
+          for (const key in sm.Prop) {
+            const singlePropId = `${propId}-${key}`;
+            propSubItems.push(
+              <CustomTreeItem key={singlePropId} itemId={singlePropId} label={`${key}: ${sm.Prop[key]}`} />
+            );
+          }
+        }
+
+        smSubItems.push(
+          <CustomTreeItem key={propId} itemId={propId} label='Properties'>
+            {propSubItems}
+          </CustomTreeItem>
+        );
+      }
+
+      smChildren.push(
+        <CustomTreeItem key={smId} itemId={smId} label={smLabel}>
+          {smSubItems}
+        </CustomTreeItem>
+      );
+    });
+
+    result.push(
+      <CustomTreeItem key='SM' itemId='SM' label='Submodels'>
+        {smChildren}
+      </CustomTreeItem>
+    );
+  }
+
+  return result;
 };
 
 export default function BorderedTreeView() {
   const aasxData = useRecoilValue(aasxDataState);
   const isVerified = useRecoilValue(isVerifiedState);
 
-  // 이미지와 같은 예시 데이터 (실제로는 aasxData를 사용할 예정)
-  const exampleData = {
-    AAS: {
-      name: 'AAS',
-      url: 'https://sambo.com/Unit1',
-      of: '[Unit1, Instance]',
-      AssetInformation: {
-        Unit1: 'Unit1',
-      },
-    },
-    SM: [
-      {
-        name: 'TempController',
-        url: 'https://sambo.com/Unit1/TempController',
-        SMC: [
-          {
-            name: 'TempControllerPresentValue_Time_Series',
-            elements: 166,
-          },
-          {
-            name: 'TempControllerPresentValue_20250206_230455',
-            elements: 2,
-            Prop: [
-              {
-                name: 'timestamp',
-                value: '2025-02-06T23:04:55',
-              },
-              {
-                name: 'value',
-                value: '0.92',
-              },
-            ],
-          },
-          {
-            name: 'TempControllerPresentValue_20250206_230511',
-            elements: 2,
-            Prop: [
-              {
-                name: 'timestamp',
-                value: '2025-02-06T23:05:11',
-              },
-              {
-                name: 'value',
-                value: '0.92',
-              },
-            ],
-          },
-          {
-            name: 'TempControllerPresentValue_20250206_230534',
-            elements: 2,
-          },
-          {
-            name: 'TempControllerPresentValue_20250206_230553',
-            elements: 2,
-          },
-        ],
-        Prop: {
-          name: 'TempControllerPresentValue_Unit',
-          value: '°C',
-        },
-      },
-      {
-        name: 'HopperDryer',
-        url: 'https://sambo.com/Unit1/HopperDryer',
-        SMC: {
-          name: 'HopperDryerSetValue_Time_Series',
-          elements: 166,
-        },
-        Prop: {
-          name: 'HopperDryerSetValue_Unit',
-          value: '°C',
-        },
-      },
-    ],
-  };
-
   return (
     <SimpleTreeView
       aria-label='aasx-tree-view'
-      defaultExpandedItems={['AAS', 'SM-0']}
+      defaultExpandedItems={['AAS', 'SM']}
       slots={{
         expandIcon: ExpandIcon,
         collapseIcon: CollapseIcon,
         endIcon: EndIcon,
       }}
       sx={{
+        padding: '0 10px',
         overflowX: 'hidden',
         minHeight: 400,
         flexGrow: 1,
@@ -213,7 +218,7 @@ export default function BorderedTreeView() {
         },
       }}
     >
-      {isVerified && aasxData ? createTreeItems(aasxData) : createTreeItems(exampleData)}
+      {isVerified && createTreeItems(aasxData)}
     </SimpleTreeView>
   );
 }

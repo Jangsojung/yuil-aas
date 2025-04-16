@@ -11,6 +11,7 @@ import {
   insertAASXFile,
   updateAASXFile,
   deleteAASXFiles,
+  getVerify,
 } from '../../controller/file/FileController.js';
 
 const router = express.Router();
@@ -50,6 +51,11 @@ export default () => {
 
   router.get('/aasxFiles', (req, res) => {
     getAASXFiles(res);
+  });
+
+  router.post('/verify', (req, res) => {
+    const { file } = req.body;
+    getVerify(file, res);
   });
 
   return router;

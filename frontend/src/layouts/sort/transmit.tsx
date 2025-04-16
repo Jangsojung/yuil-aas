@@ -23,57 +23,135 @@ const Item = styled('div')(({ theme }) => ({
   }),
 }));
 
+interface AASXFile {
+  af_idx: number;
+  af_name: string;
+}
+
 export default function Sort() {
   const currentFile = useRecoilValue(currentFileState);
   const [, setAasxData] = useRecoilState(aasxDataState);
-  const [, setIsVerified] = useRecoilState(isVerifiedState);
-  const [selectedFileName, setSelectedFileName] = React.useState('');
+  const [isVerified, setIsVerified] = useRecoilState(isVerifiedState);
+  const [selectedFile, setSelectedFile] = React.useState<AASXFile | undefined>(undefined);
 
   React.useEffect(() => {
     if (currentFile) {
-      getSelectedFileName();
+      setIsVerified(false);
     }
   }, [currentFile]);
 
-  const getSelectedFileName = async () => {
-    try {
-      const response = await fetch(`http://localhost:5001/api/file/filename/${currentFile}`, {
-        method: 'GET',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch file name');
-      }
-
-      const data = await response.json();
-      setSelectedFileName(data.af_name);
-    } catch (err: any) {
-      console.log(err.message);
-    }
-  };
-
   const handleVerify = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/file/aas/${selectedFileName}`, {
-        method: 'GET',
+      if (!selectedFile) {
+        console.error('선택된 파일이 없습니다');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:5001/api/file/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          file: selectedFile,
+        }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to fetch AASX data');
       }
 
-      const data = await response.json();
-      setAasxData(data);
+      const rawData = await response.json();
+      const transformedData = transformAASXData(rawData);
+
+      setAasxData(transformedData);
       setIsVerified(true);
-      console.log('AASX file verified:', data);
+      setSelectedFile(undefined);
+      console.log('AASX file verified:', transformedData);
     } catch (err: any) {
       console.log(err.message);
     }
   };
 
-  const handleRegister = () => {
-    console.log('Register file with ID:', currentFile);
-    // 등록 기능 구현
+  const transformAASXData = (rawData) => {
+    if (!rawData || !rawData.assetAdministrationShells || !rawData.submodels) {
+      console.error('유효하지 않은 AASX 데이터 형식');
+      return null;
+    }
+
+    const result = {
+      AAS: [],
+    };
+
+    rawData.assetAdministrationShells.forEach((aas) => {
+      const aasItem = {
+        name: aas.idShort || 'AAS',
+        url: aas.id,
+        of: aas.assetInformation?.assetKind || '',
+        AssetInformation: {
+          Unit1: aas.assetInformation?.globalAssetId || '',
+        },
+        submodelRefs: aas.submodels?.map((sm) => sm.keys[0]?.value) || [],
+      };
+
+      result.AAS.push(aasItem);
+    });
+
+    result.SM = [];
+
+    rawData.submodels.forEach((submodel) => {
+      const smResult = {
+        name: submodel.idShort,
+        url: submodel.id,
+      };
+
+      if (submodel.submodelElements && submodel.submodelElements.length > 0) {
+        smResult.SMC = [];
+
+        submodel.submodelElements.forEach((element) => {
+          if (element.modelType === 'SubmodelElementCollection') {
+            const smcResult = {
+              name: element.idShort,
+              elements: element.value?.length || 0,
+            };
+
+            if (element.value && element.value.length > 0) {
+              smcResult.items = [];
+
+              element.value.forEach((item) => {
+                if (item.modelType === 'SubmodelElementCollection') {
+                  const childCollection = {
+                    name: item.idShort,
+                    elements: item.value?.length || 0,
+                  };
+
+                  if (item.value && item.value.length > 0) {
+                    childCollection.Prop = item.value.map((prop) => ({
+                      name: prop.idShort,
+                      value: prop.value,
+                    }));
+                  }
+
+                  smcResult.items.push(childCollection);
+                }
+              });
+            }
+
+            smResult.SMC.push(smcResult);
+          }
+        });
+      }
+
+      const parentAAS = result.AAS.filter((aas) => aas.submodelRefs && aas.submodelRefs.includes(submodel.id));
+
+      if (parentAAS.length > 0) {
+        smResult.parentAAS = parentAAS.map((aas) => aas.url);
+      }
+
+      result.SM.push(smResult);
+    });
+
+    return result;
   };
 
   return (
@@ -87,7 +165,7 @@ export default function Sort() {
                   <div className='sort-title'>AASX 파일</div>
                 </Grid>
                 <Grid>
-                  <SelectAASXFile />
+                  <SelectAASXFile setSelectedFile={setSelectedFile} />
                 </Grid>
               </Grid>
             </Grid>
@@ -99,9 +177,9 @@ export default function Sort() {
             <Button variant='contained' color='success' onClick={handleVerify} disabled={!currentFile}>
               검증하기
             </Button>
-            <Button variant='contained' color='primary' onClick={handleRegister} disabled={!currentFile}>
+            {/* <Button variant='contained' color='primary' onClick={handleRegister} disabled={!currentFile}>
               등록
-            </Button>
+            </Button> */}
           </Stack>
         </Grid>
       </Grid>

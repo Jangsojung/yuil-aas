@@ -252,3 +252,30 @@ export const deleteAASXFilesFromDB = async (ids) => {
     throw err;
   }
 };
+
+export const getVerifyFromDB = async (file) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const filePath = path.join(__dirname, '../../../../files/aas', file.af_name.replace(/\.aasx$/i, '.json'));
+
+      fs.readFile(filePath, 'utf8', (err, fileData) => {
+        if (err) {
+          console.error('AASX 파일 읽기 오류:', err);
+          reject(new Error('AASX 파일 읽기 실패'));
+          return;
+        }
+
+        try {
+          const jsonData = JSON.parse(fileData);
+          resolve(jsonData);
+        } catch (parseError) {
+          console.error('JSON 파싱 오류:', parseError);
+          reject(new Error('JSON 파싱 실패'));
+        }
+      });
+    } catch (error) {
+      console.error('AASX 파일 처리 오류:', error);
+      reject(new Error('AASX 파일 처리 실패'));
+    }
+  });
+};

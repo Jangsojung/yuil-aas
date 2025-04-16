@@ -12,10 +12,13 @@ interface AASXFile {
   af_name: string;
 }
 
-export default function SelectSmall() {
+type Props = {
+  setSelectedFile: React.Dispatch<React.SetStateAction<AASXFile | undefined>>;
+};
+
+export default function SelectSmall({ setSelectedFile }: Props) {
   const [files, setFiles] = React.useState<AASXFile[]>([]);
   const [currentFile, setCurrentFile] = useRecoilState(currentFileState);
-  const [, setAasxData] = useRecoilState(aasxDataState);
 
   React.useEffect(() => {
     getFiles();
@@ -34,18 +37,22 @@ export default function SelectSmall() {
       const data: AASXFile[] = await response.json();
       setFiles(data);
       setCurrentFile(data[0].af_idx);
+      setSelectedFile(data[0]);
     } catch (err: any) {
       console.log(err.message);
     }
   };
 
   const handleChange = (event: any) => {
-    setCurrentFile(event.target.value);
+    const selectedId = event.target.value;
+    setCurrentFile(selectedId);
+    const selected = files.find((f) => f.af_idx === selectedId);
+    setSelectedFile(selected);
   };
 
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }} size='small'>
-      <Select value={currentFile} onChange={handleChange} IconComponent={ExpandMoreIcon}>
+      <Select value={currentFile || ''} onChange={handleChange} IconComponent={ExpandMoreIcon} displayEmpty>
         {files &&
           files.map((file) => (
             <MenuItem key={file.af_idx} value={file.af_idx}>

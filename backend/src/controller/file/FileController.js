@@ -6,6 +6,7 @@ import {
   insertAASXFileToDB,
   updateAASXFileToDB,
   deleteAASXFilesFromDB,
+  getVerifyFromDB,
 } from '../../service/file/FileService.js';
 
 export const insertFile = async (fc_idx, fileName, res) => {
@@ -82,5 +83,23 @@ export const deleteAASXFiles = async (ids, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const getVerify = async (file, res) => {
+  try {
+    const result = await getVerifyFromDB(file);
+    if (!result) {
+      return res.status(400).json({ error: '파일 정보가 필요합니다' });
+    }
+
+    return res.json(result);
+  } catch (err) {
+    console.error(err.message);
+    if (res) {
+      res.status(500).json({ err: 'Internal Server Error' });
+    } else {
+      console.error('Internal Server Error (no res)');
+    }
   }
 };
