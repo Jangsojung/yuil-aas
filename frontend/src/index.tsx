@@ -16,7 +16,6 @@ dayjs.locale('ko');
 root.render(
   <RecoilRoot>
     <ThemeProvider theme={theme}>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
       <App />
     </ThemeProvider>
