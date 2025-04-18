@@ -1,11 +1,10 @@
-import * as React from 'react';
-import { createBrowserRouter, RouterProvider, Outlet, useNavigate, Navigate } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
 
 import Layout from './layouts/dashboard';
 import AuthLayout from './layouts/auth';
-
 import DashboardPage from './pages/aas/dashboard';
 import ConvertPage from './pages/aas/convert';
 import TransmitPage from './pages/aas/transmit';
@@ -13,78 +12,7 @@ import AasxManagerPage from './pages/aasx/aasxManager';
 import DataManagerPage from './pages/aasx/dataManager';
 import EdgePage from './pages/edge/edge';
 import SignInPage from './pages/signIn/sign';
-import { useRecoilState } from 'recoil';
-import { userState } from './recoil/atoms';
-
-const NAVIGATION: Navigation = [
-  {
-    segment: 'aas',
-    title: 'AAS KAMP DATA I/F',
-    children: [
-      {
-        segment: 'dashboard',
-        title: '기초코드',
-      },
-      {
-        segment: 'convert',
-        title: 'DATA 변환',
-      },
-      {
-        segment: 'transmit',
-        title: 'DATA 송신',
-      },
-    ],
-  },
-  {
-    segment: 'aasx',
-    title: 'AASX Package Explorer 관리',
-    children: [
-      {
-        segment: 'aasxManager',
-        title: 'AASX 관리',
-      },
-      {
-        segment: 'dataManager',
-        title: '데이터 관리',
-      },
-    ],
-  },
-  {
-    segment: 'edge',
-    title: 'Edge Gateway 관리',
-    children: [
-      {
-        segment: 'edge',
-        title: 'Edge Gateway 관리',
-      },
-    ],
-  },
-];
-
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useRecoilState(userState);
-  const navigate = useNavigate();
-
-  React.useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        localStorage.removeItem('user');
-        navigate('/signIn/sign');
-      }
-    } else {
-      navigate('/signIn/sign');
-    }
-  }, [setUser, navigate]);
-
-  if (!user) {
-    return null;
-  }
-
-  return <>{children}</>;
-};
+import ProtectedRoute from './components/route/ProtectedRoute';
 
 function App() {
   return (
@@ -95,7 +23,7 @@ function App() {
 }
 
 export default function ReactRouter() {
-  const router = React.useMemo(
+  const router = useMemo(
     () =>
       createBrowserRouter([
         {
@@ -178,3 +106,48 @@ export default function ReactRouter() {
 
   return <RouterProvider router={router} />;
 }
+
+const NAVIGATION: Navigation = [
+  {
+    segment: 'aas',
+    title: 'AAS KAMP DATA I/F',
+    children: [
+      {
+        segment: 'dashboard',
+        title: '기초코드',
+      },
+      {
+        segment: 'convert',
+        title: 'DATA 변환',
+      },
+      {
+        segment: 'transmit',
+        title: 'DATA 송신',
+      },
+    ],
+  },
+  {
+    segment: 'aasx',
+    title: 'AASX Package Explorer 관리',
+    children: [
+      {
+        segment: 'aasxManager',
+        title: 'AASX 관리',
+      },
+      {
+        segment: 'dataManager',
+        title: '데이터 관리',
+      },
+    ],
+  },
+  {
+    segment: 'edge',
+    title: 'Edge Gateway 관리',
+    children: [
+      {
+        segment: 'edge',
+        title: 'Edge Gateway 관리',
+      },
+    ],
+  },
+];
