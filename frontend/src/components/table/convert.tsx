@@ -57,8 +57,8 @@ export default function BasicTable() {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
-              {cells.map((cell) => (
-                <TableCell>{cell}</TableCell>
+              {cells.map((cell, idx) => (
+                <TableCell key={idx}>{cell}</TableCell>
               ))}
             </TableRow>
           </TableHead>

@@ -96,8 +96,8 @@ export default function BasicTable() {
               <TableCell>
                 <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
               </TableCell>
-              {cells.map((cell, index) => (
-                <TableCell key={index}>{cell}</TableCell>
+              {cells.map((cell, idx) => (
+                <TableCell key={idx}>{cell}</TableCell>
               ))}
             </TableRow>
           </TableHead>

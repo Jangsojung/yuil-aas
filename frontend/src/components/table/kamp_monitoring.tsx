@@ -52,8 +52,8 @@ export default function BasicTable() {
         <Table sx={{ minWidth: 650 }} aria-label='simple table'>
           <TableHead>
             <TableRow>
-              {cells.map((cell) => (
-                <TableCell>{cell}</TableCell>
+              {cells.map((cell, idx) => (
+                <TableCell key={idx}>{cell}</TableCell>
               ))}
             </TableRow>
           </TableHead>

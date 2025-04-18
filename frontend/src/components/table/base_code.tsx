@@ -105,8 +105,8 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
               <TableCell>
                 <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
               </TableCell>
-              {cells.map((cell) => (
-                <TableCell>{cell}</TableCell>
+              {cells.map((cell, idx) => (
+                <TableCell key={idx}>{cell}</TableCell>
               ))}
             </TableRow>
           </TableHead>
