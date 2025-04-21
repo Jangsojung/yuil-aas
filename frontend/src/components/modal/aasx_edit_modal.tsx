@@ -1,8 +1,6 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Grid from '@mui/system/Grid';
-import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -12,13 +10,8 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { grey } from '@mui/material/colors';
 
-//switch
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch, { SwitchProps } from '@mui/material/Switch';
-
 import { useRecoilState } from 'recoil';
-import { dataTableRefreshTriggerState, edgeGatewayRefreshState } from '../../recoil/atoms';
+import { dataTableRefreshTriggerState } from '../../recoil/atoms';
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { CircularProgress } from '@mui/material';
 
@@ -188,7 +181,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
           </div> */}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleEdit} variant='contained' color='primary'>
+        <Button onClick={handleEdit} variant='contained' color='primary' disabled={uploadFile == null}>
           확인
         </Button>
 
