@@ -22,6 +22,14 @@ interface File {
 export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [files, setFiles] = React.useState<File[]>([]);
+  const [currentPage, setCurrentPage] = React.useState(0);
+  const rowsPerPage = 10;
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const pagedData = files.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   React.useEffect(() => {
     if (currentFactory !== null) {
@@ -58,8 +66,8 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {files &&
-              files.map((file) => (
+            {pagedData.length > 0 &&
+              pagedData.map((file) => (
                 <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>{file.af_idx}</TableCell>
                   <TableCell>{file.af_name}</TableCell>
@@ -74,7 +82,7 @@ export default function BasicTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagenation count={files ? files.length : 0} />
+      <Pagenation count={files ? files.length : 0} onPageChange={handlePageChange} />
     </>
   );
 }

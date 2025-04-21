@@ -42,6 +42,7 @@ export default function Edge_Gateway() {
   };
 
   const pagedData = edgeGateways.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+
   const handleInsert = async (eg: EdgeGateway) => {
     setEdgeGateways([eg, ...edgeGateways]);
   };

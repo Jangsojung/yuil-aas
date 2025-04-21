@@ -22,6 +22,14 @@ export default function BasicTable() {
   const currentFactory = useRecoilValue(currentFactoryState);
   const [bases, setBases] = React.useState<Base[]>([]);
   const [selectedConvert, setSelectedConvert] = useRecoilState(selectedConvertsState);
+  const [currentPage, setCurrentPage] = React.useState(0);
+  const rowsPerPage = 10;
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const pagedData = bases.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   React.useEffect(() => {
     if (currentFactory !== null) {
@@ -63,8 +71,8 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {bases &&
-              bases.map((base) => (
+            {pagedData.length > 0 &&
+              pagedData.map((base) => (
                 <TableRow key={base.ab_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>
                     <Checkbox
@@ -79,7 +87,7 @@ export default function BasicTable() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagenation count={bases ? bases.length : 0} />
+      <Pagenation count={bases ? bases.length : 0} onPageChange={handlePageChange} />
     </>
   );
 }

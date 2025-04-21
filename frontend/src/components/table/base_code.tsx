@@ -37,6 +37,14 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
   const refreshTrigger = useRecoilValue(edgeGatewayRefreshState);
   const [, setSelectedBase] = useRecoilState(selectedBaseState);
   const [, setBaseEditMode] = useRecoilState(baseEditModeState);
+  const [currentPage, setCurrentPage] = React.useState(0);
+  const rowsPerPage = 10;
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const pagedData = bases.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   React.useEffect(() => {
     getBases();
@@ -97,7 +105,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
   };
 
   return (
-    <>
+    <div>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label='simple table'>
           <TableHead>
@@ -111,8 +119,8 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {bases ? (
-              bases.map((base) => (
+            {pagedData.length > 0 ? (
+              pagedData.map((base) => (
                 <TableRow
                   key={base.ab_idx}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
@@ -139,8 +147,8 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
           </TableBody>
         </Table>
       </TableContainer>
-      <Pagenation count={bases ? bases.length : 0} />
-    </>
+      <Pagenation count={bases ? bases.length : 0} onPageChange={handlePageChange} />
+    </div>
   );
 }
 
