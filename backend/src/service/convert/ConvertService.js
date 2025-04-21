@@ -47,11 +47,13 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
         [sensor.fg_name, sensor.fa_name, sensor.sn_name]
       );
 
-      const { fg_alias, fa_alias, sn_alias } = aliases[0]
+      const { fg_alias, fa_alias, sn_alias } = aliases[0];
 
-      const fgNameEn = fg_alias?.as_en || sensor.fg_name;
-      const faNameEn = fa_alias?.as_en || sensor.fa_name;
-      const snNameEn = sn_alias?.as_en || sensor.sn_name;  
+      const fgNameEn = fg_alias || sensor.fg_name;
+      const faNameEn = fa_alias || sensor.fa_name;
+      const snNameEn = sn_alias || sensor.sn_name;
+
+      console.log(fgNameEn, faNameEn, snNameEn);
 
       const [sensorData] = await pool.promise().query(
         `SELECT ROUND(sn_compute_data, 2) AS sn_compute_data, sd_createdAt 
