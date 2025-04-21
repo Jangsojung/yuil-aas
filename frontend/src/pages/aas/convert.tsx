@@ -10,6 +10,12 @@ import Pagenation from '../../components/pagenation';
 import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/convert/ConvertTableRow';
 
+interface Base {
+  ab_idx: number;
+  ab_name: string;
+  sn_length: number;
+}
+
 export default function ConvertPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedConvert, setSelectedConvert] = useState<number | null>();
@@ -19,12 +25,6 @@ export default function ConvertPage() {
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [currentPage, setCurrentPage] = React.useState(0);
   const rowsPerPage = 10;
-
-  interface Base {
-    ab_idx: number;
-    ab_name: string;
-    sn_length: number;
-  }
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
