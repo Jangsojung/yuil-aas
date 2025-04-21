@@ -106,7 +106,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
     setIsLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5001/api/file?af_idx=${af_idx}`, {
+      const response = await fetch(`http://localhost:5001/api/file/aasx?af_idx=${af_idx}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

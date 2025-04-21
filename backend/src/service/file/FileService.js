@@ -58,8 +58,8 @@ export const updateFileToDB = async (af_idx, fileName) => {
     console.log('JSON 파일 업데이트 및 DB 수정 완료');
     console.log(oldFileName, '------->', newFileName);
 
-    const old_pythonFilePath = `../files/front/${oldFileName}`;
-    const pythonFilePath = `../files/front/${fileName}`;
+    const old_pythonFilePath = `../files/aas/${oldFileName}`;
+    const pythonFilePath = `../files/aas/${fileName}`;
 
     const pythonResponse = await fetch('http://127.0.0.1:5000/api/aas', {
       method: 'POST',
@@ -187,8 +187,9 @@ export const updateAASXFileToDB = async (af_idx, fileName) => {
       throw new Error('파일을 찾을 수 없습니다.');
     }
 
-    const oldFileName = rows[0].af_name;
-    const newFileName = fileName.endsWith('.json') ? fileName.replace(/\.json$/i, '.aasx') : fileName;
+    const oldFileName = rows[0].af_name.replace(/\.aasx$/i, '.json');
+    const newFileName = fileName.replace(/\.json$/i, '.aasx');
+
     const file_path = '/files/aasx';
 
     const query = `UPDATE tb_aasx_file SET af_name = ? WHERE af_idx = ?`;
@@ -196,8 +197,10 @@ export const updateAASXFileToDB = async (af_idx, fileName) => {
 
     console.log('JSON 파일 업데이트 및 DB 수정 완료');
 
-    const old_pythonFilePath = `../files/aas/${oldFileName}`;
-    const pythonFilePath = `../files/aas/${newFileName}`;
+    const old_pythonFilePath = `../files/aasx/${oldFileName}`;
+    const pythonFilePath = `../files/aasx/${newFileName}`;
+
+    console.log(old_pythonFilePath, ' ', pythonFilePath);
 
     const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
       method: 'POST',
