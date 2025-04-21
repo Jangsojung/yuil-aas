@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import SelectAASXFile from '../../components/select/aasx_files';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { aasxDataState, currentFileState, isVerifiedState } from '../../recoil/atoms';
+import { handleVerifyAPI } from '../../apis/api/transmit';
 
 interface AASXFile {
   af_idx: number;
@@ -20,35 +21,19 @@ export default function TransmitPage() {
   const [selectedFile, setSelectedFile] = React.useState<AASXFile | undefined>(undefined);
 
   const handleVerify = async () => {
-    try {
-      if (!selectedFile) {
-        console.error('선택된 파일이 없습니다');
-        return;
-      }
+    if (!selectedFile) {
+      console.error('선택된 파일이 없습니다');
+      return;
+    }
 
-      const response = await fetch(`http://localhost:5001/api/file/verify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          file: selectedFile,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch AASX data');
-      }
-
-      const rawData = await response.json();
+    const rawData = await handleVerifyAPI(selectedFile);
+    if (rawData) {
       const transformedData = transformAASXData(rawData);
 
       setAasxData(transformedData);
       setIsVerified(true);
       setSelectedFile(undefined);
       console.log('AASX file verified:', transformedData);
-    } catch (err: any) {
-      console.log(err.message);
     }
   };
 
