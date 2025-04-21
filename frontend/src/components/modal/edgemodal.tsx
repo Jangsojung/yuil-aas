@@ -12,7 +12,6 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { grey } from '@mui/material/colors';
 
-//switch
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch, { SwitchProps } from '@mui/material/Switch';
@@ -124,6 +123,8 @@ interface CustomizedDialogsProps {
   open: boolean;
   handleClose: () => void;
   edgeGatewayData: EdgeGateway | null;
+  handleInsert: (eg: EdgeGateway) => void;
+  handleUpdate: (eg: EdgeGateway) => void;
 }
 
 export default function CustomizedDialogs({
@@ -131,13 +132,14 @@ export default function CustomizedDialogs({
   open,
   handleClose,
   edgeGatewayData = null,
+  handleInsert,
+  handleUpdate,
 }: CustomizedDialogsProps) {
   const [serverTemp, setServerTemp] = React.useState('');
   const [networkStatus, setNetworkStatus] = React.useState(true);
   const [pcTemp, setPcTemp] = React.useState('');
   const [pcIp, setPcIp] = React.useState('');
   const [pcPort, setPcPort] = React.useState('');
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(edgeGatewayRefreshState);
   const [edgeGatewayId, setEdgeGatewayId] = React.useState<number | null>(null);
 
   React.useEffect(() => {
@@ -199,7 +201,19 @@ export default function CustomizedDialogs({
         throw new Error(`Failed to ${modalType === 'insert' ? '등록' : '수정'} edge gateway`);
       }
 
-      setRefreshTrigger((prev) => prev + 1);
+      const result = await response.json();
+
+      console.log(result);
+
+      const eg = {
+        eg_idx: result.eg_idx,
+        eg_server_temp: serverTemp,
+        eg_network: networkStatus ? 1 : 0,
+        eg_pc_temp: pcTemp,
+        eg_ip_port: pcIp + ':' + pcPort,
+      };
+
+      modalType === 'insert' ? handleInsert(eg) : handleUpdate(eg);
       handleClose();
     } catch (err) {
       console.log(err.message);
