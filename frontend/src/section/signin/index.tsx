@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
@@ -11,7 +11,7 @@ const providers = [{ id: 'credentials', name: 'Email and Password' }];
 const signIn = async (
   provider: AuthProvider,
   formData: FormData,
-  setUser: React.Dispatch<React.SetStateAction<User | null>>,
+  setUser: Dispatch<SetStateAction<User | null>>,
   nav: NavigateFunction
 ) => {
   const email = formData.get('email');
@@ -53,7 +53,7 @@ export default function SignInView() {
   const [user, setUser] = useRecoilState(userState);
   const nav = useNavigate();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       nav('/aas/dashboard');
     }
@@ -67,7 +67,7 @@ export default function SignInView() {
         slotProps={{
           emailField: { autoFocus: false },
           form: { noValidate: true },
-          rememberMe: { style: { display: 'none' }}
+          rememberMe: { style: { display: 'none' } },
         }}
       />
     </AppProvider>

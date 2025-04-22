@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -12,10 +12,10 @@ interface FacilityGroup {
 }
 
 export default function SelectSmall() {
-  const [groups, setGroups] = React.useState<FacilityGroup[]>([]);
+  const [groups, setGroups] = useState<FacilityGroup[]>([]);
   const [currentFacilityGroup, setCurrentFacilityGroup] = useRecoilState(currentFacilityGroupState);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getFacilityGroups();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

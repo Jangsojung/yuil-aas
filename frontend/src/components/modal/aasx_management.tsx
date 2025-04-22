@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ChangeEvent, DragEvent, Fragment, useState } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
@@ -9,18 +9,10 @@ import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-import ClearIcon from '@mui/icons-material/Clear';
 import { grey } from '@mui/material/colors';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { CircularProgress } from '@mui/material';
-
-const DeleteIcon = styled(ClearIcon)<IconProps>(() => ({
-  fontSize: '1rem',
-  color: '#637381',
-  verticalAlign: 'top',
-  cursor: 'pointer',
-}));
 
 const GreyButton = styled(Button)<ButtonProps>(() => ({
   color: '#637381',
@@ -54,9 +46,9 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 export default function CustomizedDialogs({ handleInsert }) {
-  const [open, setOpen] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -67,13 +59,13 @@ export default function CustomizedDialogs({ handleInsert }) {
   };
 
   const fileUploadProp: FileUploadProps = {
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
       if (event.target.files !== null && event.target?.files?.length > 0) {
         const file = event.target.files[0];
         setSelectedFile(file);
       }
     },
-    onDrop: (event: React.DragEvent<HTMLElement>) => {
+    onDrop: (event: DragEvent<HTMLElement>) => {
       const file = event.dataTransfer.files[0];
       setSelectedFile(file);
     },
@@ -127,7 +119,7 @@ export default function CustomizedDialogs({ handleInsert }) {
   };
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Button variant='contained' color='primary' onClick={handleClickOpen}>
         <AddIcon />
         파일등록
@@ -181,6 +173,6 @@ export default function CustomizedDialogs({ handleInsert }) {
           </GreyButton>
         </DialogActions>
       </BootstrapDialog>
-    </React.Fragment>
+    </Fragment>
   );
 }

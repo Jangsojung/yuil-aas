@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -20,17 +20,17 @@ interface Base {
 
 interface Props {
   insertMode: boolean;
-  setInsertMode: React.Dispatch<React.SetStateAction<boolean>>;
+  setInsertMode: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function BasicTable({ insertMode, setInsertMode }: Props) {
-  const [bases, setBases] = React.useState<Base[]>([]);
+  const [bases, setBases] = useState<Base[]>([]);
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
-  const [selectAll, setSelectAll] = React.useState(false);
+  const [selectAll, setSelectAll] = useState(false);
   const refreshTrigger = useRecoilValue(edgeGatewayRefreshState);
   const [, setSelectedBase] = useRecoilState(selectedBaseState);
   const [, setBaseEditMode] = useRecoilState(baseEditModeState);
-  const [currentPage, setCurrentPage] = React.useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 10;
 
   const handlePageChange = (page) => {
@@ -39,13 +39,13 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
 
   const pagedData = bases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getBases();
     setSelectedBases([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedBases.length === 0) {
       setSelectAll(false);
     } else if (selectedBases.length === bases.length) {
@@ -77,7 +77,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
     setBaseEditMode(true);
   };
 
-  const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAllChange = (event: ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;
     setSelectAll(checked);
     if (checked) {

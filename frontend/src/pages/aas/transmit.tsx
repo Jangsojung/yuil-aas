@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import TransmitView from '../../section/aas/transmit/view';
 import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
@@ -18,7 +18,7 @@ export default function TransmitPage() {
   const currentFile = useRecoilValue(currentFileState);
   const [, setAasxData] = useRecoilState(aasxDataState);
   const [, setIsVerified] = useRecoilState(isVerifiedState);
-  const [selectedFile, setSelectedFile] = React.useState<AASXFile | undefined>(undefined);
+  const [selectedFile, setSelectedFile] = useState<AASXFile | undefined>(undefined);
 
   const handleVerify = async () => {
     if (!selectedFile) {

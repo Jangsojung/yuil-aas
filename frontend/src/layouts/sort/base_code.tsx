@@ -1,29 +1,15 @@
-import * as React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
-import styled from '@mui/system/styled';
 import { useRecoilState } from 'recoil';
 import { edgeGatewayRefreshState, selectedBasesState } from '../../recoil/atoms';
 
-const Item = styled('div')(({ theme }) => ({
-  backgroundColor: '#fff',
-  border: '1px solid',
-  borderColor: '#ced7e0',
-  padding: theme.spacing(1),
-  borderRadius: '4px',
-  textAlign: 'center',
-  ...theme.applyStyles('dark', {
-    backgroundColor: '#1A2027',
-    borderColor: '#444d58',
-  }),
-}));
-
 interface Props {
   insertMode: boolean;
-  setInsertMode: React.Dispatch<React.SetStateAction<boolean>>;
+  setInsertMode: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function Sort({ insertMode, setInsertMode }: Props) {

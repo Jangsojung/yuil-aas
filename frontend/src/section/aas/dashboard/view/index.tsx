@@ -1,19 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@mui/system/Grid';
 import Table from '../../../../components/table/basic_code';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentFacilityGroupState, hasBasicsState } from '../../../../recoil/atoms';
-
-const style = {
-  py: 0,
-  width: '100%',
-  maxWidth: 360,
-  borderRadius: 2,
-  border: '1px solid',
-  borderColor: 'divider',
-  backgroundColor: 'background.paper',
-};
 
 interface Basic {
   fa_idx: number;
@@ -22,15 +12,8 @@ interface Basic {
 
 export default function BasicCode() {
   const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
-  const [basics, setBasics] = React.useState<Basic[]>([]);
+  const [basics, setBasics] = useState<Basic[]>([]);
   const [, setHasBasics] = useRecoilState(hasBasicsState);
-
-  React.useEffect(() => {
-    if (currentFacilityGroup !== null) {
-      getBasicCode(currentFacilityGroup);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentFacilityGroup]);
 
   const getBasicCode = async (fg_idx: number) => {
     try {
@@ -50,6 +33,13 @@ export default function BasicCode() {
       console.log(err.message);
     }
   };
+
+  useEffect(() => {
+    if (currentFacilityGroup !== null) {
+      getBasicCode(currentFacilityGroup);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFacilityGroup]);
 
   return (
     <div className='sensor-list-wrap'>

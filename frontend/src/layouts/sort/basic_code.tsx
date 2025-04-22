@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
@@ -7,44 +7,23 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import SaveIcon from '@mui/icons-material/Save';
 
 import SelectFacilityGroup from '../../components/select/facility_group';
-
-import styled from '@mui/system/styled';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedSensorsState, baseEditModeState, selectedBaseState } from '../../recoil/atoms';
 import { TextField } from '@mui/material';
-
-const Item = styled('div')(({ theme }) => ({
-  backgroundColor: '#fff',
-  border: '1px solid',
-  borderColor: '#ced7e0',
-  padding: theme.spacing(1),
-  borderRadius: '4px',
-  textAlign: 'center',
-  ...theme.applyStyles('dark', {
-    backgroundColor: '#1A2027',
-    borderColor: '#444d58',
-  }),
-}));
 
 const ADD_EQUIPMENT_EVENT = 'add-new-equipment';
 const DELETE_EQUIPMENT_EVENT = 'delete-equipment';
 
 interface Props {
   insertMode: boolean;
-  setInsertMode: React.Dispatch<React.SetStateAction<boolean>>;
+  setInsertMode: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function Sort({ insertMode, setInsertMode }: Props) {
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
-  const [name, setName] = React.useState('');
+  const [name, setName] = useState('');
   const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
   const selectedBase = useRecoilValue(selectedBaseState);
-
-  React.useEffect(() => {
-    setName(baseEditMode ? selectedBase.ab_name : '');
-    setSelectedSensors([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleAdd = async () => {
     if (!name) {
@@ -106,6 +85,12 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
     setInsertMode(false);
     setBaseEditMode(false);
   };
+
+  useEffect(() => {
+    setName(baseEditMode ? selectedBase.ab_name : '');
+    setSelectedSensors([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>

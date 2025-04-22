@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -26,17 +26,17 @@ interface Base {
 }
 
 export default function BasicTable({ sm_idx, fa_idx }) {
-  const [sensors, setSensors] = React.useState<Sensor[]>([]);
+  const [sensors, setSensors] = useState<Sensor[]>([]);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const baseEditMode = useRecoilValue(baseEditModeState);
   const selectedBase = useRecoilValue(selectedBaseState);
 
-  React.useEffect(() => {
-    if (baseEditMode) {
-      getSelectedSensors(selectedBase);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedBase]);
+  const style = {
+    width: '100%',
+    bgcolor: 'background.paper',
+    border: '1px solid #e0e0e0',
+    borderRadius: 1,
+  };
 
   const getSelectedSensors = async (selectedBase: Base) => {
     try {
@@ -55,23 +55,6 @@ export default function BasicTable({ sm_idx, fa_idx }) {
       console.log(err.message);
     }
   };
-
-  const style = {
-    width: '100%',
-    bgcolor: 'background.paper',
-    border: '1px solid #e0e0e0',
-    borderRadius: 1,
-  };
-
-  React.useEffect(() => {
-    getSensors(fa_idx);
-  }, [fa_idx]);
-
-  React.useEffect(() => {
-    if (fa_idx) {
-      getSensors(fa_idx);
-    }
-  }, [fa_idx]);
 
   const getSensors = async (fa_idx: number) => {
     try {
@@ -109,6 +92,23 @@ export default function BasicTable({ sm_idx, fa_idx }) {
       rows.push(rowSensors);
     }
   }
+
+  useEffect(() => {
+    if (baseEditMode) {
+      getSelectedSensors(selectedBase);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBase]);
+
+  useEffect(() => {
+    getSensors(fa_idx);
+  }, [fa_idx]);
+
+  useEffect(() => {
+    if (fa_idx) {
+      getSensors(fa_idx);
+    }
+  }, [fa_idx]);
 
   return (
     <TableContainer component={Paper}>

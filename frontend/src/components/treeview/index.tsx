@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { JSX, PropsWithoutRef } from 'react';
 import IndeterminateCheckBoxRoundedIcon from '@mui/icons-material/IndeterminateCheckBoxRounded';
 import DisabledByDefaultRoundedIcon from '@mui/icons-material/DisabledByDefaultRounded';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
@@ -27,22 +27,22 @@ const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
   },
 }));
 
-function ExpandIcon(props: React.PropsWithoutRef<typeof AddBoxRoundedIcon>) {
+function ExpandIcon(props: PropsWithoutRef<typeof AddBoxRoundedIcon>) {
   return <AddBoxRoundedIcon {...props} sx={{ opacity: 0.8 }} />;
 }
 
-function CollapseIcon(props: React.PropsWithoutRef<typeof IndeterminateCheckBoxRoundedIcon>) {
+function CollapseIcon(props: PropsWithoutRef<typeof IndeterminateCheckBoxRoundedIcon>) {
   return <IndeterminateCheckBoxRoundedIcon {...props} sx={{ opacity: 0.8 }} />;
 }
 
-function EndIcon(props: React.PropsWithoutRef<typeof DisabledByDefaultRoundedIcon>) {
+function EndIcon(props: PropsWithoutRef<typeof DisabledByDefaultRoundedIcon>) {
   return <DisabledByDefaultRoundedIcon {...props} sx={{ opacity: 0.3 }} />;
 }
 
 const createTreeItems = (data: any) => {
   if (!data) return null;
 
-  const result: React.JSX.Element[] = [];
+  const result: JSX.Element[] = [];
 
   if (data.AAS) {
     const aasItems = Array.isArray(data.AAS) ? data.AAS : [data.AAS];

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
@@ -10,8 +10,6 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { grey } from '@mui/material/colors';
 
-import { useRecoilState } from 'recoil';
-import { dataTableRefreshTriggerState } from '../../recoil/atoms';
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { CircularProgress } from '@mui/material';
 
@@ -68,13 +66,13 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   const title = selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정';
 
   const fileUploadProp: FileUploadProps = {
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
       if (event.target.files !== null && event.target?.files?.length > 0) {
         const file = event.target.files[0];
         setUploadFile(file);
       }
     },
-    onDrop: (event: React.DragEvent<HTMLElement>) => {
+    onDrop: (event: DragEvent<HTMLElement>) => {
       const file = event.dataTransfer.files[0];
       setUploadFile(file);
     },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getBasesAPI, insertBaseAPI } from '../../apis/api/convert';
 
 import CircularProgress from '@mui/material/CircularProgress';
@@ -23,7 +23,7 @@ export default function ConvertPage() {
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [currentPage, setCurrentPage] = React.useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 10;
 
   const handlePageChange = (page) => {
@@ -78,7 +78,7 @@ export default function ConvertPage() {
     setSelectedConvert((prev) => (prev === convertsIdx ? null : convertsIdx));
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getBases();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

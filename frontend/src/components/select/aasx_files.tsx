@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
@@ -12,14 +12,14 @@ interface AASXFile {
 }
 
 type Props = {
-  setSelectedFile: React.Dispatch<React.SetStateAction<AASXFile | undefined>>;
+  setSelectedFile: Dispatch<SetStateAction<AASXFile | undefined>>;
 };
 
 export default function SelectSmall({ setSelectedFile }: Props) {
-  const [files, setFiles] = React.useState<AASXFile[]>([]);
+  const [files, setFiles] = useState<AASXFile[]>([]);
   const [currentFile, setCurrentFile] = useRecoilState(currentFileState);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getFiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

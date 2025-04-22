@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
@@ -93,7 +93,7 @@ export default function DataManagerPage() {
     setFiles(data);
   };
 
-  const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAllChange = (event: ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;
     setSelectAll(checked);
     if (checked) {

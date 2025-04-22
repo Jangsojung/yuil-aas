@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { deleteEdgeAPI, getEdgeAPI } from '../../apis/api/edge';
 
 import Box from '@mui/system/Box';
@@ -80,7 +80,7 @@ export default function Edge_Gateway() {
     setEdgeGateways(data);
   };
 
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAll = (e: ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     setSelectAll(checked);
 

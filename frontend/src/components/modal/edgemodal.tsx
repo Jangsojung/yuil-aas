@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Grid from '@mui/system/Grid';
@@ -15,9 +15,6 @@ import { grey } from '@mui/material/colors';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch, { SwitchProps } from '@mui/material/Switch';
-
-import { useRecoilState } from 'recoil';
-import { edgeGatewayRefreshState } from '../../recoil/atoms';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -135,14 +132,14 @@ export default function CustomizedDialogs({
   handleInsert,
   handleUpdate,
 }: CustomizedDialogsProps) {
-  const [serverTemp, setServerTemp] = React.useState('');
-  const [networkStatus, setNetworkStatus] = React.useState(true);
-  const [pcTemp, setPcTemp] = React.useState('');
-  const [pcIp, setPcIp] = React.useState('');
-  const [pcPort, setPcPort] = React.useState('');
-  const [edgeGatewayId, setEdgeGatewayId] = React.useState<number | null>(null);
+  const [serverTemp, setServerTemp] = useState('');
+  const [networkStatus, setNetworkStatus] = useState(true);
+  const [pcTemp, setPcTemp] = useState('');
+  const [pcIp, setPcIp] = useState('');
+  const [pcPort, setPcPort] = useState('');
+  const [edgeGatewayId, setEdgeGatewayId] = useState<number | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (modalType === 'update' && edgeGatewayData) {
       setEdgeGatewayId(edgeGatewayData.eg_idx);
       setServerTemp(edgeGatewayData.eg_server_temp.toString());

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent, DragEvent, FC } from 'react';
 
 export type FileUploadProps = {
   imageButton?: boolean;
@@ -15,12 +15,12 @@ export type FileUploadProps = {
       height?: string;
     };
   };
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onDrop: (event: React.DragEvent<HTMLElement>) => void;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onDrop: (event: DragEvent<HTMLElement>) => void;
   selectedFileName?: string;
 };
 
-export const FileUpload: React.FC<FileUploadProps> = ({
+export const FileUpload: FC<FileUploadProps> = ({
   accept,
   imageButton = false,
   hoverLabel = 'Click or drag to upload file',
@@ -29,7 +29,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   onDrop,
   selectedFileName,
 }) => {
-  const stopDefaults = (e: React.DragEvent) => {
+  const stopDefaults = (e: DragEvent) => {
     e.stopPropagation();
     e.preventDefault();
   };
@@ -40,18 +40,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     onMouseLeave: () => {
       setIsMouseOver(false);
     },
-    onDragEnter: (e: React.DragEvent) => {
+    onDragEnter: (e: DragEvent) => {
       stopDefaults(e);
       setIsDragOver(true);
       setLabelText(dropLabel);
     },
-    onDragLeave: (e: React.DragEvent) => {
+    onDragLeave: (e: DragEvent) => {
       stopDefaults(e);
       setIsDragOver(false);
       setLabelText(hoverLabel);
     },
     onDragOver: stopDefaults,
-    onDrop: (e: React.DragEvent<HTMLElement>) => {
+    onDrop: (e: DragEvent<HTMLElement>) => {
       stopDefaults(e);
       setLabelText(hoverLabel);
       setIsDragOver(false);
@@ -62,7 +62,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     },
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (imageButton && event.target.files[0]) {
       setImageUrl(URL.createObjectURL(event.target.files[0]));
     }
