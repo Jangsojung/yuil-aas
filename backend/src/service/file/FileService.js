@@ -151,7 +151,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName) => {
     const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
 
     const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path) VALUES (?, 3, ?, ?)`;
-    await pool.promise().query(query, [fc_idx, aasxFileName, file_path]);
+    const [result] = await pool.promise().query(query, [fc_idx, aasxFileName, file_path]);
 
     console.log('JSON 파일 저장 및 DB 등록 완료');
 
@@ -173,6 +173,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName) => {
       success: true,
       fileName: aasxFileName,
       filePath: file_path,
+      af_idx: result.insertId,
     };
   } catch (err) {
     console.log('Failed to insert JSON File: ', err);

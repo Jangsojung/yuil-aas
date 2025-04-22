@@ -50,14 +50,14 @@ interface File {
   createdAt: Date;
 }
 
-interface FileProps {
+interface Props {
   open: boolean;
   handleClose: () => void;
   fileData: File | null;
   handleUpdate: (file: File) => void;
 }
 
-export default function CustomizedDialogs({ open, handleClose, fileData = null, handleUpdate }: FileProps) {
+export default function CustomizedDialogs({ open, handleClose, fileData = null, handleUpdate }: Props) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadFile, setUploadFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -177,11 +177,6 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       <DialogContent dividers className='file-upload'>
         <Box sx={{ typography: 'subtitle2' }}>json 파일</Box>
         <FileUpload {...fileUploadProp} />
-        {/* <div className='file-list'>
-            <Box sx={{ typography: 'body2' }}>
-              업로드 파일 목록 <DeleteIcon />
-            </Box>
-          </div> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleEdit} variant='contained' color='primary' disabled={uploadFile == null}>
