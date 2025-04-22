@@ -9,12 +9,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  currentFactoryState,
-  dataTableRefreshTriggerState,
-  dateRangeAASXState,
-  selectedDataFilesState,
-} from '../../recoil/atoms';
+import { dataTableRefreshTriggerState, dateRangeAASXState, selectedDataFilesState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 import dayjs from 'dayjs';
 import CustomizedDialogs from '../modal/aasx_edit_modal';
@@ -27,7 +22,6 @@ interface File {
 
 const cells = ['파일 번호', '파일 이름', '생성 날짜'];
 export default function BasicTable() {
-  const currentFactory = useRecoilValue(currentFactoryState);
   const [files, setFiles] = React.useState<File[]>([]);
   const [selectedFiles, setSelectedFiles] = useRecoilState(selectedDataFilesState);
   const refreshTrigger = useRecoilValue(dataTableRefreshTriggerState);
@@ -43,15 +37,13 @@ export default function BasicTable() {
     setCurrentPage(page);
   };
 
-  const pagedData = files.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+  const pagedData = files?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   React.useEffect(() => {
-    if (currentFactory !== null) {
-      setSelectedFiles([]);
-      getFiles();
-    }
+    setSelectedFiles([]);
+    getFiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger, currentFactory]);
+  }, [refreshTrigger]);
 
   React.useEffect(() => {
     if (selectedFiles.length === 0) {
@@ -131,7 +123,7 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {pagedData.length > 0 ? (
+            {pagedData && pagedData.length > 0 ? (
               pagedData.map((file) => (
                 <TableRow
                   key={file.af_idx}

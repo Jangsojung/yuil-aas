@@ -33,7 +33,6 @@ export default function TransmitPage() {
       setAasxData(transformedData);
       setIsVerified(true);
       setSelectedFile(undefined);
-      console.log('AASX file verified:', transformedData);
     }
   };
 

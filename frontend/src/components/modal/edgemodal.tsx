@@ -203,8 +203,6 @@ export default function CustomizedDialogs({
 
       const result = await response.json();
 
-      console.log(result);
-
       const eg = {
         eg_idx: result.eg_idx,
         eg_server_temp: serverTemp,

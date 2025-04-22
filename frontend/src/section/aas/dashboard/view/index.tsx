@@ -3,13 +3,7 @@ import Grid from '@mui/system/Grid';
 import Table from '../../../../components/table/basic_code';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  baseEditModeState,
-  currentFacilityGroupState,
-  hasBasicsState,
-  selectedBaseState,
-  selectedFacilitiesState,
-} from '../../../../recoil/atoms';
+import { currentFacilityGroupState, hasBasicsState } from '../../../../recoil/atoms';
 
 const style = {
   py: 0,

@@ -9,13 +9,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  baseEditModeState,
-  currentFactoryState,
-  edgeGatewayRefreshState,
-  selectedBasesState,
-  selectedBaseState,
-} from '../../recoil/atoms';
+import { baseEditModeState, edgeGatewayRefreshState, selectedBasesState, selectedBaseState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 
 interface Base {
@@ -30,7 +24,6 @@ interface Props {
 }
 
 export default function BasicTable({ insertMode, setInsertMode }: Props) {
-  const currentFactory = useRecoilValue(currentFactoryState);
   const [bases, setBases] = React.useState<Base[]>([]);
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
   const [selectAll, setSelectAll] = React.useState(false);
@@ -44,13 +37,13 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
     setCurrentPage(page);
   };
 
-  const pagedData = bases.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+  const pagedData = bases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   React.useEffect(() => {
     getBases();
     setSelectedBases([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger, currentFactory]);
+  }, [refreshTrigger]);
 
   React.useEffect(() => {
     if (selectedBases.length === 0) {
@@ -119,7 +112,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {pagedData.length > 0 ? (
+            {pagedData && pagedData.length > 0 ? (
               pagedData.map((base) => (
                 <TableRow
                   key={base.ab_idx}

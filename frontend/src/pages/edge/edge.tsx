@@ -41,7 +41,7 @@ export default function Edge_Gateway() {
     setCurrentPage(page);
   };
 
-  const pagedData = edgeGateways.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+  const pagedData = edgeGateways?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   const handleInsert = async (eg: EdgeGateway) => {
     setEdgeGateways([eg, ...edgeGateways]);
@@ -114,8 +114,6 @@ export default function Edge_Gateway() {
     setSelectedEdgeGateway(null);
   };
 
-  console.log(edgeGateways);
-
   useEffect(() => {
     getEdge();
   }, []);
@@ -157,7 +155,7 @@ export default function Edge_Gateway() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {pagedData.length > 0 ? (
+              {pagedData && pagedData.length > 0 ? (
                 pagedData.map((eg) => (
                   <EdgeTableRow
                     eg={eg}

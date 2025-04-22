@@ -13,8 +13,8 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { grey } from '@mui/material/colors';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { currentFactoryState, dataTableRefreshTriggerState } from '../../recoil/atoms';
+import { useRecoilState } from 'recoil';
+import { dataTableRefreshTriggerState } from '../../recoil/atoms';
 import { CircularProgress } from '@mui/material';
 
 const DeleteIcon = styled(ClearIcon)<IconProps>(() => ({
@@ -59,7 +59,6 @@ export default function CustomizedDialogs() {
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-  const currentFactory = useRecoilValue(currentFactoryState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
 
   const handleClickOpen = () => {
@@ -100,7 +99,7 @@ export default function CustomizedDialogs() {
     try {
       const fileName = selectedFile.name;
 
-      const response = await fetch(`http://localhost:5001/api/file/aasx?fc_idx=${currentFactory}`, {
+      const response = await fetch(`http://localhost:5001/api/file/aasx?fc_idx=3`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,14 +111,12 @@ export default function CustomizedDialogs() {
         throw new Error('파일 업로드 실패');
       }
 
-      const result = await response.json();
-      console.log('업로드 결과:', result);
+      //const result = await response.json();
 
       alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aasx');
       setRefreshTrigger((prev) => prev + 1);
       handleClose();
     } catch (err) {
-      console.error(err.message);
       alert('업로드 중 오류 발생: ' + err.message);
     } finally {
       setIsLoading(false);

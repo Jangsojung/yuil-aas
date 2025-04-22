@@ -30,7 +30,7 @@ export default function ConvertPage() {
     setCurrentPage(page);
   };
 
-  const pagedData = bases.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+  const pagedData = bases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   const startLoading = () => {
     setIsLoading(true);
@@ -144,7 +144,7 @@ export default function ConvertPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {pagedData.length > 0 ? (
+                {pagedData && pagedData.length > 0 ? (
                   pagedData.map((base, idx) => (
                     <ConvertTableRow
                       base={base}

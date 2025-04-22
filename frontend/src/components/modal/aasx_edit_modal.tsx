@@ -113,14 +113,12 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
         throw new Error(`Failed to edit Python JSON File`);
       }
 
-      const result = await response.json();
-      console.log('업로드 결과:', result);
+      //const result = await response.json();
 
       alert('성공적으로 json파일을 수정하였습니다.\n파일 위치: /files/aas');
       setRefreshTrigger((prev) => prev + 1);
       handleClose();
     } catch (err) {
-      console.log(err.message);
       alert('업로드 중 오류 발생: ' + err.message);
     } finally {
       setIsLoading(false);

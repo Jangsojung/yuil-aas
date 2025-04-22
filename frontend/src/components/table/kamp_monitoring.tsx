@@ -9,7 +9,6 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 
 import { useRecoilValue } from 'recoil';
-import { currentFactoryState } from '../../recoil/atoms';
 import Pagenation from '../../components/pagenation';
 
 interface File {
@@ -20,7 +19,6 @@ interface File {
 }
 
 export default function BasicTable() {
-  const currentFactory = useRecoilValue(currentFactoryState);
   const [files, setFiles] = React.useState<File[]>([]);
   const [currentPage, setCurrentPage] = React.useState(0);
   const rowsPerPage = 10;
@@ -29,17 +27,15 @@ export default function BasicTable() {
     setCurrentPage(page);
   };
 
-  const pagedData = files.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+  const pagedData = files?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   React.useEffect(() => {
-    if (currentFactory !== null) {
-      getFiles(currentFactory);
-    }
-  }, [currentFactory]);
+    getFiles();
+  }, []);
 
-  const getFiles = async (fc_idx: number) => {
+  const getFiles = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/kamp_monitoring/files?fc_idx=${fc_idx}`, {
+      const response = await fetch(`http://localhost:5001/api/kamp_monitoring/files?fc_idx=3`, {
         method: 'GET',
       });
 
@@ -66,7 +62,8 @@ export default function BasicTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {pagedData.length > 0 &&
+            {pagedData &&
+              pagedData.length > 0 &&
               pagedData.map((file) => (
                 <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>{file.af_idx}</TableCell>

@@ -9,13 +9,8 @@ import BasicDatePicker from '../../components/datepicker';
 import ModalBasic from '../../components/modal/aasx_management';
 
 import styled from '@mui/system/styled';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  currentFactoryState,
-  dataTableRefreshTriggerState,
-  selectedDataFilesState,
-  dateRangeAASXState,
-} from '../../recoil/atoms';
+import { useRecoilState } from 'recoil';
+import { dataTableRefreshTriggerState, selectedDataFilesState, dateRangeAASXState } from '../../recoil/atoms';
 
 import RemoveIcon from '@mui/icons-material/Remove';
 
