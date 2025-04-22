@@ -8,7 +8,7 @@ import Grid from '@mui/system/Grid';
 import BasicDatePicker from '../../components/datepicker';
 import Pagenation from '../../components/pagenation';
 import Paper from '@mui/material/Paper';
-import ConvertTableRow from '../../components/convert/ConvertTableRow';
+import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
 
 interface Base {
   ab_idx: number;

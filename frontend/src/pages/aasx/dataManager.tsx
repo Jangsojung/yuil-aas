@@ -13,7 +13,7 @@ import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, Table
 import Pagenation from '../../components/pagenation';
 import CustomizedDialogs from '../../components/modal/file_edit_modal';
 import { deleteDataAPI, getFilesAPI } from '../../apis/api/data_manage';
-import DataTableRow from '../../components/data_management/DataTableRow';
+import DataTableRow from '../../components/aasx/data_management/DataTableRow';
 
 interface File {
   af_idx: number;
