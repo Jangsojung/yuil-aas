@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
@@ -13,8 +13,6 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { grey } from '@mui/material/colors';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { currentFactoryState, dataTableRefreshTriggerState, edgeGatewayRefreshState } from '../../recoil/atoms';
 import { CircularProgress } from '@mui/material';
 
 const DeleteIcon = styled(ClearIcon)<IconProps>(() => ({
@@ -55,16 +53,15 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-export default function CustomizedDialogs() {
-  const [open, setOpen] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-  const currentFactory = useRecoilValue(currentFactoryState);
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
+export default function CustomizedDialogs({ handleInsert }) {
+  const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleClickOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
     setSelectedFile(null);
@@ -100,7 +97,7 @@ export default function CustomizedDialogs() {
     try {
       const fileName = selectedFile.name;
 
-      const response = await fetch(`http://localhost:5001/api/file?fc_idx=${currentFactory}`, {
+      const response = await fetch(`http://localhost:5001/api/file?fc_idx=3`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,10 +110,15 @@ export default function CustomizedDialogs() {
       }
 
       const result = await response.json();
-      console.log('업로드 결과:', result);
+
+      const newFile = {
+        af_idx: result.af_idx,
+        af_name: result.fileName,
+        createdAt: new Date(),
+      };
 
       alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aas');
-      setRefreshTrigger((prev) => prev + 1);
+      handleInsert(newFile);
       handleClose();
     } catch (err) {
       console.error(err.message);
@@ -171,16 +173,8 @@ export default function CustomizedDialogs() {
         <DialogContent dividers className='file-upload'>
           <Box sx={{ typography: 'subtitle2' }}>json 파일</Box>
           <FileUpload {...fileUploadProp} />
-          {/* <div className='file-list'>
-            <Box sx={{ typography: 'body2' }}>
-              업로드 파일 목록 <DeleteIcon />
-            </Box>
-          </div> */}
         </DialogContent>
         <DialogActions>
-          {/* <Button variant='outlined' color='primary'>
-            변환
-          </Button> */}
           <Button autoFocus onClick={handleAdd} variant='contained' color='primary'>
             등록
           </Button>

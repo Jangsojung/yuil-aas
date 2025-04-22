@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
@@ -10,8 +10,6 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { grey } from '@mui/material/colors';
 
-import { useRecoilState } from 'recoil';
-import { dataTableRefreshTriggerState } from '../../recoil/atoms';
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { CircularProgress } from '@mui/material';
 
@@ -56,23 +54,16 @@ interface FileProps {
   open: boolean;
   handleClose: () => void;
   fileData: File | null;
+  handleUpdate: (file: File) => void;
 }
 
-export default function CustomizedDialogs({ open, handleClose, fileData = null }: FileProps) {
-  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-  const [uploadFile, setUploadFile] = React.useState<any>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(dataTableRefreshTriggerState);
-  const [af_idx, setAf_Idx] = React.useState<number | null>(null);
+export default function CustomizedDialogs({ open, handleClose, fileData = null, handleUpdate }: FileProps) {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadFile, setUploadFile] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [af_idx, setAf_Idx] = useState<number | null>(null);
 
-  React.useEffect(() => {
-    if (fileData) {
-      setSelectedFile(fileData);
-      setAf_Idx(fileData.af_idx);
-    } else {
-      handleReset();
-    }
-  }, [fileData, open]);
+  const title = selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정';
 
   const fileUploadProp: FileUploadProps = {
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,10 +105,15 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
       }
 
       const result = await response.json();
-      console.log('업로드 결과:', result);
+
+      const newFile = {
+        af_idx: fileData?.af_idx,
+        af_name: result.fileName,
+        createdAt: fileData?.createdAt || new Date(),
+      };
 
       alert('성공적으로 json파일을 수정하였습니다.\n파일 위치: /files/aas');
-      setRefreshTrigger((prev) => prev + 1);
+      handleUpdate(newFile);
       handleClose();
     } catch (err) {
       console.error(err.message);
@@ -133,7 +129,14 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null }
     setAf_Idx(null);
   };
 
-  const title = selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정';
+  useEffect(() => {
+    if (fileData) {
+      setSelectedFile(fileData);
+      setAf_Idx(fileData.af_idx);
+    } else {
+      handleReset();
+    }
+  }, [fileData, open]);
 
   return (
     <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
