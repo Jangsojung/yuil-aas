@@ -58,7 +58,7 @@ export default function BasicDatePicker({ onDateChange, startDate, endDate }: Pr
             value={startDate}
             format='YYYY-MM-DD'
             onChange={handleStartDateChange}
-            maxDate={endDate || dayjs()}
+            maxDate={dayjs(endDate) || dayjs()}
             slots={{ openPickerIcon: CalendarTodayIcon }}
           />
           <span>
@@ -69,7 +69,7 @@ export default function BasicDatePicker({ onDateChange, startDate, endDate }: Pr
             value={endDate}
             format='YYYY-MM-DD'
             onChange={handleEndDateChange}
-            minDate={startDate}
+            minDate={dayjs(startDate)}
             maxDate={dayjs()}
             slots={{ openPickerIcon: CalendarTodayIcon }}
           />
