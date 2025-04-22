@@ -19,11 +19,6 @@ export default function SelectSmall({ setSelectedFile }: Props) {
   const [files, setFiles] = useState<AASXFile[]>([]);
   const [currentFile, setCurrentFile] = useRecoilState(currentFileState);
 
-  useEffect(() => {
-    getFiles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const getFiles = async () => {
     try {
       const response = await fetch(`http://localhost:5001/api/file/aasxFiles`, {
@@ -49,6 +44,11 @@ export default function SelectSmall({ setSelectedFile }: Props) {
     const selected = files.find((f) => f.af_idx === selectedId);
     setSelectedFile(selected);
   };
+
+  useEffect(() => {
+    getFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }} size='small'>

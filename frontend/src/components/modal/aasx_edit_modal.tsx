@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, DragEvent, useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';

@@ -40,12 +40,6 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
   const pagedData = bases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   useEffect(() => {
-    getBases();
-    setSelectedBases([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger]);
-
-  useEffect(() => {
     if (selectedBases.length === 0) {
       setSelectAll(false);
     } else if (selectedBases.length === bases.length) {
@@ -96,6 +90,12 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
       }
     });
   };
+
+  useEffect(() => {
+    getBases();
+    setSelectedBases([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]);
 
   return (
     <div>

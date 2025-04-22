@@ -15,11 +15,6 @@ export default function SelectSmall() {
   const [groups, setGroups] = useState<FacilityGroup[]>([]);
   const [currentFacilityGroup, setCurrentFacilityGroup] = useRecoilState(currentFacilityGroupState);
 
-  useEffect(() => {
-    getFacilityGroups();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const getFacilityGroups = async () => {
     try {
       const response = await fetch(`http://localhost:5001/api/base_code/facilityGroups?fc_idx=3`, {
@@ -44,6 +39,11 @@ export default function SelectSmall() {
   const handleChange = (event: any) => {
     setCurrentFacilityGroup(event.target.value);
   };
+
+  useEffect(() => {
+    getFacilityGroups();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <FormControl sx={{ m: 1, minWidth: 120 }} size='small'>
