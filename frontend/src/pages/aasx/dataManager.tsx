@@ -40,7 +40,7 @@ export default function DataManagerPage() {
   const pagedData = files?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   const handleInsert = async (file: File) => {
-    setFiles([file, ...files]);
+    setFiles((prevFiles) => [file, ...prevFiles]);
   };
 
   const handleUpdate = async (newFile: File) => {
@@ -180,40 +180,42 @@ export default function DataManagerPage() {
           </Grid>
         </Grid>
       </Box>
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
-              </TableCell>
-              {cells.map((cell, idx) => (
-                <TableCell key={idx}>{cell}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {pagedData && pagedData.length > 0 ? (
-              pagedData.map((file, idx) => (
-                <DataTableRow
-                  file={file}
-                  key={idx}
-                  onCheckboxChange={handleCheckboxChange}
-                  onDoubleClick={handleDoubleClick}
-                  checked={selectedFiles.includes(file.af_idx)}
-                />
-              ))
-            ) : (
+      <div className='table-wrap'>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={cells.length + 1} align='center'>
-                  데이터가 없습니다.
+                <TableCell>
+                  <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
                 </TableCell>
+                {cells.map((cell, idx) => (
+                  <TableCell key={idx}>{cell}</TableCell>
+                ))}
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Pagenation count={files ? files.length : 0} onPageChange={handlePageChange} />
+            </TableHead>
+            <TableBody>
+              {pagedData && pagedData.length > 0 ? (
+                pagedData.map((file, idx) => (
+                  <DataTableRow
+                    file={file}
+                    key={idx}
+                    onCheckboxChange={handleCheckboxChange}
+                    onDoubleClick={handleDoubleClick}
+                    checked={selectedFiles.includes(file.af_idx)}
+                  />
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={cells.length + 1} align='center'>
+                    데이터가 없습니다.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Pagenation count={files ? files.length : 0} onPageChange={handlePageChange} />
+      </div>
       <CustomizedDialogs
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
