@@ -98,7 +98,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
   }, [refreshTrigger]);
 
   return (
-    <div>
+    <div className='table-wrap-min'>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label='simple table'>
           <TableHead>

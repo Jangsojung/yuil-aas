@@ -1,5 +1,5 @@
 main {
-  >.MuiContainer-root {
+  > .MuiContainer-root {
     max-width: 100%;
   }
   .MuiContainer-root {
@@ -41,10 +41,9 @@ main {
         align-items: center;
       }
 
-      .w-100 .MuiFormControl-root{
+      .w-100 .MuiFormControl-root {
         width: 100%;
       }
-
     }
     .MuiFormControl-root {
       .MuiInputBase-root.MuiOutlinedInput-root {
@@ -65,7 +64,7 @@ main {
       line-height: 1.4;
       font-weight: bold;
       box-shadow: none;
-      
+
       svg {
         font-size: 1rem;
         margin-right: 3px;
@@ -74,7 +73,7 @@ main {
 
     .MuiButton-containedSuccess {
       color: #fff;
-    }    
+    }
 
     //센서리스트
     .sensor-list-wrap {
@@ -102,16 +101,27 @@ main {
     .sensor-list .MuiListItemText-secondary {
       color: var(--mui-palette-text-primary);
     }
-    
-    
 
     //체크박스
     .MuiButtonBase-root.MuiCheckbox-root {
       padding: 0;
     }
 
+    .basic-checkbox {
+      display: flex;
+      align-items: flex-start;
+
+      .MuiCheckbox-colorPrimary {
+        padding: 10px 0 10px 10px;
+        margin-right: -8px;
+      }
+    }
+    .basic-checkbox > div {
+      flex-grow: 1;
+    }
+
     //테이블영역
-    .MuiTableContainer-root {      
+    .MuiTableContainer-root {
       border-radius: 0;
       box-shadow: none;
     }
@@ -119,7 +129,16 @@ main {
       height: calc(100% - 130px);
     }
     .table-wrap {
-      height: 100%;
+      height: calc(100% - 34px);
+
+      .MuiTableContainer-root {
+        height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+    .table-wrap-min {
+      height: 630px;
 
       .MuiTableContainer-root {
         height: 100%;
@@ -143,13 +162,13 @@ main {
     }
 
     //페이징
-    .MuiTablePagination-selectLabel,.MuiTablePagination-select {
+    .MuiTablePagination-selectLabel,
+    .MuiTablePagination-select {
       display: none;
     }
 
     //데이트피커
     .datepicker-wrap {
-
       .MuiInputLabel-formControl {
         transform: translate(14px, 7px) scale(1);
         color: #90a4ae;
@@ -168,12 +187,10 @@ main {
       svg {
         font-size: 1rem;
       }
-      
     }
     .MuiFormControl-root.MuiTextField-root {
       .MuiInputBase-input {
         padding: 6px 9px;
-        
       }
     }
 
@@ -192,25 +209,21 @@ main {
       margin-left: 0;
       max-width: 100%;
     }
-  
   }
- 
 }
 
-
- //모달
- .MuiDialog-container {
+//모달
+.MuiDialog-container {
   .MuiBox-root {
     margin-left: 3px;
   }
   input {
     width: 100%;
     padding: 3px;
-    border: 1px solid #DCE0E4;
+    border: 1px solid #dce0e4;
   }
   .file-list {
     margin-top: 15px;
     height: 60px;
   }
-
 }

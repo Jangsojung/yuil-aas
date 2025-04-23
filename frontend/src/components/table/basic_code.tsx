@@ -121,20 +121,20 @@ export default function BasicTable({ sm_idx, fa_idx }) {
                   {rowSensors &&
                     rowSensors.map((sensor, idx) => (
                       <Grid item xs={2} key={sensor.sn_idx}>
-                        <List sx={style}>
-                          <ListItem>
-                            <Checkbox
-                              checked={selectedSensors.includes(sensor.sn_idx)}
-                              onChange={() => handleCheckboxChange(sensor.sn_idx)}
-                            />
-                          </ListItem>
-                          <ListItem>
-                            <ListItemText secondary={sensor.sn_name} />
-                          </ListItem>
-                          <Divider variant='middle' component='li' />
-                          <ListItem>
-                            <ListItemText secondary={'Prop 1.' + sm_idx + '.' + (idx + 1)} />
-                          </ListItem>
+                        <List sx={style} className='basic-checkbox'>
+                          <Checkbox
+                            checked={selectedSensors.includes(sensor.sn_idx)}
+                            onChange={() => handleCheckboxChange(sensor.sn_idx)}
+                          />
+                          <div>
+                            <ListItem>
+                              <ListItemText secondary={sensor.sn_name} />
+                            </ListItem>
+                            <Divider variant='middle' component='li' />
+                            <ListItem>
+                              <ListItemText secondary={'Prop 1.' + sm_idx + '.' + (idx + 1)} />
+                            </ListItem>
+                          </div>
                         </List>
                       </Grid>
                     ))}

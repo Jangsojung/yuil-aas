@@ -140,7 +140,7 @@ export default function ConvertPage() {
             </Grid>
           </Grid>
         </Box>
-        <div className='table-wrap'>
+        <div className='table-wrap-min'>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label='simple table'>
               <TableHead>
