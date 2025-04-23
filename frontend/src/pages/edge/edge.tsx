@@ -44,7 +44,7 @@ export default function Edge_Gateway() {
   const pagedData = edgeGateways?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   const handleInsert = async (eg: EdgeGateway) => {
-    setEdgeGateways([eg, ...edgeGateways]);
+    setEdgeGateways((prevEdgeGateways) => [eg, ...prevEdgeGateways]);
   };
 
   const handleUpdate = async (newEg: EdgeGateway) => {
@@ -85,8 +85,7 @@ export default function Edge_Gateway() {
     setSelectAll(checked);
 
     if (checked) {
-      const egIdx = edgeGateways.map((file) => file.eg_idx);
-      setSelectedEdgeGateways(egIdx);
+      setSelectedEdgeGateways(edgeGateways.map((file) => file.eg_idx));
     } else {
       setSelectedEdgeGateways([]);
     }
@@ -97,16 +96,14 @@ export default function Edge_Gateway() {
     setOpenUpdateModal(true);
   };
 
-  const handleCheckboxChange = (fileIdx: number) => {
-    let newSelectedEdgeGateways: number[] = [];
-
-    if (selectedEdgeGateways.includes(fileIdx)) {
-      newSelectedEdgeGateways = selectedEdgeGateways.filter((eg_idx) => eg_idx !== fileIdx);
-    } else {
-      newSelectedEdgeGateways = [...selectedEdgeGateways, fileIdx];
-    }
-
-    setSelectedEdgeGateways(newSelectedEdgeGateways);
+  const handleCheckboxChange = (edgeIdx: number) => {
+    setSelectedEdgeGateways((prevSelected) => {
+      if (prevSelected.includes(edgeIdx)) {
+        return prevSelected.filter((idx) => idx !== edgeIdx);
+      } else {
+        return [...prevSelected, edgeIdx];
+      }
+    });
   };
 
   const handleCloseUpdateModal = () => {
@@ -117,6 +114,16 @@ export default function Edge_Gateway() {
   useEffect(() => {
     getEdge();
   }, []);
+
+  useEffect(() => {
+    if (selectedEdgeGateways.length === 0) {
+      setSelectAll(false);
+    } else if (selectedEdgeGateways.length === edgeGateways.length) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedEdgeGateways, edgeGateways]);
 
   return (
     <div className='table-outer'>
@@ -156,10 +163,10 @@ export default function Edge_Gateway() {
             </TableHead>
             <TableBody>
               {pagedData && pagedData.length > 0 ? (
-                pagedData.map((eg) => (
+                pagedData.map((eg, idx) => (
                   <EdgeTableRow
                     eg={eg}
-                    key={eg.eg_idx}
+                    key={idx}
                     onCheckboxChange={handleCheckboxChange}
                     onDoubleClick={handleDoubleClick}
                     checked={selectedEdgeGateways.includes(eg.eg_idx)}
