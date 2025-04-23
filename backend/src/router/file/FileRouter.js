@@ -50,7 +50,8 @@ export default () => {
   });
 
   router.get('/aasxFiles', (req, res) => {
-    getAASXFiles(res);
+    const { af_kind, fc_idx, startDate, endDate } = req.query;
+    getAASXFiles(af_kind, fc_idx, startDate, endDate, res);
   });
 
   router.post('/verify', (req, res) => {

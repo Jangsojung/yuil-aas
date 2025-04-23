@@ -24,7 +24,7 @@ export const deleteAASXAPI = async (selectedFiles) => {
 export const getFilesAPI = async (start, end) => {
   try {
     const response = await fetch(
-      `http://localhost:5001/api/kamp_monitoring/AASXfiles?af_kind=3&fc_idx=3&startDate=${start}&endDate=${end}`,
+      `http://localhost:5001/api/file/aasxFiles?af_kind=3&fc_idx=3&startDate=${start}&endDate=${end}`,
       {
         method: 'GET',
       }

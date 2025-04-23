@@ -5,7 +5,6 @@ import cors from 'cors';
 import http from 'http';
 import { WebSocketServer } from 'ws';
 import BaseCodeRouter from './router/basic_code/BasicCodeRouter.js';
-import KampMonitoringRouter from './router/kamp_monitoring/KampMonitoringRouter.js';
 import EdgeGatewayRouter from './router/edge_gateway/EdgeGatewayRouter.js';
 import ConvertRouter from './router/convert/ConvertRouter.js';
 import FileRouter from './router/file/FileRouter.js';
@@ -28,7 +27,6 @@ export const pool = mysql.createPool({
 });
 
 app.use('/api/base_code', BaseCodeRouter());
-app.use('/api/kamp_monitoring', KampMonitoringRouter());
 app.use('/api/edge_gateway', EdgeGatewayRouter());
 app.use('/api/convert', ConvertRouter());
 app.use('/api/file', FileRouter());

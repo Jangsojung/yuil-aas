@@ -42,9 +42,9 @@ export const deleteFiles = async (ids, res) => {
   }
 };
 
-export const getAASXFiles = async (res) => {
+export const getAASXFiles = async (af_kind, fc_idx, startDate, endDate, res) => {
   try {
-    const result = await getAASXFilesFromDB();
+    const result = await getAASXFilesFromDB(af_kind, fc_idx, startDate, endDate);
 
     res.status(200).json(result);
   } catch (err) {

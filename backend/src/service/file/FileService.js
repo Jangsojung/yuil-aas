@@ -117,12 +117,22 @@ export const deleteFilesFromDB = async (ids) => {
   }
 };
 
-export const getAASXFilesFromDB = async () => {
+export const getAASXFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, endDate = null) => {
   return new Promise((resolve, reject) => {
-    const query =
-      'select af_idx, af_name, createdAt from tb_aasx_file where af_kind = 3 and fc_idx = 3 order by af_idx desc';
+    let query = 'select af_idx, af_name, createdAt from tb_aasx_file where af_kind = ? and fc_idx = ?';
 
-    pool.query(query, (err, results) => {
+    const queryParams = [af_kind, fc_idx];
+
+    if (startDate && endDate) {
+      const startDateTime = `${startDate} 00:00:00`;
+      const endDateTime = `${endDate} 23:59:59`;
+      query += ' and createdAt between ? and ?';
+      queryParams.push(startDateTime, endDateTime);
+    }
+
+    query += ' order by af_idx desc';
+
+    pool.query(query, queryParams, (err, results) => {
       if (err) {
         reject(err);
       } else {
