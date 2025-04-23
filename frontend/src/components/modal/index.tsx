@@ -1,5 +1,5 @@
 import React, { ChangeEvent, DragEvent, Fragment, useState } from 'react';
-import Button from '@mui/material/Button';
+import Button, { ButtonProps } from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
@@ -74,6 +74,7 @@ export default function CustomizedDialogs({ handleInsert }) {
       setSelectedFile(file);
     },
     selectedFileName: selectedFile?.name || '',
+    accept: '.json',
   };
 
   const handleAdd = async () => {
@@ -173,7 +174,7 @@ export default function CustomizedDialogs({ handleInsert }) {
           <Button autoFocus onClick={handleAdd} variant='contained' color='primary'>
             등록
           </Button>
-          <GreyButton variant='outlined' color='grey' onClick={handleClose}>
+          <GreyButton variant='outlined' onClick={handleClose}>
             취소
           </GreyButton>
         </DialogActions>
