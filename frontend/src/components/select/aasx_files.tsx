@@ -57,7 +57,7 @@ export default function SelectSmall({ setSelectedFile }: Props) {
   }, []);
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 120 }} size='small'>
+    <FormControl sx={{ m: 1, minWidth: 250 }} size='small'>
       <Select value={currentFile || ''} onChange={handleChange} IconComponent={ExpandMoreIcon} displayEmpty>
         {files && files.length > 0 ? (
           files.map((file) => (
