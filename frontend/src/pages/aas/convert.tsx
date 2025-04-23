@@ -11,6 +11,7 @@ import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
+import { height } from '@mui/system';
 
 interface Base {
   ab_idx: number;
@@ -140,7 +141,7 @@ export default function ConvertPage() {
             </Grid>
           </Grid>
         </Box>
-        <div className='table-wrap-min'>
+        <div className='table-wrap-min' style={{ height: '623px' }}>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label='simple table'>
               <TableHead>
