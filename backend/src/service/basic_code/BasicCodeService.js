@@ -54,10 +54,10 @@ export const getBasesFromDB = async () => {
   });
 };
 
-export const insertBasesToDB = async (name, ids) => {
+export const insertBasesToDB = async (name, ids, user_idx) => {
   try {
-    const query = `insert into tb_aasx_base (ab_name) values (?);`;
-    const [result] = await pool.promise().query(query, [name]);
+    const query = `insert into tb_aasx_base (ab_name, creator, updater) values (?, ?, ?);`;
+    const [result] = await pool.promise().query(query, [name, user_idx, user_idx]);
 
     const ab_idx = result.insertId;
 
@@ -76,12 +76,15 @@ export const insertBasesToDB = async (name, ids) => {
   }
 };
 
-export const updateBaseToDB = async (ab_idx, name, ids) => {
+export const updateBaseToDB = async (ab_idx, name, ids, user_idx) => {
   const connection = await pool.promise().getConnection();
   try {
     await connection.beginTransaction();
 
-    await connection.query(`update tb_aasx_base set ab_name = ? where ab_idx = ?`, [name, ab_idx]);
+    await connection.query(
+      `update tb_aasx_base set ab_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where ab_idx = ?`,
+      [name, user_idx, ab_idx]
+    );
     await connection.query(`delete from tb_aasx_base_sensor where ab_idx = ?`, [ab_idx]);
 
     if (ids.length > 0) {
@@ -197,12 +200,6 @@ export const getSensorsFromDB = async (fa_idx) => {
 
 export const getBaseCodeFromDB = async (fg_idx) => {
   return new Promise((resolve, reject) => {
-    // const query = `SELECT sm.fa_name, GROUP_CONCAT(prop.sn_name ORDER BY prop.sn_idx SEPARATOR ', ') AS sn_names
-    // FROM tb_aasx_data_sm sm, tb_aasx_data_prop prop where sm.fa_idx = prop.fa_idx
-    // and sm.fg_idx = ?
-    // GROUP BY sm.fa_idx
-    // ORDER BY sm.fa_idx;`;
-
     const query = `SELECT fa_idx, fa_name from tb_aasx_data_sm where fg_idx =  ?;`;
 
     pool.query(query, [fg_idx], (err, results) => {
@@ -227,10 +224,10 @@ export const getBaseCodeFromDB = async (fg_idx) => {
   });
 };
 
-export const insertBaseCodeToDB = async (fa_idx, fg_idx, fa_name) => {
+export const insertBaseCodeToDB = async (fa_idx, fg_idx, fa_name, user_idx) => {
   try {
-    const query = `insert into tb_aasx_data_sm (fa_idx, fg_idx, fa_name) values (?, ?, ?);`;
-    const [result] = await pool.promise().query(query, [fa_idx, fg_idx, fa_name]);
+    const query = `insert into tb_aasx_data_sm (fa_idx, fg_idx, fa_name, creator, updater) values (?, ?, ?, ?, ?);`;
+    const [result] = await pool.promise().query(query, [fa_idx, fg_idx, fa_name, user_idx, user_idx]);
 
     return {
       fa_idx: fa_idx,
@@ -242,10 +239,10 @@ export const insertBaseCodeToDB = async (fa_idx, fg_idx, fa_name) => {
   }
 };
 
-export const editBaseCodeFromDB = async (fg_idx, fa_idx, fa_name) => {
+export const editBaseCodeFromDB = async (fg_idx, fa_idx, fa_name, user_idx) => {
   try {
-    const query = `update tb_aasx_data_sm set fa_name = ? where fa_idx = ?;`;
-    await pool.promise().query(query, [fa_name, fa_idx]);
+    const query = `update tb_aasx_data_sm set fa_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP  where fa_idx = ?;`;
+    await pool.promise().query(query, [fa_name, user_idx, fa_idx]);
   } catch (err) {
     console.log('Failed to update Facility: ', err);
     throw err;
@@ -262,10 +259,10 @@ export const deleteBaseCodeFromDB = async (fa_idx) => {
   }
 };
 
-export const insertSensorBaseCodeFromDB = async (sn_idx, fa_idx, sn_name) => {
+export const insertSensorBaseCodeFromDB = async (sn_idx, fa_idx, sn_name, user_idx) => {
   try {
-    const query = `insert into tb_aasx_data_prop (sn_idx, fa_idx, sn_name) values (?, ?, ?);`;
-    await pool.promise().query(query, [sn_idx, fa_idx, sn_name]);
+    const query = `insert into tb_aasx_data_prop (sn_idx, fa_idx, sn_name, creator, updater) values (?, ?, ?, ?, ?);`;
+    await pool.promise().query(query, [sn_idx, fa_idx, sn_name, user_idx, user_idx]);
 
     return {
       sn_idx: sn_idx,
@@ -277,10 +274,10 @@ export const insertSensorBaseCodeFromDB = async (sn_idx, fa_idx, sn_name) => {
   }
 };
 
-export const editSensorBaseCodeFromDB = async (sn_idx, sn_name) => {
+export const editSensorBaseCodeFromDB = async (sn_idx, sn_name, user_idx) => {
   try {
-    const query = `update tb_aasx_data_prop set sn_name = ? where sn_idx = ?;`;
-    await pool.promise().query(query, [sn_name, sn_idx]);
+    const query = `update tb_aasx_data_prop set sn_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where sn_idx = ?;`;
+    await pool.promise().query(query, [sn_name, user_idx, sn_idx]);
   } catch (err) {
     console.log('Failed to update Sensor: ', err);
     throw err;

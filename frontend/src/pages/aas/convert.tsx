@@ -56,6 +56,11 @@ export default function ConvertPage() {
       return;
     }
 
+    if (!selectedConvert) {
+      alert('기초코드를 선택해야합니다.');
+      return;
+    }
+
     startLoading();
 
     const formattedStartDate = startDate.format('YYMMDD');

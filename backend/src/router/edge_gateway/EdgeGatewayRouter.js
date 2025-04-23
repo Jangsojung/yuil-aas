@@ -14,15 +14,16 @@ export default () => {
   });
 
   router.post('/', (req, res) => {
+    const { user_idx } = req.query;
     const { serverTemp, networkStatus, pcTemp, pcIp, pcPort } = req.body;
-    insertEdgeGateways(serverTemp, networkStatus, pcTemp, pcIp, pcPort, res);
+    insertEdgeGateways(serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res);
   });
 
   router.put('/', (req, res) => {
-    const { eg_idx } = req.query;
+    const { eg_idx, user_idx } = req.query;
     const { serverTemp, networkStatus, pcTemp, pcIp, pcPort } = req.body;
 
-    updateEdgeGateway(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, res);
+    updateEdgeGateway(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res);
   });
 
   router.delete('/', (req, res) => {

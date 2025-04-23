@@ -1,6 +1,7 @@
 import { atom } from 'recoil';
 
 export interface User {
+  user_idx: number;
   user_id: string;
   user_name: string;
 }

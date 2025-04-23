@@ -29,13 +29,15 @@ export default () => {
   });
 
   router.post('/bases', (req, res) => {
+    const { user_idx } = req.query;
     const { name, ids } = req.body;
-    insertBases(name, ids, res);
+    insertBases(name, ids, user_idx, res);
   });
 
   router.put('/bases', (req, res) => {
+    const { user_idx } = req.query;
     const { ab_idx, name, ids } = req.body;
-    updateBase(ab_idx, name, ids, res);
+    updateBase(ab_idx, name, ids, user_idx, res);
   });
 
   router.delete('/bases', (req, res) => {
@@ -64,15 +66,15 @@ export default () => {
   });
 
   router.post('/', (req, res) => {
-    const { fg_idx } = req.query;
+    const { fg_idx, user_idx } = req.query;
     const { fa_idx, fa_name } = req.body;
-    insertBaseCode(fa_idx, fg_idx, fa_name, res);
+    insertBaseCode(fa_idx, fg_idx, fa_name, user_idx, res);
   });
 
   router.put('/', (req, res) => {
-    const { fg_idx } = req.query;
+    const { fg_idx, user_idx } = req.query;
     const { fa_idx, fa_name } = req.body;
-    editBaseCode(fg_idx, fa_idx, fa_name, res);
+    editBaseCode(fg_idx, fa_idx, fa_name, user_idx, res);
   });
 
   router.delete('/', (req, res) => {
@@ -81,13 +83,15 @@ export default () => {
   });
 
   router.post('/sensors', (req, res) => {
+    const { user_idx } = req.query;
     const { sn_idx, fa_idx, sn_name } = req.body;
-    insertSensorBaseCode(sn_idx, fa_idx, sn_name, res);
+    insertSensorBaseCode(sn_idx, fa_idx, sn_name, user_idx, res);
   });
 
   router.put('/sensors', (req, res) => {
+    const { user_idx } = req.query;
     const { sn_idx, sn_name } = req.body;
-    editSensorBaseCode(sn_idx, sn_name, res);
+    editSensorBaseCode(sn_idx, sn_name, user_idx, res);
   });
 
   router.delete('/sensors', (req, res) => {

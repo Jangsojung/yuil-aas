@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
+export const insertConvertsToDB = async (fc_idx, start, end, ids, user_idx) => {
   const formattedStart = start.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
   const formattedEnd = end.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
   const startDateTime = `${formattedStart} 00:00:00`;
@@ -100,8 +100,8 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids) => {
 
     fs.writeFileSync(filePath, jsonContent);
 
-    const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path) VALUES (?, 1, ?, '/files/front')`;
-    await pool.promise().query(query, [fc_idx, file_name]);
+    const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 1, ?, '/files/front', ?, ?)`;
+    await pool.promise().query(query, [fc_idx, file_name, user_idx, user_idx]);
 
     console.log('JSON 파일 생성 및 DB 저장 완료');
 

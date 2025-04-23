@@ -30,6 +30,7 @@ const signIn = async (
 
     if (response.ok && data.success) {
       const user: User = {
+        user_idx: data.user_idx,
         user_id: data.user_id,
         user_name: data.user_name,
       };

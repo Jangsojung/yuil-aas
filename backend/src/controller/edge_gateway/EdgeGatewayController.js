@@ -16,9 +16,9 @@ export const getEdgeGateways = async (res) => {
   }
 };
 
-export const insertEdgeGateways = async (serverTemp, networkStatus, pcTemp, pcIp, pcPort, res) => {
+export const insertEdgeGateways = async (serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res) => {
   try {
-    const eg_idx = await insertEdgeGatewaysToDB(serverTemp, networkStatus, pcTemp, pcIp, pcPort);
+    const eg_idx = await insertEdgeGatewaysToDB(serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx);
 
     const newEdgeGateway = {
       eg_idx,
@@ -35,9 +35,9 @@ export const insertEdgeGateways = async (serverTemp, networkStatus, pcTemp, pcIp
   }
 };
 
-export const updateEdgeGateway = async (eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, res) => {
+export const updateEdgeGateway = async (eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res) => {
   try {
-    const result = await updateEdgeGatewayToDB(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort);
+    const result = await updateEdgeGatewayToDB(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx);
 
     res.status(200).json(result);
   } catch (err) {

@@ -30,12 +30,12 @@ export const getEdgeGatewaysFromDB = async () => {
   });
 };
 
-export const insertEdgeGatewaysToDB = async (serverTemp, networkStatus, pcTemp, pcIp, pcPort) => {
+export const insertEdgeGatewaysToDB = async (serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx) => {
   try {
     const ipPort = `${pcIp}:${pcPort}`;
 
-    const query = `insert into tb_aasx_edge_gateway (eg_server_temp, eg_network, eg_pc_temp, eg_ip_port) values (?, ?, ?, ?)`;
-    const [result] = await pool.promise().query(query, [serverTemp, networkStatus, pcTemp, ipPort]);
+    const query = `insert into tb_aasx_edge_gateway (eg_server_temp, eg_network, eg_pc_temp, eg_ip_port, creator, updater) values (?, ?, ?, ?, ?, ?)`;
+    const [result] = await pool.promise().query(query, [serverTemp, networkStatus, pcTemp, ipPort, user_idx, user_idx]);
 
     console.log('Edge Gateway inserted successfully');
 
@@ -46,12 +46,12 @@ export const insertEdgeGatewaysToDB = async (serverTemp, networkStatus, pcTemp, 
   }
 };
 
-export const updateEdgeGatewayToDB = async (eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort) => {
+export const updateEdgeGatewayToDB = async (eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx) => {
   try {
     const ipPort = `${pcIp}:${pcPort}`;
 
-    const query = `update tb_aasx_edge_gateway set eg_server_temp = ?, eg_network = ?, eg_pc_temp = ?, eg_ip_port = ? where eg_idx = ?`;
-    await pool.promise().query(query, [serverTemp, networkStatus, pcTemp, ipPort, eg_idx]);
+    const query = `update tb_aasx_edge_gateway set eg_server_temp = ?, eg_network = ?, eg_pc_temp = ?, eg_ip_port = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where eg_idx = ?`;
+    await pool.promise().query(query, [serverTemp, networkStatus, pcTemp, ipPort, user_idx, eg_idx]);
 
     console.log('Edge Gateway updated successfully');
   } catch (err) {

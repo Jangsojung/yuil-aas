@@ -15,6 +15,8 @@ import { grey } from '@mui/material/colors';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch, { SwitchProps } from '@mui/material/Switch';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../recoil/atoms';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -138,6 +140,7 @@ export default function CustomizedDialogs({
   const [pcIp, setPcIp] = useState('');
   const [pcPort, setPcPort] = useState('');
   const [edgeGatewayId, setEdgeGatewayId] = useState<number | null>(null);
+  const userIdx = useRecoilValue(userState)?.user_idx;
 
   useEffect(() => {
     if (modalType === 'update' && edgeGatewayData) {
@@ -178,11 +181,11 @@ export default function CustomizedDialogs({
     };
 
     try {
-      let url = 'http://localhost:5001/api/edge_gateway';
+      let url = `http://localhost:5001/api/edge_gateway?user_idx=${userIdx}`;
       let method = 'POST';
 
       if (modalType === 'update') {
-        url = `http://localhost:5001/api/edge_gateway?eg_idx=${edgeGatewayId}`;
+        url = `http://localhost:5001/api/edge_gateway?eg_idx=${edgeGatewayId}&user_idx=${userIdx}`;
         method = 'PUT';
       }
 

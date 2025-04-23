@@ -9,9 +9,9 @@ import {
   getVerifyFromDB,
 } from '../../service/file/FileService.js';
 
-export const insertFile = async (fc_idx, fileName, res) => {
+export const insertFile = async (fc_idx, fileName, user_idx, res) => {
   try {
-    const result = await insertFileToDB(fc_idx, fileName);
+    const result = await insertFileToDB(fc_idx, fileName, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -20,9 +20,9 @@ export const insertFile = async (fc_idx, fileName, res) => {
   }
 };
 
-export const updateFile = async (af_idx, fileName, res) => {
+export const updateFile = async (af_idx, fileName, user_idx, res) => {
   try {
-    const result = await updateFileToDB(af_idx, fileName);
+    const result = await updateFileToDB(af_idx, fileName, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -53,9 +53,9 @@ export const getAASXFiles = async (af_kind, fc_idx, startDate, endDate, res) => 
   }
 };
 
-export const insertAASXFile = async (fc_idx, fileName, res) => {
+export const insertAASXFile = async (fc_idx, fileName, user_idx, res) => {
   try {
-    const result = await insertAASXFileToDB(fc_idx, fileName);
+    const result = await insertAASXFileToDB(fc_idx, fileName, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -64,9 +64,9 @@ export const insertAASXFile = async (fc_idx, fileName, res) => {
   }
 };
 
-export const updateAASXFile = async (af_idx, fileName, res) => {
+export const updateAASXFile = async (af_idx, fileName, user_idx, res) => {
   try {
-    const result = await updateAASXFileToDB(af_idx, fileName);
+    const result = await updateAASXFileToDB(af_idx, fileName, user_idx);
 
     res.status(200).json(result);
   } catch (err) {

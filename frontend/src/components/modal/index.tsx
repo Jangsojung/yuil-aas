@@ -13,6 +13,8 @@ import { grey } from '@mui/material/colors';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { CircularProgress } from '@mui/material';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../recoil/atoms';
 
 const GreyButton = styled(Button)<ButtonProps>(() => ({
   color: '#637381',
@@ -49,6 +51,7 @@ export default function CustomizedDialogs({ handleInsert }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const userIdx = useRecoilValue(userState)?.user_idx;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -89,7 +92,7 @@ export default function CustomizedDialogs({ handleInsert }) {
     try {
       const fileName = selectedFile.name;
 
-      const response = await fetch(`http://localhost:5001/api/file?fc_idx=3`, {
+      const response = await fetch(`http://localhost:5001/api/file?fc_idx=3&user_idx=${userIdx}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

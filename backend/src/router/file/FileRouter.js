@@ -1,8 +1,4 @@
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
 import {
   insertFile,
   updateFile,
@@ -18,12 +14,12 @@ const router = express.Router();
 
 export default () => {
   router.post('/', (req, res) => {
-    const { fc_idx, af_idx } = req.query;
+    const { fc_idx, af_idx, user_idx } = req.query;
     const { fileName } = req.body;
     if (af_idx) {
-      updateFile(af_idx, fileName, res);
+      updateFile(af_idx, fileName, user_idx, res);
     } else {
-      insertFile(fc_idx, fileName, res);
+      insertFile(fc_idx, fileName, user_idx, res);
     }
   });
 
@@ -31,9 +27,9 @@ export default () => {
     const { fc_idx, af_idx } = req.query;
     const { fileName } = req.body;
     if (af_idx) {
-      updateAASXFile(af_idx, fileName, res);
+      updateAASXFile(af_idx, fileName, user_idx, res);
     } else {
-      insertAASXFile(fc_idx, fileName, res);
+      insertAASXFile(fc_idx, fileName, user_idx, res);
     }
   });
 

@@ -16,9 +16,9 @@ export const getBasesAPI = async () => {
   }
 };
 
-export const insertBaseAPI = async (formattedStartDate, formattedEndDate, selectedConvert) => {
+export const insertBaseAPI = async (formattedStartDate, formattedEndDate, selectedConvert, userIdx) => {
   try {
-    const response = await fetch(`http://localhost:5001/api/convert?fc_idx=3`, {
+    const response = await fetch(`http://localhost:5001/api/convert?fc_idx=3&user_idx=${userIdx}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -38,9 +38,9 @@ export const getBases = async (res) => {
   }
 };
 
-export const insertBases = async (name, ids, res) => {
+export const insertBases = async (name, ids, user_idx, res) => {
   try {
-    const result = await insertBasesToDB(name, ids);
+    const result = await insertBasesToDB(name, ids, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -49,9 +49,9 @@ export const insertBases = async (name, ids, res) => {
   }
 };
 
-export const updateBase = async (ab_idx, name, ids, res) => {
+export const updateBase = async (ab_idx, name, ids, user_idx, res) => {
   try {
-    const result = await updateBaseToDB(ab_idx, name, ids);
+    const result = await updateBaseToDB(ab_idx, name, ids, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -115,9 +115,9 @@ export const getBaseCode = async (fg_idx, res) => {
   }
 };
 
-export const insertBaseCode = async (fa_idx, fg_idx, fa_name, res) => {
+export const insertBaseCode = async (fa_idx, fg_idx, fa_name, user_idx, res) => {
   try {
-    const result = await insertBaseCodeToDB(fa_idx, fg_idx, fa_name);
+    const result = await insertBaseCodeToDB(fa_idx, fg_idx, fa_name, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -126,9 +126,9 @@ export const insertBaseCode = async (fa_idx, fg_idx, fa_name, res) => {
   }
 };
 
-export const editBaseCode = async (fg_idx, fa_idx, fa_name, res) => {
+export const editBaseCode = async (fg_idx, fa_idx, fa_name, user_idx, res) => {
   try {
-    const result = await editBaseCodeFromDB(fg_idx, fa_idx, fa_name);
+    const result = await editBaseCodeFromDB(fg_idx, fa_idx, fa_name, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -148,9 +148,9 @@ export const deleteBaseCode = async (fa_idx, res) => {
   }
 };
 
-export const insertSensorBaseCode = async (sn_idx, fa_idx, sn_name, res) => {
+export const insertSensorBaseCode = async (sn_idx, fa_idx, sn_name, user_idx, res) => {
   try {
-    const result = await insertSensorBaseCodeFromDB(sn_idx, fa_idx, sn_name);
+    const result = await insertSensorBaseCodeFromDB(sn_idx, fa_idx, sn_name, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -159,9 +159,9 @@ export const insertSensorBaseCode = async (sn_idx, fa_idx, sn_name, res) => {
   }
 };
 
-export const editSensorBaseCode = async (sn_idx, sn_name, res) => {
+export const editSensorBaseCode = async (sn_idx, sn_name, user_idx, res) => {
   try {
-    const result = await editSensorBaseCodeFromDB(sn_idx, sn_name);
+    const result = await editSensorBaseCodeFromDB(sn_idx, sn_name, user_idx);
 
     res.status(200).json(result);
   } catch (err) {

@@ -6,12 +6,12 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const insertFileToDB = async (fc_idx, fileName) => {
+export const insertFileToDB = async (fc_idx, fileName, user_idx) => {
   try {
     const file_path = '/files/aas';
 
-    const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path) VALUES (?, 2, ?, ?)`;
-    const [result] = await pool.promise().query(query, [fc_idx, fileName, file_path]);
+    const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, ?, ?, ?)`;
+    const [result] = await pool.promise().query(query, [fc_idx, fileName, file_path, user_idx, user_idx]);
 
     console.log('JSON 파일 저장 및 DB 등록 완료');
 
@@ -41,7 +41,7 @@ export const insertFileToDB = async (fc_idx, fileName) => {
   }
 };
 
-export const updateFileToDB = async (af_idx, fileName) => {
+export const updateFileToDB = async (af_idx, fileName, user_idx) => {
   try {
     const [rows] = await pool.promise().query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ?', [af_idx]);
 
@@ -53,8 +53,8 @@ export const updateFileToDB = async (af_idx, fileName) => {
     const newFileName = fileName;
 
     const file_path = '/files/aas';
-    const query = `UPDATE tb_aasx_file SET af_name = ? WHERE af_idx = ?`;
-    await pool.promise().query(query, [fileName, af_idx]);
+    const query = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_idx = ?`;
+    await pool.promise().query(query, [fileName, user_idx, af_idx]);
 
     console.log('JSON 파일 업데이트 및 DB 수정 완료');
     console.log(oldFileName, '------->', newFileName);
@@ -155,13 +155,13 @@ export const getAASXFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = nu
   });
 };
 
-export const insertAASXFileToDB = async (fc_idx, fileName) => {
+export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
   try {
     const file_path = '/files/aasx';
     const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
 
-    const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path) VALUES (?, 3, ?, ?)`;
-    const [result] = await pool.promise().query(query, [fc_idx, aasxFileName, file_path]);
+    const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, ?, ?, ?)`;
+    const [result] = await pool.promise().query(query, [fc_idx, aasxFileName, file_path, user_idx, user_idx]);
 
     console.log('JSON 파일 저장 및 DB 등록 완료');
 
@@ -191,7 +191,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName) => {
   }
 };
 
-export const updateAASXFileToDB = async (af_idx, fileName) => {
+export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
   try {
     const [rows] = await pool.promise().query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ?', [af_idx]);
 
@@ -204,8 +204,8 @@ export const updateAASXFileToDB = async (af_idx, fileName) => {
 
     const file_path = '/files/aasx';
 
-    const query = `UPDATE tb_aasx_file SET af_name = ? WHERE af_idx = ?`;
-    await pool.promise().query(query, [newFileName, af_idx]);
+    const query = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_idx = ?`;
+    await pool.promise().query(query, [newFileName, user_idx, af_idx]);
 
     console.log('JSON 파일 업데이트 및 DB 수정 완료');
 

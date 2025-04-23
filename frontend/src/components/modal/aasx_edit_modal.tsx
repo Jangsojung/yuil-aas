@@ -12,6 +12,8 @@ import { grey } from '@mui/material/colors';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { CircularProgress } from '@mui/material';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../recoil/atoms';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -62,6 +64,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   const [uploadFile, setUploadFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [af_idx, setAf_Idx] = useState<number | null>(null);
+  const userIdx = useRecoilValue(userState)?.user_idx;
 
   const title = selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정';
 
@@ -90,7 +93,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     setIsLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5001/api/file/aasx?af_idx=${af_idx}`, {
+      const response = await fetch(`http://localhost:5001/api/file/aasx?af_idx=${af_idx}&user_idx=${userIdx}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

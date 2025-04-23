@@ -8,7 +8,7 @@ import SaveIcon from '@mui/icons-material/Save';
 
 import SelectFacilityGroup from '../../components/select/facility_group';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { selectedSensorsState, baseEditModeState, selectedBaseState } from '../../recoil/atoms';
+import { selectedSensorsState, baseEditModeState, selectedBaseState, userState } from '../../recoil/atoms';
 import { TextField } from '@mui/material';
 
 const ADD_EQUIPMENT_EVENT = 'add-new-equipment';
@@ -24,6 +24,7 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
   const [name, setName] = useState('');
   const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
   const selectedBase = useRecoilValue(selectedBaseState);
+  const userIdx = useRecoilValue(userState)?.user_idx;
 
   const handleAdd = async () => {
     if (!name) {
@@ -32,7 +33,7 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases`, {
+      const response = await fetch(`http://localhost:5001/api/base_code/bases?user_idx=${userIdx}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +60,7 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases`, {
+      const response = await fetch(`http://localhost:5001/api/base_code/bases&user_idx=${userIdx}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
