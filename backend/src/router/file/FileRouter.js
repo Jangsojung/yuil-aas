@@ -24,7 +24,7 @@ export default () => {
   });
 
   router.post('/aasx', (req, res) => {
-    const { fc_idx, af_idx } = req.query;
+    const { fc_idx, af_idx, user_idx } = req.query;
     const { fileName } = req.body;
     if (af_idx) {
       updateAASXFile(af_idx, fileName, user_idx, res);
