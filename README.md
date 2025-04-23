@@ -1,5 +1,8 @@
 ### Backend 실행 방법 ---
 
+- backend/.env 파일 생성 필요
+  - PORT, DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, JWT_SECRET
+
 1. cd backend
 2. npm i
 3. Backend 파일 .env 확인(DB, Port 확인필요)
