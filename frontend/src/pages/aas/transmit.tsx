@@ -22,7 +22,7 @@ export default function TransmitPage() {
 
   const handleVerify = async () => {
     if (!selectedFile) {
-      console.error('선택된 파일이 없습니다');
+      alert('선택된 파일이 없습니다.');
       return;
     }
 
