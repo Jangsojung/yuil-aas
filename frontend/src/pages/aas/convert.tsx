@@ -11,7 +11,6 @@ import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
-import { height } from '@mui/system';
 
 interface Base {
   ab_idx: number;
