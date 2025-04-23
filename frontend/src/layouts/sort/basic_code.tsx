@@ -60,7 +60,7 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases&user_idx=${userIdx}`, {
+      const response = await fetch(`http://localhost:5001/api/base_code/bases?user_idx=${userIdx}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

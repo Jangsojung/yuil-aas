@@ -1,31 +1,5 @@
 import { pool } from '../../index.js';
 
-export const getFactoriesFromDB = async () => {
-  return new Promise((resolve, reject) => {
-    const query = 'select fc_idx, fc_name from tb_aasx_data';
-
-    pool.query(query, (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
-
-        const factories = results.map((factory) => {
-          return {
-            fc_idx: factory.fc_idx,
-            fc_name: factory.fc_name,
-          };
-        });
-
-        resolve(factories);
-      }
-    });
-  });
-};
-
 export const getBasesFromDB = async () => {
   return new Promise((resolve, reject) => {
     const query =
@@ -222,74 +196,4 @@ export const getBaseCodeFromDB = async (fg_idx) => {
       }
     });
   });
-};
-
-export const insertBaseCodeToDB = async (fa_idx, fg_idx, fa_name, user_idx) => {
-  try {
-    const query = `insert into tb_aasx_data_sm (fa_idx, fg_idx, fa_name, creator, updater) values (?, ?, ?, ?, ?);`;
-    const [result] = await pool.promise().query(query, [fa_idx, fg_idx, fa_name, user_idx, user_idx]);
-
-    return {
-      fa_idx: fa_idx,
-      fa_name: fa_name,
-    };
-  } catch (err) {
-    console.log('Failed to insert new Equipment: ', err);
-    throw err;
-  }
-};
-
-export const editBaseCodeFromDB = async (fg_idx, fa_idx, fa_name, user_idx) => {
-  try {
-    const query = `update tb_aasx_data_sm set fa_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP  where fa_idx = ?;`;
-    await pool.promise().query(query, [fa_name, user_idx, fa_idx]);
-  } catch (err) {
-    console.log('Failed to update Facility: ', err);
-    throw err;
-  }
-};
-
-export const deleteBaseCodeFromDB = async (fa_idx) => {
-  try {
-    const query = `delete from tb_aasx_data_sm where fa_idx = ?;`;
-    await pool.promise().query(query, [fa_idx]);
-  } catch (err) {
-    console.log('Failed to delete Facility: ', err);
-    throw err;
-  }
-};
-
-export const insertSensorBaseCodeFromDB = async (sn_idx, fa_idx, sn_name, user_idx) => {
-  try {
-    const query = `insert into tb_aasx_data_prop (sn_idx, fa_idx, sn_name, creator, updater) values (?, ?, ?, ?, ?);`;
-    await pool.promise().query(query, [sn_idx, fa_idx, sn_name, user_idx, user_idx]);
-
-    return {
-      sn_idx: sn_idx,
-      sn_name: sn_name,
-    };
-  } catch (err) {
-    console.log('Failed to insert Sensor: ', err);
-    throw err;
-  }
-};
-
-export const editSensorBaseCodeFromDB = async (sn_idx, sn_name, user_idx) => {
-  try {
-    const query = `update tb_aasx_data_prop set sn_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where sn_idx = ?;`;
-    await pool.promise().query(query, [sn_name, user_idx, sn_idx]);
-  } catch (err) {
-    console.log('Failed to update Sensor: ', err);
-    throw err;
-  }
-};
-
-export const deleteSensorBaseCodeFromDB = async (sn_idx) => {
-  try {
-    const query = `delete from tb_aasx_data_prop where sn_idx = ?;`;
-    await pool.promise().query(query, [sn_idx]);
-  } catch (err) {
-    console.log('Failed to delete Sensor: ', err);
-    throw err;
-  }
 };
