@@ -9,6 +9,8 @@ import BasicDatePicker from '../../components/datepicker';
 import Pagenation from '../../components/pagenation';
 import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../recoil/atoms';
 
 interface Base {
   ab_idx: number;
@@ -20,6 +22,7 @@ export default function ConvertPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedConvert, setSelectedConvert] = useState<number | null>();
   const [bases, setBases] = useState<Base[]>([]);
+  const userIdx = useRecoilValue(userState)?.user_idx;
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -66,7 +69,7 @@ export default function ConvertPage() {
     const formattedStartDate = startDate.format('YYMMDD');
     const formattedEndDate = endDate.format('YYMMDD');
 
-    const data = await insertBaseAPI(formattedStartDate, formattedEndDate, selectedConvert);
+    const data = await insertBaseAPI(formattedStartDate, formattedEndDate, selectedConvert, userIdx);
 
     if (data) {
       alert('성공적으로 json파일을 생성하였습니다.\n파일 위치: /files/front');
