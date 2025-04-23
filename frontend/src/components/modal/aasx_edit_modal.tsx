@@ -80,6 +80,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       setUploadFile(file);
     },
     selectedFileName: uploadFile?.af_name || '',
+    accept: '.json',
   };
 
   const handleEdit = async () => {
