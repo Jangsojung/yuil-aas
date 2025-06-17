@@ -98,6 +98,13 @@ main {
     .sensor-tit span {
       font-weight: normal;
     }
+    .sensor-tit .MuiFormControlLabel-root {
+      margin: 0;
+      .MuiCheckbox-root {
+        padding: 4px;
+        color: #607d8b;
+      }
+    }
     .sensor-list .MuiListItemText-secondary {
       color: var(--mui-palette-text-primary);
     }

@@ -82,6 +82,10 @@ export default function ReactRouter() {
                   path: 'dataManager',
                   element: <DataManagerPage />,
                 },
+                {
+                  path: 'transmit',
+                  element: <TransmitPage />,
+                },
               ],
             },
             {
@@ -109,6 +113,16 @@ export default function ReactRouter() {
 
 const NAVIGATION: Navigation = [
   {
+    segment: 'aasx',
+    title: '데이터 관리',
+    children: [
+      {
+        segment: 'dataManager',
+        title: '데이터 관리',
+      },
+    ],
+  },
+  {
     segment: 'aas',
     title: 'AAS KAMP DATA I/F',
     children: [
@@ -120,10 +134,10 @@ const NAVIGATION: Navigation = [
         segment: 'convert',
         title: 'DATA 변환',
       },
-      {
-        segment: 'transmit',
-        title: 'DATA 송신',
-      },
+      // {
+      //   segment: 'transmit',
+      //   title: 'DATA 송신',
+      // },
     ],
   },
   {
@@ -135,8 +149,8 @@ const NAVIGATION: Navigation = [
         title: 'AASX 관리',
       },
       {
-        segment: 'dataManager',
-        title: '데이터 관리',
+        segment: 'transmit',
+        title: 'AASX 송신',
       },
     ],
   },
