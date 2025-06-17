@@ -14,7 +14,7 @@ export default function DataTableRow({ file, onDoubleClick, onCheckboxChange, ch
       <TableCell>
         <Checkbox checked={checked} onChange={() => onCheckboxChange(file.af_idx)} />
       </TableCell>
-      <TableCell>{file.af_idx}</TableCell>
+      {/* <TableCell>{file.af_idx}</TableCell> */}
       <TableCell>{file.af_name}</TableCell>
       <TableCell>{new Date(file.createdAt).toLocaleDateString()}</TableCell>
     </TableRow>

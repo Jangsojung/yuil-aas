@@ -75,7 +75,9 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
     const checked = event.target.checked;
     setSelectAll(checked);
     if (checked) {
-      setSelectedBases(bases.map((base) => base.ab_idx));
+      if (bases && bases.length > 0) {
+        setSelectedBases(bases.map((base) => base.ab_idx));
+      }
     } else {
       setSelectedBases([]);
     }
@@ -104,7 +106,11 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
           <TableHead>
             <TableRow>
               <TableCell>
-                <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
+                <Checkbox
+                  checked={selectAll}
+                  onChange={handleSelectAllChange}
+                  disabled={!bases || bases.length === 0}
+                />
               </TableCell>
               {cells.map((cell, idx) => (
                 <TableCell key={idx}>{cell}</TableCell>
@@ -125,9 +131,10 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
                       onChange={() => handleCheckboxChange(base.ab_idx)}
                     />
                   </TableCell>
-                  <TableCell>{base.ab_idx}</TableCell>
+                  {/* <TableCell>{base.ab_idx}</TableCell> */}
                   <TableCell>{base.ab_name}</TableCell>
                   <TableCell>{base.sn_length}</TableCell>
+                  <TableCell>{new Date(base.createdAt).toLocaleDateString()}</TableCell>
                 </TableRow>
               ))
             ) : (
@@ -145,4 +152,5 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
   );
 }
 
-const cells = ['번호', '기초코드 이름', '센서'];
+// const cells = ['번호', '기초코드 이름', '센서'];
+const cells = ['기초코드 이름', '센서 개수', '생성 날짜'];

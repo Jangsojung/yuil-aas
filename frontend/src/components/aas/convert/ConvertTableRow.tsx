@@ -14,8 +14,10 @@ export default function ConvertTableRow({ base, checked, onCheckboxChange }) {
       <TableCell>
         <Checkbox checked={checked} onChange={handleChange} />
       </TableCell>
-      <TableCell>{base.ab_idx}</TableCell>
+      {/* <TableCell>{base.ab_idx}</TableCell> */}
       <TableCell>{base.ab_name}</TableCell>
+      <TableCell>{base.sn_length}</TableCell>
+      <TableCell>{new Date(base.createdAt).toLocaleDateString()}</TableCell>
     </TableRow>
   );
 }

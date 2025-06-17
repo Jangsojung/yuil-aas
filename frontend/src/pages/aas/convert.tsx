@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { getBasesAPI, insertBaseAPI } from '../../apis/api/convert';
 
 import CircularProgress from '@mui/material/CircularProgress';
@@ -10,7 +11,7 @@ import Pagenation from '../../components/pagenation';
 import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
-import { userState } from '../../recoil/atoms';
+import { userState, navigationResetState } from '../../recoil/atoms';
 
 interface Base {
   ab_idx: number;
@@ -23,6 +24,8 @@ export default function ConvertPage() {
   const [selectedConvert, setSelectedConvert] = useState<number | null>();
   const [bases, setBases] = useState<Base[]>([]);
   const userIdx = useRecoilValue(userState)?.user_idx;
+  const location = useLocation();
+  const navigationReset = useRecoilValue(navigationResetState);
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -90,6 +93,14 @@ export default function ConvertPage() {
     getBases();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    setSelectedConvert(null);
+    setStartDate(null);
+    setEndDate(null);
+    setCurrentPage(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigationReset]);
 
   return (
     <div style={{ position: 'relative' }}>
@@ -177,4 +188,5 @@ export default function ConvertPage() {
     </div>
   );
 }
-const cells = ['번호', '기초코드 이름'];
+// const cells = ['번호', '기초코드 이름'];
+const cells = ['기초코드 이름', '센서 개수', '생성 날짜'];

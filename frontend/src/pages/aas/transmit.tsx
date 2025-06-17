@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import TransmitView from '../../section/aas/transmit/view';
 import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
@@ -6,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import SelectAASXFile from '../../components/select/aasx_files';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { aasxDataState, currentFileState, isVerifiedState } from '../../recoil/atoms';
+import { aasxDataState, currentFileState, isVerifiedState, navigationResetState } from '../../recoil/atoms';
 import { handleVerifyAPI } from '../../apis/api/transmit';
 
 interface AASXFile {
@@ -18,7 +19,10 @@ export default function TransmitPage() {
   const currentFile = useRecoilValue(currentFileState);
   const [, setAasxData] = useRecoilState(aasxDataState);
   const [, setIsVerified] = useRecoilState(isVerifiedState);
+  const [, setCurrentFile] = useRecoilState(currentFileState);
   const [selectedFile, setSelectedFile] = useState<AASXFile | undefined>(undefined);
+  const location = useLocation();
+  const navigationReset = useRecoilValue(navigationResetState);
 
   const handleVerify = async () => {
     if (!selectedFile) {
@@ -123,6 +127,14 @@ export default function TransmitPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFile]);
+
+  useEffect(() => {
+    setSelectedFile(undefined);
+    setAasxData(null);
+    setIsVerified(false);
+    setCurrentFile(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigationReset]);
 
   return (
     <div>

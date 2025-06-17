@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { deleteEdgeAPI, getEdgeAPI } from '../../apis/api/edge';
 
 import Box from '@mui/system/Box';
@@ -17,6 +18,8 @@ import TableBody from '@mui/material/TableBody';
 import CustomizedDialogs from '../../components/modal/edgemodal';
 import EdgeTableRow from '../../components/edge/EdgeTableRow';
 import Pagenation from '../../components/pagenation';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../recoil/atoms';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -30,6 +33,8 @@ export default function Edge_Gateway() {
   const [edgeGateways, setEdgeGateways] = useState<EdgeGateway[]>([]);
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useState<number[]>([]);
   const [selectedEdgeGateway, setSelectedEdgeGateway] = useState<EdgeGateway | null>(null);
+  const location = useLocation();
+  const navigationReset = useRecoilValue(navigationResetState);
 
   const [openModal, setOpenModal] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
@@ -85,7 +90,9 @@ export default function Edge_Gateway() {
     setSelectAll(checked);
 
     if (checked) {
-      setSelectedEdgeGateways(edgeGateways.map((file) => file.eg_idx));
+      if (edgeGateways && edgeGateways.length > 0) {
+        setSelectedEdgeGateways(edgeGateways.map((file) => file.eg_idx));
+      }
     } else {
       setSelectedEdgeGateways([]);
     }
@@ -114,6 +121,16 @@ export default function Edge_Gateway() {
   useEffect(() => {
     getEdge();
   }, []);
+
+  useEffect(() => {
+    setSelectedEdgeGateways([]);
+    setSelectAll(false);
+    setCurrentPage(0);
+    setOpenModal(false);
+    setOpenUpdateModal(false);
+    setSelectedEdgeGateway(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigationReset]);
 
   useEffect(() => {
     if (selectedEdgeGateways.length === 0) {
@@ -154,7 +171,11 @@ export default function Edge_Gateway() {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <Checkbox checked={selectAll} onChange={handleSelectAll} />
+                  <Checkbox
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    disabled={!edgeGateways || edgeGateways.length === 0}
+                  />
                 </TableCell>
                 {cells.map((cell, idx) => (
                   <TableCell key={idx}>{cell}</TableCell>
@@ -202,4 +223,5 @@ export default function Edge_Gateway() {
   );
 }
 
-const cells = ['번호', '서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT'];
+// const cells = ['번호', '서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT'];
+const cells = ['서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT', '생성 날짜'];

@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
@@ -15,6 +16,8 @@ import Pagenation from '../../components/pagenation';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
 import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
 import AASXTableRow from '../../components/aasx/aasx_management/AASXTableRow';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../recoil/atoms';
 
 interface File {
   af_idx: number;
@@ -28,6 +31,8 @@ export default function AasxManagerPage() {
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  const location = useLocation();
+  const navigationReset = useRecoilValue(navigationResetState);
 
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -99,7 +104,9 @@ export default function AasxManagerPage() {
     const checked = event.target.checked;
     setSelectAll(checked);
     if (checked) {
-      setSelectedFiles(files.map((file) => file.af_idx));
+      if (files && files.length > 0) {
+        setSelectedFiles(files.map((file) => file.af_idx));
+      }
     } else {
       setSelectedFiles([]);
     }
@@ -129,6 +136,16 @@ export default function AasxManagerPage() {
     handleReset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    setSelectedFiles([]);
+    setSelectAll(false);
+    setCurrentPage(0);
+    setOpenUpdateModal(false);
+    setSelectedFile(null);
+    handleReset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigationReset]);
 
   useEffect(() => {
     if (selectedFiles.length === 0) {
@@ -188,7 +205,11 @@ export default function AasxManagerPage() {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
+                  <Checkbox
+                    checked={selectAll}
+                    onChange={handleSelectAllChange}
+                    disabled={!files || files.length === 0}
+                  />
                 </TableCell>
                 {cells.map((cell, idx) => (
                   <TableCell key={idx}>{cell}</TableCell>
@@ -228,4 +249,5 @@ export default function AasxManagerPage() {
   );
 }
 
-const cells = ['파일 번호', '파일 이름', '생성 날짜'];
+// const cells = ['파일 번호', '파일 이름', '생성 날짜'];
+const cells = ['파일 이름', '생성 날짜'];
