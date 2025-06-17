@@ -8,6 +8,7 @@ import {
   getFacilityGroups,
   getSensors,
   getBaseCode,
+  getAllSensorsInGroup,
 } from '../../controller/basic_code/BasicCodeController.js';
 
 const router = express.Router();
@@ -52,6 +53,11 @@ export default () => {
   router.get('/', (req, res) => {
     const { fg_idx } = req.query;
     getBaseCode(fg_idx, res);
+  });
+
+  router.get('/allSensorsInGroup', (req, res) => {
+    const { fg_idx } = req.query;
+    getAllSensorsInGroup(fg_idx, res);
   });
 
   return router;

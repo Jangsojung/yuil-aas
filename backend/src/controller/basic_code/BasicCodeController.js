@@ -7,6 +7,7 @@ import {
   getFacilityGroupsFromDB,
   getSensorsFromDB,
   getBaseCodeFromDB,
+  getAllSensorsInGroupFromDB,
 } from '../../service/basic_code/BasicCodeService.js';
 
 export const getBases = async (res) => {
@@ -89,6 +90,17 @@ export const getSensors = async (fa_idx, res) => {
 export const getBaseCode = async (fg_idx, res) => {
   try {
     const result = await getBaseCodeFromDB(fg_idx);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const getAllSensorsInGroup = async (fg_idx, res) => {
+  try {
+    const result = await getAllSensorsInGroupFromDB(fg_idx);
 
     res.status(200).json(result);
   } catch (err) {

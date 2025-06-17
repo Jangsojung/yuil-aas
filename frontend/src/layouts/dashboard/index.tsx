@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Outlet, useNavigate } from 'react-router';
+import { Outlet, useNavigate, useLocation } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Logo from '../../assets/yuil.png';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { userState } from '../../recoil/atoms';
+import { userState, navigationResetState } from '../../recoil/atoms';
 import { Button, ButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
@@ -52,6 +52,29 @@ function ToolbarActionsAdmin({ user }) {
 
 export default function Layout() {
   const user = useRecoilValue(userState);
+  const location = useLocation();
+  const [, setNavigationReset] = useRecoilState(navigationResetState);
+
+  React.useEffect(() => {
+    const handleNavigationClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.MuiListItemButton-root') || target.closest('[role="menuitem"]')) {
+        const clickedElement = target.closest('a');
+        if (clickedElement) {
+          const href = clickedElement.getAttribute('href');
+          if (href && href === location.pathname) {
+            setNavigationReset((prev) => prev + 1);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('click', handleNavigationClick);
+
+    return () => {
+      document.removeEventListener('click', handleNavigationClick);
+    };
+  }, [location.pathname, setNavigationReset]);
 
   return (
     <DashboardLayout
