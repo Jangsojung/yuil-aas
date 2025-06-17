@@ -32,13 +32,8 @@ export default function SelectSmall({ setSelectedFile }: Props) {
       const data: AASXFile[] = await response.json();
       setFiles(data);
 
-      if (data.length > 0) {
-        setCurrentFile(data[0].af_idx);
-        setSelectedFile(data[0]);
-      } else {
-        setCurrentFile(null);
-        setSelectedFile(undefined);
-      }
+      setCurrentFile(null);
+      setSelectedFile(undefined);
     } catch (err: any) {
       console.log(err.message);
     }
@@ -59,6 +54,9 @@ export default function SelectSmall({ setSelectedFile }: Props) {
   return (
     <FormControl sx={{ m: 1, minWidth: 250 }} size='small'>
       <Select value={currentFile || ''} onChange={handleChange} IconComponent={ExpandMoreIcon} displayEmpty>
+        <MenuItem disabled value='' style={{ color: '#666', fontStyle: 'italic' }}>
+          AASX 파일을 선택해 주세요.
+        </MenuItem>
         {files && files.length > 0 ? (
           files.map((file) => (
             <MenuItem key={file.af_idx} value={file.af_idx}>
@@ -67,7 +65,7 @@ export default function SelectSmall({ setSelectedFile }: Props) {
           ))
         ) : (
           <MenuItem disabled value=''>
-            파일이 없습니다.
+            aasx 파일이 없습니다.
           </MenuItem>
         )}
       </Select>
