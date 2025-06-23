@@ -122,7 +122,6 @@ export default function BasicCode() {
                     control={
                       <Checkbox
                         checked={isAllInFaSelected(basic.fa_idx)}
-                        indeterminate={isPartiallySelectedInFa(basic.fa_idx)}
                         onChange={(e) => handleSelectAllInFa(basic.fa_idx, e.target.checked)}
                       />
                     }
