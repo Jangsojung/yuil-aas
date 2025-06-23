@@ -118,11 +118,7 @@ export default function SelectSmall() {
       </FormControl>
       <FormControlLabel style={{ marginLeft: 10 }}
         control={
-          <Checkbox
-            checked={isAllInGroupSelected()}
-            indeterminate={isPartiallySelected()}
-            onChange={(e) => handleSelectAllInGroup(e.target.checked)}
-          />
+          <Checkbox checked={isAllInGroupSelected()} onChange={(e) => handleSelectAllInGroup(e.target.checked)} />
         }
         label='전체 선택'
       />
