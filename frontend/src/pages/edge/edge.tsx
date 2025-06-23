@@ -52,9 +52,8 @@ export default function Edge_Gateway() {
     setEdgeGateways((prevEdgeGateways) => [eg, ...prevEdgeGateways]);
   };
 
-  const handleUpdate = async (newEg: EdgeGateway) => {
-    const newEdgeGateways = edgeGateways.map((eg) => (eg.eg_idx === newEg.eg_idx ? newEg : eg));
-    setEdgeGateways(newEdgeGateways);
+  const handleUpdate = async () => {
+    await getEdge();
   };
 
   const handleDelete = async () => {
@@ -144,17 +143,18 @@ export default function Edge_Gateway() {
 
   return (
     <div className='table-outer'>
-      <Box sx={{ flexGrow: 1 }} className='sort-box'>
-        <Grid container spacing={1}>
+      <Box sx={{ flexGrow: 1, p: 1 }} className='sort-box'>
+        <Grid container spacing={0} alignItems='center'>
           <Grid size={8}></Grid>
           <Grid size={4}>
-            <Stack spacing={1} direction='row' sx={{ justifyContent: 'flex-end' }}>
-              <Button variant='contained' color='success' onClick={handleOpenModal}>
+            <Stack spacing={1} direction='row' sx={{ justifyContent: 'flex-end', alignItems: 'center', minHeight: 0 }}>
+              <Button variant='contained' color='success' size='small' onClick={handleOpenModal}>
                 등록
               </Button>
               <Button
                 variant='contained'
                 color='error'
+                size='small'
                 onClick={handleDelete}
                 disabled={selectedEdgeGateways.length === 0}
               >
@@ -180,6 +180,7 @@ export default function Edge_Gateway() {
                 {cells.map((cell, idx) => (
                   <TableCell key={idx}>{cell}</TableCell>
                 ))}
+                <TableCell>수정</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -189,8 +190,8 @@ export default function Edge_Gateway() {
                     eg={eg}
                     key={idx}
                     onCheckboxChange={handleCheckboxChange}
-                    onDoubleClick={handleDoubleClick}
                     checked={selectedEdgeGateways.includes(eg.eg_idx)}
+                    onEditClick={handleDoubleClick}
                   />
                 ))
               ) : (

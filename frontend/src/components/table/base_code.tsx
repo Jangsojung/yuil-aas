@@ -7,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
 
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { baseEditModeState, edgeGatewayRefreshState, selectedBasesState, selectedBaseState } from '../../recoil/atoms';
@@ -16,6 +17,7 @@ interface Base {
   ab_idx: number;
   ab_name: string;
   sn_length: number;
+  createdAt: Date;
 }
 
 interface Props {
@@ -75,9 +77,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
     const checked = event.target.checked;
     setSelectAll(checked);
     if (checked) {
-      if (bases && bases.length > 0) {
-        setSelectedBases(bases.map((base) => base.ab_idx));
-      }
+      setSelectedBases(bases.map((base) => base.ab_idx));
     } else {
       setSelectedBases([]);
     }
@@ -106,25 +106,18 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
           <TableHead>
             <TableRow>
               <TableCell>
-                <Checkbox
-                  checked={selectAll}
-                  onChange={handleSelectAllChange}
-                  disabled={!bases || bases.length === 0}
-                />
+                <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
               </TableCell>
               {cells.map((cell, idx) => (
                 <TableCell key={idx}>{cell}</TableCell>
               ))}
+              <TableCell>수정</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {pagedData && pagedData.length > 0 ? (
               pagedData.map((base) => (
-                <TableRow
-                  key={base.ab_idx}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
-                  onDoubleClick={() => handleDoubleClick(base)}
-                >
+                <TableRow key={base.ab_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>
                     <Checkbox
                       checked={selectedBases.includes(base.ab_idx)}
@@ -135,11 +128,16 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
                   <TableCell>{base.ab_name}</TableCell>
                   <TableCell>{base.sn_length}</TableCell>
                   <TableCell>{new Date(base.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Button variant='contained' color='success' onClick={() => handleDoubleClick(base)}>
+                      수정
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={cells.length + 1} align='center'>
+                <TableCell colSpan={cells.length + 2} align='center'>
                   데이터가 없습니다.
                 </TableCell>
               </TableRow>

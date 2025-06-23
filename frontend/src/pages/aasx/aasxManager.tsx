@@ -214,6 +214,7 @@ export default function AasxManagerPage() {
                 {cells.map((cell, idx) => (
                   <TableCell key={idx}>{cell}</TableCell>
                 ))}
+                <TableCell>수정</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -223,13 +224,13 @@ export default function AasxManagerPage() {
                     file={file}
                     key={idx}
                     onCheckboxChange={handleCheckboxChange}
-                    onDoubleClick={handleDoubleClick}
                     checked={selectedFiles.includes(file.af_idx)}
+                    onEditClick={handleDoubleClick}
                   />
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={cells.length + 1} align='center'>
+                  <TableCell colSpan={cells.length + 2} align='center'>
                     데이터가 없습니다.
                   </TableCell>
                 </TableRow>
