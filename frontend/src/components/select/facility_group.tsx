@@ -116,7 +116,7 @@ export default function SelectSmall() {
             ))}
         </Select>
       </FormControl>
-      <FormControlLabel
+      <FormControlLabel style={{ marginLeft: 10 }}
         control={
           <Checkbox
             checked={isAllInGroupSelected()}

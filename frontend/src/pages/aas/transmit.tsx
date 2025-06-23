@@ -140,18 +140,12 @@ export default function TransmitPage() {
     <div>
       <Box sx={{ flexGrow: 1 }} className='sort-box'>
         <Grid container spacing={1}>
-          <Grid size={8}>
-            <Grid container spacing={1}>
-              <Grid size={12}>
-                <Grid container spacing={1}>
-                  <Grid>
-                    <div className='sort-title'>AASX 파일</div>
-                  </Grid>
-                  <Grid>
-                    <SelectAASXFile setSelectedFile={setSelectedFile} />
-                  </Grid>
-                </Grid>
-              </Grid>
+          <Grid container spacing={1} size={8}>
+            <Grid>
+              <div className='sort-title'>AASX 파일</div>
+            </Grid>
+            <Grid size={10}>
+              <SelectAASXFile setSelectedFile={setSelectedFile} />
             </Grid>
           </Grid>
 

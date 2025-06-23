@@ -188,7 +188,7 @@ export default function AasxManagerPage() {
           </Grid>
         </Grid>
 
-        <Grid container spacing={1}>
+        <Grid container spacing={1} style={{marginTop: '5px'}}>
           <Grid size={12}>
             <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
               <ModalBasic handleInsert={handleInsert} />

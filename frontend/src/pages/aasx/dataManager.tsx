@@ -4,6 +4,9 @@ import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -157,46 +160,76 @@ export default function DataManagerPage() {
 
   return (
     <div className='table-outer'>
-      <Box sx={{ flexGrow: 1 }} className='sort-box'>
-        <Grid container spacing={1}>
-          <Grid size={8}>
-            <Grid container spacing={1} style={{ gap: '20px' }}>
-              <Grid>
-                <Grid container spacing={1}>
-                  <Grid className='d-flex gap-5'>
-                    <div className='sort-title'>날짜</div>
-                  </Grid>
-                  <Grid>
-                    <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
+      <div>
+        <Box sx={{ flexGrow: 1 }} className='sort-box'>
+          <Grid container spacing={1}>
+            <Grid size={10}>
+              <Grid container spacing={1}>
+                <Grid>
+                  <div className='sort-title'>검색</div>
+                </Grid>
+        
+                <Grid size={2}>
+                  <FormControl sx={{ m: 0, width: '100%' }} size='small'>
+                    <Select />
+                  </FormControl>
+                </Grid>
+                <Grid size={7}>
+                  <FormControl sx={{ m: 0, width: '100%' }} size='small'>
+                    <TextField />
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid size={2}>
+              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+                <Button variant='contained' color='success' onClick={handleSearch}>
+                  검색
+                </Button>
+              </Stack>
+            </Grid>
+          </Grid>
+        </Box>
+        <Box sx={{ flexGrow: 1 }} className='sort-box'>
+          <Grid container spacing={1}>
+            <Grid size={8}>
+              <Grid container spacing={1} style={{ gap: '20px' }}>
+                <Grid>
+                  <Grid container spacing={1}>
+                    <Grid className='d-flex gap-5'>
+                      <div className='sort-title'>날짜</div>
+                    </Grid>
+                    <Grid>
+                      <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
+            <Grid size={4}>
+              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+                <Button variant='contained' color='success' onClick={handleSearch}>
+                  조회
+                </Button>
+                <Button variant='contained' color='success' onClick={handleReset}>
+                  초기화
+                </Button>
+              </Stack>
+            </Grid>
           </Grid>
+          <Grid container spacing={1} style={{marginTop: '5px'}}>
+            <Grid size={12}>
+              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+                <ModalBasic handleInsert={handleInsert} />
+                <Button variant='contained' color='error' onClick={handleDelete} disabled={selectedFiles.length === 0}>
+                  <RemoveIcon /> 파일삭제
+                </Button>
+              </Stack>
+            </Grid>
+          </Grid>
+        </Box>
+      </div>
 
-          <Grid size={4}>
-            <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              <Button variant='contained' color='success' onClick={handleSearch}>
-                조회
-              </Button>
-              <Button variant='contained' color='success' onClick={handleReset}>
-                초기화
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-
-        <Grid container spacing={1}>
-          <Grid size={12}>
-            <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              <ModalBasic handleInsert={handleInsert} />
-              <Button variant='contained' color='error' onClick={handleDelete} disabled={selectedFiles.length === 0}>
-                <RemoveIcon /> 파일삭제
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Box>
       <div className='table-wrap'>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>

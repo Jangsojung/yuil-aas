@@ -55,6 +55,9 @@ main {
         padding: 6px 14px;
       }
     }
+    .sort-box + .sort-box {
+      border-top: 1px solid #d6d9dc;
+    }
 
     //버튼
     .MuiButtonBase-root.MuiButton-root {
@@ -133,10 +136,15 @@ main {
       box-shadow: none;
     }
     .table-outer {
-      height: calc(100% - 130px);
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
     }
     .table-wrap {
-      height: calc(100% - 34px);
+      height: calc(100% - 90px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
 
       .MuiTableContainer-root {
         height: 100%;
@@ -144,15 +152,15 @@ main {
         box-shadow: none;
       }
     }
-    .table-wrap-min {
-      height: 630px;
+    // .table-wrap-min {
+    //   height: calc(100% - 100px);
 
-      .MuiTableContainer-root {
-        height: 100%;
-        border-radius: 0;
-        box-shadow: none;
-      }
-    }
+    //   .MuiTableContainer-root {
+    //     height: 100%;
+    //     border-radius: 0;
+    //     box-shadow: none;
+    //   }
+    // }
     .MuiTable-root {
       border-top: 2px solid #787878;
       th {
@@ -169,6 +177,9 @@ main {
     }
 
     //페이징
+    .MuiTablePagination-root {
+      overflow: hidden;
+    }
     .MuiTablePagination-selectLabel,
     .MuiTablePagination-select {
       display: none;

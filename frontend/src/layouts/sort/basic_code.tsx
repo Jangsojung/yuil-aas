@@ -97,21 +97,22 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
         <Grid size={8}>
-          <Grid container spacing={1} style={{ gap: '20px' }}>
-            <Grid>
-              <Grid container spacing={1}>
-                <Grid className='d-flex gap-5'>
-                  <div className='sort-title'>제목</div>
-                </Grid>
-                <Grid>
-                  <TextField value={name} onChange={(e) => setName(e.target.value)} />
-                </Grid>
-                <Grid>
-                  <div className='sort-title'>설비 그룹</div>
-                </Grid>
-                <Grid>
-                  <SelectFacilityGroup />
-                </Grid>
+          <Grid container spacing={4} >
+            <Grid container spacing={1}>
+              <Grid>
+                <div className='sort-title'>제목</div>
+              </Grid>
+              <Grid>
+                <TextField value={name} onChange={(e) => setName(e.target.value)} />
+              </Grid>
+            </Grid>
+            
+            <Grid container spacing={1}>
+              <Grid>
+                <div className='sort-title'>설비 그룹</div>
+              </Grid>
+              <Grid>
+                <SelectFacilityGroup />
               </Grid>
             </Grid>
           </Grid>
