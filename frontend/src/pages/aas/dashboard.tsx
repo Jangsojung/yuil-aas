@@ -22,17 +22,17 @@ export default function DashboardPage() {
   }, [navigationReset]);
 
   return (
-    <div>
+    <div style={{height: '100%'}}>
       {insertMode || baseEditMode ? (
-        <>
+        <div>
           <Sort2 insertMode={insertMode} setInsertMode={setInsertMode} />
           <BasicCode />
-        </>
+        </div>
       ) : (
-        <>
+        <div className='table-outer'>
           <Sort insertMode={insertMode} setInsertMode={setInsertMode} />
           <BaseCode />
-        </>
+        </div>
       )}
     </div>
   );

@@ -165,7 +165,7 @@ export default function Edge_Gateway() {
         </Grid>
       </Box>
 
-      <div className='table-wrap-min'>
+      <div className='table-wrap'>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>

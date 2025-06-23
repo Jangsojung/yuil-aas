@@ -103,7 +103,7 @@ export default function ConvertPage() {
   }, [navigationReset]);
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', height: '100%' }}>
       {isLoading && (
         <div
           style={{
@@ -124,21 +124,15 @@ export default function ConvertPage() {
         </div>
       )}
 
-      <div style={{ pointerEvents: isLoading ? 'none' : 'auto' }}>
+      <div style={{ pointerEvents: isLoading ? 'none' : 'auto' }} className='table-outer'>
         <Box sx={{ flexGrow: 1 }} className='sort-box'>
           <Grid container spacing={1}>
-            <Grid size={8}>
-              <Grid container spacing={1}>
-                <Grid size={10}>
-                  <Grid container spacing={1}>
-                    <Grid className='d-flex gap-5'>
-                      <div className='sort-title'>날짜</div>
-                    </Grid>
-                    <Grid>
-                      <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
-                    </Grid>
-                  </Grid>
-                </Grid>
+            <Grid size={8} container spacing={1}>
+              <Grid>
+                <div className='sort-title'>날짜</div>
+              </Grid>
+              <Grid>
+                <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
               </Grid>
             </Grid>
 
@@ -151,7 +145,7 @@ export default function ConvertPage() {
             </Grid>
           </Grid>
         </Box>
-        <div>
+        <div className='table-wrap'>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label='simple table'>
               <TableHead>

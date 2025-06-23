@@ -139,9 +139,10 @@ main {
       display: flex;
       flex-direction: column;
       flex-grow: 1;
+      height: 100%;
     }
     .table-wrap {
-      height: calc(100% - 90px);
+      height: calc(100% - 50px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
