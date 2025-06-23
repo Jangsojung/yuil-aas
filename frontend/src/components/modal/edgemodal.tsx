@@ -121,9 +121,9 @@ interface CustomizedDialogsProps {
   modalType?: 'insert' | 'update';
   open: boolean;
   handleClose: () => void;
-  edgeGatewayData: EdgeGateway | null;
-  handleInsert: (eg: EdgeGateway) => void;
-  handleUpdate: (eg: EdgeGateway) => void;
+  edgeGatewayData?: EdgeGateway | null;
+  handleInsert?: (eg: EdgeGateway) => void;
+  handleUpdate?: (eg: EdgeGateway) => void;
 }
 
 export default function CustomizedDialogs({
@@ -166,9 +166,20 @@ export default function CustomizedDialogs({
     setNetworkStatus(event.target.checked);
   };
 
+  const validateIp = (ip: string) => {
+    // IPv4 정규식: 0~255.0~255.0~255.0~255
+    const regex =
+      /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$/;
+    return regex.test(ip);
+  };
+
   const handleAction = async () => {
     if (!serverTemp || !pcTemp || !pcIp || !pcPort) {
       alert('모든 필드를 입력해야 합니다.');
+      return;
+    }
+    if (!validateIp(pcIp)) {
+      alert('PC IP는 숫자.숫자.숫자.숫자 형식(예: 192.168.0.1)으로 입력해야 합니다.');
       return;
     }
 
@@ -205,13 +216,17 @@ export default function CustomizedDialogs({
 
       const eg = {
         eg_idx: result.eg_idx,
-        eg_server_temp: serverTemp,
+        eg_server_temp: Number(serverTemp),
         eg_network: networkStatus ? 1 : 0,
-        eg_pc_temp: pcTemp,
+        eg_pc_temp: Number(pcTemp),
         eg_ip_port: pcIp + ':' + pcPort,
       };
 
-      modalType === 'insert' ? handleInsert(eg) : handleUpdate(eg);
+      if (modalType === 'insert') {
+        handleInsert && handleInsert(eg);
+      } else {
+        handleUpdate && handleUpdate(eg);
+      }
       handleClose();
     } catch (err) {
       console.log(err.message);
@@ -312,6 +327,7 @@ export default function CustomizedDialogs({
                   size='small'
                   value={pcIp}
                   onChange={(e) => setPcIp(e.target.value)}
+                  placeholder='예: 192.168.0.1'
                 />
                 <span>:</span>
                 <TextField

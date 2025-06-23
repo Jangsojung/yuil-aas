@@ -37,9 +37,9 @@ export const insertEdgeGateways = async (serverTemp, networkStatus, pcTemp, pcIp
 
 export const updateEdgeGateway = async (eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res) => {
   try {
-    const result = await updateEdgeGatewayToDB(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx);
+    await updateEdgeGatewayToDB(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx);
 
-    res.status(200).json(result);
+    res.status(200).json({ success: true });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
