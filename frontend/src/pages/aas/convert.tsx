@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getBasesAPI, insertBaseAPI } from '../../apis/api/convert';
 
-import CircularProgress from '@mui/material/CircularProgress';
 import { Dayjs } from 'dayjs';
 import { Box, Button, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Grid from '@mui/system/Grid';
@@ -12,6 +11,7 @@ import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
 import { userState, navigationResetState } from '../../recoil/atoms';
+import LoadingOverlay from '../../components/loading/LodingOverlay';
 
 interface Base {
   ab_idx: number;
@@ -104,25 +104,7 @@ export default function ConvertPage() {
 
   return (
     <div style={{ position: 'relative', height: '100%' }}>
-      {isLoading && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-            pointerEvents: 'none',
-          }}
-        >
-          <CircularProgress />
-        </div>
-      )}
+      {isLoading && <LoadingOverlay />}
 
       <div style={{ pointerEvents: isLoading ? 'none' : 'auto' }} className='table-outer'>
         <Box sx={{ flexGrow: 1 }} className='sort-box'>

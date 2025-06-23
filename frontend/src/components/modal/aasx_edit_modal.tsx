@@ -11,9 +11,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import { grey } from '@mui/material/colors';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
-import { CircularProgress } from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
+import LoadingOverlay from '../loading/LodingOverlay';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -111,7 +111,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       const result = await response.json();
 
       const newFile = {
-        af_idx: fileData?.af_idx,
+        af_idx: fileData!.af_idx,
         af_name: result.fileName,
         createdAt: fileData?.createdAt || new Date(),
       };
@@ -143,25 +143,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
 
   return (
     <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
-      {isLoading && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-            pointerEvents: 'none',
-          }}
-        >
-          <CircularProgress />
-        </div>
-      )}
+      {isLoading && <LoadingOverlay />}
       <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
         {title}
       </DialogTitle>

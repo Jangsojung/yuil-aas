@@ -12,9 +12,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import { grey } from '@mui/material/colors';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
-import { CircularProgress } from '@mui/material';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
+import LoadingOverlay from '../loading/LodingOverlay';
 
 const GreyButton = styled(Button)<ButtonProps>(() => ({
   color: '#637381',
@@ -50,7 +50,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 export default function CustomizedDialogs({ handleInsert }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<globalThis.File | null>(null);
   const userIdx = useRecoilValue(userState)?.user_idx;
 
   const handleClickOpen = () => {
@@ -128,25 +128,8 @@ export default function CustomizedDialogs({ handleInsert }) {
         <AddIcon />
         파일등록
       </Button>
-      {isLoading && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-            pointerEvents: 'none',
-          }}
-        >
-          <CircularProgress />
-        </div>
-      )}
+
+      {isLoading && <LoadingOverlay />}
 
       <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
