@@ -1,4 +1,4 @@
-import React, { ChangeEvent, DragEvent, FC } from 'react';
+import React, { ChangeEvent, DragEvent, FC, useState } from 'react';
 
 export type FileUploadProps = {
   imageButton?: boolean;
@@ -28,53 +28,78 @@ export const FileUpload: FC<FileUploadProps> = ({
   onChange,
   onDrop,
   selectedFileName,
+  width = '100%',
+  height = '60px',
+  backgroundColor = '#f5f5f5',
 }) => {
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [labelText, setLabelText] = useState(hoverLabel);
+
   const stopDefaults = (e: DragEvent) => {
     e.stopPropagation();
     e.preventDefault();
   };
-  const dragEvents = {
-    onMouseEnter: () => {
-      setIsMouseOver(true);
-    },
-    onMouseLeave: () => {
-      setIsMouseOver(false);
-    },
-    onDragEnter: (e: DragEvent) => {
-      stopDefaults(e);
-      setIsDragOver(true);
-      setLabelText(dropLabel);
-    },
-    onDragLeave: (e: DragEvent) => {
-      stopDefaults(e);
-      setIsDragOver(false);
-      setLabelText(hoverLabel);
-    },
-    onDragOver: stopDefaults,
-    onDrop: (e: DragEvent<HTMLElement>) => {
-      stopDefaults(e);
-      setLabelText(hoverLabel);
-      setIsDragOver(false);
-      if (imageButton && e.dataTransfer.files[0]) {
-        setImageUrl(URL.createObjectURL(e.dataTransfer.files[0]));
-      }
-      onDrop(e);
-    },
+
+  const handleDragEnter = (e: DragEvent) => {
+    stopDefaults(e);
+    setIsDragOver(true);
+    setLabelText(dropLabel);
+  };
+  const handleDragLeave = (e: DragEvent) => {
+    stopDefaults(e);
+    setIsDragOver(false);
+    setLabelText(hoverLabel);
+  };
+  const handleDragOver = (e: DragEvent) => {
+    stopDefaults(e);
+  };
+  const handleDrop = (e: DragEvent<HTMLElement>) => {
+    stopDefaults(e);
+    setIsDragOver(false);
+    setLabelText(hoverLabel);
+    onDrop(e);
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (imageButton && event.target.files[0]) {
-      setImageUrl(URL.createObjectURL(event.target.files[0]));
-    }
-
     onChange(event);
   };
 
   return (
-    <>
-      <input onChange={handleChange} accept={accept} id='file-upload' type='file' />
-
-      <label htmlFor='file-upload' {...dragEvents}></label>
-    </>
+    <div
+      style={{
+        width,
+        height,
+        backgroundColor: isDragOver ? '#e0e0e0' : backgroundColor,
+        border: isDragOver ? '2px solid #1976d2' : '2px dashed #bdbdbd',
+        borderRadius: '6px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+        position: 'relative',
+        fontSize: '1rem',
+        color: '#333',
+      }}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      <input onChange={handleChange} accept={accept} id='file-upload' type='file' style={{ display: 'none' }} />
+      <label
+        htmlFor='file-upload'
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+        }}
+      >
+        {selectedFileName ? selectedFileName : labelText}
+      </label>
+    </div>
   );
 };
