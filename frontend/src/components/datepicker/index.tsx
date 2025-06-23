@@ -1,4 +1,3 @@
-import * as React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ko';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -50,7 +49,7 @@ export default function BasicDatePicker({ onDateChange, startDate, endDate }: Pr
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={ko}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ko'}>
       <ThemeProvider theme={theme}>
         <div className='datepicker-wrap d-flex gap-5'>
           <DatePicker

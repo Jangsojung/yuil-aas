@@ -55,7 +55,7 @@ export default function SelectSmall({ setSelectedFile }: Props) {
     <FormControl sx={{ m: 1, width:'100%' }} size='small'>
       <Select value={currentFile || ''} onChange={handleChange} IconComponent={ExpandMoreIcon} displayEmpty>
         <MenuItem disabled value='' style={{ color: '#666', fontStyle: 'italic' }}>
-          AASX 파일을 선택해 주세요.
+          aasx 파일을 선택해 주세요.
         </MenuItem>
         {files && files.length > 0 ? (
           files.map((file) => (
