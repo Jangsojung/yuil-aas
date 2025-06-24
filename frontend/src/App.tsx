@@ -32,7 +32,7 @@ export default function ReactRouter() {
           children: [
             {
               path: '',
-              element: <Navigate to='/aas/dashboard' replace />,
+              element: <Navigate to='/aasx/dataManager' replace />,
             },
             {
               path: 'signIn',
