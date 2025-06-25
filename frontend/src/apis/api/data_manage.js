@@ -41,3 +41,39 @@ export const getFilesAPI = async (start, end) => {
     console.error(error.message);
   }
 };
+
+export const getWordsAPI = async () => {
+  try {
+    const response = await fetch(`http://localhost:5001/api/file/words?fc_idx=3`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch files');
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+export const getSearchAPI = async (type, text) => {
+  try {
+    const response = await fetch(`http://localhost:5001/api/file/search?fc_idx=3&type=${type}&text=${text}`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch files');
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error(error.message);
+  }
+};

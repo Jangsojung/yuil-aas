@@ -8,6 +8,8 @@ import {
   updateAASXFile,
   deleteAASXFiles,
   getVerify,
+  getWords,
+  getSearch,
 } from '../../controller/file/FileController.js';
 
 const router = express.Router();
@@ -53,6 +55,15 @@ export default () => {
   router.post('/verify', (req, res) => {
     const { file } = req.body;
     getVerify(file, res);
+  });
+
+  router.get('/words', (req, res) => {
+    getWords(res);
+  });
+
+  router.get('/search', (req, res) => {
+    const { type, text } = req.query;
+    getSearch(type, text, res);
   });
 
   return router;

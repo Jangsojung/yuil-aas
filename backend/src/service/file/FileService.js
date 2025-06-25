@@ -294,3 +294,61 @@ export const getVerifyFromDB = async (file) => {
     }
   });
 };
+
+export const getWordsFromDB = async () => {
+  return new Promise((resolve, reject) => {
+    const query = 'select as_kr, as_en from tb_aasx_alias order by as_idx desc';
+
+    pool.query(query, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        const words = results.map((word) => {
+          return {
+            as_kr: word.as_kr,
+            as_en: word.as_en,
+          };
+        });
+
+        resolve(words);
+      }
+    });
+  });
+};
+
+export const getSearchFromDB = async (type, text) => {
+  return new Promise((resolve, reject) => {
+    let column;
+    if (type === 'kr') column = 'as_kr';
+    else if (type === 'en') column = 'as_en';
+    else return reject(new Error('Invalid type'));
+
+    const query = `SELECT as_kr, as_en FROM tb_aasx_alias WHERE ${column} LIKE ? order by as_idx desc`;
+    const searchText = `%${text}%`;
+
+    pool.query(query, [searchText], (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        const words = results.map((word) => {
+          return {
+            as_kr: word.as_kr,
+            as_en: word.as_en,
+          };
+        });
+
+        resolve(words);
+      }
+    });
+  });
+};

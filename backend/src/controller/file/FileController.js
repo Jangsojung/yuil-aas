@@ -7,6 +7,8 @@ import {
   updateAASXFileToDB,
   deleteAASXFilesFromDB,
   getVerifyFromDB,
+  getWordsFromDB,
+  getSearchFromDB,
 } from '../../service/file/FileService.js';
 
 export const insertFile = async (fc_idx, fileName, user_idx, res) => {
@@ -101,5 +103,27 @@ export const getVerify = async (file, res) => {
     } else {
       console.error('Internal Server Error (no res)');
     }
+  }
+};
+
+export const getWords = async (res) => {
+  try {
+    const result = await getWordsFromDB();
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const getSearch = async (type, text, res) => {
+  try {
+    const result = await getSearchFromDB(type, text);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
   }
 };
