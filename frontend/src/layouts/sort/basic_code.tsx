@@ -96,29 +96,27 @@ export default function Sort({ insertMode, setInsertMode }: Props) {
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
       <Grid container spacing={1}>
-        <Grid size={8}>
-          <Grid container spacing={4} >
-            <Grid container spacing={1}>
-              <Grid>
-                <div className='sort-title'>제목</div>
-              </Grid>
-              <Grid>
-                <TextField value={name} onChange={(e) => setName(e.target.value)} />
-              </Grid>
+        <Grid container spacing={2} size={6}>
+          <Grid container spacing={1} style={{flexGrow: 1}}>
+            <Grid>
+              <div className='sort-title'>제목</div>
             </Grid>
-            
-            <Grid container spacing={1}>
-              <Grid>
-                <div className='sort-title'>설비 그룹</div>
-              </Grid>
-              <Grid>
-                <SelectFacilityGroup />
-              </Grid>
+            <Grid size={9}  style={{flexGrow: 1}}>
+              <TextField value={name} onChange={(e) => setName(e.target.value)}  style={{width: '100%'}} />
+            </Grid>
+          </Grid>
+          
+          <Grid container spacing={1} size={6}>
+            <Grid>
+              <div className='sort-title'>설비 그룹</div>
+            </Grid>
+            <Grid>
+              <SelectFacilityGroup />
             </Grid>
           </Grid>
         </Grid>
 
-        <Grid size={4} direction='row' style={{ justifyContent: 'flex-end' }}>
+        <Grid size={6} direction='row' style={{ justifyContent: 'flex-end' }}>
           <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
             <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
               <Button

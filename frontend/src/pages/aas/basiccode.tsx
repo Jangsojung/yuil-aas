@@ -7,7 +7,7 @@ import BaseCode from '../../section/aas/dashboard/view/base_index';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { baseEditModeState, navigationResetState, selectedBasesState } from '../../recoil/atoms';
 
-export default function DashboardPage() {
+export default function BasiccodePage() {
   const [insertMode, setInsertMode] = useState(false);
   const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
   const [, setSelectedBases] = useRecoilState(selectedBasesState);

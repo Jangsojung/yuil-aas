@@ -29,7 +29,7 @@ main {
     .sort-box {
       border-top: 2px solid #787878;
       border-bottom: 1px solid #d6d9dc;
-      padding: 10px;
+      padding: 10px 15px;
       background-color: #ececec;
 
       .sort-title {
@@ -139,6 +139,7 @@ main {
       flex-direction: column;
       flex-grow: 1;
       height: 100%;
+      border: 1px solid #E5E8EB;
     }
     .table-wrap {
       height: calc(100% - 50px);
@@ -152,15 +153,7 @@ main {
         box-shadow: none;
       }
     }
-    // .table-wrap-min {
-    //   height: calc(100% - 100px);
-
-    //   .MuiTableContainer-root {
-    //     height: 100%;
-    //     border-radius: 0;
-    //     box-shadow: none;
-    //   }
-    // }
+    
     .MuiTable-root {
       border-top: 2px solid #787878;
       th {
@@ -169,16 +162,39 @@ main {
         background-color: #efefef;
         color: #607d8b;
         font-weight: bold;
+        border-bottom: 2px solid #D9DCDF;
+        position: relative;
+      }
+      th:last-child::after {
+        display: none;
+      }
+      th:after {
+        content: '';
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        margin-top: -8px;
+        width: 2px;
+        height: 16px;
+        background-color: #D9DCDF;
       }
       td {
         text-align: center;
         padding: 8px;
+        border-right: 1px solid #E5E8EB;
+        border-bottom: 1px solid #E5E8EB;
+      }
+      td:last-child {
+        border-right: 0;
       }
     }
 
     //페이징
     .MuiTablePagination-root {
       overflow: hidden;
+      background-color: #F5F5F5;
+      border-top: 2px solid #DDE0E3;
     }
     .MuiTablePagination-selectLabel,
     .MuiTablePagination-select {
@@ -245,3 +261,35 @@ main {
     height: 60px;
   }
 }
+
+.MuiTableContainer-root.modal-table {
+  box-shadow: none;
+  border-radius: 0;
+  border-top: 2px solid #787878;
+  border-bottom: 2px solid #787878;
+
+  td {
+    border-right: 1px solid var(--mui-palette-TableCell-border);
+    font-size: 0.875rem !important;
+    padding: 10px;
+    input, span {
+      font-size: 0.875rem !important;
+    } 
+    
+  }
+  td:first-child {
+    background-color: rgba(0,0,0,0.04)
+  }
+
+  td:last-child {
+    border-right: 0;
+  }
+}
+
+//스위치
+.MuiSwitch-sizeMedium {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+

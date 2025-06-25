@@ -9,6 +9,8 @@ import { Button, ButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
 
+import { Link } from 'react-router-dom';
+
 const GreyButton = styled(Button)<ButtonProps>(() => ({
   color: '#637381',
   fontWeight: 'bold',
@@ -23,7 +25,7 @@ const GreyButton = styled(Button)<ButtonProps>(() => ({
 function CustomAppTitle() {
   return (
     <div className='logo'>
-      <img src={Logo} alt='yuil' />
+      <Link to='/dashboard/dashboard'><img src={Logo} alt='yuil' /></Link>
     </div>
   );
 }

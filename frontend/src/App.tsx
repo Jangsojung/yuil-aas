@@ -5,7 +5,8 @@ import type { Navigation } from '@toolpad/core/AppProvider';
 
 import Layout from './layouts/dashboard';
 import AuthLayout from './layouts/auth';
-import DashboardPage from './pages/aas/dashboard';
+import DashboardPage from './pages/dashboard/dashboard';
+import BasiccodePage from './pages/aas/basiccode';
 import ConvertPage from './pages/aas/convert';
 import TransmitPage from './pages/aas/transmit';
 import AasxManagerPage from './pages/aasx/aasxManager';
@@ -31,8 +32,18 @@ export default function ReactRouter() {
           Component: App,
           children: [
             {
-              path: '',
-              element: <Navigate to='/aasx/dataManager' replace />,
+              path: 'dashboard',
+              element: (
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              ),
+              children: [
+                {
+                  path: 'dashboard',
+                  element: <DashboardPage />,
+                },
+              ],
             },
             {
               path: 'signIn',
@@ -53,8 +64,8 @@ export default function ReactRouter() {
               ),
               children: [
                 {
-                  path: 'dashboard',
-                  element: <DashboardPage />,
+                  path: 'basiccode',
+                  element: <BasiccodePage />,
                 },
                 {
                   path: 'convert',

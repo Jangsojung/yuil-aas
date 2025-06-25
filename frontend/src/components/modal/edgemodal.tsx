@@ -10,6 +10,15 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 import { grey } from '@mui/material/colors';
 
 import FormGroup from '@mui/material/FormGroup';
@@ -30,7 +39,7 @@ const GreyButton = styled(Button)(({ theme }) => ({
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '.MuiDialog-paper': {
-    width: '500px',
+    width: '550px',
   },
   '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
@@ -55,6 +64,7 @@ const IOSSwitch = styled((props: SwitchProps) => (
   width: 42,
   height: 26,
   padding: 0,
+  margin: 0,
   '& .MuiSwitch-switchBase': {
     padding: 0,
     margin: 2,
@@ -263,85 +273,89 @@ export default function CustomizedDialogs({
         <CloseIcon />
       </IconButton>
       <DialogContent dividers className='file-upload'>
-        <Grid container spacing={1}>
-          <Grid size={4}>
-            <Grid container spacing={1}>
-              <Grid size={6}>
-                <Box sx={{ typography: 'subtitle2' }}>서버 온도</Box>
-              </Grid>
-              <Grid size={6} className='d-flex gap-5 align-flex-end'>
-                <TextField
-                  hiddenLabel
-                  type='number'
-                  id='outlined-size-small'
-                  size='small'
-                  value={serverTemp}
-                  onChange={(e) => setServerTemp(e.target.value)}
-                />
-                <span>℃</span>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid size={8}>
-            <Grid container spacing={1}>
-              <Grid size={4}>
-                <Box sx={{ typography: 'subtitle2' }}>네트워크 상태</Box>
-              </Grid>
-              <Grid size={8}>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<IOSSwitch sx={{ m: 1 }} checked={networkStatus} onChange={handleNetworkStatusChange} />}
-                    label={networkStatus ? '연결 됨' : '연결 안 됨'}
-                  />
-                </FormGroup>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid size={4}>
-            <Grid container spacing={1}>
-              <Grid size={6}>
-                <Box sx={{ typography: 'subtitle2' }}>PC 온도</Box>
-              </Grid>
-              <Grid size={6} className='d-flex gap-5 align-flex-end'>
-                <TextField
-                  hiddenLabel
-                  type='number'
-                  id='outlined-size-small'
-                  size='small'
-                  value={pcTemp}
-                  onChange={(e) => setPcTemp(e.target.value)}
-                />
-                <span>℃</span>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid size={8}>
-            <Grid container spacing={1}>
-              <Grid size={4}>
-                <Box sx={{ typography: 'subtitle2' }}>PC IP:PORT</Box>
-              </Grid>
-              <Grid size={8} className='d-flex gap-5 align-flex-end'>
-                <TextField
-                  hiddenLabel
-                  id='outlined-size-small'
-                  size='small'
-                  value={pcIp}
-                  onChange={(e) => setPcIp(e.target.value)}
-                  placeholder='예: 192.168.0.1'
-                />
-                <span>:</span>
-                <TextField
-                  hiddenLabel
-                  type='number'
-                  id='outlined-size-small'
-                  size='small'
-                  value={pcPort}
-                  onChange={(e) => setPcPort(e.target.value)}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
+
+        <TableContainer component={Paper} className='modal-table'>
+          <Table aria-label='simple table'>
+            <TableBody>
+              <TableRow>
+                <TableCell>서버온도</TableCell>
+                <TableCell>
+                  <div className="d-flex gap-5" style={{alignItems: 'flex-start'}}>
+                    <TextField
+                      hiddenLabel
+                      type='number'
+                      id='outlined-size-small'
+                      size='small'
+                      value={serverTemp}
+                      onChange={(e) => setServerTemp(e.target.value)}
+                      style={{width: 50}}
+                    />
+                    <span>℃</span>
+                  </div>
+                </TableCell>
+                
+              </TableRow>
+              <TableRow>
+                <TableCell>네트워크상태</TableCell>
+                <TableCell>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<IOSSwitch sx={{ m: 1 }} checked={networkStatus} onChange={handleNetworkStatusChange} />}
+                      label={networkStatus ? '연결 됨' : '연결 안 됨'}
+                    />
+                  </FormGroup>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>PC 온도</TableCell>
+                <TableCell>
+                  <div className="d-flex gap-5" style={{alignItems: 'flex-start'}}>
+                    <TextField
+                      hiddenLabel
+                      type='number'
+                      id='outlined-size-small'
+                      size='small'
+                      value={pcTemp}
+                      onChange={(e) => setPcTemp(e.target.value)}
+                      style={{width: 50}}
+                    />
+                    <span>℃</span>
+                  </div>
+                </TableCell>
+                
+              </TableRow>
+              <TableRow>
+                <TableCell>PC IP:PORT</TableCell>
+                <TableCell>
+                  <div className="d-flex gap-5" style={{alignItems: 'center'}}>
+                    <TextField
+                      hiddenLabel
+                      id='outlined-size-small'
+                      size='small'
+                      value={pcIp}
+                      onChange={(e) => setPcIp(e.target.value)}
+                      placeholder='예: 192.168.0.1'
+                      style={{width: 120}}
+                    />
+                    <span>:</span>
+                    <TextField
+                      hiddenLabel
+                      type='number'
+                      id='outlined-size-small'
+                      size='small'
+                      value={pcPort}
+                      onChange={(e) => setPcPort(e.target.value)}
+                      style={{width: 120}}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+              
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        
       </DialogContent>
       <DialogActions>
         <Button onClick={handleAction} variant='contained' color='primary'>
