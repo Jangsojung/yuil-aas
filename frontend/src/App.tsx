@@ -148,29 +148,25 @@ const NAVIGATION: Navigation = [
     children: [
       {
         segment: 'basiccode',
-        title: '기초코드',
+        title: '기초코드 등록',
       },
       {
         segment: 'convert',
-        title: 'DATA 변환',
+        title: '기초코드 변환',
       },
-      // {
-      //   segment: 'transmit',
-      //   title: 'DATA 송신',
-      // },
     ],
   },
   {
     segment: 'data',
-    title: '데이터 관리',
+    title: 'DATA 관리',
     children: [
       {
         segment: 'dataManager',
-        title: 'DATA 관리',
+        title: '식별 ID 관리',
       },
       {
         segment: 'jsonManager',
-        title: '변환 파일 관리',
+        title: 'JSON 파일 관리',
       },
     ],
   },

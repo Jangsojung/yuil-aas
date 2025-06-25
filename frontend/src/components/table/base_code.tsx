@@ -153,4 +153,4 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
 }
 
 // const cells = ['번호', '기초코드 이름', '센서'];
-const cells = ['기초코드 이름', '센서 개수', '생성 날짜'];
+const cells = ['기초코드명', '센서 개수', '생성 날짜'];

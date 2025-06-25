@@ -253,4 +253,4 @@ export default function AasxManagerPage() {
 }
 
 // const cells = ['파일 번호', '파일 이름', '생성 날짜'];
-const cells = ['번호', '파일 이름', '생성 날짜'];
+const cells = ['번호', '파일명', '생성 날짜'];
