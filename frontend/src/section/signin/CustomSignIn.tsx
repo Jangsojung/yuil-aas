@@ -25,7 +25,7 @@ const signIn = async (formData: FormData, setUser: Dispatch<SetStateAction<User 
       };
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
-      nav('/aasx/dataManager');
+      nav('/dashboard/dashboard');
     } else {
       alert(`로그인 실패: ${data.message}`);
     }
@@ -41,7 +41,7 @@ export default function CustomSignInView() {
 
   useEffect(() => {
     if (user) {
-      nav('/aasx/dataManager');
+      nav('/dashboard/dashboard');
     }
   }, [user, nav]);
 
