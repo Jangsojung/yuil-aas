@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import Logo from '../../assets/yuil.png';
+import Logo from '../../assets/sambo.png';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState, navigationResetState } from '../../recoil/atoms';
 import { Button, ButtonProps } from '@mui/material';
@@ -25,7 +25,7 @@ const GreyButton = styled(Button)<ButtonProps>(() => ({
 function CustomAppTitle() {
   return (
     <div className='logo'>
-      <Link to='/dashboard/dashboard'><img src={Logo} alt='yuil' /></Link>
+      <Link to='/dashboard/dashboard'><img src={Logo} alt='삼보에이앤티' /></Link>
     </div>
   );
 }

@@ -2,16 +2,16 @@ header.MuiPaper-root {
   background-color: transparent;
 
   .MuiStack-root {
-    padding: 0.3vh 0 0.3vh 40px;
+    padding: 0.3vh 0 0.3vh 0;
   }
 
   .MuiStack-root .logo {
-    height: 3.5vh;
+    height: 2vh;
     width: auto;
   }
 
   .MuiStack-root .logo img {
-    height: 100%;
+    width: 200px;
   }
 
   .MuiToolbar-root {
@@ -26,11 +26,12 @@ header.MuiPaper-root {
 }
 
 .MuiDrawer-docked {
-  width: 200px;
+  width: 220px !important;
 }
 
 .MuiPaper-root.MuiDrawer-paper {
   background: #111827;
+  width: 220px !important;
 
   .MuiSvgIcon-root path {
     fill: #dfe3e8;
@@ -39,6 +40,7 @@ header.MuiPaper-root {
   .MuiTypography-root {
     color: #dfe3e8;
     letter-spacing: -0.03em !important;
+    font-size: 0.8125rem;
   }
 
   .MuiList-root {

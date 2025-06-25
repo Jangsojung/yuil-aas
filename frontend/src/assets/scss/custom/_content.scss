@@ -4,7 +4,6 @@ main {
   }
   .MuiContainer-root {
     //컨테이너
-    background: #f3f3f3;
 
     .MuiBox-root {
       background-color: #fff;
@@ -27,10 +26,9 @@ main {
 
     //검색영역
     .sort-box {
-      border-top: 2px solid #787878;
-      border-bottom: 1px solid #d6d9dc;
+      border: 1px solid #d6d9dc;
+      border-radius: 5px;
       padding: 10px 15px;
-      background-color: #ececec;
 
       .sort-title {
         color: #37474f;
@@ -139,7 +137,7 @@ main {
       flex-direction: column;
       flex-grow: 1;
       height: 100%;
-      border: 1px solid #E5E8EB;
+      // border: 1px solid #E5E8EB;
     }
     .table-wrap {
       height: calc(100% - 50px);
@@ -155,11 +153,11 @@ main {
     }
     
     .MuiTable-root {
-      border-top: 2px solid #787878;
+      
       th {
         text-align: center;
         padding: 3px 0px;
-        background-color: #efefef;
+        background-color: rgb(238, 246,255);
         color: #607d8b;
         font-weight: bold;
         border-bottom: 2px solid #D9DCDF;
