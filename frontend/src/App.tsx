@@ -33,6 +33,10 @@ export default function ReactRouter() {
           Component: App,
           children: [
             {
+              index: true,
+              element: <Navigate to='/dashboard/dashboard' replace />,
+            },
+            {
               path: 'dashboard',
               element: (
                 <ProtectedRoute>
