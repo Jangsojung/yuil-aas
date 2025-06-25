@@ -192,6 +192,8 @@ export default function Edge_Gateway() {
                     onCheckboxChange={handleCheckboxChange}
                     checked={selectedEdgeGateways.includes(eg.eg_idx)}
                     onEditClick={handleDoubleClick}
+                    index={currentPage * rowsPerPage + idx}
+                    totalCount={edgeGateways.length}
                   />
                 ))
               ) : (
@@ -225,4 +227,4 @@ export default function Edge_Gateway() {
 }
 
 // const cells = ['번호', '서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT'];
-const cells = ['서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT', '생성 날짜'];
+const cells = ['번호', '서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT', '생성 날짜'];

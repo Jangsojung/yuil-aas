@@ -100,7 +100,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
   }, [refreshTrigger]);
 
   return (
-    <div className="table-wrap">
+    <div className='table-wrap'>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label='simple table'>
           <TableHead>
@@ -108,6 +108,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
               <TableCell>
                 <Checkbox checked={selectAll} onChange={handleSelectAllChange} />
               </TableCell>
+              <TableCell>번호</TableCell>
               {cells.map((cell, idx) => (
                 <TableCell key={idx}>{cell}</TableCell>
               ))}
@@ -116,7 +117,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
           </TableHead>
           <TableBody>
             {pagedData && pagedData.length > 0 ? (
-              pagedData.map((base) => (
+              pagedData.map((base, idx) => (
                 <TableRow key={base.ab_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell>
                     <Checkbox
@@ -124,6 +125,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
                       onChange={() => handleCheckboxChange(base.ab_idx)}
                     />
                   </TableCell>
+                  <TableCell>{bases.length - (currentPage * rowsPerPage + idx)}</TableCell>
                   {/* <TableCell>{base.ab_idx}</TableCell> */}
                   <TableCell>{base.ab_name}</TableCell>
                   <TableCell>{base.sn_length}</TableCell>
@@ -137,7 +139,7 @@ export default function BasicTable({ insertMode, setInsertMode }: Props) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={cells.length + 2} align='center'>
+                <TableCell colSpan={cells.length + 3} align='center'>
                   데이터가 없습니다.
                 </TableCell>
               </TableRow>

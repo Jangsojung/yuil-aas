@@ -1,23 +1,25 @@
 import React from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import Checkbox from '@mui/material/Checkbox';
-import Button from '@mui/material/Button';
 
-export default function DataTableRow({ file, onCheckboxChange, checked, onEditClick }) {
+interface DataTableRowProps {
+  data: {
+    as_kr: string;
+    as_en: string;
+    af_idx?: number;
+  };
+  index: number;
+  totalCount?: number;
+}
+
+export default function DataTableRow({ data, index, totalCount }: DataTableRowProps) {
+  const displayNumber = totalCount ? totalCount - index : index + 1;
+
   return (
-    <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell>
-        <Checkbox checked={checked} onChange={() => onCheckboxChange(file.af_idx)} />
-      </TableCell>
-      {/* <TableCell>{file.af_idx}</TableCell> */}
-      <TableCell>{file.af_name}</TableCell>
-      <TableCell>{new Date(file.createdAt).toLocaleDateString()}</TableCell>
-      <TableCell>
-        <Button variant='contained' color='success' onClick={() => onEditClick(file)}>
-          수정
-        </Button>
-      </TableCell>
+    <TableRow key={data.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+      <TableCell sx={{ width: '10%' }}>{displayNumber}</TableCell>
+      <TableCell sx={{ width: '45%' }}>{data.as_kr}</TableCell>
+      <TableCell sx={{ width: '45%' }}>{data.as_en}</TableCell>
     </TableRow>
   );
 }

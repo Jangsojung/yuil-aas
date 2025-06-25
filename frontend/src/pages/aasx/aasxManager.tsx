@@ -188,7 +188,7 @@ export default function AasxManagerPage() {
           </Grid>
         </Grid>
 
-        <Grid container spacing={1} style={{marginTop: '5px'}}>
+        <Grid container spacing={1} style={{ marginTop: '5px' }}>
           <Grid size={12}>
             <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
               <ModalBasic handleInsert={handleInsert} />
@@ -226,6 +226,8 @@ export default function AasxManagerPage() {
                     onCheckboxChange={handleCheckboxChange}
                     checked={selectedFiles.includes(file.af_idx)}
                     onEditClick={handleDoubleClick}
+                    index={currentPage * rowsPerPage + idx}
+                    totalCount={files.length}
                   />
                 ))
               ) : (
@@ -251,4 +253,4 @@ export default function AasxManagerPage() {
 }
 
 // const cells = ['파일 번호', '파일 이름', '생성 날짜'];
-const cells = ['파일 이름', '생성 날짜'];
+const cells = ['번호', '파일 이름', '생성 날짜'];
