@@ -14,6 +14,7 @@ import DataManagerPage from './pages/aasx/dataManager';
 import EdgePage from './pages/edge/edge';
 import SignInPage from './pages/signIn/sign';
 import ProtectedRoute from './components/route/ProtectedRoute';
+import JsonPage from './pages/aasx/jsonManager';
 
 function App() {
   return (
@@ -78,6 +79,24 @@ export default function ReactRouter() {
               ],
             },
             {
+              path: 'data',
+              element: (
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              ),
+              children: [
+                {
+                  path: 'dataManager',
+                  element: <DataManagerPage />,
+                },
+                {
+                  path: 'jsonManager',
+                  element: <JsonPage />,
+                },
+              ],
+            },
+            {
               path: 'aasx',
               element: (
                 <ProtectedRoute>
@@ -88,10 +107,6 @@ export default function ReactRouter() {
                 {
                   path: 'aasxManager',
                   element: <AasxManagerPage />,
-                },
-                {
-                  path: 'dataManager',
-                  element: <DataManagerPage />,
                 },
                 {
                   path: 'transmit',
@@ -124,21 +139,11 @@ export default function ReactRouter() {
 
 const NAVIGATION: Navigation = [
   {
-    segment: 'aasx',
-    title: '데이터 관리',
-    children: [
-      {
-        segment: 'dataManager',
-        title: '데이터 관리',
-      },
-    ],
-  },
-  {
     segment: 'aas',
     title: 'AAS KAMP DATA I/F',
     children: [
       {
-        segment: 'dashboard',
+        segment: 'basiccode',
         title: '기초코드',
       },
       {
@@ -149,6 +154,20 @@ const NAVIGATION: Navigation = [
       //   segment: 'transmit',
       //   title: 'DATA 송신',
       // },
+    ],
+  },
+  {
+    segment: 'data',
+    title: '데이터 관리',
+    children: [
+      {
+        segment: 'dataManager',
+        title: 'DATA 관리',
+      },
+      {
+        segment: 'jsonManager',
+        title: '변환 파일 관리',
+      },
     ],
   },
   {
