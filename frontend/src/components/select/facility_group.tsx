@@ -16,14 +16,9 @@ interface FacilityGroup {
 type Props = {
   selectedFacilityGroups: number[];
   setSelectedFacilityGroups: Dispatch<SetStateAction<number[]>>;
-  onFacilityGroupChange?: () => void;
 };
 
-export default function FacilityGroupSelect({
-  selectedFacilityGroups,
-  setSelectedFacilityGroups,
-  onFacilityGroupChange,
-}: Props) {
+export default function FacilityGroupSelect({ selectedFacilityGroups, setSelectedFacilityGroups }: Props) {
   const [facilityGroups, setFacilityGroups] = useState<FacilityGroup[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -49,21 +44,13 @@ export default function FacilityGroupSelect({
   const handleChange = (event: any) => {
     const value = event.target.value;
     setSelectedFacilityGroups(value);
-    if (onFacilityGroupChange) {
-      onFacilityGroupChange();
-    }
   };
 
   const handleSelectAll = () => {
     if (selectedFacilityGroups.length === facilityGroups.length) {
-      // 모든 것이 선택된 상태에서 "전체 선택" 클릭 시 모두 해제
       setSelectedFacilityGroups([]);
     } else {
-      // 일부만 선택된 상태에서 "전체 선택" 클릭 시 모두 선택
       setSelectedFacilityGroups(facilityGroups.map((fg) => fg.fg_idx));
-    }
-    if (onFacilityGroupChange) {
-      onFacilityGroupChange();
     }
   };
 
@@ -93,6 +80,13 @@ export default function FacilityGroupSelect({
           displayEmpty
           disabled={loading}
           renderValue={() => getDisplayText()}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 500,
+              },
+            },
+          }}
         >
           {loading ? (
             <MenuItem disabled value=''>

@@ -490,11 +490,21 @@ export default function BasiccodePage() {
 
   const handleInsertMode = () => {
     setInsertMode(true);
-    setTreeData([]);
-    setTreeLoading(false);
-    setSelectedSensors([]);
-    setBasicName('');
-    setBasicDesc('');
+    getAllFacilityGroups();
+  };
+
+  const getAllFacilityGroups = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      if (!response.ok) {
+        throw new Error('Failed to fetch facility groups');
+      }
+      const facilityGroups = await response.json();
+      setSelectedFacilityGroups(facilityGroups.map((fg: any) => fg.fg_idx));
+    } catch (err) {
+      console.error('설비그룹 로딩 에러:', err);
+      setSelectedFacilityGroups([]);
+    }
   };
 
   const handleBackToMain = () => {
@@ -792,10 +802,6 @@ export default function BasiccodePage() {
                     <FacilityGroupSelect
                       selectedFacilityGroups={selectedFacilityGroups}
                       setSelectedFacilityGroups={setSelectedFacilityGroups}
-                      onFacilityGroupChange={() => {
-                        setTreeData([]);
-                        setSelectedSensors([]);
-                      }}
                     />
                   </Grid>
                 </Grid>
