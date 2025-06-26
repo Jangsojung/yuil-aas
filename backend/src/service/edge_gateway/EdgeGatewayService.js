@@ -63,8 +63,14 @@ export const updateEdgeGatewayToDB = async (eg_idx, serverTemp, networkStatus, p
 
 export const deleteEdgeGatewaysFromDB = async (ids) => {
   try {
-    const query = `delete from tb_aasx_edge_gateway where eg_idx in (?)`;
-    await pool.promise().query(query, [ids]);
+    if (!ids || ids.length === 0) {
+      console.log('No IDs provided for deletion');
+      return;
+    }
+
+    const idString = ids.join(',');
+    const query = `delete from tb_aasx_edge_gateway where eg_idx in (${idString})`;
+    await pool.promise().query(query);
 
     console.log('Edge Gateway deleted successfully');
   } catch (err) {
