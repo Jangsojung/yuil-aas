@@ -15,6 +15,7 @@ import EdgePage from './pages/edge/edge';
 import SignInPage from './pages/signIn/sign';
 import ProtectedRoute from './components/route/ProtectedRoute';
 import JsonPage from './pages/aasx/jsonManager';
+import FacilityPage from './pages/aas/facility';
 
 function App() {
   return (
@@ -68,6 +69,10 @@ export default function ReactRouter() {
                 </ProtectedRoute>
               ),
               children: [
+                {
+                  path: 'facility',
+                  element: <FacilityPage />,
+                },
                 {
                   path: 'basiccode',
                   element: <BasiccodePage />,
@@ -147,6 +152,10 @@ const NAVIGATION: Navigation = [
     title: 'AAS KAMP DATA I/F',
     children: [
       {
+        segment: 'facility',
+        title: '설비 관리',
+      },
+      {
         segment: 'basiccode',
         title: '기초코드 관리',
       },
@@ -158,7 +167,7 @@ const NAVIGATION: Navigation = [
   },
   {
     segment: 'data',
-    title: 'DATA 관리',
+    title: '데이터 관리',
     children: [
       {
         segment: 'dataManager',
