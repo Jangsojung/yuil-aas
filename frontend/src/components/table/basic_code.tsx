@@ -25,7 +25,15 @@ interface Base {
   sn_length: number;
 }
 
-export default function BasicTable({ sm_idx, fa_idx }) {
+export default function BasicTable({
+  sm_idx,
+  fa_idx,
+  sensors: propSensors,
+}: {
+  sm_idx: string;
+  fa_idx: number;
+  sensors?: Sensor[];
+}) {
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const baseEditMode = useRecoilValue(baseEditModeState);
@@ -85,10 +93,12 @@ export default function BasicTable({ sm_idx, fa_idx }) {
     });
   };
 
-  const rows = [];
-  if (sensors) {
-    for (let i = 0; i < sensors.length; i += 6) {
-      const rowSensors = sensors.slice(i, i + 6);
+  const displaySensors = propSensors || sensors;
+
+  const rows: Sensor[][] = [];
+  if (displaySensors) {
+    for (let i = 0; i < displaySensors.length; i += 6) {
+      const rowSensors = displaySensors.slice(i, i + 6);
       rows.push(rowSensors);
     }
   }
@@ -101,14 +111,10 @@ export default function BasicTable({ sm_idx, fa_idx }) {
   }, [selectedBase]);
 
   useEffect(() => {
-    getSensors(fa_idx);
-  }, [fa_idx]);
-
-  useEffect(() => {
-    if (fa_idx) {
+    if (!propSensors) {
       getSensors(fa_idx);
     }
-  }, [fa_idx]);
+  }, [fa_idx, propSensors]);
 
   return (
     <TableContainer component={Paper}>

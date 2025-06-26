@@ -523,22 +523,17 @@ export default function BasiccodePage() {
   const getBaseDetail = async (base: Base) => {
     setDetailLoading(true);
     try {
-      console.log('기초코드 상세 조회 시작:', base.ab_idx);
       const response = await fetch(`http://localhost:5001/api/base_code/bases/${base.ab_idx}/sensors`);
-      console.log('API 응답 상태:', response.status);
 
       if (!response.ok) {
         throw new Error('Failed to fetch base detail');
       }
 
       const sensorIds = await response.json();
-      console.log('기초코드 센서 ID들:', sensorIds);
       const sensorIdList = Array.isArray(sensorIds)
         ? sensorIds.map((item) => (typeof item === 'object' ? item.sn_idx : item))
         : [];
-      console.log('실제 비교에 쓸 센서 ID 배열:', sensorIdList);
       const treeData = await buildTreeFromSensorIds(sensorIdList);
-      console.log('구성된 트리 데이터:', treeData);
       setDetailTreeData(treeData);
     } catch (err: any) {
       console.error('기초코드 상세 로딩 에러:', err.message);
@@ -550,40 +545,37 @@ export default function BasiccodePage() {
 
   const buildTreeFromSensorIds = async (sensorIds: number[]) => {
     try {
-      console.log('센서 ID로 트리 구성 시작:', sensorIds);
-
       const fgRes = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
       const allFacilityGroups = await fgRes.json();
-      console.log('전체 설비그룹:', allFacilityGroups);
 
       const facilitiesAll = await Promise.all(
         allFacilityGroups.map(async (fg) => {
           const faRes = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg.fg_idx}`);
           const facilities = await faRes.json();
-          console.log(`설비그룹 ${fg.fg_name}의 설비들:`, facilities);
 
           const facilitiesWithSensors = await Promise.all(
             facilities.map(async (fa) => {
               const snRes = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa.fa_idx}`);
               const sensors = await snRes.json();
               const sensorsArray = Array.isArray(sensors) ? sensors : [];
-              console.log(`설비 ${fa.fa_name}의 전체 센서들:`, sensorsArray);
 
-              const filteredSensors = sensorsArray.filter((sensor) => sensorIds.includes(sensor.sn_idx));
-              console.log(`설비 ${fa.fa_name}의 필터링된 센서들:`, filteredSensors);
+              let filteredSensors = sensorsArray;
+              if (sensorName.trim()) {
+                filteredSensors = sensorsArray.filter((sensor) =>
+                  sensor.sn_name.toLowerCase().includes(sensorName.trim().toLowerCase())
+                );
+              }
 
               return { ...fa, sensors: filteredSensors };
             })
           );
 
           const facilitiesWithSensorsFiltered = facilitiesWithSensors.filter((fa) => fa.sensors.length > 0);
-          console.log(`설비그룹 ${fg.fg_name}의 최종 설비들:`, facilitiesWithSensorsFiltered);
           return { ...fg, facilities: facilitiesWithSensorsFiltered };
         })
       );
 
       const finalTreeData = facilitiesAll.filter((fg) => fg.facilities.length > 0);
-      console.log('최종 트리 데이터:', finalTreeData);
       return finalTreeData;
     } catch (err) {
       console.error('트리 데이터 구성 에러:', err);
@@ -931,7 +923,7 @@ export default function BasiccodePage() {
                       }
                     >
                       <div style={{ padding: '8px 0' }}>
-                        <BasicTable sm_idx={`${fgIdx + 1}.${faIdx + 1}`} fa_idx={fa.fa_idx} />
+                        <BasicTable sm_idx={`${fgIdx + 1}.${faIdx + 1}`} fa_idx={fa.fa_idx} sensors={fa.sensors} />
                       </div>
                     </TreeItem>
                   ))}
