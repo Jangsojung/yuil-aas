@@ -136,6 +136,34 @@ export default function TransmitPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
+  const handleInsertMode = async () => {
+    setInsertMode(true);
+    setTreeLoading(true);
+    try {
+      const fgRes = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const facilityGroups = await fgRes.json();
+      const facilitiesAll = await Promise.all(
+        facilityGroups.map(async (fg) => {
+          const faRes = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg.fg_idx}`);
+          const facilities = await faRes.json();
+          const facilitiesWithSensors = await Promise.all(
+            facilities.map(async (fa) => {
+              const snRes = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa.fa_idx}`);
+              const sensors = await snRes.json();
+              return { ...fa, sensors };
+            })
+          );
+          return { ...fg, facilities: facilitiesWithSensors };
+        })
+      );
+      setTreeData(facilitiesAll);
+    } catch (err) {
+      setTreeData([]);
+    } finally {
+      setTreeLoading(false);
+    }
+  };
+
   return (
     <div>
       <Box sx={{ flexGrow: 1 }} className='sort-box'>
