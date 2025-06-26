@@ -171,9 +171,22 @@ export default function BasiccodePage() {
   useEffect(() => {
     if (navigationReset) {
       getBases();
+      setInsertMode(false);
+      setDetailMode(false);
+      setSelectedBaseForDetail(null);
+      setDetailTreeData([]);
+      setTreeData([]);
+      setSelectedSensors([]);
+      setBasicName('');
+      setBasicDesc('');
+      setBasicModalOpen(false);
+      setSelectedFacilityGroup('');
+      setFacilityName('');
+      setSensorName('');
+      setSearchKeyword('');
+      setStartDate(null);
+      setEndDate(null);
       setSelectedBases([]);
-      setSelectAll(false);
-      setCurrentPage(0);
     }
   }, [navigationReset]);
 
