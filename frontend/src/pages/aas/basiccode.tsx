@@ -592,6 +592,14 @@ export default function BasiccodePage() {
   };
 
   const handleTreeSearch = async () => {
+    if (selectedFacilityGroups.length === 0) {
+      setAlertTitle('알림');
+      setAlertContent('설비그룹을 최소 1개이상 선택해주세요.');
+      setAlertType('alert');
+      setAlertOpen(true);
+      return;
+    }
+
     setTreeLoading(true);
 
     try {
