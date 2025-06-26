@@ -148,7 +148,7 @@ const NAVIGATION: Navigation = [
     children: [
       {
         segment: 'basiccode',
-        title: '기초코드 등록',
+        title: '기초코드 관리',
       },
       {
         segment: 'convert',

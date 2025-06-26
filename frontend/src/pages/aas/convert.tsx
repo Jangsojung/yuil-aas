@@ -166,5 +166,5 @@ export default function ConvertPage() {
     </div>
   );
 }
-// const cells = ['번호', '기초코드 이름'];
-const cells = ['번호', '기초코드명', '센서 개수', '생성 날짜'];
+
+const cells = ['No.', '기초코드명', '센서 개수', '생성 날짜'];

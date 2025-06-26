@@ -28,7 +28,6 @@ export default function EdgeTableRow({
   index,
   totalCount,
 }: EdgeTableRowProps) {
-  // 전체 데이터 개수에서 현재 인덱스를 빼서 역순 번호 계산
   const displayNumber = totalCount ? totalCount - index : index + 1;
 
   return (

@@ -169,4 +169,4 @@ export default function DataManagerPage() {
   );
 }
 
-const cells = ['번호', '한글', '영어'];
+const cells = ['No.', '한글', '영어'];
