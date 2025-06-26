@@ -21,9 +21,9 @@ export const getBases = async (res) => {
   }
 };
 
-export const insertBases = async (name, ids, user_idx, res) => {
+export const insertBases = async (name, note, ids, user_idx, res) => {
   try {
-    const result = await insertBasesToDB(name, ids, user_idx);
+    const result = await insertBasesToDB(name, note, ids, user_idx);
 
     res.status(200).json(result);
   } catch (err) {
@@ -32,9 +32,9 @@ export const insertBases = async (name, ids, user_idx, res) => {
   }
 };
 
-export const updateBase = async (ab_idx, name, ids, user_idx, res) => {
+export const updateBase = async (ab_idx, name, note, ids, user_idx, res) => {
   try {
-    const result = await updateBaseToDB(ab_idx, name, ids, user_idx);
+    const result = await updateBaseToDB(ab_idx, name, note, ids, user_idx);
 
     res.status(200).json(result);
   } catch (err) {

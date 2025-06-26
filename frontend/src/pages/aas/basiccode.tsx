@@ -44,6 +44,7 @@ import Divider from '@mui/material/Divider';
 interface Base {
   ab_idx: number;
   ab_name: string;
+  ab_note: string;
   sn_length: number;
   createdAt: Date;
 }
@@ -76,6 +77,7 @@ const cells = ['기초코드명', '센서 개수', '생성 날짜', '비고'];
 export default function BasiccodePage() {
   const [insertMode, setInsertMode] = useState(false);
   const [detailMode, setDetailMode] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
@@ -119,13 +121,19 @@ export default function BasiccodePage() {
   const [detailTreeData, setDetailTreeData] = useState<FacilityGroupTree[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
 
+  const [editingBase, setEditingBase] = useState<Base | null>(null);
+
   useEffect(() => {
     if (detailMode && selectedBaseForDetail) {
       document.title = `기초코드 관리 > ${selectedBaseForDetail.ab_name}`;
+    } else if (editMode && editingBase) {
+      document.title = `기초코드 관리 > ${editingBase.ab_name} 수정`;
+    } else if (insertMode) {
+      document.title = '기초코드 관리 > 기초코드 등록';
     } else {
       document.title = '기초코드 관리';
     }
-  }, [detailMode, selectedBaseForDetail]);
+  }, [detailMode, selectedBaseForDetail, editMode, editingBase, insertMode]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -173,7 +181,9 @@ export default function BasiccodePage() {
       getBases();
       setInsertMode(false);
       setDetailMode(false);
+      setEditMode(false);
       setSelectedBaseForDetail(null);
+      setEditingBase(null);
       setDetailTreeData([]);
       setTreeData([]);
       setSelectedSensors([]);
@@ -392,8 +402,13 @@ export default function BasiccodePage() {
   };
 
   const handleBasicModalReset = () => {
-    setBasicName('');
-    setBasicDesc('');
+    if (editMode && editingBase) {
+      setBasicName(editingBase.ab_name);
+      setBasicDesc(editingBase.ab_note || '');
+    } else {
+      setBasicName('');
+      setBasicDesc('');
+    }
   };
 
   const handleUpdate = async () => {
@@ -413,6 +428,14 @@ export default function BasiccodePage() {
       return;
     }
 
+    if (!editingBase) {
+      setAlertTitle('오류');
+      setAlertContent('수정할 기초코드 정보가 없습니다.');
+      setAlertType('alert');
+      setAlertOpen(true);
+      return;
+    }
+
     try {
       const response = await fetch(`http://localhost:5001/api/base_code/bases?user_idx=${userIdx}`, {
         method: 'PUT',
@@ -420,8 +443,9 @@ export default function BasiccodePage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ab_idx: selectedBase.ab_idx,
+          ab_idx: editingBase.ab_idx,
           name: basicName,
+          note: basicDesc,
           ids: selectedSensors,
         }),
       });
@@ -431,12 +455,17 @@ export default function BasiccodePage() {
       }
 
       const updatedBase = await response.json();
-      setBases(bases.map((base) => (base.ab_idx === selectedBase.ab_idx ? updatedBase : base)));
+
+      await getBases();
+
       setSelectedSensors([]);
       setBasicName('');
       setBasicDesc('');
       setBasicModalOpen(false);
-      setBaseEditMode(false);
+      setEditMode(false);
+      setEditingBase(null);
+      setTreeData([]);
+      setSelectedFacilityGroups([]);
       setAlertTitle('알림');
       setAlertContent('기초코드가 수정되었습니다.');
       setAlertType('alert');
@@ -509,8 +538,12 @@ export default function BasiccodePage() {
 
   const handleBackToMain = () => {
     setInsertMode(false);
+    setDetailMode(false);
+    setEditMode(false);
+    setSelectedBaseForDetail(null);
+    setEditingBase(null);
+    setDetailTreeData([]);
     setTreeData([]);
-    setTreeLoading(false);
     setSelectedSensors([]);
     setBasicName('');
     setBasicDesc('');
@@ -518,6 +551,87 @@ export default function BasiccodePage() {
     setSelectedFacilityGroups([]);
     setFacilityName('');
     setSensorName('');
+    setSearchKeyword('');
+    setStartDate(null);
+    setEndDate(null);
+    setSelectedBases([]);
+  };
+
+  const handleEditMode = async () => {
+    if (!selectedBaseForDetail) return;
+
+    setEditMode(true);
+    setDetailMode(false);
+    setEditingBase(selectedBaseForDetail);
+
+    try {
+      const response = await fetch(`http://localhost:5001/api/base_code/bases/${selectedBaseForDetail.ab_idx}/sensors`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch base sensors');
+      }
+
+      const sensorIds = await response.json();
+      const sensorIdList = Array.isArray(sensorIds)
+        ? sensorIds.map((item) => (typeof item === 'object' ? item.sn_idx : item))
+        : [];
+
+      setSelectedSensors(sensorIdList);
+
+      setBasicName(selectedBaseForDetail.ab_name);
+      setBasicDesc(selectedBaseForDetail.ab_note || '');
+
+      await loadAllFacilityGroupsForEdit(sensorIdList);
+    } catch (err: any) {
+      console.log('수정 모드 초기화 에러:', err.message);
+      setAlertTitle('오류');
+      setAlertContent('기초코드 정보를 불러오는데 실패했습니다.');
+      setAlertType('alert');
+      setAlertOpen(true);
+    }
+  };
+
+  const loadAllFacilityGroupsForEdit = async (selectedSensorIds: number[]) => {
+    try {
+      const fgRes = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const allFacilityGroups = await fgRes.json();
+
+      const facilitiesAll = await Promise.all(
+        allFacilityGroups.map(async (fg) => {
+          const faRes = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg.fg_idx}`);
+          const facilities = await faRes.json();
+
+          const facilitiesWithSensors = await Promise.all(
+            facilities.map(async (fa) => {
+              const snRes = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa.fa_idx}`);
+              const sensors = await snRes.json();
+              const sensorsArray = Array.isArray(sensors) ? sensors : [];
+
+              return { ...fa, sensors: sensorsArray };
+            })
+          );
+
+          return { ...fg, facilities: facilitiesWithSensors };
+        })
+      );
+
+      setTreeData(facilitiesAll);
+
+      const relevantFacilityGroups = new Set<number>();
+      facilitiesAll.forEach((fg) => {
+        fg.facilities.forEach((fa) => {
+          fa.sensors.forEach((sensor) => {
+            if (selectedSensorIds.includes(sensor.sn_idx)) {
+              relevantFacilityGroups.add(fg.fg_idx);
+            }
+          });
+        });
+      });
+
+      setSelectedFacilityGroups(Array.from(relevantFacilityGroups));
+    } catch (err) {
+      console.log('설비그룹 로드 에러:', err.message);
+    }
   };
 
   const getBaseDetail = async (base: Base) => {
@@ -559,12 +673,7 @@ export default function BasiccodePage() {
               const sensors = await snRes.json();
               const sensorsArray = Array.isArray(sensors) ? sensors : [];
 
-              let filteredSensors = sensorsArray;
-              if (sensorName.trim()) {
-                filteredSensors = sensorsArray.filter((sensor) =>
-                  sensor.sn_name.toLowerCase().includes(sensorName.trim().toLowerCase())
-                );
-              }
+              const filteredSensors = sensorsArray.filter((sensor) => sensorIds.includes(sensor.sn_idx));
 
               return { ...fa, sensors: filteredSensors };
             })
@@ -705,7 +814,6 @@ export default function BasiccodePage() {
       !isAllSensorsSelectedInGroup(fgIdx)
     );
   };
-
   const handleFacilitySelectAll = (fgIdx: number, faIdx: number, checked: boolean) => {
     const fg = treeData[fgIdx];
     if (!fg || !fg.facilities[faIdx]) return;
@@ -787,12 +895,12 @@ export default function BasiccodePage() {
     getBaseDetail(base);
   };
 
-  if (insertMode) {
+  if (insertMode || editMode) {
     return (
       <div className='table-outer'>
         <div>
           <Box sx={{ flexGrow: 1 }} className='sort-box'>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
               <Grid item xs={3}>
                 <Grid container spacing={1}>
                   <Grid item>
@@ -813,12 +921,14 @@ export default function BasiccodePage() {
                     <div className='sort-title'>설비명</div>
                   </Grid>
                   <Grid item xs={9}>
-                    <TextField
-                      size='small'
-                      value={facilityName}
-                      onChange={(e) => setFacilityName(e.target.value)}
-                      placeholder='설비명을 입력하세요'
-                    />
+                    <FormControl sx={{ width: '100%' }} size='small'>
+                      <TextField
+                        size='small'
+                        value={facilityName}
+                        onChange={(e) => setFacilityName(e.target.value)}
+                        placeholder='설비명을 입력하세요'
+                      />
+                    </FormControl>
                   </Grid>
                 </Grid>
               </Grid>
@@ -829,12 +939,14 @@ export default function BasiccodePage() {
                     <div className='sort-title'>센서명</div>
                   </Grid>
                   <Grid item xs={9}>
-                    <TextField
-                      size='small'
-                      value={sensorName}
-                      onChange={(e) => setSensorName(e.target.value)}
-                      placeholder='센서명을 입력하세요'
-                    />
+                    <FormControl sx={{ width: '100%' }} size='small'>
+                      <TextField
+                        size='small'
+                        value={sensorName}
+                        onChange={(e) => setSensorName(e.target.value)}
+                        placeholder='센서명을 입력하세요'
+                      />
+                    </FormControl>
                   </Grid>
                 </Grid>
               </Grid>
@@ -855,7 +967,7 @@ export default function BasiccodePage() {
                 <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
                   <Button
                     variant='contained'
-                    color='success'
+                    color={editMode ? 'primary' : 'success'}
                     onClick={() => {
                       if (selectedSensors.length === 0) {
                         setAlertTitle('알림');
@@ -867,7 +979,7 @@ export default function BasiccodePage() {
                       }
                     }}
                   >
-                    기초코드 등록
+                    {editMode ? '저장' : '기초코드 등록'}
                   </Button>
                   <Button variant='contained' color='inherit' onClick={handleBackToMain}>
                     취소
@@ -898,6 +1010,7 @@ export default function BasiccodePage() {
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Checkbox
                         checked={isAllSensorsSelectedInGroup(fgIdx)}
+                        indeterminate={false}
                         onChange={(e) => handleFacilityGroupSelectAll(fgIdx, e.target.checked)}
                         onClick={(e) => e.stopPropagation()}
                         style={{ marginRight: '8px' }}
@@ -914,6 +1027,7 @@ export default function BasiccodePage() {
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <Checkbox
                             checked={isAllSensorsSelectedInFacility(fgIdx, faIdx)}
+                            indeterminate={false}
                             onChange={(e) => handleFacilitySelectAll(fgIdx, faIdx, e.target.checked)}
                             onClick={(e) => e.stopPropagation()}
                             style={{ marginRight: '8px' }}
@@ -936,13 +1050,14 @@ export default function BasiccodePage() {
         <BasicModal
           open={basicModalOpen}
           handleClose={() => setBasicModalOpen(false)}
-          handleAdd={handleBasicModalAdd}
+          handleAdd={editMode ? handleUpdate : handleBasicModalAdd}
           handleReset={handleBasicModalReset}
           selectedSensorCount={selectedSensors.length}
           name={basicName}
           setName={setBasicName}
           desc={basicDesc}
           setDesc={setBasicDesc}
+          isEditMode={editMode}
         />
         <AlertModal
           open={alertOpen}
@@ -965,15 +1080,7 @@ export default function BasiccodePage() {
               <Grid item xs={8}></Grid>
               <Grid item xs={4}>
                 <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                  <Button
-                    variant='contained'
-                    color='success'
-                    onClick={() => {
-                      setDetailMode(false);
-                      setSelectedBaseForDetail(null);
-                      setDetailTreeData([]);
-                    }}
-                  >
+                  <Button variant='contained' color='success' onClick={handleEditMode}>
                     수정
                   </Button>
                 </Stack>
@@ -1151,7 +1258,7 @@ export default function BasiccodePage() {
                     <TableCell>{base.ab_name}</TableCell>
                     <TableCell>{base.sn_length || 0}</TableCell>
                     <TableCell>{formatDate(base.createdAt?.toString())}</TableCell>
-                    <TableCell>{/* {base.note} */}</TableCell>
+                    <TableCell>{base.ab_note}</TableCell>
                   </TableRow>
                 ))
               ) : (

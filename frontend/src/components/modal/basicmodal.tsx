@@ -55,6 +55,7 @@ interface BasicModalProps {
   setName: (v: string) => void;
   desc: string;
   setDesc: (v: string) => void;
+  isEditMode?: boolean;
 }
 
 export default function BasicModal({
@@ -67,11 +68,12 @@ export default function BasicModal({
   setName,
   desc,
   setDesc,
+  isEditMode = false,
 }: BasicModalProps) {
   return (
     <BootstrapDialog open={open} onClose={handleClose}>
       <DialogTitle sx={{ m: 0, p: 2 }}>
-        기초코드 등록 팝업
+        {isEditMode ? '기초코드 수정 팝업' : '기초코드 등록 팝업'}
         <IconButton
           aria-label='close'
           onClick={handleClose}
@@ -115,6 +117,9 @@ export default function BasicModal({
                 fullWidth
                 multiline
                 minRows={3}
+                maxRows={5}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${desc.length}/500`}
                 placeholder='비고를 입력하세요'
               />
             </Grid>
@@ -123,7 +128,7 @@ export default function BasicModal({
       </DialogContent>
       <DialogActions>
         <Button variant='contained' color='primary' onClick={handleAdd}>
-          등록
+          {isEditMode ? '수정' : '등록'}
         </Button>
         <GreyButton variant='outlined' onClick={handleReset}>
           초기화

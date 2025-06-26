@@ -3,6 +3,7 @@ import { atom } from 'recoil';
 interface Base {
   ab_idx: number;
   ab_name: string;
+  ab_note: string;
   sn_length: number;
 }
 

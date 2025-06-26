@@ -3,7 +3,7 @@ import { pool } from '../../index.js';
 export const getBasesFromDB = async () => {
   return new Promise((resolve, reject) => {
     const query =
-      'select b.ab_idx, b.ab_name, COUNT(bs.sn_idx) as sn_length, b.createdAt from tb_aasx_base b, tb_aasx_base_sensor bs where b.ab_idx = bs.ab_idx group by b.ab_idx, b.ab_name order by b.ab_idx desc';
+      'select b.ab_idx, b.ab_name, b.ab_note, COUNT(bs.sn_idx) as sn_length, b.createdAt from tb_aasx_base b, tb_aasx_base_sensor bs where b.ab_idx = bs.ab_idx group by b.ab_idx, b.ab_name, b.ab_note order by b.ab_idx desc';
 
     pool.query(query, (err, results) => {
       if (err) {
@@ -18,6 +18,7 @@ export const getBasesFromDB = async () => {
           return {
             ab_idx: base.ab_idx,
             ab_name: base.ab_name,
+            ab_note: base.ab_note,
             sn_length: base.sn_length,
             createdAt: base.createdAt,
           };
@@ -29,10 +30,10 @@ export const getBasesFromDB = async () => {
   });
 };
 
-export const insertBasesToDB = async (name, ids, user_idx) => {
+export const insertBasesToDB = async (name, note, ids, user_idx) => {
   try {
-    const query = `insert into tb_aasx_base (ab_name, creator, updater) values (?, ?, ?);`;
-    const [result] = await pool.promise().query(query, [name, user_idx, user_idx]);
+    const query = `insert into tb_aasx_base (ab_name, ab_note, creator, updater) values (?, ?, ?, ?);`;
+    const [result] = await pool.promise().query(query, [name, note || null, user_idx, user_idx]);
 
     const ab_idx = result.insertId;
 
@@ -44,6 +45,7 @@ export const insertBasesToDB = async (name, ids, user_idx) => {
     return {
       ab_idx,
       ab_name: name,
+      ab_note: note,
     };
   } catch (err) {
     console.log('Failed to insert new Bases: ', err);
@@ -51,14 +53,14 @@ export const insertBasesToDB = async (name, ids, user_idx) => {
   }
 };
 
-export const updateBaseToDB = async (ab_idx, name, ids, user_idx) => {
+export const updateBaseToDB = async (ab_idx, name, note, ids, user_idx) => {
   const connection = await pool.promise().getConnection();
   try {
     await connection.beginTransaction();
 
     await connection.query(
-      `update tb_aasx_base set ab_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where ab_idx = ?`,
-      [name, user_idx, ab_idx]
+      `update tb_aasx_base set ab_name = ?, ab_note = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where ab_idx = ?`,
+      [name, note || null, user_idx, ab_idx]
     );
     await connection.query(`delete from tb_aasx_base_sensor where ab_idx = ?`, [ab_idx]);
 
@@ -72,6 +74,7 @@ export const updateBaseToDB = async (ab_idx, name, ids, user_idx) => {
     return {
       ab_idx,
       ab_name: name,
+      ab_note: note,
     };
   } catch (err) {
     await connection.rollback();

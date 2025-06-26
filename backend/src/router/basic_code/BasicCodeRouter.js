@@ -20,14 +20,14 @@ export default () => {
 
   router.post('/bases', (req, res) => {
     const { user_idx } = req.query;
-    const { name, ids } = req.body;
-    insertBases(name, ids, user_idx, res);
+    const { name, note, ids } = req.body;
+    insertBases(name, note, ids, user_idx, res);
   });
 
   router.put('/bases', (req, res) => {
     const { user_idx } = req.query;
-    const { ab_idx, name, ids } = req.body;
-    updateBase(ab_idx, name, ids, user_idx, res);
+    const { ab_idx, name, note, ids } = req.body;
+    updateBase(ab_idx, name, note, ids, user_idx, res);
   });
 
   router.delete('/bases', (req, res) => {
