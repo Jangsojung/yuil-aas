@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Box from '@mui/system/Box';
-import Grid from '@mui/system/Grid';
+import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
@@ -36,6 +36,10 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import LoadingOverlay from '../../components/loading/LodingOverlay';
 import BasicModal from '../../components/modal/basicmodal';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
 
 interface Base {
   ab_idx: number;
@@ -54,7 +58,6 @@ interface Sensor {
   sn_name: string;
 }
 
-// 트리 데이터 타입
 interface FacilityGroupTree {
   fg_idx: number;
   fg_name: string;
@@ -72,6 +75,7 @@ const cells = ['기초코드명', '센서 개수', '생성 날짜', '비고'];
 
 export default function BasiccodePage() {
   const [insertMode, setInsertMode] = useState(false);
+  const [detailMode, setDetailMode] = useState(false);
   const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
@@ -111,11 +115,22 @@ export default function BasiccodePage() {
 
   const [selectedFacilityGroup, setSelectedFacilityGroup] = useState<number | ''>('');
 
+  const [selectedBaseForDetail, setSelectedBaseForDetail] = useState<Base | null>(null);
+  const [detailTreeData, setDetailTreeData] = useState<FacilityGroupTree[]>([]);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  useEffect(() => {
+    if (detailMode && selectedBaseForDetail) {
+      document.title = `기초코드 관리 > ${selectedBaseForDetail.ab_name}`;
+    } else {
+      document.title = '기초코드 관리';
+    }
+  }, [detailMode, selectedBaseForDetail]);
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  // 초기화 함수 (기초코드 등록 모드용)
   const handleReset = () => {
     setSelectedFacilityGroup('');
     setFacilityName('');
@@ -124,7 +139,6 @@ export default function BasiccodePage() {
     setSelectedSensors([]);
   };
 
-  // 메인 페이지 초기화 함수
   const handleMainReset = () => {
     setSearchKeyword('');
     setStartDate(null);
@@ -137,23 +151,23 @@ export default function BasiccodePage() {
   useEffect(() => {
     if (selectedBases.length === 0) {
       setSelectAll(false);
-    } else if (selectedBases.length === filteredBases.length) {
-      setSelectAll(true);
+    } else if (pagedData && pagedData.length > 0) {
+      const currentPageIds = pagedData.map((base) => base.ab_idx);
+      const allCurrentPageSelected = currentPageIds.every((id) => selectedBases.includes(id));
+      setSelectAll(allCurrentPageSelected);
     } else {
       setSelectAll(false);
     }
-  }, [selectedBases, filteredBases]);
+  }, [selectedBases, pagedData]);
 
   useEffect(() => {
     setFilteredBases(bases);
   }, [bases]);
 
-  // 페이지 로드 시 기초코드 목록 불러오기
   useEffect(() => {
     getBases();
   }, []);
 
-  // 네비게이션 리셋 시 기초코드 목록 다시 불러오기
   useEffect(() => {
     if (navigationReset) {
       getBases();
@@ -222,53 +236,27 @@ export default function BasiccodePage() {
     }
   };
 
-  const handleSelectAllInFa = (fa_idx: number, checked: boolean) => {
-    const sensorsInFa = sensorsByFa[fa_idx] || [];
-    const sensorIds = sensorsInFa.map((sensor) => sensor.sn_idx);
-
-    if (checked) {
-      setSelectedSensors((prevSelected) => {
-        const newSelected = [...prevSelected];
-        sensorIds.forEach((id) => {
-          if (!newSelected.includes(id)) {
-            newSelected.push(id);
-          }
-        });
-        return newSelected;
-      });
-    } else {
-      setSelectedSensors((prevSelected) => prevSelected.filter((id) => !sensorIds.includes(id)));
-    }
-  };
-
-  const isAllInFaSelected = (fa_idx: number) => {
-    const sensorsInFa = sensorsByFa[fa_idx] || [];
-    return sensorsInFa.length > 0 && sensorsInFa.every((sensor) => selectedSensors.includes(sensor.sn_idx));
-  };
-
-  const isPartiallySelectedInFa = (fa_idx: number) => {
-    const sensorsInFa = sensorsByFa[fa_idx] || [];
-    return (
-      sensorsInFa.length > 0 &&
-      sensorsInFa.some((sensor) => selectedSensors.includes(sensor.sn_idx)) &&
-      !isAllInFaSelected(fa_idx)
-    );
-  };
-
-  const handleClick = (base: Base) => {
-    setSelectedBase(base);
-    setBaseEditMode(true);
-  };
-
   const handleSelectAllChange = (event: ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;
     setSelectAll(checked);
     if (checked) {
-      if (filteredBases && filteredBases.length > 0) {
-        setSelectedBases(filteredBases.map((base) => base.ab_idx));
+      if (pagedData && pagedData.length > 0) {
+        setSelectedBases((prevSelected) => {
+          const currentPageIds = pagedData.map((base) => base.ab_idx);
+          const newSelected = [...prevSelected];
+          currentPageIds.forEach((id) => {
+            if (!newSelected.includes(id)) {
+              newSelected.push(id);
+            }
+          });
+          return newSelected;
+        });
       }
     } else {
-      setSelectedBases([]);
+      if (pagedData && pagedData.length > 0) {
+        const currentPageIds = pagedData.map((base) => base.ab_idx);
+        setSelectedBases((prevSelected) => prevSelected.filter((id) => !currentPageIds.includes(id)));
+      }
     }
   };
 
@@ -361,7 +349,6 @@ export default function BasiccodePage() {
 
       const newBase = await response.json();
 
-      // 누락된 필드들을 추가
       const completeNewBase = {
         ...newBase,
         sn_length: selectedSensors.length,
@@ -508,6 +495,77 @@ export default function BasiccodePage() {
     setSelectedFacilityGroup('');
     setFacilityName('');
     setSensorName('');
+  };
+
+  const getBaseDetail = async (base: Base) => {
+    setDetailLoading(true);
+    try {
+      console.log('기초코드 상세 조회 시작:', base.ab_idx);
+      const response = await fetch(`http://localhost:5001/api/base_code/bases/${base.ab_idx}/sensors`);
+      console.log('API 응답 상태:', response.status);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch base detail');
+      }
+
+      const sensorIds = await response.json();
+      console.log('기초코드 센서 ID들:', sensorIds);
+      const sensorIdList = Array.isArray(sensorIds)
+        ? sensorIds.map((item) => (typeof item === 'object' ? item.sn_idx : item))
+        : [];
+      console.log('실제 비교에 쓸 센서 ID 배열:', sensorIdList);
+      const treeData = await buildTreeFromSensorIds(sensorIdList);
+      console.log('구성된 트리 데이터:', treeData);
+      setDetailTreeData(treeData);
+    } catch (err: any) {
+      console.error('기초코드 상세 로딩 에러:', err.message);
+      setDetailTreeData([]);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const buildTreeFromSensorIds = async (sensorIds: number[]) => {
+    try {
+      console.log('센서 ID로 트리 구성 시작:', sensorIds);
+
+      const fgRes = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const allFacilityGroups = await fgRes.json();
+      console.log('전체 설비그룹:', allFacilityGroups);
+
+      const facilitiesAll = await Promise.all(
+        allFacilityGroups.map(async (fg) => {
+          const faRes = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg.fg_idx}`);
+          const facilities = await faRes.json();
+          console.log(`설비그룹 ${fg.fg_name}의 설비들:`, facilities);
+
+          const facilitiesWithSensors = await Promise.all(
+            facilities.map(async (fa) => {
+              const snRes = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa.fa_idx}`);
+              const sensors = await snRes.json();
+              const sensorsArray = Array.isArray(sensors) ? sensors : [];
+              console.log(`설비 ${fa.fa_name}의 전체 센서들:`, sensorsArray);
+
+              const filteredSensors = sensorsArray.filter((sensor) => sensorIds.includes(sensor.sn_idx));
+              console.log(`설비 ${fa.fa_name}의 필터링된 센서들:`, filteredSensors);
+
+              return { ...fa, sensors: filteredSensors };
+            })
+          );
+
+          const facilitiesWithSensorsFiltered = facilitiesWithSensors.filter((fa) => fa.sensors.length > 0);
+          console.log(`설비그룹 ${fg.fg_name}의 최종 설비들:`, facilitiesWithSensorsFiltered);
+          return { ...fg, facilities: facilitiesWithSensorsFiltered };
+        })
+      );
+
+      const finalTreeData = facilitiesAll.filter((fg) => fg.facilities.length > 0);
+      console.log('최종 트리 데이터:', finalTreeData);
+      return finalTreeData;
+    } catch (err) {
+      console.error('트리 데이터 구성 에러:', err);
+      return [];
+    }
   };
 
   const handleTreeSearch = async () => {
@@ -667,18 +725,57 @@ export default function BasiccodePage() {
     );
   };
 
+  const handleSelectAllInFa = (fa_idx: number, checked: boolean) => {
+    const sensorsInFa = sensorsByFa[fa_idx] || [];
+    const sensorIds = sensorsInFa.map((sensor) => sensor.sn_idx);
+
+    if (checked) {
+      setSelectedSensors((prevSelected) => {
+        const newSelected = [...prevSelected];
+        sensorIds.forEach((id) => {
+          if (!newSelected.includes(id)) {
+            newSelected.push(id);
+          }
+        });
+        return newSelected;
+      });
+    } else {
+      setSelectedSensors((prevSelected) => prevSelected.filter((id) => !sensorIds.includes(id)));
+    }
+  };
+
+  const isAllInFaSelected = (fa_idx: number) => {
+    const sensorsInFa = sensorsByFa[fa_idx] || [];
+    return sensorsInFa.length > 0 && sensorsInFa.every((sensor) => selectedSensors.includes(sensor.sn_idx));
+  };
+
+  const isPartiallySelectedInFa = (fa_idx: number) => {
+    const sensorsInFa = sensorsByFa[fa_idx] || [];
+    return (
+      sensorsInFa.length > 0 &&
+      sensorsInFa.some((sensor) => selectedSensors.includes(sensor.sn_idx)) &&
+      !isAllInFaSelected(fa_idx)
+    );
+  };
+
+  const handleClick = (base: Base) => {
+    setSelectedBaseForDetail(base);
+    setDetailMode(true);
+    getBaseDetail(base);
+  };
+
   if (insertMode) {
     return (
       <div className='table-outer'>
         <div>
           <Box sx={{ flexGrow: 1 }} className='sort-box'>
             <Grid container spacing={1}>
-              <Grid size={3}>
+              <Grid item xs={3}>
                 <Grid container spacing={1}>
-                  <Grid>
+                  <Grid item>
                     <div className='sort-title'>설비그룹</div>
                   </Grid>
-                  <Grid size={9}>
+                  <Grid item xs={9}>
                     <FacilityGroupSelect
                       selectedFacilityGroup={selectedFacilityGroup}
                       setSelectedFacilityGroup={setSelectedFacilityGroup}
@@ -691,12 +788,12 @@ export default function BasiccodePage() {
                 </Grid>
               </Grid>
 
-              <Grid size={3}>
+              <Grid item xs={3}>
                 <Grid container spacing={1}>
-                  <Grid>
+                  <Grid item>
                     <div className='sort-title'>설비명</div>
                   </Grid>
-                  <Grid size={9}>
+                  <Grid item xs={9}>
                     <TextField
                       size='small'
                       value={facilityName}
@@ -707,12 +804,12 @@ export default function BasiccodePage() {
                 </Grid>
               </Grid>
 
-              <Grid size={3}>
+              <Grid item xs={3}>
                 <Grid container spacing={1}>
-                  <Grid>
+                  <Grid item>
                     <div className='sort-title'>센서명</div>
                   </Grid>
-                  <Grid size={9}>
+                  <Grid item xs={9}>
                     <TextField
                       size='small'
                       value={sensorName}
@@ -723,7 +820,7 @@ export default function BasiccodePage() {
                 </Grid>
               </Grid>
 
-              <Grid size={3}>
+              <Grid item xs={3}>
                 <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
                   <Button variant='contained' color='success' onClick={handleTreeSearch}>
                     검색
@@ -734,8 +831,8 @@ export default function BasiccodePage() {
           </Box>
           <Box sx={{ flexGrow: 1 }} className='sort-box'>
             <Grid container spacing={1}>
-              <Grid size={8}></Grid>
-              <Grid size={4}>
+              <Grid item xs={8}></Grid>
+              <Grid item xs={4}>
                 <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
                   <Button
                     variant='contained'
@@ -840,17 +937,126 @@ export default function BasiccodePage() {
     );
   }
 
+  if (detailMode) {
+    return (
+      <div className='table-outer'>
+        <div>
+          <Box sx={{ flexGrow: 1 }} className='sort-box'>
+            <Grid container spacing={1}>
+              <Grid item xs={8}></Grid>
+              <Grid item xs={4}>
+                <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+                  <Button
+                    variant='contained'
+                    color='success'
+                    onClick={() => {
+                      setDetailMode(false);
+                      setSelectedBaseForDetail(null);
+                      setDetailTreeData([]);
+                    }}
+                  >
+                    수정
+                  </Button>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Box>
+        </div>
+
+        <div className='table-wrap'>
+          {detailLoading ? (
+            <LoadingOverlay />
+          ) : detailTreeData.length === 0 ? (
+            <div style={{ textAlign: 'center', color: '#888', padding: '40px 0' }}>센서 데이터가 없습니다.</div>
+          ) : (
+            <SimpleTreeView
+              defaultExpandedItems={detailTreeData.flatMap((fg, fgIdx) => [
+                `detail-${fgIdx}`,
+                ...fg.facilities.map((fa, faIdx) => `detail-sub-${fgIdx}-${faIdx}`),
+              ])}
+            >
+              {detailTreeData.map((fg, fgIdx) => (
+                <TreeItem key={fg.fg_idx} itemId={`detail-${fgIdx}`} label={<span>{fg.fg_name}</span>}>
+                  {fg.facilities.map((fa, faIdx) => (
+                    <TreeItem key={fa.fa_idx} itemId={`detail-sub-${fgIdx}-${faIdx}`} label={<span>{fa.fa_name}</span>}>
+                      <div style={{ padding: '8px 0' }}>
+                        <TableContainer component={Paper}>
+                          <Table size='small'>
+                            <TableBody>
+                              {(() => {
+                                const sensors = fa.sensors || [];
+                                const rows: (typeof sensors)[] = [];
+                                for (let i = 0; i < sensors.length; i += 6) {
+                                  const rowSensors = sensors.slice(i, i + 6);
+                                  rows.push(rowSensors);
+                                }
+                                return rows.map((rowSensors, rowIndex) => (
+                                  <TableRow key={rowIndex}>
+                                    <TableCell colSpan={3}>
+                                      <Grid container spacing={1}>
+                                        {rowSensors.map((sensor, idx) => (
+                                          <Grid item xs={2} key={sensor.sn_idx}>
+                                            <List
+                                              sx={{
+                                                width: '100%',
+                                                bgcolor: 'background.paper',
+                                                border: '1px solid #e0e0e0',
+                                                borderRadius: 1,
+                                              }}
+                                              className='basic-checkbox'
+                                            >
+                                              <div>
+                                                <ListItem>
+                                                  <ListItemText secondary={sensor.sn_name} />
+                                                </ListItem>
+                                                <Divider variant='middle' component='li' />
+                                                <ListItem>
+                                                  <ListItemText
+                                                    secondary={
+                                                      'Prop 1.' +
+                                                      (fgIdx + 1) +
+                                                      '.' +
+                                                      (faIdx + 1) +
+                                                      '.' +
+                                                      (rowIndex * 6 + idx + 1)
+                                                    }
+                                                  />
+                                                </ListItem>
+                                              </div>
+                                            </List>
+                                          </Grid>
+                                        ))}
+                                      </Grid>
+                                    </TableCell>
+                                  </TableRow>
+                                ));
+                              })()}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </div>
+                    </TreeItem>
+                  ))}
+                </TreeItem>
+              ))}
+            </SimpleTreeView>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='table-outer'>
       <div>
         <Box sx={{ flexGrow: 1 }} className='sort-box'>
           <Grid container spacing={2}>
-            <Grid size={3}>
+            <Grid item xs={3}>
               <Grid container spacing={1}>
-                <Grid>
+                <Grid item>
                   <div className='sort-title'>기초코드명</div>
                 </Grid>
-                <Grid size={9}>
+                <Grid item xs={9}>
                   <FormControl sx={{ width: '100%' }} size='small'>
                     <TextField size='small' value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value)} />
                   </FormControl>
@@ -858,18 +1064,18 @@ export default function BasiccodePage() {
               </Grid>
             </Grid>
 
-            <Grid size={6}>
+            <Grid item xs={6}>
               <Grid container spacing={1}>
-                <Grid>
+                <Grid item>
                   <div className='sort-title'>날짜</div>
                 </Grid>
-                <Grid size={9}>
+                <Grid item xs={9}>
                   <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
                 </Grid>
               </Grid>
             </Grid>
 
-            <Grid size={3}>
+            <Grid item xs={3}>
               <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
                 <Button variant='contained' color='success' onClick={handleSearch}>
                   검색
@@ -880,8 +1086,8 @@ export default function BasiccodePage() {
         </Box>
         <Box sx={{ flexGrow: 1 }} className='sort-box'>
           <Grid container spacing={1}>
-            <Grid size={8}></Grid>
-            <Grid size={4}>
+            <Grid item xs={8}></Grid>
+            <Grid item xs={4}>
               <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
                 <Button variant='contained' color='success' onClick={handleInsertMode}>
                   기초코드 등록

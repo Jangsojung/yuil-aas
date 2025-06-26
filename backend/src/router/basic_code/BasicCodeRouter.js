@@ -40,6 +40,11 @@ export default () => {
     getSelectedSensors(ab_idx, res);
   });
 
+  router.get('/bases/:ab_idx/sensors', (req, res) => {
+    const { ab_idx } = req.params;
+    getSelectedSensors(ab_idx, res);
+  });
+
   router.get('/facilityGroups', (req, res) => {
     const { fc_idx, order } = req.query;
     getFacilityGroups(fc_idx, order, res);
