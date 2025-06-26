@@ -16,7 +16,6 @@ import Checkbox from '@mui/material/Checkbox';
 import TableBody from '@mui/material/TableBody';
 
 import CustomizedDialogs from '../../components/modal/edgemodal';
-import EdgeTableRow from '../../components/edge/EdgeTableRow';
 import Pagenation from '../../components/pagenation';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
@@ -26,7 +25,12 @@ interface EdgeGateway {
   eg_server_temp: number;
   eg_network: number;
   eg_pc_temp: number;
-  eg_ip_port: String;
+  eg_ip_port: string;
+  createdAt?: string;
+  created_at?: string;
+  createDate?: string;
+  create_date?: string;
+  date?: string;
 }
 
 export default function Edge_Gateway() {
@@ -37,7 +41,7 @@ export default function Edge_Gateway() {
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [openModal, setOpenModal] = useState(false);
-  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 10;
@@ -49,7 +53,7 @@ export default function Edge_Gateway() {
   const pagedData = edgeGateways?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   const handleInsert = async (eg: EdgeGateway) => {
-    setEdgeGateways((prevEdgeGateways) => [eg, ...prevEdgeGateways]);
+    await getEdge();
   };
 
   const handleUpdate = async () => {
@@ -57,6 +61,11 @@ export default function Edge_Gateway() {
   };
 
   const handleDelete = async () => {
+    if (selectedEdgeGateways.length === 0) {
+      alert('삭제할 Edge Gateway들을 선택해주세요.');
+      return;
+    }
+
     if (!window.confirm(`선택한 ${selectedEdgeGateways.length}개 항목을 삭제하시겠습니까?`)) {
       return;
     }
@@ -72,15 +81,20 @@ export default function Edge_Gateway() {
   };
 
   const handleOpenModal = () => {
+    setIsEditMode(false);
+    setSelectedEdgeGateway(null);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setIsEditMode(false);
+    setSelectedEdgeGateway(null);
   };
 
   const getEdge = async () => {
     const data: EdgeGateway[] = await getEdgeAPI();
+    console.log('Edge Gateway 데이터:', data);
     setEdgeGateways(data);
   };
 
@@ -97,9 +111,10 @@ export default function Edge_Gateway() {
     }
   };
 
-  const handleDoubleClick = (edgeGateway: EdgeGateway) => {
+  const handleRowClick = (edgeGateway: EdgeGateway) => {
     setSelectedEdgeGateway(edgeGateway);
-    setOpenUpdateModal(true);
+    setIsEditMode(true);
+    setOpenModal(true);
   };
 
   const handleCheckboxChange = (edgeIdx: number) => {
@@ -112,9 +127,13 @@ export default function Edge_Gateway() {
     });
   };
 
-  const handleCloseUpdateModal = () => {
-    setOpenUpdateModal(false);
-    setSelectedEdgeGateway(null);
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
   };
 
   useEffect(() => {
@@ -126,7 +145,7 @@ export default function Edge_Gateway() {
     setSelectAll(false);
     setCurrentPage(0);
     setOpenModal(false);
-    setOpenUpdateModal(false);
+    setIsEditMode(false);
     setSelectedEdgeGateway(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
@@ -151,13 +170,7 @@ export default function Edge_Gateway() {
               <Button variant='contained' color='success' size='small' onClick={handleOpenModal}>
                 등록
               </Button>
-              <Button
-                variant='contained'
-                color='error'
-                size='small'
-                onClick={handleDelete}
-                disabled={selectedEdgeGateways.length === 0}
-              >
+              <Button variant='contained' color='error' size='small' onClick={handleDelete}>
                 삭제
               </Button>
             </Stack>
@@ -180,25 +193,32 @@ export default function Edge_Gateway() {
                 {cells.map((cell, idx) => (
                   <TableCell key={idx}>{cell}</TableCell>
                 ))}
-                <TableCell>수정</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {pagedData && pagedData.length > 0 ? (
                 pagedData.map((eg, idx) => (
-                  <EdgeTableRow
-                    eg={eg}
-                    key={idx}
-                    onCheckboxChange={handleCheckboxChange}
-                    checked={selectedEdgeGateways.includes(eg.eg_idx)}
-                    onEditClick={handleDoubleClick}
-                    index={currentPage * rowsPerPage + idx}
-                    totalCount={edgeGateways.length}
-                  />
+                  <TableRow
+                    key={eg.eg_idx}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                    onClick={() => handleRowClick(eg)}
+                  >
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedEdgeGateways.includes(eg.eg_idx)}
+                        onChange={() => handleCheckboxChange(eg.eg_idx)}
+                      />
+                    </TableCell>
+                    <TableCell>{eg.eg_server_temp} °C</TableCell>
+                    <TableCell>{eg.eg_network === 1 ? '연결 됨' : '연결 안 됨'}</TableCell>
+                    <TableCell>{eg.eg_pc_temp} °C</TableCell>
+                    <TableCell>{eg.eg_ip_port}</TableCell>
+                    <TableCell>{eg.createdAt ? formatDate(eg.createdAt) : ''}</TableCell>
+                  </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={cells.length + 2} align='center'>
+                  <TableCell colSpan={cells.length + 1} align='center'>
                     데이터가 없습니다.
                   </TableCell>
                 </TableRow>
@@ -210,21 +230,15 @@ export default function Edge_Gateway() {
       </div>
 
       <CustomizedDialogs
-        modalType='insert'
+        modalType={isEditMode ? 'update' : 'insert'}
         open={openModal}
         handleClose={handleCloseModal}
-        handleInsert={handleInsert}
-      />
-      <CustomizedDialogs
-        modalType='update'
-        open={openUpdateModal}
-        handleClose={handleCloseUpdateModal}
         edgeGatewayData={selectedEdgeGateway}
+        handleInsert={handleInsert}
         handleUpdate={handleUpdate}
       />
     </div>
   );
 }
 
-// const cells = ['번호', '서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT'];
-const cells = ['번호', '서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT', '생성 날짜'];
+const cells = ['서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT', '생성 날짜'];

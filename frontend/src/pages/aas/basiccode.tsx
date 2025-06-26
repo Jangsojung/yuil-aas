@@ -297,6 +297,15 @@ export default function BasiccodePage() {
     getBases();
   };
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
+  };
+
   useEffect(() => {
     if (currentFacilityGroup !== null) {
       getBasicCode(currentFacilityGroup);
@@ -478,10 +487,9 @@ export default function BasiccodePage() {
                         onChange={() => handleCheckboxChange(base.ab_idx)}
                       />
                     </TableCell>
-                    <TableCell>{bases.length - (currentPage * rowsPerPage + idx)}</TableCell>
                     <TableCell>{base.ab_name}</TableCell>
                     <TableCell>{base.sn_length}</TableCell>
-                    <TableCell>{new Date(base.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell>{formatDate(base.createdAt.toString())}</TableCell>
                     <TableCell>{/* {base.note} */}</TableCell>
                   </TableRow>
                 ))
@@ -501,4 +509,4 @@ export default function BasiccodePage() {
   );
 }
 
-const cells = ['No.', '기초코드명', '센서 개수', '생성 날짜', '비고'];
+const cells = ['기초코드명', '센서 개수', '생성 날짜', '비고'];

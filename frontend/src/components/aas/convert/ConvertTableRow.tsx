@@ -2,6 +2,7 @@ import React from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
 
 interface ConvertTableRowProps {
   base: {
@@ -12,27 +13,39 @@ interface ConvertTableRowProps {
   };
   checked: boolean;
   onCheckboxChange: (id: number) => void;
-  index: number;
+  onEditClick: (base: any) => void;
   totalCount?: number;
 }
 
-export default function ConvertTableRow({ base, checked, onCheckboxChange, index, totalCount }: ConvertTableRowProps) {
-  const handleChange = () => {
-    onCheckboxChange(base.ab_idx);
+export default function ConvertTableRow({
+  base,
+  checked,
+  onCheckboxChange,
+  onEditClick,
+  totalCount,
+}: ConvertTableRowProps) {
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day} `;
   };
-
-  const displayNumber = totalCount ? totalCount - index : index + 1;
 
   return (
     <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell>
-        <Checkbox checked={checked} onChange={handleChange} />
+        <Checkbox checked={checked} onChange={() => onCheckboxChange(base.ab_idx)} />
       </TableCell>
-      <TableCell>{displayNumber}</TableCell>
-      {/* <TableCell>{base.ab_idx}</TableCell> */}
       <TableCell>{base.ab_name}</TableCell>
       <TableCell>{base.sn_length}</TableCell>
-      <TableCell>{base.createdAt ? new Date(base.createdAt).toLocaleDateString() : ''}</TableCell>
+      <TableCell>{base.createdAt ? formatDate(base.createdAt) : ''}</TableCell>
+      <TableCell>
+        <Button variant='contained' color='success' onClick={() => onEditClick(base)}>
+          수정
+        </Button>
+      </TableCell>
     </TableRow>
   );
 }

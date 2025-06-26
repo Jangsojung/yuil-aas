@@ -146,7 +146,6 @@ export default function ConvertPage() {
                       key={idx}
                       checked={selectedConvert === base.ab_idx}
                       onCheckboxChange={handleCheckboxChange}
-                      index={currentPage * rowsPerPage + idx}
                       totalCount={bases.length}
                     />
                   ))
@@ -167,4 +166,4 @@ export default function ConvertPage() {
   );
 }
 
-const cells = ['No.', '기초코드명', '센서 개수', '생성 날짜'];
+const cells = ['기초코드명', '센서 개수', '생성 날짜 및 시간', '시작 날짜', '종료 날짜'];

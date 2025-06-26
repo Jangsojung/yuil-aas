@@ -8,36 +8,33 @@ interface AASXTableRowProps {
   file: {
     af_idx: number;
     af_name: string;
-    createdAt: string | Date;
+    af_size: number;
+    createdAt: string;
   };
   onCheckboxChange: (id: number) => void;
   checked: boolean;
   onEditClick: (file: any) => void;
-  index: number;
   totalCount?: number;
 }
 
-export default function AASXTableRow({
-  file,
-  onCheckboxChange,
-  checked,
-  onEditClick,
-  index,
-  totalCount,
-}: AASXTableRowProps) {
-  // 전체 데이터 개수에서 현재 인덱스를 빼서 역순 번호 계산
-  const displayNumber = totalCount ? totalCount - index : index + 1;
-  const createdAtStr = typeof file.createdAt === 'string' ? file.createdAt : file.createdAt.toISOString();
+export default function AASXTableRow({ file, onCheckboxChange, checked, onEditClick, totalCount }: AASXTableRowProps) {
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
+  };
 
   return (
-    <TableRow key={file.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell>
         <Checkbox checked={checked} onChange={() => onCheckboxChange(file.af_idx)} />
       </TableCell>
-      <TableCell>{displayNumber}</TableCell>
-      {/* <TableCell>{file.af_idx}</TableCell> */}
       <TableCell>{file.af_name}</TableCell>
-      <TableCell>{new Date(createdAtStr).toLocaleDateString()}</TableCell>
+      <TableCell>{formatDate(file.createdAt)}</TableCell>
+      <TableCell>{file.af_size}</TableCell>
       <TableCell>
         <Button variant='contained' color='success' onClick={() => onEditClick(file)}>
           수정

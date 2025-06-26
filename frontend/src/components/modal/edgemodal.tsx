@@ -124,7 +124,8 @@ interface EdgeGateway {
   eg_server_temp: number;
   eg_network: number;
   eg_pc_temp: number;
-  eg_ip_port: String;
+  eg_ip_port: string;
+  createdAt?: string;
 }
 
 interface CustomizedDialogsProps {
@@ -164,7 +165,7 @@ export default function CustomizedDialogs({
         setPcIp(ipPortParts[0]);
         setPcPort(ipPortParts[1]);
       } else {
-        setPcIp(edgeGatewayData.eg_ip_port.toString());
+        setPcIp(edgeGatewayData.eg_ip_port);
         setPcPort('');
       }
     } else {
@@ -177,7 +178,6 @@ export default function CustomizedDialogs({
   };
 
   const validateIp = (ip: string) => {
-    // IPv4 정규식: 0~255.0~255.0~255.0~255
     const regex =
       /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$/;
     return regex.test(ip);
@@ -189,7 +189,7 @@ export default function CustomizedDialogs({
       return;
     }
     if (!validateIp(pcIp)) {
-      alert('PC IP는 숫자.숫자.숫자.숫자 형식(예: 192.168.0.1)으로 입력해야 합니다.');
+      alert('PC IP는 IPv4 정규식에 따라 [0~255.0~255.0~255.0~255]으로 입력해야 합니다.');
       return;
     }
 
@@ -234,10 +234,11 @@ export default function CustomizedDialogs({
 
       if (modalType === 'insert') {
         handleInsert && handleInsert(eg);
-      } else {
-        handleUpdate && handleUpdate(eg);
+        handleClose();
+      } else if (modalType === 'update') {
+        handleUpdate && handleUpdate();
+        handleClose();
       }
-      handleClose();
     } catch (err) {
       console.log(err.message);
     }
@@ -252,13 +253,21 @@ export default function CustomizedDialogs({
     setEdgeGatewayId(null);
   };
 
-  const title = modalType === 'insert' ? 'Edge Gateway 등록' : 'Edge Gateway 수정';
-  const actionButtonText = modalType === 'insert' ? '등록' : '수정';
+  const getTitle = () => {
+    if (modalType === 'insert') return 'Edge Gateway 등록';
+    if (modalType === 'update') return 'Edge Gateway 수정';
+    return 'Edge Gateway';
+  };
 
+  const getActionButtonText = () => {
+    if (modalType === 'insert') return '등록';
+    if (modalType === 'update') return '수정';
+    return '확인';
+  };
   return (
     <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
       <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
-        {title}
+        {getTitle()}
       </DialogTitle>
       <IconButton
         aria-label='close'
@@ -273,14 +282,13 @@ export default function CustomizedDialogs({
         <CloseIcon />
       </IconButton>
       <DialogContent dividers className='file-upload'>
-
         <TableContainer component={Paper} className='modal-table'>
           <Table aria-label='simple table'>
             <TableBody>
               <TableRow>
                 <TableCell>서버온도</TableCell>
                 <TableCell>
-                  <div className="d-flex gap-5" style={{alignItems: 'flex-start'}}>
+                  <div className='d-flex gap-5' style={{ alignItems: 'flex-start' }}>
                     <TextField
                       hiddenLabel
                       type='number'
@@ -288,12 +296,11 @@ export default function CustomizedDialogs({
                       size='small'
                       value={serverTemp}
                       onChange={(e) => setServerTemp(e.target.value)}
-                      style={{width: 50}}
+                      style={{ width: 50 }}
                     />
                     <span>℃</span>
                   </div>
                 </TableCell>
-                
               </TableRow>
               <TableRow>
                 <TableCell>네트워크상태</TableCell>
@@ -309,7 +316,7 @@ export default function CustomizedDialogs({
               <TableRow>
                 <TableCell>PC 온도</TableCell>
                 <TableCell>
-                  <div className="d-flex gap-5" style={{alignItems: 'flex-start'}}>
+                  <div className='d-flex gap-5' style={{ alignItems: 'flex-start' }}>
                     <TextField
                       hiddenLabel
                       type='number'
@@ -317,17 +324,16 @@ export default function CustomizedDialogs({
                       size='small'
                       value={pcTemp}
                       onChange={(e) => setPcTemp(e.target.value)}
-                      style={{width: 50}}
+                      style={{ width: 50 }}
                     />
                     <span>℃</span>
                   </div>
                 </TableCell>
-                
               </TableRow>
               <TableRow>
                 <TableCell>PC IP:PORT</TableCell>
                 <TableCell>
-                  <div className="d-flex gap-5" style={{alignItems: 'center'}}>
+                  <div className='d-flex gap-5' style={{ alignItems: 'center' }}>
                     <TextField
                       hiddenLabel
                       id='outlined-size-small'
@@ -335,7 +341,7 @@ export default function CustomizedDialogs({
                       value={pcIp}
                       onChange={(e) => setPcIp(e.target.value)}
                       placeholder='예: 192.168.0.1'
-                      style={{width: 120}}
+                      style={{ width: 120 }}
                     />
                     <span>:</span>
                     <TextField
@@ -345,21 +351,18 @@ export default function CustomizedDialogs({
                       size='small'
                       value={pcPort}
                       onChange={(e) => setPcPort(e.target.value)}
-                      style={{width: 120}}
+                      style={{ width: 120 }}
                     />
                   </div>
                 </TableCell>
               </TableRow>
-              
             </TableBody>
           </Table>
         </TableContainer>
-
-        
       </DialogContent>
       <DialogActions>
         <Button onClick={handleAction} variant='contained' color='primary'>
-          {actionButtonText}
+          {getActionButtonText()}
         </Button>
         {modalType === 'insert' && (
           <Button autoFocus onClick={handleReset} variant='outlined' color='primary'>

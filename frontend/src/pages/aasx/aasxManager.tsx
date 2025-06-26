@@ -226,7 +226,6 @@ export default function AasxManagerPage() {
                     onCheckboxChange={handleCheckboxChange}
                     checked={selectedFiles.includes(file.af_idx)}
                     onEditClick={handleDoubleClick}
-                    index={currentPage * rowsPerPage + idx}
                     totalCount={files.length}
                   />
                 ))
@@ -252,4 +251,4 @@ export default function AasxManagerPage() {
   );
 }
 
-const cells = ['No.', '파일명', '생성 날짜'];
+const cells = ['파일명', '생성 날짜'];

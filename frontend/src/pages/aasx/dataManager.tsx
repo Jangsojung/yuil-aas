@@ -145,14 +145,7 @@ export default function DataManagerPage() {
             </TableHead>
             <TableBody>
               {pagedData && pagedData.length > 0 ? (
-                pagedData.map((word, idx) => (
-                  <DataTableRow
-                    key={idx}
-                    data={word}
-                    index={currentPage * rowsPerPage + idx}
-                    totalCount={words.length}
-                  />
-                ))
+                pagedData.map((word, idx) => <DataTableRow key={idx} data={word} totalCount={words.length} />)
               ) : (
                 <TableRow>
                   <TableCell colSpan={cells.length} align='center'>
@@ -169,4 +162,4 @@ export default function DataManagerPage() {
   );
 }
 
-const cells = ['No.', '한글', '영어'];
+const cells = ['한글', '영어'];
