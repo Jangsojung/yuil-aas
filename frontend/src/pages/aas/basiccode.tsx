@@ -113,7 +113,7 @@ export default function BasiccodePage() {
   const [basicName, setBasicName] = useState('');
   const [basicDesc, setBasicDesc] = useState('');
 
-  const [selectedFacilityGroup, setSelectedFacilityGroup] = useState<number | ''>('');
+  const [selectedFacilityGroups, setSelectedFacilityGroups] = useState<number[]>([]);
 
   const [selectedBaseForDetail, setSelectedBaseForDetail] = useState<Base | null>(null);
   const [detailTreeData, setDetailTreeData] = useState<FacilityGroupTree[]>([]);
@@ -132,7 +132,7 @@ export default function BasiccodePage() {
   };
 
   const handleReset = () => {
-    setSelectedFacilityGroup('');
+    setSelectedFacilityGroups([]);
     setFacilityName('');
     setSensorName('');
     setTreeData([]);
@@ -180,7 +180,7 @@ export default function BasiccodePage() {
       setBasicName('');
       setBasicDesc('');
       setBasicModalOpen(false);
-      setSelectedFacilityGroup('');
+      setSelectedFacilityGroups([]);
       setFacilityName('');
       setSensorName('');
       setSearchKeyword('');
@@ -505,7 +505,7 @@ export default function BasiccodePage() {
     setBasicName('');
     setBasicDesc('');
     setBasicModalOpen(false);
-    setSelectedFacilityGroup('');
+    setSelectedFacilityGroups([]);
     setFacilityName('');
     setSensorName('');
   };
@@ -589,8 +589,8 @@ export default function BasiccodePage() {
       const allFacilityGroups = await fgRes.json();
 
       let filteredFacilityGroups = allFacilityGroups;
-      if (selectedFacilityGroup) {
-        filteredFacilityGroups = allFacilityGroups.filter((fg) => fg.fg_idx === selectedFacilityGroup);
+      if (selectedFacilityGroups.length > 0) {
+        filteredFacilityGroups = allFacilityGroups.filter((fg) => selectedFacilityGroups.includes(fg.fg_idx));
       }
 
       const facilitiesAll = await Promise.all(
@@ -790,8 +790,8 @@ export default function BasiccodePage() {
                   </Grid>
                   <Grid item xs={9}>
                     <FacilityGroupSelect
-                      selectedFacilityGroup={selectedFacilityGroup}
-                      setSelectedFacilityGroup={setSelectedFacilityGroup}
+                      selectedFacilityGroups={selectedFacilityGroups}
+                      setSelectedFacilityGroups={setSelectedFacilityGroups}
                       onFacilityGroupChange={() => {
                         setTreeData([]);
                         setSelectedSensors([]);
