@@ -6,14 +6,16 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const insertConvertsToDB = async (fc_idx, start, end, ids, user_idx) => {
-  const formattedStart = start.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
-  const formattedEnd = end.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
+export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedConvert, user_idx) => {
+  const formattedStart = startDate.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
+  const formattedEnd = endDate.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
   const startDateTime = `${formattedStart} 00:00:00`;
   const endDateTime = `${formattedEnd} 23:59:59`;
 
   try {
-    const [snRows] = await pool.promise().query(`SELECT sn_idx FROM tb_aasx_base_sensor WHERE ab_idx IN (?)`, [ids]);
+    const [snRows] = await pool
+      .promise()
+      .query(`SELECT sn_idx FROM tb_aasx_base_sensor WHERE ab_idx IN (?)`, [selectedConvert]);
     const snIdxList = snRows.map((row) => row.sn_idx);
     if (snIdxList.length === 0) throw new Error('선택된 base에 연결된 센서가 없습니다.');
 
@@ -90,7 +92,7 @@ export const insertConvertsToDB = async (fc_idx, start, end, ids, user_idx) => {
     }
 
     const jsonContent = JSON.stringify(jsonStructure, null, 2);
-    const file_name = `${ids}-${start}-${end}.json`;
+    const file_name = `${selectedConvert}-${startDate}-${endDate}.json`;
     const filePath = path.join(__dirname, '..', '..', '..', '..', 'files', 'front', file_name);
 
     const dir = path.dirname(filePath);

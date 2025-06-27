@@ -202,11 +202,11 @@ export default function CustomizedDialogs({
     };
 
     try {
-      let url = `http://localhost:5001/api/edge_gateway?user_idx=${userIdx}`;
+      let url = `${process.env.REACT_APP_API_BASE_URL}/api/edge_gateway`;
       let method = 'POST';
 
       if (modalType === 'update') {
-        url = `http://localhost:5001/api/edge_gateway?eg_idx=${edgeGatewayId}&user_idx=${userIdx}`;
+        url = `${process.env.REACT_APP_API_BASE_URL}/api/edge_gateway`;
         method = 'PUT';
       }
 
@@ -215,7 +215,11 @@ export default function CustomizedDialogs({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          ...payload,
+          user_idx: userIdx,
+          ...(modalType === 'update' && { eg_idx: edgeGatewayId }),
+        }),
       });
 
       if (!response.ok) {

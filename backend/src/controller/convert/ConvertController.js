@@ -1,8 +1,8 @@
 import { insertConvertsToDB } from '../../service/convert/ConvertService.js';
 
-export const insertConverts = async (fc_idx, start, end, ids, user_idx, res) => {
+export const insertConverts = async (fc_idx, startDate, endDate, selectedConvert, user_idx, res) => {
   try {
-    const result = await insertConvertsToDB(fc_idx, start, end, ids, user_idx);
+    const result = await insertConvertsToDB(fc_idx, startDate, endDate, selectedConvert, user_idx);
 
     res.status(200).json(result);
   } catch (err) {

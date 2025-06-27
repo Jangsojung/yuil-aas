@@ -92,12 +92,16 @@ export default function CustomizedDialogs({ handleInsert }) {
     try {
       const fileName = selectedFile.name;
 
-      const response = await fetch(`http://localhost:5001/api/file/aasx?fc_idx=3&user_idx=${userIdx}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/file/aasx`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fileName }),
+        body: JSON.stringify({
+          fc_idx: 3,
+          user_idx: userIdx,
+          file: selectedFile,
+        }),
       });
 
       if (!response.ok) {

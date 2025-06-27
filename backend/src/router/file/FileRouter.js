@@ -16,7 +16,7 @@ const router = express.Router();
 
 export default () => {
   router.post('/', (req, res) => {
-    const { fc_idx, af_idx, user_idx } = req.query;
+    const { fc_idx, af_idx, user_idx } = req.body;
     const { fileName } = req.body;
     if (af_idx) {
       updateFile(af_idx, fileName, user_idx, res);
@@ -26,7 +26,7 @@ export default () => {
   });
 
   router.post('/aasx', (req, res) => {
-    const { fc_idx, af_idx, user_idx } = req.query;
+    const { fc_idx, af_idx, user_idx } = req.body;
     const { fileName } = req.body;
     if (af_idx) {
       updateAASXFile(af_idx, fileName, user_idx, res);
@@ -47,8 +47,8 @@ export default () => {
     deleteAASXFiles(ids, res);
   });
 
-  router.get('/aasxFiles', (req, res) => {
-    const { af_kind, fc_idx, startDate, endDate } = req.query;
+  router.post('/aasxFiles', (req, res) => {
+    const { af_kind, fc_idx, startDate, endDate } = req.body;
     getAASXFiles(af_kind, fc_idx, startDate, endDate, res);
   });
 
@@ -57,13 +57,14 @@ export default () => {
     getVerify(file, res);
   });
 
-  router.get('/words', (req, res) => {
-    getWords(res);
+  router.post('/words', (req, res) => {
+    const { fc_idx } = req.body;
+    getWords(fc_idx, res);
   });
 
-  router.get('/search', (req, res) => {
-    const { type, text } = req.query;
-    getSearch(type, text, res);
+  router.post('/search', (req, res) => {
+    const { fc_idx, type, text } = req.body;
+    getSearch(fc_idx, type, text, res);
   });
 
   return router;

@@ -1,38 +1,21 @@
+import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+
 export const deleteEdgeAPI = async (data) => {
-    try {
-        const response = await fetch('http://localhost:5001/api/edge_gateway/', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: data
-        })
-
-        if (!response.ok) {
-            throw new Error('Failed to delete items');
-        }
-
-        return true
-    } catch (error) {
-        console.error('삭제 중 오류가 발생했습니다:', error.message);
-        alert('삭제 중 오류가 발생했습니다.');
-    }
-}
+  try {
+    const result = await apiHelpers.delete(API_ENDPOINTS.EDGE_GATEWAY.LIST, data);
+    return result;
+  } catch (error) {
+    console.error('Error deleting edge gateways:', error);
+    throw error;
+  }
+};
 
 export const getEdgeAPI = async () => {
-    try {
-        const response = await fetch(`http://localhost:5001/api/edge_gateway`, {
-            method: 'GET',
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch detections');
-        } 
-
-        const data = await response.json();
-
-        return data;
-    } catch (error) {
-        console.error(error.message)
-    }
-} 
+  try {
+    const data = await apiHelpers.post(API_ENDPOINTS.EDGE_GATEWAY.LIST);
+    return data;
+  } catch (error) {
+    console.error('Error fetching edge gateways:', error);
+    throw error;
+  }
+};

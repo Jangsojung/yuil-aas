@@ -17,7 +17,7 @@ export const insertFileToDB = async (fc_idx, fileName, user_idx) => {
 
     const pythonFilePath = `../files/front/${fileName}`;
 
-    const pythonResponse = await fetch('http://localhost:5000/api/aas', {
+    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export const updateFileToDB = async (af_idx, fileName, user_idx) => {
     const old_pythonFilePath = `../files/aas/${oldFileName}`;
     const pythonFilePath = `../files/aas/${fileName}`;
 
-    const pythonResponse = await fetch('http://127.0.0.1:5000/api/aas', {
+    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export const deleteFilesFromDB = async (ids) => {
 
     const filePaths = fileNames.map((name) => `../files/aas/${name}`);
 
-    const pythonResponse = await fetch('http://localhost:5000/api/aas', {
+    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
     const pythonFilePath = `../files/aas/${fileName}`;
 
-    const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
+    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
 
     console.log(old_pythonFilePath, ' ', pythonFilePath);
 
-    const pythonResponse = await fetch('http://localhost:5000/api/aasx', {
+    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -251,7 +251,7 @@ export const deleteAASXFilesFromDB = async (ids) => {
 
     const filePaths = fileNames.map((name) => `../files/aasx/${name}`);
 
-    const pythonResponse = await fetch('http://localhost:5000/api/aas', {
+    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ export const getVerifyFromDB = async (file) => {
   });
 };
 
-export const getWordsFromDB = async () => {
+export const getWordsFromDB = async (fc_idx) => {
   return new Promise((resolve, reject) => {
     const query = 'select as_kr, as_en from tb_aasx_alias order by as_idx desc';
 
@@ -321,7 +321,7 @@ export const getWordsFromDB = async () => {
   });
 };
 
-export const getSearchFromDB = async (type, text) => {
+export const getSearchFromDB = async (fc_idx, type, text) => {
   return new Promise((resolve, reject) => {
     let column;
     if (type === 'kr') column = 'as_kr';

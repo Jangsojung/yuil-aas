@@ -202,56 +202,71 @@ export default function BasiccodePage() {
 
   const getBases = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases`, {
-        method: 'GET',
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch detections');
+        throw new Error('Failed to fetch bases');
       }
 
-      const data: Base[] = await response.json();
+      const data = await response.json();
       setBases(data);
-    } catch (err: any) {
-      console.log('기초코드 목록 불러오기 실패:', err.message);
+    } catch (error) {
+      console.error('Error fetching bases:', error);
     }
   };
 
   const getBasicCode = async (fg_idx: number) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg_idx}`, {
-        method: 'GET',
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fg_idx: fg_idx,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch detections');
+        throw new Error('Failed to fetch basic code');
       }
 
-      const data: Basic[] = await response.json();
+      const data = await response.json();
       setBasics(data);
       setHasBasics(data !== null && data.length > 0);
-    } catch (err: any) {
-      console.log(err.message);
+    } catch (error) {
+      console.error('Error fetching basic code:', error);
     }
   };
 
   const getSensorsByFa = async (fa_idx: number) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa_idx}`, {
-        method: 'GET',
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fa_idx: fa_idx,
+        }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to fetch sensors');
       }
 
-      const data: Sensor[] = await response.json();
+      const data = await response.json();
       setSensorsByFa((prev) => ({
         ...prev,
         [fa_idx]: Array.isArray(data) ? data : [],
       }));
-    } catch (err: any) {
-      console.log(err.message);
+    } catch (error) {
+      console.error('Error fetching sensors:', error);
       setSensorsByFa((prev) => ({
         ...prev,
         [fa_idx]: [],
@@ -310,7 +325,7 @@ export default function BasiccodePage() {
 
   const handleConfirmDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -355,45 +370,32 @@ export default function BasiccodePage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases?user_idx=${userIdx}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases/insert`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          user_idx: userIdx,
           name: basicName,
+          note: basicDesc,
           ids: selectedSensors,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add base');
+        throw new Error('Failed to insert base');
       }
 
-      const newBase = await response.json();
-
-      const completeNewBase = {
-        ...newBase,
-        sn_length: selectedSensors.length,
-        createdAt: new Date().toISOString(),
-      };
-
-      setBases([completeNewBase, ...bases]);
-      setSelectedSensors([]);
+      const data = await response.json();
+      console.log('Base inserted successfully:', data);
       setBasicName('');
       setBasicDesc('');
+      setSelectedSensors([]);
+      getBases();
       setBasicModalOpen(false);
-      setInsertMode(false);
-      setAlertTitle('알림');
-      setAlertContent('기초코드가 등록되었습니다.');
-      setAlertType('alert');
-      setAlertOpen(true);
-    } catch (err: any) {
-      console.log(err.message);
-      setAlertTitle('오류');
-      setAlertContent('등록 중 오류가 발생했습니다.');
-      setAlertType('alert');
-      setAlertOpen(true);
+    } catch (error) {
+      console.error('Error inserting base:', error);
     }
   };
 
@@ -428,22 +430,20 @@ export default function BasiccodePage() {
       return;
     }
 
-    if (!editingBase) {
-      setAlertTitle('오류');
-      setAlertContent('수정할 기초코드 정보가 없습니다.');
-      setAlertType('alert');
-      setAlertOpen(true);
+    if (!selectedBaseForDetail) {
+      console.error('No base selected for update');
       return;
     }
 
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases?user_idx=${userIdx}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ab_idx: editingBase.ab_idx,
+          user_idx: userIdx,
+          ab_idx: selectedBaseForDetail.ab_idx,
           name: basicName,
           note: basicDesc,
           ids: selectedSensors,
@@ -454,28 +454,15 @@ export default function BasiccodePage() {
         throw new Error('Failed to update base');
       }
 
-      const updatedBase = await response.json();
-
-      await getBases();
-
-      setSelectedSensors([]);
+      const data = await response.json();
+      console.log('Base updated successfully:', data);
       setBasicName('');
       setBasicDesc('');
+      setSelectedSensors([]);
+      getBases();
       setBasicModalOpen(false);
-      setEditMode(false);
-      setEditingBase(null);
-      setTreeData([]);
-      setSelectedFacilityGroups([]);
-      setAlertTitle('알림');
-      setAlertContent('기초코드가 수정되었습니다.');
-      setAlertType('alert');
-      setAlertOpen(true);
-    } catch (err: any) {
-      console.log(err.message);
-      setAlertTitle('오류');
-      setAlertContent('수정 중 오류가 발생했습니다.');
-      setAlertType('alert');
-      setAlertOpen(true);
+    } catch (error) {
+      console.error('Error updating base:', error);
     }
   };
 
@@ -524,14 +511,23 @@ export default function BasiccodePage() {
 
   const getAllFacilityGroups = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/facilityGroups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fc_idx: 3,
+        }),
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch facility groups');
       }
-      const facilityGroups = await response.json();
-      setSelectedFacilityGroups(facilityGroups.map((fg: any) => fg.fg_idx));
-    } catch (err) {
-      console.error('설비그룹 로딩 에러:', err);
+
+      const data = await response.json();
+      setSelectedFacilityGroups(data.map((fg: any) => fg.fg_idx));
+    } catch (error) {
+      console.error('Error fetching facility groups:', error);
       setSelectedFacilityGroups([]);
     }
   };
@@ -565,7 +561,15 @@ export default function BasiccodePage() {
     setEditingBase(selectedBaseForDetail);
 
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases/${selectedBaseForDetail.ab_idx}/sensors`);
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases/${selectedBaseForDetail.ab_idx}/sensors`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch base sensors');
@@ -593,24 +597,46 @@ export default function BasiccodePage() {
 
   const loadAllFacilityGroupsForEdit = async (selectedSensorIds: number[]) => {
     try {
-      const fgRes = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const fgRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/facilityGroups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fc_idx: 3,
+        }),
+      });
       const allFacilityGroups = await fgRes.json();
 
       const facilitiesAll = await Promise.all(
         allFacilityGroups.map(async (fg) => {
-          const faRes = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg.fg_idx}`);
+          const faRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fg_idx: fg.fg_idx,
+            }),
+          });
           const facilities = await faRes.json();
 
           const facilitiesWithSensors = await Promise.all(
             facilities.map(async (fa) => {
-              const snRes = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa.fa_idx}`);
+              const snRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  fa_idx: fa.fa_idx,
+                }),
+              });
               const sensors = await snRes.json();
               const sensorsArray = Array.isArray(sensors) ? sensors : [];
-
               return { ...fa, sensors: sensorsArray };
             })
           );
-
           return { ...fg, facilities: facilitiesWithSensors };
         })
       );
@@ -637,7 +663,12 @@ export default function BasiccodePage() {
   const getBaseDetail = async (base: Base) => {
     setDetailLoading(true);
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases/${base.ab_idx}/sensors`);
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases/${base.ab_idx}/sensors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         throw new Error('Failed to fetch base detail');
@@ -659,43 +690,104 @@ export default function BasiccodePage() {
 
   const buildTreeFromSensorIds = async (sensorIds: number[]) => {
     try {
-      const fgRes = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const fgRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/facilityGroups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fc_idx: 3,
+        }),
+      });
       const allFacilityGroups = await fgRes.json();
 
       const facilitiesAll = await Promise.all(
         allFacilityGroups.map(async (fg) => {
-          const faRes = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg.fg_idx}`);
+          const faRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fg_idx: fg.fg_idx,
+            }),
+          });
           const facilities = await faRes.json();
 
           const facilitiesWithSensors = await Promise.all(
             facilities.map(async (fa) => {
-              const snRes = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa.fa_idx}`);
+              const snRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  fa_idx: fa.fa_idx,
+                }),
+              });
               const sensors = await snRes.json();
               const sensorsArray = Array.isArray(sensors) ? sensors : [];
-
-              const filteredSensors = sensorsArray.filter((sensor) => sensorIds.includes(sensor.sn_idx));
-
-              return { ...fa, sensors: filteredSensors };
+              return { ...fa, sensors: sensorsArray };
             })
           );
-
-          const facilitiesWithSensorsFiltered = facilitiesWithSensors.filter((fa) => fa.sensors.length > 0);
-          return { ...fg, facilities: facilitiesWithSensorsFiltered };
+          return { ...fg, facilities: facilitiesWithSensors };
         })
       );
 
-      const finalTreeData = facilitiesAll.filter((fg) => fg.facilities.length > 0);
-      return finalTreeData;
-    } catch (err) {
-      console.error('트리 데이터 구성 에러:', err);
+      const filteredFacilityGroups = allFacilityGroups.filter((fg) =>
+        facilitiesAll
+          .find((fgData) => fgData.fg_idx === fg.fg_idx)
+          ?.facilities.some((fa) => fa.sensors.some((sensor) => sensorIds.includes(sensor.sn_idx)))
+      );
+
+      const filteredFacilitiesAll = await Promise.all(
+        filteredFacilityGroups.map(async (fg) => {
+          const faRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fg_idx: fg.fg_idx,
+            }),
+          });
+          const facilities = await faRes.json();
+
+          const filteredFacilities = facilities.filter((fa) =>
+            fa.sensors.some((sensor) => sensorIds.includes(sensor.sn_idx))
+          );
+
+          const facilitiesWithSensors = await Promise.all(
+            filteredFacilities.map(async (fa) => {
+              const snRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  fa_idx: fa.fa_idx,
+                }),
+              });
+              const sensors = await snRes.json();
+              const sensorsArray = Array.isArray(sensors) ? sensors : [];
+              return { ...fa, sensors: sensorsArray };
+            })
+          );
+          return { ...fg, facilities: facilitiesWithSensors };
+        })
+      );
+
+      return filteredFacilitiesAll;
+    } catch (error) {
+      console.error('Error building tree from sensor IDs:', error);
       return [];
     }
   };
 
   const handleTreeSearch = async () => {
-    if (selectedFacilityGroups.length === 0) {
+    if (!facilityName.trim() && !sensorName.trim() && selectedFacilityGroups.length === 0) {
       setAlertTitle('알림');
-      setAlertContent('설비그룹을 최소 1개이상 선택해주세요.');
+      setAlertContent('검색 조건을 입력해주세요.');
       setAlertType('alert');
       setAlertOpen(true);
       return;
@@ -704,7 +796,15 @@ export default function BasiccodePage() {
     setTreeLoading(true);
 
     try {
-      const fgRes = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const fgRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/facilityGroups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fc_idx: 3,
+        }),
+      });
       const allFacilityGroups = await fgRes.json();
 
       let filteredFacilityGroups = allFacilityGroups;
@@ -714,7 +814,15 @@ export default function BasiccodePage() {
 
       const facilitiesAll = await Promise.all(
         filteredFacilityGroups.map(async (fg) => {
-          const faRes = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg.fg_idx}`);
+          const faRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fg_idx: fg.fg_idx,
+            }),
+          });
           const facilities = await faRes.json();
 
           let filteredFacilities = facilities;
@@ -726,7 +834,15 @@ export default function BasiccodePage() {
 
           const facilitiesWithSensors = await Promise.all(
             filteredFacilities.map(async (fa) => {
-              const snRes = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa.fa_idx}`);
+              const snRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  fa_idx: fa.fa_idx,
+                }),
+              });
               const sensors = await snRes.json();
               const sensorsArray = Array.isArray(sensors) ? sensors : [];
 
@@ -893,6 +1009,37 @@ export default function BasiccodePage() {
     setSelectedBaseForDetail(base);
     setDetailMode(true);
     getBaseDetail(base);
+  };
+
+  const handleConfirmInsert = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases/insert`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_idx: userIdx,
+          name: basicName,
+          note: basicDesc,
+          ids: selectedSensors,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to insert base');
+      }
+
+      const data = await response.json();
+      console.log('Base inserted successfully:', data);
+      setBasicName('');
+      setBasicDesc('');
+      setSelectedSensors([]);
+      getBases();
+      setBasicModalOpen(false);
+    } catch (error) {
+      console.error('Error inserting base:', error);
+    }
   };
 
   if (insertMode || editMode) {

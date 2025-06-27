@@ -25,17 +25,24 @@ export default function FacilityGroupSelect({ selectedFacilityGroups, setSelecte
   const getFacilityGroups = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/facilityGroups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fc_idx: 3,
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error('Failed to fetch facility groups');
       }
 
       const data = await response.json();
-      setFacilityGroups(Array.isArray(data) ? data : []);
-    } catch (err: any) {
-      console.error('설비그룹 로딩 에러:', err.message);
-      setFacilityGroups([]);
+      setFacilityGroups(data);
+    } catch (error) {
+      console.error('Error fetching facility groups:', error);
     } finally {
       setLoading(false);
     }

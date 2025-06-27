@@ -1,79 +1,62 @@
+import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+
 export const deleteDataAPI = async (selectedFiles) => {
   try {
-    const response = await fetch(`http://localhost:5001/api/file`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ids: selectedFiles,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete items');
-    }
-
-    return true;
+    const result = await apiHelpers.delete(API_ENDPOINTS.FILE.ROOT, selectedFiles);
+    return result;
   } catch (error) {
-    console.error('삭제 중 오류가 발생했습니다:', error.message);
-    alert('삭제 중 오류가 발생했습니다.');
+    console.error('Error deleting data:', error);
+    throw error;
   }
 };
 
-export const getFilesAPI = async (start, end) => {
+export const getDataAPI = async () => {
   try {
-    const response = await fetch(
-      `http://localhost:5001/api/file/aasxFiles?af_kind=2&fc_idx=3&startDate=${start}&endDate=${end}`,
-      {
-        method: 'GET',
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch files');
-    }
-
-    const data = await response.json();
-
+    const data = await apiHelpers.post(API_ENDPOINTS.FILE.ROOT);
     return data;
   } catch (error) {
-    console.error(error.message);
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+};
+
+export const getAASXFilesAPI = async (start, end) => {
+  try {
+    const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
+      af_kind: 2,
+      fc_idx: 3,
+      startDate: start,
+      endDate: end,
+    });
+    return data;
+  } catch (error) {
+    console.error('Error fetching AASX files:', error);
+    throw error;
   }
 };
 
 export const getWordsAPI = async () => {
   try {
-    const response = await fetch(`http://localhost:5001/api/file/words?fc_idx=3`, {
-      method: 'GET',
+    const data = await apiHelpers.post(API_ENDPOINTS.FILE.WORDS, {
+      fc_idx: 3,
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch files');
-    }
-
-    const data = await response.json();
-
     return data;
   } catch (error) {
-    console.error(error.message);
+    console.error('Error fetching words:', error);
+    throw error;
   }
 };
 
 export const getSearchAPI = async (type, text) => {
   try {
-    const response = await fetch(`http://localhost:5001/api/file/search?fc_idx=3&type=${type}&text=${text}`, {
-      method: 'GET',
+    const data = await apiHelpers.post(API_ENDPOINTS.FILE.SEARCH, {
+      fc_idx: 3,
+      type: type,
+      text: text,
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch files');
-    }
-
-    const data = await response.json();
-
     return data;
   } catch (error) {
-    console.error(error.message);
+    console.error('Error searching:', error);
+    throw error;
   }
 };

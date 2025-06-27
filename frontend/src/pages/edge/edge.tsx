@@ -218,7 +218,7 @@ export default function Edge_Gateway() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={cells.length + 1} align='center'>
+                  <TableCell colSpan={cells.length + 2} align='center'>
                     데이터가 없습니다.
                   </TableCell>
                 </TableRow>

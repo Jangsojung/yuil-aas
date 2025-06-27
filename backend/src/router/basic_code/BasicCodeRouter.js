@@ -14,18 +14,18 @@ import {
 const router = express.Router();
 
 export default () => {
-  router.get('/bases', (req, res) => {
+  router.post('/bases', (req, res) => {
     getBases(res);
   });
 
-  router.post('/bases', (req, res) => {
-    const { user_idx } = req.query;
+  router.post('/bases/insert', (req, res) => {
+    const { user_idx } = req.body;
     const { name, note, ids } = req.body;
     insertBases(name, note, ids, user_idx, res);
   });
 
   router.put('/bases', (req, res) => {
-    const { user_idx } = req.query;
+    const { user_idx } = req.body;
     const { ab_idx, name, note, ids } = req.body;
     updateBase(ab_idx, name, note, ids, user_idx, res);
   });
@@ -35,33 +35,33 @@ export default () => {
     deleteBases(ids, res);
   });
 
-  router.get('/bases/sensors', (req, res) => {
-    const { ab_idx } = req.query;
+  router.post('/bases/sensors', (req, res) => {
+    const { ab_idx } = req.body;
     getSelectedSensors(ab_idx, res);
   });
 
-  router.get('/bases/:ab_idx/sensors', (req, res) => {
+  router.post('/bases/:ab_idx/sensors', (req, res) => {
     const { ab_idx } = req.params;
     getSelectedSensors(ab_idx, res);
   });
 
-  router.get('/facilityGroups', (req, res) => {
-    const { fc_idx, order } = req.query;
+  router.post('/facilityGroups', (req, res) => {
+    const { fc_idx, order } = req.body;
     getFacilityGroups(fc_idx, order, res);
   });
 
-  router.get('/sensors', (req, res) => {
-    const { fa_idx } = req.query;
+  router.post('/sensors', (req, res) => {
+    const { fa_idx } = req.body;
     getSensors(fa_idx, res);
   });
 
-  router.get('/', (req, res) => {
-    const { fg_idx } = req.query;
+  router.post('/', (req, res) => {
+    const { fg_idx } = req.body;
     getBaseCode(fg_idx, res);
   });
 
-  router.get('/allSensorsInGroup', (req, res) => {
-    const { fg_idx } = req.query;
+  router.post('/allSensorsInGroup', (req, res) => {
+    const { fg_idx } = req.body;
     getAllSensorsInGroup(fg_idx, res);
   });
 

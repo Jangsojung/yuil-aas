@@ -21,21 +21,24 @@ export default function SelectSmall({ setSelectedFile }: Props) {
 
   const getFiles = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/file/aasxFiles`, {
-        method: 'GET',
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/file/aasxFiles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
         throw new Error('Failed to fetch files');
       }
 
-      const data: AASXFile[] = await response.json();
+      const data = await response.json();
       setFiles(data);
 
       setCurrentFile(null);
       setSelectedFile(undefined);
-    } catch (err: any) {
-      console.log(err.message);
+    } catch (error) {
+      console.error('Error fetching files:', error);
     }
   };
 
@@ -52,7 +55,7 @@ export default function SelectSmall({ setSelectedFile }: Props) {
   }, []);
 
   return (
-    <FormControl sx={{ m: 1, width:'100%' }} size='small'>
+    <FormControl sx={{ m: 1, width: '100%' }} size='small'>
       <Select value={currentFile || ''} onChange={handleChange} IconComponent={ExpandMoreIcon} displayEmpty>
         <MenuItem disabled value='' style={{ color: '#666', fontStyle: 'italic' }}>
           aasx 파일을 선택해 주세요.

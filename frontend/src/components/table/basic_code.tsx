@@ -49,38 +49,47 @@ export default function BasicTable({
 
   const getSelectedSensors = async (selectedBase: Base) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/bases/sensors?ab_idx=${selectedBase.ab_idx}`, {
-        method: 'GET',
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases/sensors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ab_idx: selectedBase.ab_idx,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch detections');
+        throw new Error('Failed to fetch selected sensors');
       }
 
-      const data: { sn_idx: number }[] = await response.json();
-      const sn_idx_list = data.map((sensor) => sensor.sn_idx);
-      setSelectedSensors(sn_idx_list);
-    } catch (err: any) {
-      console.log(err.message);
+      const data = await response.json();
+      setSelectedSensors(data);
+    } catch (error) {
+      console.error('Error fetching selected sensors:', error);
     }
   };
 
   const getSensors = async (fa_idx: number) => {
     try {
-      const response = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa_idx}`, {
-        method: 'GET',
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fa_idx: fa_idx,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch detections');
+        throw new Error('Failed to fetch sensors');
       }
 
       const data = await response.json();
-
-      setSensors(Array.isArray(data) ? data : []);
-    } catch (err: any) {
-      console.log(err.message);
-      setSensors([]);
+      setSensors(data);
+    } catch (error) {
+      console.error('Error fetching sensors:', error);
     }
   };
 

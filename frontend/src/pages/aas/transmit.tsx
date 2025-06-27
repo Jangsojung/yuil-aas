@@ -140,15 +140,39 @@ export default function TransmitPage() {
     setInsertMode(true);
     setTreeLoading(true);
     try {
-      const fgRes = await fetch('http://localhost:5001/api/base_code/facilityGroups?fc_idx=3');
+      const fgRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/facilityGroups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fc_idx: 3,
+        }),
+      });
       const facilityGroups = await fgRes.json();
       const facilitiesAll = await Promise.all(
         facilityGroups.map(async (fg) => {
-          const faRes = await fetch(`http://localhost:5001/api/base_code?fg_idx=${fg.fg_idx}`);
+          const faRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fg_idx: fg.fg_idx,
+            }),
+          });
           const facilities = await faRes.json();
           const facilitiesWithSensors = await Promise.all(
             facilities.map(async (fa) => {
-              const snRes = await fetch(`http://localhost:5001/api/base_code/sensors?fa_idx=${fa.fa_idx}`);
+              const snRes = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  fa_idx: fa.fa_idx,
+                }),
+              });
               const sensors = await snRes.json();
               return { ...fa, sensors };
             })

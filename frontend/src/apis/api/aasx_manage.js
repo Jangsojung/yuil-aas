@@ -1,30 +1,19 @@
+import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+
 export const deleteAASXAPI = async (selectedFiles) => {
   try {
-    const response = await fetch(`http://localhost:5001/api/file/aasx`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ids: selectedFiles,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete items');
-    }
-
-    return true;
+    const result = await apiHelpers.delete(API_ENDPOINTS.FILE.AASX, selectedFiles);
+    return result;
   } catch (error) {
-    console.error('삭제 중 오류가 발생했습니다:', error.message);
-    alert('삭제 중 오류가 발생했습니다.');
+    console.error('Error deleting AASX files:', error);
+    throw error;
   }
 };
 
 export const getFilesAPI = async (start, end) => {
   try {
     const response = await fetch(
-      `http://localhost:5001/api/file/aasxFiles?af_kind=3&fc_idx=3&startDate=${start}&endDate=${end}`,
+      `${process.env.REACT_APP_API_BASE_URL}/api/file/aasxFiles?af_kind=3&fc_idx=3&startDate=${start}&endDate=${end}`,
       {
         method: 'GET',
       }
@@ -39,5 +28,30 @@ export const getFilesAPI = async (start, end) => {
     return data;
   } catch (error) {
     console.error(error.message);
+  }
+};
+
+export const getAASXAPI = async () => {
+  try {
+    const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX);
+    return data;
+  } catch (error) {
+    console.error('Error fetching AASX:', error);
+    throw error;
+  }
+};
+
+export const getAASXFilesAPI = async (start, end) => {
+  try {
+    const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
+      af_kind: 3,
+      fc_idx: 3,
+      startDate: start,
+      endDate: end,
+    });
+    return data;
+  } catch (error) {
+    console.error('Error fetching AASX files:', error);
+    throw error;
   }
 };
