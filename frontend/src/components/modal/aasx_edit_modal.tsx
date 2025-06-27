@@ -15,7 +15,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import LoadingOverlay from '../loading/LodingOverlay';
 import AlertModal from './alert';
-import { updateAASXFileAPI } from '../../apis/api/aasx_manage';
+import { updateAASXFileAPI, uploadAASXFileAPI } from '../../apis/api/aasx_manage';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -75,7 +75,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   });
   const userIdx = useRecoilValue(userState)?.user_idx;
 
-  const title = selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정';
+  const title = fileData ? (selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정') : '파일 등록';
 
   const fileUploadProp: FileUploadProps = {
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +88,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       const file = event.dataTransfer.files[0];
       setUploadFile(file);
     },
-    selectedFileName: uploadFile?.af_name || '',
+    selectedFileName: uploadFile?.name || '',
     accept: '.json',
   };
 
@@ -106,13 +106,30 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       return;
     }
 
+    if (fileData && !af_idx) {
+      setAlertModal({
+        open: true,
+        title: '오류',
+        content: '파일 정보가 올바르지 않습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const result = await updateAASXFileAPI(af_idx, name, userIdx);
+      let result;
+
+      if (fileData) {
+        result = await updateAASXFileAPI(af_idx, name, userIdx);
+      } else {
+        result = await uploadAASXFileAPI(uploadFile, userIdx);
+      }
 
       const newFile = {
-        af_idx: fileData!.af_idx,
+        af_idx: result.af_idx || fileData?.af_idx || af_idx,
         af_name: result.fileName,
         createdAt: fileData?.createdAt || new Date(),
       };
@@ -120,7 +137,9 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       setAlertModal({
         open: true,
         title: '알림',
-        content: '성공적으로 json파일을 수정하였습니다.\n파일 위치: /files/aas',
+        content: fileData
+          ? '성공적으로 json파일을 수정하였습니다.'
+          : '성공적으로 파일을 등록하였습니다.\n파일 위치: /files/aas, /files/aasx',
         type: 'alert',
         onConfirm: undefined,
       });
@@ -150,9 +169,12 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   };
 
   useEffect(() => {
-    if (fileData) {
+    if (fileData && fileData.af_idx) {
       setSelectedFile(fileData);
       setAf_Idx(fileData.af_idx);
+    } else if (fileData === null) {
+      setSelectedFile(null);
+      setUploadFile(null);
     } else {
       handleReset();
     }

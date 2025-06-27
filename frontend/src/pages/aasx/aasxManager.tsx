@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Box from '@mui/system/Box';
-import Grid from '@mui/system/Grid';
+import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
@@ -29,6 +29,12 @@ interface File {
   af_idx: number;
   af_name: string;
   af_size: number;
+  createdAt: string;
+}
+
+interface AASXFile {
+  af_idx: number;
+  af_name: string;
   createdAt: Date;
 }
 
@@ -43,7 +49,7 @@ export default function AasxManagerPage() {
 
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openInsertModal, setOpenInsertModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<AASXFile | null>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -75,8 +81,26 @@ export default function AasxManagerPage() {
     setFiles((prevFiles) => [file, ...prevFiles]);
   };
 
-  const handleUpdate = async (newFile: File) => {
-    const newFiles = files.map((file) => (file.af_idx === newFile.af_idx ? newFile : file));
+  const handleInsertFile = (file: AASXFile) => {
+    const newFile: File = {
+      af_idx: file.af_idx,
+      af_name: file.af_name,
+      af_size: 0, // 기본값 설정
+      createdAt: file.createdAt.toISOString(),
+    };
+    setFiles((prevFiles) => [newFile, ...prevFiles]);
+  };
+
+  const handleUpdate = (newFile: AASXFile) => {
+    const newFiles = files.map((file) =>
+      file.af_idx === newFile.af_idx
+        ? {
+            ...file,
+            af_name: newFile.af_name,
+            createdAt: newFile.createdAt.toISOString(),
+          }
+        : file
+    );
     setFiles(newFiles);
   };
 
@@ -164,7 +188,12 @@ export default function AasxManagerPage() {
   };
 
   const handleDoubleClick = (file: File) => {
-    setSelectedFile(file);
+    const aasxFile: AASXFile = {
+      af_idx: file.af_idx,
+      af_name: file.af_name,
+      createdAt: new Date(file.createdAt),
+    };
+    setSelectedFile(aasxFile);
     setOpenUpdateModal(true);
   };
 
@@ -191,6 +220,7 @@ export default function AasxManagerPage() {
     setSelectAll(false);
     setCurrentPage(0);
     setOpenUpdateModal(false);
+    setOpenInsertModal(false);
     setSelectedFile(null);
     handleReset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -300,7 +330,12 @@ export default function AasxManagerPage() {
         fileData={selectedFile}
         handleUpdate={handleUpdate}
       />
-      <CustomizedDialogs open={openInsertModal} handleClose={handleCloseInsertModal} handleInsert={handleInsert} />
+      <CustomizedDialogs
+        open={openInsertModal}
+        handleClose={handleCloseInsertModal}
+        fileData={null}
+        handleUpdate={handleInsertFile}
+      />
       <AlertModal
         open={alertModal.open}
         handleClose={handleCloseAlert}

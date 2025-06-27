@@ -151,34 +151,58 @@ export const getAASXFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = nu
 
 export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
   try {
-    const file_path = '/files/aasx';
-    const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
+    const frontFilePath = `../files/front/${fileName}`;
 
-    const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, ?, ?, ?)`;
-    const [result] = await pool.promise().query(query, [fc_idx, aasxFileName, file_path, user_idx, user_idx]);
-
-    console.log('JSON 파일 저장 및 DB 등록 완료');
-
-    const pythonFilePath = `../files/aas/${fileName}`;
-
-    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
+    const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        path: pythonFilePath,
+        path: frontFilePath,
       }),
     });
+
+    if (!aasResponse.ok) {
+      throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
+    }
+
+    const aasFileName = fileName;
+    const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
+    await pool.promise().query(aasQuery, [fc_idx, aasFileName, user_idx, user_idx]);
+
+    console.log('AAS JSON 파일 생성 및 DB 저장 완료');
+
+    const aasFilePath = `../files/aas/${fileName}`;
+    const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        path: aasFilePath,
+      }),
+    });
+
+    if (!aasxResponse.ok) {
+      throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
+    }
+
+    const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
+    const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, '/files/aasx', ?, ?)`;
+    const [result] = await pool.promise().query(aasxQuery, [fc_idx, aasxFileName, user_idx, user_idx]);
+
+    console.log('AASX 파일 생성 및 DB 저장 완료');
 
     return {
       success: true,
       fileName: aasxFileName,
-      filePath: file_path,
+      filePath: '/files/aasx',
       af_idx: result.insertId,
+      message: '변환 완료: AAS JSON, AASX 파일이 모두 생성되었습니다.',
     };
   } catch (err) {
-    console.log('Failed to insert JSON File: ', err);
+    console.log('Failed to insert AASX File: ', err);
     throw err;
   }
 };
@@ -191,37 +215,57 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       throw new Error('파일을 찾을 수 없습니다.');
     }
 
-    const oldFileName = rows[0].af_name.replace(/\.aasx$/i, '.json');
+    const oldFileName = rows[0].af_name;
     const newFileName = fileName.replace(/\.json$/i, '.aasx');
 
-    const file_path = '/files/aasx';
+    // front 폴더의 JSON 파일 경로
+    const frontFilePath = `../files/front/${fileName}`;
 
-    const query = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_idx = ?`;
-    await pool.promise().query(query, [newFileName, user_idx, af_idx]);
-
-    console.log('JSON 파일 업데이트 및 DB 수정 완료');
-
-    const old_pythonFilePath = `../files/aasx/${oldFileName}`;
-    const pythonFilePath = `../files/aasx/${newFileName}`;
-
-    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
+    // Python 서버를 호출해서 AAS용 JSON 파일 생성
+    const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        old_path: old_pythonFilePath,
-        path: pythonFilePath,
+        path: frontFilePath,
       }),
     });
+
+    if (!aasResponse.ok) {
+      throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
+    }
+
+    // Python 서버를 호출해서 AASX 파일 생성
+    const aasFilePath = `../files/aas/${fileName}`;
+    const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        path: aasFilePath,
+      }),
+    });
+
+    if (!aasxResponse.ok) {
+      throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
+    }
+
+    // AASX 파일명을 DB에 업데이트
+    const query = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_idx = ?`;
+    await pool.promise().query(query, [newFileName, user_idx, af_idx]);
+
+    console.log('AASX 파일 업데이트 및 DB 수정 완료');
 
     return {
       success: true,
       fileName: newFileName,
-      filePath: file_path,
+      filePath: '/files/aasx',
+      message: '변환 완료: AAS JSON, AASX 파일이 모두 업데이트되었습니다.',
     };
   } catch (err) {
-    console.log('Failed to update JSON File: ', err);
+    console.log('Failed to update AASX File: ', err);
     throw err;
   }
 };

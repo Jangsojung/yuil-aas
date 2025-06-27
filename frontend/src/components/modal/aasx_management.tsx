@@ -121,8 +121,10 @@ export default function CustomizedDialogs({ handleInsert }) {
 
       setAlertModal({
         open: true,
-        title: '알림',
-        content: '성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aasx',
+        title: '변환 완료',
+        content:
+          result.message ||
+          '성공적으로 변환이 완료되었습니다.\n\n생성된 파일:\n• AAS JSON 파일 (/files/aas)\n• AASX 파일 (/files/aasx)',
         type: 'alert',
         onConfirm: undefined,
       });
