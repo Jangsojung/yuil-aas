@@ -164,6 +164,7 @@ export default function BasiccodePage() {
       setAlertContent('선택한 항목이 삭제되었습니다.');
       setAlertType('alert');
       setAlertOpen(true);
+      handleReset();
     } catch (err: any) {
       console.log(err.message);
       setAlertTitle('오류');
@@ -228,6 +229,10 @@ export default function BasiccodePage() {
     window.location.href = `/aas/basic/edit/${base.ab_idx}/view`;
   };
 
+  const handleAdd = () => {
+    window.location.href = '/aas/basic/add';
+  };
+
   return (
     <div className='table-outer'>
       <div>
@@ -272,6 +277,9 @@ export default function BasiccodePage() {
             <Grid item xs={8}></Grid>
             <Grid item xs={4}>
               <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
+                <Button variant='contained' color='success' onClick={handleAdd}>
+                  기초코드 등록
+                </Button>
                 <Button variant='contained' color='error' onClick={handleDelete}>
                   삭제
                 </Button>

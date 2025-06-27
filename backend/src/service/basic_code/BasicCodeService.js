@@ -87,10 +87,16 @@ export const updateBaseToDB = async (ab_idx, name, note, ids, user_idx) => {
 
 export const deleteBasesFromDB = async (ids) => {
   try {
-    const query = `delete from tb_aasx_base where ab_idx in (?)`;
-    await pool.promise().query(query, [ids]);
+    // 먼저 관련된 센서 데이터 삭제
+    const deleteSensorsQuery = `delete from tb_aasx_base_sensor where ab_idx in (?)`;
+    await pool.promise().query(deleteSensorsQuery, [ids]);
+
+    // 그 다음 기초코드 삭제
+    const deleteBasesQuery = `delete from tb_aasx_base where ab_idx in (?)`;
+    await pool.promise().query(deleteBasesQuery, [ids]);
 
     console.log('Bases deleted successfully');
+    return { success: true, message: 'Bases deleted successfully' };
   } catch (err) {
     console.log('Failed to delete Bases: ', err);
     throw err;
