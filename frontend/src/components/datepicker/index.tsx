@@ -1,3 +1,4 @@
+import React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/ko';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -57,7 +58,7 @@ export default function BasicDatePicker({ onDateChange, startDate, endDate }: Pr
             value={startDate}
             format='YYYY-MM-DD'
             onChange={handleStartDateChange}
-            maxDate={dayjs(endDate) || dayjs()}
+            maxDate={dayjs()}
             slots={{ openPickerIcon: CalendarTodayIcon }}
           />
           <span>

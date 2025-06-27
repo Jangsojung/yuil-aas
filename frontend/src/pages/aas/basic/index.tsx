@@ -321,7 +321,35 @@ export default function BasiccodePage() {
   };
 
   const handleSearch = () => {
-    const filtered = bases.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+    let filtered = bases;
+
+    if (searchKeyword.trim()) {
+      filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+    }
+
+    if (startDate || endDate) {
+      filtered = filtered.filter((base) => {
+        if (!base.createdAt) return false;
+
+        const baseDate = new Date(base.createdAt);
+        const baseDateOnly = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+
+        if (startDate && endDate) {
+          const start = startDate.toDate();
+          const end = endDate.toDate();
+          return baseDateOnly >= start && baseDateOnly <= end;
+        } else if (startDate) {
+          const start = startDate.toDate();
+          return baseDateOnly >= start;
+        } else if (endDate) {
+          const end = endDate.toDate();
+          return baseDateOnly <= end;
+        }
+
+        return true;
+      });
+    }
+
     setFilteredBases(filtered);
     setCurrentPage(0);
   };
@@ -388,6 +416,9 @@ export default function BasiccodePage() {
               <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
                 <Button variant='contained' color='success' onClick={handleSearch}>
                   검색
+                </Button>
+                <Button variant='contained' color='inherit' onClick={handleMainReset}>
+                  초기화
                 </Button>
               </Stack>
             </Grid>
