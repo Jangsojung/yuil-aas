@@ -6,7 +6,6 @@ import type { Navigation } from '@toolpad/core/AppProvider';
 import Layout from './layouts/dashboard';
 import AuthLayout from './layouts/auth';
 import DashboardPage from './pages/dashboard/dashboard';
-import BasiccodePage from './pages/aas/basiccode';
 import ConvertPage from './pages/aas/convert';
 import TransmitPage from './pages/aas/transmit';
 import AasxManagerPage from './pages/aasx/aasxManager';
@@ -16,6 +15,9 @@ import SignInPage from './pages/signIn/sign';
 import ProtectedRoute from './components/route/ProtectedRoute';
 import JsonPage from './pages/aasx/jsonManager';
 import FacilityPage from './pages/aas/facility';
+import BasicCodeIndex from './pages/aas/basic';
+import BasicCodeAdd from './pages/aas/basic/add';
+import BasicCodeEdit from './pages/aas/basic/edit';
 
 function App() {
   return (
@@ -74,8 +76,16 @@ export default function ReactRouter() {
                   element: <FacilityPage />,
                 },
                 {
-                  path: 'basiccode',
-                  element: <BasiccodePage />,
+                  path: 'basic',
+                  element: <BasicCodeIndex />,
+                },
+                {
+                  path: 'basic/add',
+                  element: <BasicCodeAdd />,
+                },
+                {
+                  path: 'basic/edit/:id',
+                  element: <BasicCodeEdit />,
                 },
                 {
                   path: 'convert',
@@ -156,7 +166,7 @@ const NAVIGATION: Navigation = [
         title: '설비 관리',
       },
       {
-        segment: 'basiccode',
+        segment: 'basic',
         title: '기초코드 관리',
       },
       {
