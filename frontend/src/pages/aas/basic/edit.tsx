@@ -17,9 +17,7 @@ import TableRow from '@mui/material/TableRow';
 import FacilityGroupSelect from '../../../components/select/facility_group';
 import BasicTable from '../../../components/table/basic_code';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { navigationResetState, selectedBaseState, selectedSensorsState, userState } from '../../../recoil/atoms';
-import BasicDatePicker from '../../../components/datepicker';
-import { Dayjs } from 'dayjs';
+import { selectedSensorsState, userState } from '../../../recoil/atoms';
 import AlertModal from '../../../components/modal/alert';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
@@ -67,12 +65,7 @@ export default function BasiccodeEditPage() {
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const [facilityName, setFacilityName] = useState('');
   const [sensorName, setSensorName] = useState('');
-  const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
   const userIdx = useRecoilValue(userState)?.user_idx;
-  const navigationReset = useRecoilValue(navigationResetState);
-
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
@@ -108,15 +101,15 @@ export default function BasiccodeEditPage() {
     }
   }, [id, mode]);
 
-  useEffect(() => {
-    if (detailMode && selectedBaseForDetail) {
-      document.title = `기초코드 관리 > ${selectedBaseForDetail.ab_name}`;
-    } else if (editMode && editingBase) {
-      document.title = `기초코드 관리 > ${editingBase.ab_name} 수정`;
-    } else {
-      document.title = '기초코드 관리';
-    }
-  }, [detailMode, selectedBaseForDetail, editMode, editingBase]);
+  // useEffect(() => {
+  //   if (detailMode && selectedBaseForDetail) {
+  //     document.title = `기초코드 관리 > ${selectedBaseForDetail.ab_name}`;
+  //   } else if (editMode && editingBase) {
+  //     document.title = `기초코드 관리 > ${editingBase.ab_name} 수정`;
+  //   } else {
+  //     document.title = '기초코드 관리';
+  //   }
+  // }, [detailMode, selectedBaseForDetail, editMode, editingBase]);
 
   const loadBaseForDetail = async (baseId: number) => {
     setDetailLoading(true);
@@ -264,10 +257,6 @@ export default function BasiccodeEditPage() {
       setBasicName('');
       setBasicDesc('');
     }
-  };
-
-  const handleBackToMain = () => {
-    window.location.href = '/aas/basic';
   };
 
   const handleTreeSearch = async () => {

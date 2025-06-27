@@ -8,8 +8,6 @@ import { TextField } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { navigationResetState, selectedSensorsState, userState } from '../../../recoil/atoms';
-import BasicDatePicker from '../../../components/datepicker';
-import { Dayjs } from 'dayjs';
 import AlertModal from '../../../components/modal/alert';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
@@ -17,7 +15,7 @@ import LoadingOverlay from '../../../components/loading/LodingOverlay';
 import BasicModal from '../../../components/modal/basicmodal';
 import FacilityGroupSelect from '../../../components/select/facility_group';
 import BasicTable from '../../../components/table/basic_code';
-import { insertBaseAPI, getFacilityGroupsAPI, buildTreeDataAPI } from '../../../apis/api/basic';
+import { insertBaseAPI, buildTreeDataAPI } from '../../../apis/api/basic';
 
 interface FacilityGroupTree {
   fg_idx: number;
@@ -39,9 +37,6 @@ export default function BasiccodeAddPage() {
   const userIdx = useRecoilValue(userState)?.user_idx;
   const navigationReset = useRecoilValue(navigationResetState);
 
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
-
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
   const [alertContent, setAlertContent] = useState('');
@@ -57,19 +52,6 @@ export default function BasiccodeAddPage() {
   const [selectedFacilityGroups, setSelectedFacilityGroups] = useState<number[]>([]);
 
   useEffect(() => {
-    document.title = '기초코드 관리 > 기초코드 등록';
-    getAllFacilityGroups();
-  }, []);
-
-  const handleReset = () => {
-    setSelectedFacilityGroups([]);
-    setFacilityName('');
-    setSensorName('');
-    setTreeData([]);
-    setSelectedSensors([]);
-  };
-
-  useEffect(() => {
     if (navigationReset) {
       setTreeData([]);
       setSelectedSensors([]);
@@ -79,8 +61,6 @@ export default function BasiccodeAddPage() {
       setSelectedFacilityGroups([]);
       setFacilityName('');
       setSensorName('');
-      setStartDate(null);
-      setEndDate(null);
     }
   }, [navigationReset]);
 
@@ -126,54 +106,6 @@ export default function BasiccodeAddPage() {
   const handleBasicModalReset = () => {
     setBasicName('');
     setBasicDesc('');
-  };
-
-  const handleCancle = () => {
-    setSelectedSensors([]);
-    setBasicName('');
-    setBasicDesc('');
-    setBasicModalOpen(false);
-  };
-
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) {
-      return '-';
-    }
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) {
-        return '-';
-      }
-      return date
-        .toLocaleString('ko-KR', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        })
-        .replace(/\. /g, '.')
-        .replace(/\./g, '.')
-        .replace(/ /g, ' ');
-    } catch (error) {
-      return '-';
-    }
-  };
-
-  const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
-  };
-
-  const getAllFacilityGroups = async () => {
-    try {
-      const data = await getFacilityGroupsAPI(3);
-      setSelectedFacilityGroups(data.map((fg: any) => fg.fg_idx));
-    } catch (error) {
-      console.error('Error fetching facility groups:', error);
-      setSelectedFacilityGroups([]);
-    }
   };
 
   const handleBackToMain = () => {
@@ -298,39 +230,6 @@ export default function BasiccodeAddPage() {
       fa.sensors.length > 0 &&
       fa.sensors.some((sensor) => selectedSensors.includes(sensor.sn_idx)) &&
       !isAllSensorsSelectedInFacility(fgIdx, faIdx)
-    );
-  };
-
-  const handleSelectAllInFa = (fa_idx: number, checked: boolean) => {
-    const sensorsInFa = sensorsByFa[fa_idx] || [];
-    const sensorIds = sensorsInFa.map((sensor) => sensor.sn_idx);
-
-    if (checked) {
-      setSelectedSensors((prevSelected) => {
-        const newSelected = [...prevSelected];
-        sensorIds.forEach((id) => {
-          if (!newSelected.includes(id)) {
-            newSelected.push(id);
-          }
-        });
-        return newSelected;
-      });
-    } else {
-      setSelectedSensors((prevSelected) => prevSelected.filter((id) => !sensorIds.includes(id)));
-    }
-  };
-
-  const isAllInFaSelected = (fa_idx: number) => {
-    const sensorsInFa = sensorsByFa[fa_idx] || [];
-    return sensorsInFa.length > 0 && sensorsInFa.every((sensor) => selectedSensors.includes(sensor.sn_idx));
-  };
-
-  const isPartiallySelectedInFa = (fa_idx: number) => {
-    const sensorsInFa = sensorsByFa[fa_idx] || [];
-    return (
-      sensorsInFa.length > 0 &&
-      sensorsInFa.some((sensor) => selectedSensors.includes(sensor.sn_idx)) &&
-      !isAllInFaSelected(fa_idx)
     );
   };
 

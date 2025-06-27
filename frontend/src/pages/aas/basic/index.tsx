@@ -50,10 +50,6 @@ export default function BasiccodePage() {
   const [alertContent, setAlertContent] = useState('');
   const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
 
-  useEffect(() => {
-    document.title = '기초코드 관리';
-  }, []);
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
