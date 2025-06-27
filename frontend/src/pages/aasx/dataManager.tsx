@@ -11,7 +11,7 @@ import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
 
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import Pagenation from '../../components/pagenation';
+import Pagination from '../../components/pagination';
 import { deleteDataAPI, getFilesAPI, getWordsAPI } from '../../apis/api/data_manage';
 import DataTableRow from '../../components/aasx/data_management/DataTableRow';
 import { useRecoilValue } from 'recoil';
@@ -156,7 +156,7 @@ export default function DataManagerPage() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagenation count={words ? words.length : 0} onPageChange={handlePageChange} />
+        <Pagination count={words ? words.length : 0} onPageChange={handlePageChange} />
       </div>
     </div>
   );

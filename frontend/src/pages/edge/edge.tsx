@@ -16,7 +16,7 @@ import Checkbox from '@mui/material/Checkbox';
 import TableBody from '@mui/material/TableBody';
 
 import CustomizedDialogs from '../../components/modal/edgemodal';
-import Pagenation from '../../components/pagenation';
+import Pagination from '../../components/pagination';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 
@@ -228,7 +228,7 @@ export default function Edge_Gateway() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagenation count={edgeGateways ? edgeGateways.length : 0} onPageChange={handlePageChange} />
+        <Pagination count={edgeGateways ? edgeGateways.length : 0} onPageChange={handlePageChange} />
       </div>
 
       <CustomizedDialogs

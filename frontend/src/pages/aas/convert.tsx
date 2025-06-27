@@ -6,7 +6,7 @@ import { Dayjs } from 'dayjs';
 import { Box, Button, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Grid from '@mui/system/Grid';
 import BasicDatePicker from '../../components/datepicker';
-import Pagenation from '../../components/pagenation';
+import Pagination from '../../components/pagination';
 import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
@@ -160,7 +160,7 @@ export default function ConvertPage() {
               </TableBody>
             </Table>
           </TableContainer>
-          <Pagenation count={bases ? bases.length : 0} onPageChange={handlePageChange} />
+          <Pagination count={bases ? bases.length : 0} onPageChange={handlePageChange} />
         </div>
       </div>
     </div>

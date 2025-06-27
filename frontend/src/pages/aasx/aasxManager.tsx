@@ -12,7 +12,7 @@ import ModalBasic from '../../components/modal/aasx_management';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import Pagenation from '../../components/pagenation';
+import Pagination from '../../components/pagination';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
 import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
 import AASXTableRow from '../../components/aasx/aasx_management/AASXTableRow';
@@ -239,7 +239,7 @@ export default function AasxManagerPage() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagenation count={files ? files.length : 0} onPageChange={handlePageChange} />
+        <Pagination count={files ? files.length : 0} onPageChange={handlePageChange} />
       </div>
       <CustomizedDialogs
         open={openUpdateModal}

@@ -12,7 +12,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Pagenation from '../../../components/pagenation';
+import Pagination from '../../../components/pagination';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { navigationResetState, selectedBasesState, selectedBaseState } from '../../../recoil/atoms';
 import BasicDatePicker from '../../../components/datepicker';
@@ -329,7 +329,7 @@ export default function BasiccodePage() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagenation count={filteredBases ? filteredBases.length : 0} onPageChange={handlePageChange} />
+        <Pagination count={filteredBases ? filteredBases.length : 0} onPageChange={handlePageChange} />
       </div>
       <AlertModal
         open={alertOpen}
