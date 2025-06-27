@@ -6,6 +6,10 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
+import { TextField } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 import BasicDatePicker from '../../components/datepicker';
 import ModalBasic from '../../components/modal/aasx_management';
@@ -38,6 +42,7 @@ export default function AasxManagerPage() {
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [openInsertModal, setOpenInsertModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -105,18 +110,9 @@ export default function AasxManagerPage() {
     }
   };
 
-  const handleDateChange = (date: Date | null) => {
-    if (!date) {
-      setAlertModal({
-        open: true,
-        title: '알림',
-        content: '날짜를 선택해주세요.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
-      return;
-    }
-    setSelectedDate(date);
+  const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
   };
 
   const handleSearch = () => {
@@ -177,6 +173,10 @@ export default function AasxManagerPage() {
     setSelectedFile(null);
   };
 
+  const handleCloseInsertModal = () => {
+    setOpenInsertModal(false);
+  };
+
   const handleCloseAlert = () => {
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
@@ -211,14 +211,15 @@ export default function AasxManagerPage() {
       <SearchBox
         buttons={[
           {
-            text: '조회',
+            text: '검색',
             onClick: handleSearch,
             color: 'success',
           },
           {
             text: '초기화',
             onClick: handleReset,
-            color: 'success',
+            color: 'inherit',
+            variant: 'outlined',
           },
         ]}
       >
@@ -239,14 +240,16 @@ export default function AasxManagerPage() {
       <ActionBox
         buttons={[
           {
+            text: '파일등록',
+            onClick: () => setOpenInsertModal(true),
+            color: 'success',
+          },
+          {
             text: '파일삭제',
             onClick: handleDelete,
             color: 'error',
-            disabled: selectedFiles.length === 0,
-            icon: <RemoveIcon />,
           },
         ]}
-        leftContent={<ModalBasic handleInsert={handleInsert} />}
       />
 
       <div className='table-wrap'>
@@ -297,6 +300,7 @@ export default function AasxManagerPage() {
         fileData={selectedFile}
         handleUpdate={handleUpdate}
       />
+      <CustomizedDialogs open={openInsertModal} handleClose={handleCloseInsertModal} handleInsert={handleInsert} />
       <AlertModal
         open={alertModal.open}
         handleClose={handleCloseAlert}

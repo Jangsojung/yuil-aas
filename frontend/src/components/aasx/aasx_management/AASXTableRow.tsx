@@ -36,7 +36,6 @@ export default function AASXTableRow({ file, onCheckboxChange, checked, onEditCl
       </TableCell>
       <TableCell>{file.af_name}</TableCell>
       <TableCell>{formatDate(file.createdAt)}</TableCell>
-      <TableCell>{file.af_size}</TableCell>
       <TableCell>
         <Button variant='contained' color='success' onClick={() => onEditClick(file)}>
           수정
