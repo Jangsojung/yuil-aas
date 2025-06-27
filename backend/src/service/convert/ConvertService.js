@@ -37,7 +37,41 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       [snIdxList]
     );
 
+    // 식별 ID(as_en) 확인
+    const [aliasesCheck] = await pool.promise().query(
+      `SELECT DISTINCT
+        f.fc_name,
+        a.fg_name,
+        s.fa_name,
+        p.sn_name
+      FROM tb_aasx_data_prop p
+      JOIN tb_aasx_data_sm s ON p.fa_idx = s.fa_idx
+      JOIN tb_aasx_data_aas a ON s.fg_idx = a.fg_idx
+      JOIN tb_aasx_data f ON a.fc_idx = f.fc_idx
+      WHERE p.sn_idx IN (?)`,
+      [snIdxList]
+    );
+
+    // 각 항목에 대해 as_en이 있는지 확인
+    for (const item of aliasesCheck) {
+      const [aliasCheck] = await pool.promise().query(
+        `SELECT 
+          MAX(CASE WHEN as_kr = ? THEN as_en END) AS fg_alias,
+          MAX(CASE WHEN as_kr = ? THEN as_en END) AS fa_alias,
+          MAX(CASE WHEN as_kr = ? THEN as_en END) AS sn_alias
+        FROM tb_aasx_alias`,
+        [item.fg_name, item.fa_name, item.sn_name]
+      );
+
+      const { fg_alias, fa_alias, sn_alias } = aliasCheck[0];
+
+      if (!fg_alias || !fa_alias || !sn_alias) {
+        throw new Error('식별 ID가 지정되어있지 않은 항목이 있습니다. 식별 ID 관리 탭에서 지정해주세요.');
+      }
+    }
+
     const jsonStructure = {};
+    let hasData = false;
 
     for (const sensor of sensorInfos) {
       const [aliases] = await pool.promise().query(
@@ -69,6 +103,8 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
         continue;
       }
 
+      hasData = true;
+
       const snData = sensorData.map((record) => {
         const t = new Date(record.sd_createdAt);
         const timestamp = `${t.getFullYear()}${String(t.getMonth() + 1).padStart(2, '0')}${String(t.getDate()).padStart(
@@ -89,6 +125,11 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
         SN_Data: snData,
         Unit: sensor.sn_unit || null,
       };
+    }
+
+    // 데이터가 전혀 없는 경우
+    if (!hasData) {
+      throw new Error('선택한 날짜 범위에 데이터가 없습니다.');
     }
 
     const jsonContent = JSON.stringify(jsonStructure, null, 2);

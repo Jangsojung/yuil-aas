@@ -30,8 +30,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           transform: 'translate(14px, 8px) scale(1)',
-          '&.MuiInputLabel-shrunk': {
-            transform: 'translate(14px, -9px) scale(0.75)',
+          '&.Mui-focused': {
+            color: '#1976d2',
           },
         },
       },
@@ -41,6 +41,9 @@ const theme = createTheme({
         root: {
           '& .MuiOutlinedInput-notchedOutline': {
             borderRadius: '4px',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#1976d2',
           },
         },
       },
@@ -54,12 +57,19 @@ interface Props {
   label?: string;
   minDate?: Dayjs;
   maxDate?: Dayjs;
+  onOpen?: () => void;
 }
 
-export default function SingleDatePicker({ onDateChange, value, label = '날짜', minDate, maxDate }: Props) {
+export default function SingleDatePicker({ onDateChange, value, label = '날짜', minDate, maxDate, onOpen }: Props) {
   const handleDateChange = (newDate: Dayjs | null) => {
     if (onDateChange) {
       onDateChange(newDate);
+    }
+  };
+
+  const handleOpen = () => {
+    if (onOpen) {
+      onOpen();
     }
   };
 
@@ -67,10 +77,11 @@ export default function SingleDatePicker({ onDateChange, value, label = '날짜'
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'ko'}>
       <ThemeProvider theme={theme}>
         <DatePicker
-          label={label}
+          label={value ? '' : label}
           value={value}
           format='YYYY-MM-DD'
           onChange={handleDateChange}
+          onOpen={handleOpen}
           minDate={minDate}
           maxDate={maxDate || dayjs()}
           slots={{ openPickerIcon: CalendarTodayIcon }}

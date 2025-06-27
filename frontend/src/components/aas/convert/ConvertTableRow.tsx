@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Checkbox from '@mui/material/Checkbox';
@@ -17,24 +17,25 @@ interface ConvertTableRowProps {
   };
   checked: boolean;
   onCheckboxChange: (id: number) => void;
-  onEditClick: (base: any) => void;
   onStartDateChange?: (baseId: number, date: Dayjs | null) => void;
   onEndDateChange?: (baseId: number, date: Dayjs | null) => void;
   totalCount?: number;
+  startDate?: Dayjs | null;
+  endDate?: Dayjs | null;
+  onDatePickerOpen?: (baseId: number) => void;
 }
 
 export default function ConvertTableRow({
   base,
   checked,
   onCheckboxChange,
-  onEditClick,
   onStartDateChange,
   onEndDateChange,
   totalCount,
+  startDate,
+  endDate,
+  onDatePickerOpen,
 }: ConvertTableRowProps) {
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
-
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -47,16 +48,26 @@ export default function ConvertTableRow({
   };
 
   const handleStartDateChange = (newDate: Dayjs | null) => {
-    setStartDate(newDate);
     if (onStartDateChange) {
       onStartDateChange(base.ab_idx, newDate);
     }
   };
 
   const handleEndDateChange = (newDate: Dayjs | null) => {
-    setEndDate(newDate);
     if (onEndDateChange) {
       onEndDateChange(base.ab_idx, newDate);
+    }
+  };
+
+  const handleStartDateOpen = () => {
+    if (onDatePickerOpen) {
+      onDatePickerOpen(base.ab_idx);
+    }
+  };
+
+  const handleEndDateOpen = () => {
+    if (onDatePickerOpen) {
+      onDatePickerOpen(base.ab_idx);
     }
   };
 
@@ -69,14 +80,20 @@ export default function ConvertTableRow({
       <TableCell sx={{ width: '100px' }}>{base.sn_length}</TableCell>
       <TableCell sx={{ width: '150px' }}>{base.createdAt ? formatDate(base.createdAt) : ''}</TableCell>
       <TableCell sx={{ width: '160px' }}>
-        <SingleDatePicker onDateChange={handleStartDateChange} value={startDate} label='시작 날짜' />
+        <SingleDatePicker
+          onDateChange={handleStartDateChange}
+          value={startDate || null}
+          label='시작 날짜'
+          onOpen={handleStartDateOpen}
+        />
       </TableCell>
       <TableCell sx={{ width: '160px' }}>
         <SingleDatePicker
           onDateChange={handleEndDateChange}
-          value={endDate}
+          value={endDate || null}
           label='종료 날짜'
           minDate={startDate || undefined}
+          onOpen={handleEndDateOpen}
         />
       </TableCell>
     </TableRow>

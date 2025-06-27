@@ -7,6 +7,11 @@ export const insertConverts = async (fc_idx, startDate, endDate, selectedConvert
     res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ err: 'Internal Server Error' });
+
+    // 에러 메시지를 클라이언트에 전달
+    res.status(400).json({
+      error: true,
+      message: err.message || 'Internal Server Error',
+    });
   }
 };

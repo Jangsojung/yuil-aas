@@ -51,7 +51,20 @@ export const apiHelpers = {
     const response = await fetch(url, { ...defaultOptions, ...options });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // 에러 응답의 본문을 읽어서 에러 메시지 포함
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        // JSON 파싱 실패 시 기본 메시지 사용
+      }
+
+      const error = new Error(errorMessage);
+      (error as any).response = { status: response.status, data: errorMessage };
+      throw error;
     }
 
     return response.json();

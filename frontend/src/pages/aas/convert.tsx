@@ -12,7 +12,8 @@ import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
 import { userState, navigationResetState } from '../../recoil/atoms';
 import LoadingOverlay from '../../components/loading/LodingOverlay';
-import { SearchBox } from '../../components/common';
+import { SearchBox, ActionBox } from '../../components/common';
+import AlertModal from '../../components/modal/alert';
 
 interface Base {
   ab_idx: number;
@@ -27,6 +28,7 @@ export default function ConvertPage() {
   const [selectedConvert, setSelectedConvert] = useState<number | null>();
   const [bases, setBases] = useState<Base[]>([]);
   const [filteredBases, setFilteredBases] = useState<Base[]>([]);
+  const [baseDates, setBaseDates] = useState<{ [key: number]: { startDate: Dayjs | null; endDate: Dayjs | null } }>({});
   const userIdx = useRecoilValue(userState)?.user_idx;
   const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
@@ -36,6 +38,12 @@ export default function ConvertPage() {
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 10;
+
+  // Alert 모달 상태
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertContent, setAlertContent] = useState('');
+  const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -104,52 +112,98 @@ export default function ConvertPage() {
     setCurrentPage(0);
   };
 
-  const handleInsert = async () => {
-    if (!startDate || !endDate) {
-      alert('시작 날짜와 종료 날짜를 모두 선택해야 합니다.');
+  const handleStartDateChange = (baseId: number, date: Dayjs | null) => {
+    setBaseDates((prev) => ({
+      ...prev,
+      [baseId]: {
+        ...prev[baseId],
+        startDate: date,
+      },
+    }));
+  };
+
+  const handleEndDateChange = (baseId: number, date: Dayjs | null) => {
+    setBaseDates((prev) => ({
+      ...prev,
+      [baseId]: {
+        ...prev[baseId],
+        endDate: date,
+      },
+    }));
+  };
+
+  const handleDatePickerOpen = (baseId: number) => {
+    if (selectedConvert !== baseId) {
+      setBaseDates((prev) => {
+        const newDates = { ...prev };
+        if (selectedConvert && newDates[selectedConvert]) {
+          delete newDates[selectedConvert];
+        }
+        return newDates;
+      });
+    }
+    setSelectedConvert(baseId);
+  };
+
+  const handleConvert = async () => {
+    if (!selectedConvert) {
+      setAlertTitle('알림');
+      setAlertContent('변환할 기초코드를 선택해주세요.');
+      setAlertType('alert');
+      setAlertOpen(true);
       return;
     }
 
-    if (!selectedConvert) {
-      alert('기초코드를 선택해야합니다.');
+    const selectedBaseDates = baseDates[selectedConvert];
+    if (!selectedBaseDates || !selectedBaseDates.startDate || !selectedBaseDates.endDate) {
+      setAlertTitle('알림');
+      setAlertContent('시작날짜와 종료날짜를 모두 선택해주세요.');
+      setAlertType('alert');
+      setAlertOpen(true);
       return;
     }
 
     startLoading();
+    try {
+      const formattedStartDate = selectedBaseDates.startDate.format('YYMMDD');
+      const formattedEndDate = selectedBaseDates.endDate.format('YYMMDD');
 
-    const formattedStartDate = startDate.format('YYMMDD');
-    const formattedEndDate = endDate.format('YYMMDD');
+      const data = await insertBaseAPI(formattedStartDate, formattedEndDate, selectedConvert, userIdx);
 
-    const data = await insertBaseAPI(formattedStartDate, formattedEndDate, selectedConvert, userIdx);
+      if (data) {
+        setAlertTitle('알림');
+        setAlertContent('성공적으로 json파일을 생성하였습니다.\n파일 위치: /files/front');
+        setAlertType('alert');
+        setAlertOpen(true);
 
-    if (data) {
-      alert('성공적으로 json파일을 생성하였습니다.\n파일 위치: /files/front');
+        setSelectedConvert(null);
+        setBaseDates({});
+      }
+    } catch (error) {
+      console.error('변환 오류:', error);
 
-      setStartDate(null);
-      setEndDate(null);
-      setSelectedConvert(null);
+      const errorMessage = error.message || '파일 생성 중 오류가 발생했습니다.';
+
+      setAlertTitle('오류');
+      setAlertContent(errorMessage);
+      setAlertType('alert');
+      setAlertOpen(true);
+    } finally {
+      endLoading();
     }
-
-    endLoading();
   };
 
   const handleCheckboxChange = (convertsIdx: number) => {
+    if (selectedConvert !== convertsIdx) {
+      setBaseDates((prev) => {
+        const newDates = { ...prev };
+        if (selectedConvert && newDates[selectedConvert]) {
+          delete newDates[selectedConvert];
+        }
+        return newDates;
+      });
+    }
     setSelectedConvert((prev) => (prev === convertsIdx ? null : convertsIdx));
-  };
-
-  const handleEditClick = (base: Base) => {
-    // 수정 기능 구현
-    console.log('Edit clicked for base:', base);
-  };
-
-  const handleStartDateChange = (baseId: number, date: Dayjs | null) => {
-    console.log('Start date changed for base:', baseId, date);
-    // 여기에 시작날짜 변경 로직 추가
-  };
-
-  const handleEndDateChange = (baseId: number, date: Dayjs | null) => {
-    console.log('End date changed for base:', baseId, date);
-    // 여기에 종료날짜 변경 로직 추가
   };
 
   useEffect(() => {
@@ -163,6 +217,7 @@ export default function ConvertPage() {
     setEndDate(null);
     setCurrentPage(0);
     setSearchKeyword('');
+    setBaseDates({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
@@ -220,6 +275,16 @@ export default function ConvertPage() {
           </Grid>
         </SearchBox>
 
+        <ActionBox
+          buttons={[
+            {
+              text: '변환',
+              onClick: handleConvert,
+              color: 'success',
+            },
+          ]}
+        />
+
         <div className='table-wrap'>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label='simple table'>
@@ -241,10 +306,12 @@ export default function ConvertPage() {
                       key={idx}
                       checked={selectedConvert === base.ab_idx}
                       onCheckboxChange={handleCheckboxChange}
-                      onEditClick={handleEditClick}
                       onStartDateChange={handleStartDateChange}
                       onEndDateChange={handleEndDateChange}
                       totalCount={filteredBases.length}
+                      startDate={baseDates[base.ab_idx]?.startDate || null}
+                      endDate={baseDates[base.ab_idx]?.endDate || null}
+                      onDatePickerOpen={handleDatePickerOpen}
                     />
                   ))
                 ) : (
@@ -260,6 +327,14 @@ export default function ConvertPage() {
           <Pagination count={filteredBases ? filteredBases.length : 0} onPageChange={handlePageChange} />
         </div>
       </div>
+
+      <AlertModal
+        open={alertOpen}
+        handleClose={() => setAlertOpen(false)}
+        title={alertTitle}
+        content={alertContent}
+        type={alertType}
+      />
     </div>
   );
 }
