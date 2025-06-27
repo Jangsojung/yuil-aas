@@ -12,12 +12,18 @@ export const deleteAASXAPI = async (selectedFiles) => {
 
 export const getFilesAPI = async (start, end) => {
   try {
-    const response = await fetch(
-      `${process.env.REACT_APP_API_BASE_URL}/api/file/aasxFiles?af_kind=3&fc_idx=3&startDate=${start}&endDate=${end}`,
-      {
-        method: 'GET',
-      }
-    );
+    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/file/aasxFiles`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        af_kind: 3,
+        fc_idx: 3,
+        startDate: start,
+        endDate: end,
+      }),
+    });
 
     if (!response.ok) {
       throw new Error('Failed to fetch files');
