@@ -3,16 +3,14 @@ import { useLocation } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { baseEditModeState, navigationResetState, selectedBasesState } from '../../recoil/atoms';
 
-import Box from '@mui/system/Box';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { TextField } from '@mui/material';
 
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { SearchBox, ActionBox } from '../../components/common';
 
 export default function FacilityPage() {
   const [insertMode, setInsertMode] = useState(false);
@@ -31,79 +29,75 @@ export default function FacilityPage() {
   return (
     <div className='table-outer'>
       <div>
-        <Box sx={{ flexGrow: 1 }} className='sort-box'>
+        <SearchBox
+          buttons={[
+            {
+              text: '검색',
+              onClick: () => {},
+              color: 'success',
+            },
+          ]}
+        >
           <Grid container spacing={1}>
-            <Grid size={3} container spacing={1}>
-              <Grid>
+            <Grid item xs={3} container spacing={1}>
+              <Grid item>
                 <div className='sort-title'>설비그룹</div>
               </Grid>
-              <Grid size={9}>
+              <Grid item xs={9}>
                 <Select />
               </Grid>
             </Grid>
-            <Grid size={3}>
+            <Grid item xs={3}>
               <Grid container spacing={1}>
-                <Grid>
+                <Grid item>
                   <div className='sort-title'>설비명</div>
                 </Grid>
-                <Grid size={9}>
+                <Grid item xs={9}>
                   <FormControl sx={{ width: '100%' }} size='small'>
                     <TextField />
                   </FormControl>
                 </Grid>
               </Grid>
             </Grid>
-            <Grid size={3}>
+            <Grid item xs={3}>
               <Grid container spacing={1}>
-                <Grid>
+                <Grid item>
                   <div className='sort-title'>센서명</div>
                 </Grid>
-                <Grid size={9}>
+                <Grid item xs={9}>
                   <FormControl sx={{ width: '100%' }} size='small'>
                     <TextField />
                   </FormControl>
                 </Grid>
               </Grid>
             </Grid>
-            <Grid size={3}>
-              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button variant='contained' color='success'>
-                  검색
-                </Button>
-              </Stack>
-            </Grid>
           </Grid>
-        </Box>
-        <Box sx={{ flexGrow: 1 }} className='sort-box'>
-          <Grid container spacing={1}>
-            <Grid size={8}></Grid>
-            <Grid size={4}>
-              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button
-                  variant='contained'
-                  color='primary'
-                >
-                  설비추가
-                </Button>
-                <Button variant='contained' color='error'>
-                  설비삭제
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Box>
+        </SearchBox>
+
+        <ActionBox
+          buttons={[
+            {
+              text: '설비추가',
+              onClick: () => {},
+              color: 'primary',
+            },
+            {
+              text: '설비삭제',
+              onClick: () => {},
+              color: 'error',
+            },
+          ]}
+        />
       </div>
 
       <div className='table-wrap'>
         <SimpleTreeView>
-          1호기
-          <TreeItem>
-            2온조기
+          <TreeItem itemId='1'>
+            1호기
+            <TreeItem itemId='2'>2온조기</TreeItem>
           </TreeItem>
         </SimpleTreeView>
-
       </div>
     </div>
-
   );
 }

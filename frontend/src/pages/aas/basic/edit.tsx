@@ -34,6 +34,7 @@ import {
   buildTreeFromSensorIdsAPI,
   buildTreeDataAPI,
 } from '../../../apis/api/basic';
+import { SearchBox, ActionBox } from '../../../components/common';
 
 interface Base {
   ab_idx: number;
@@ -355,35 +356,27 @@ export default function BasiccodeEditPage() {
     return (
       <div className='table-outer'>
         <div>
-          <Box sx={{ flexGrow: 1 }} className='sort-box'>
-            <Grid container spacing={1}>
-              <Grid item xs={8}></Grid>
-              <Grid item xs={4}>
-                <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                  <Button
-                    variant='contained'
-                    color='success'
-                    onClick={() => {
-                      if (selectedBaseForDetail) {
-                        window.location.href = `/aas/basic/edit/${selectedBaseForDetail.ab_idx}/edit`;
-                      }
-                    }}
-                  >
-                    수정
-                  </Button>
-                  <Button
-                    variant='contained'
-                    color='inherit'
-                    onClick={() => {
-                      window.location.href = '/aas/basic';
-                    }}
-                  >
-                    목록
-                  </Button>
-                </Stack>
-              </Grid>
-            </Grid>
-          </Box>
+          <ActionBox
+            buttons={[
+              {
+                text: '수정',
+                onClick: () => {
+                  if (selectedBaseForDetail) {
+                    window.location.href = `/aas/basic/edit/${selectedBaseForDetail.ab_idx}/edit`;
+                  }
+                },
+                color: 'success',
+              },
+              {
+                text: '목록',
+                onClick: () => {
+                  window.location.href = '/aas/basic';
+                },
+                color: 'inherit',
+                variant: 'outlined',
+              },
+            ]}
+          />
         </div>
 
         <div className='table-wrap'>
@@ -473,7 +466,15 @@ export default function BasiccodeEditPage() {
     return (
       <div className='table-outer'>
         <div>
-          <Box sx={{ flexGrow: 1 }} className='sort-box'>
+          <SearchBox
+            buttons={[
+              {
+                text: '검색',
+                onClick: handleTreeSearch,
+                color: 'success',
+              },
+            ]}
+          >
             <Grid container spacing={2}>
               <Grid item xs={3}>
                 <Grid container spacing={1}>
@@ -524,50 +525,35 @@ export default function BasiccodeEditPage() {
                   </Grid>
                 </Grid>
               </Grid>
+            </Grid>
+          </SearchBox>
 
-              <Grid item xs={3}>
-                <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                  <Button variant='contained' color='success' onClick={handleTreeSearch}>
-                    검색
-                  </Button>
-                </Stack>
-              </Grid>
-            </Grid>
-          </Box>
-          <Box sx={{ flexGrow: 1 }} className='sort-box'>
-            <Grid container spacing={1}>
-              <Grid item xs={8}></Grid>
-              <Grid item xs={4}>
-                <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={() => {
-                      if (selectedSensors.length === 0) {
-                        setAlertTitle('알림');
-                        setAlertContent('센서를 선택해주세요.');
-                        setAlertType('alert');
-                        setAlertOpen(true);
-                      } else {
-                        setBasicModalOpen(true);
-                      }
-                    }}
-                  >
-                    저장
-                  </Button>
-                  <Button
-                    variant='contained'
-                    color='inherit'
-                    onClick={() => {
-                      window.location.href = '/aas/basic';
-                    }}
-                  >
-                    목록
-                  </Button>
-                </Stack>
-              </Grid>
-            </Grid>
-          </Box>
+          <ActionBox
+            buttons={[
+              {
+                text: '저장',
+                onClick: () => {
+                  if (selectedSensors.length === 0) {
+                    setAlertTitle('알림');
+                    setAlertContent('센서를 선택해주세요.');
+                    setAlertType('alert');
+                    setAlertOpen(true);
+                  } else {
+                    setBasicModalOpen(true);
+                  }
+                },
+                color: 'primary',
+              },
+              {
+                text: '목록',
+                onClick: () => {
+                  window.location.href = '/aas/basic';
+                },
+                color: 'inherit',
+                variant: 'outlined',
+              },
+            ]}
+          />
         </div>
 
         <div className='table-wrap'>

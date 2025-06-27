@@ -16,6 +16,7 @@ import BasicModal from '../../../components/modal/basicmodal';
 import FacilityGroupSelect from '../../../components/select/facility_group';
 import BasicTable from '../../../components/table/basic_code';
 import { insertBaseAPI, buildTreeDataAPI } from '../../../apis/api/basic';
+import { SearchBox, ActionBox } from '../../../components/common';
 
 interface FacilityGroupTree {
   fg_idx: number;
@@ -236,7 +237,15 @@ export default function BasiccodeAddPage() {
   return (
     <div className='table-outer'>
       <div>
-        <Box sx={{ flexGrow: 1 }} className='sort-box'>
+        <SearchBox
+          buttons={[
+            {
+              text: '검색',
+              onClick: handleTreeSearch,
+              color: 'success',
+            },
+          ]}
+        >
           <Grid container spacing={2}>
             <Grid item xs={3}>
               <Grid container spacing={1}>
@@ -287,44 +296,33 @@ export default function BasiccodeAddPage() {
                 </Grid>
               </Grid>
             </Grid>
+          </Grid>
+        </SearchBox>
 
-            <Grid item xs={3}>
-              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button variant='contained' color='success' onClick={handleTreeSearch}>
-                  검색
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Box>
-        <Box sx={{ flexGrow: 1 }} className='sort-box'>
-          <Grid container spacing={1}>
-            <Grid item xs={8}></Grid>
-            <Grid item xs={4}>
-              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button
-                  variant='contained'
-                  color='success'
-                  onClick={() => {
-                    if (selectedSensors.length === 0) {
-                      setAlertTitle('알림');
-                      setAlertContent('센서를 선택해주세요.');
-                      setAlertType('alert');
-                      setAlertOpen(true);
-                    } else {
-                      setBasicModalOpen(true);
-                    }
-                  }}
-                >
-                  기초코드 등록
-                </Button>
-                <Button variant='contained' color='inherit' onClick={handleBackToMain}>
-                  취소
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Box>
+        <ActionBox
+          buttons={[
+            {
+              text: '기초코드 등록',
+              onClick: () => {
+                if (selectedSensors.length === 0) {
+                  setAlertTitle('알림');
+                  setAlertContent('센서를 선택해주세요.');
+                  setAlertType('alert');
+                  setAlertOpen(true);
+                } else {
+                  setBasicModalOpen(true);
+                }
+              },
+              color: 'success',
+            },
+            {
+              text: '취소',
+              onClick: handleBackToMain,
+              color: 'inherit',
+              variant: 'outlined',
+            },
+          ]}
+        />
       </div>
 
       <div className='table-wrap'>

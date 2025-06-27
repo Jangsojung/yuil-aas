@@ -2,23 +2,13 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { deleteEdgeAPI, getEdgeAPI } from '../../apis/api/edge';
 
-import Box from '@mui/system/Box';
-import Grid from '@mui/system/Grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
+import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import Checkbox from '@mui/material/Checkbox';
-import TableBody from '@mui/material/TableBody';
-
-import CustomizedDialogs from '../../components/modal/edgemodal';
 import Pagination from '../../components/pagination';
+import CustomizedDialogs from '../../components/modal/edgemodal';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
+import { ActionBox } from '../../components/common';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -164,21 +154,20 @@ export default function Edge_Gateway() {
 
   return (
     <div className='table-outer'>
-      <Box sx={{ flexGrow: 1, p: 1 }} className='sort-box'>
-        <Grid container spacing={0} alignItems='center'>
-          <Grid size={8}></Grid>
-          <Grid size={4}>
-            <Stack spacing={1} direction='row' sx={{ justifyContent: 'flex-end', alignItems: 'center', minHeight: 0 }}>
-              <Button variant='contained' color='success' size='small' onClick={handleOpenModal}>
-                등록
-              </Button>
-              <Button variant='contained' color='error' size='small' onClick={handleDelete}>
-                삭제
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Box>
+      <ActionBox
+        buttons={[
+          {
+            text: '등록',
+            onClick: handleOpenModal,
+            color: 'success',
+          },
+          {
+            text: '삭제',
+            onClick: handleDelete,
+            color: 'error',
+          },
+        ]}
+      />
 
       <div className='table-wrap'>
         <TableContainer component={Paper}>

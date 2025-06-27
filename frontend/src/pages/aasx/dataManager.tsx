@@ -1,21 +1,18 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import Box from '@mui/system/Box';
-import Grid from '@mui/system/Grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import dayjs, { Dayjs } from 'dayjs';
-
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import Grid from '@mui/system/Grid';
+
 import Pagination from '../../components/pagination';
-import { deleteDataAPI, getFilesAPI, getWordsAPI } from '../../apis/api/data_manage';
+import { getWordsAPI } from '../../apis/api/data_manage';
 import DataTableRow from '../../components/aasx/data_management/DataTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
+import { SearchBox, FilterBox } from '../../components/common';
 
 interface Word {
   as_kr: string;
@@ -31,8 +28,8 @@ export default function DataManagerPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 10;
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
+  const handlePageChange = (event: unknown, newPage: number) => {
+    setCurrentPage(newPage);
   };
 
   const pagedData = words?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
@@ -43,18 +40,19 @@ export default function DataManagerPage() {
   // };
 
   const getWords = async () => {
-    const data: Word[] = await getWordsAPI();
-    setWords(data);
+    try {
+      const response = await getWordsAPI();
+      if (response.data) {
+        setWords(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching words:', error);
+    }
   };
 
   const handleSearch = () => {
     getWords();
   };
-
-  useEffect(() => {
-    getWords();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     getWords();
@@ -66,64 +64,63 @@ export default function DataManagerPage() {
   return (
     <div className='table-outer'>
       <div>
-        <Box sx={{ flexGrow: 1 }} className='sort-box'>
+        <SearchBox
+          buttons={[
+            {
+              text: '검색',
+              onClick: handleSearch,
+              color: 'success',
+            },
+          ]}
+        >
           <Grid container spacing={1}>
-            <Grid size={10}>
-              <Grid container spacing={1}>
-                <Grid>
-                  <div className='sort-title'>검색</div>
-                </Grid>
-
-                <Grid size={2}>
-                  <FormControl sx={{ m: 0, width: '100%' }} size='small'>
-                    <Select />
-                  </FormControl>
-                </Grid>
-                <Grid size={7}>
-                  <FormControl sx={{ m: 0, width: '100%' }} size='small'>
-                    <TextField />
-                  </FormControl>
-                </Grid>
-              </Grid>
+            <Grid item>
+              <div className='sort-title'>검색</div>
             </Grid>
-            <Grid size={2}>
-              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button variant='contained' color='success' onClick={handleSearch}>
-                  검색
-                </Button>
-              </Stack>
+
+            <Grid item xs={2}>
+              <FormControl sx={{ m: 0, width: '100%' }} size='small'>
+                <Select />
+              </FormControl>
+            </Grid>
+            <Grid item xs={7}>
+              <FormControl sx={{ m: 0, width: '100%' }} size='small'>
+                <TextField />
+              </FormControl>
             </Grid>
           </Grid>
-        </Box>
-        <Box sx={{ flexGrow: 1 }} className='sort-box'>
-          <Grid container spacing={1}>
-            <Grid size={8}>
-              <Grid container spacing={1} style={{ gap: '20px' }}>
-                <Grid>
-                  <Grid container spacing={1}>
-                    <Grid className='d-flex gap-5'>
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={(e) => (isSelected ? setIsSelected(false) : setIsSelected(true))}
-                      />{' '}
-                      매칭되지 않은 항목만 보기
-                    </Grid>
+        </SearchBox>
+
+        <FilterBox
+          leftContent={
+            <Grid container spacing={1} style={{ gap: '20px' }}>
+              <Grid item>
+                <Grid container spacing={1}>
+                  <Grid item className='d-flex gap-5'>
+                    <Checkbox
+                      checked={isSelected}
+                      onChange={(e) => (isSelected ? setIsSelected(false) : setIsSelected(true))}
+                    />{' '}
+                    매칭되지 않은 항목만 보기
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
-            <Grid size={4}>
-              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button variant='contained' color='success' onClick={handleSearch}>
-                  확인
-                </Button>
-                <Button variant='contained' color='inherit'>
-                  취소
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Box>
+          }
+          buttons={[
+            {
+              text: '확인',
+              onClick: handleSearch,
+              color: 'success',
+            },
+            {
+              text: '취소',
+              onClick: () => {},
+              color: 'inherit',
+              variant: 'outlined',
+            },
+          ]}
+        />
       </div>
 
       <div className='table-wrap'>

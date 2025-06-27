@@ -18,10 +18,12 @@ import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
 import AASXTableRow from '../../components/aasx/aasx_management/AASXTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
+import { SearchBox, ActionBox } from '../../components/common';
 
 interface File {
   af_idx: number;
   af_name: string;
+  af_size: number;
   createdAt: Date;
 }
 
@@ -159,46 +161,47 @@ export default function AasxManagerPage() {
 
   return (
     <div className='table-outer'>
-      <Box sx={{ flexGrow: 1 }} className='sort-box'>
-        <Grid container spacing={1}>
-          <Grid size={8}>
-            <Grid container spacing={1} style={{ gap: '20px' }}>
-              <Grid>
-                <Grid container spacing={1}>
-                  <Grid className='d-flex gap-5'>
-                    <div className='sort-title'>날짜</div>
-                  </Grid>
-                  <Grid>
-                    <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
-                  </Grid>
-                </Grid>
+      <SearchBox
+        buttons={[
+          {
+            text: '조회',
+            onClick: handleSearch,
+            color: 'success',
+          },
+          {
+            text: '초기화',
+            onClick: handleReset,
+            color: 'success',
+          },
+        ]}
+      >
+        <Grid container spacing={1} style={{ gap: '20px' }}>
+          <Grid item>
+            <Grid container spacing={1}>
+              <Grid item className='d-flex gap-5'>
+                <div className='sort-title'>날짜</div>
+              </Grid>
+              <Grid item>
+                <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
               </Grid>
             </Grid>
           </Grid>
-
-          <Grid size={4}>
-            <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              <Button variant='contained' color='success' onClick={handleSearch}>
-                조회
-              </Button>
-              <Button variant='contained' color='success' onClick={handleReset}>
-                초기화
-              </Button>
-            </Stack>
-          </Grid>
         </Grid>
+      </SearchBox>
 
-        <Grid container spacing={1} style={{ marginTop: '5px' }}>
-          <Grid size={12}>
-            <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              <ModalBasic handleInsert={handleInsert} />
-              <Button variant='contained' color='error' onClick={handleDelete} disabled={selectedFiles.length === 0}>
-                <RemoveIcon /> 파일삭제
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Box>
+      <ActionBox
+        buttons={[
+          {
+            text: '파일삭제',
+            onClick: handleDelete,
+            color: 'error',
+            disabled: selectedFiles.length === 0,
+            icon: <RemoveIcon />,
+          },
+        ]}
+        leftContent={<ModalBasic handleInsert={handleInsert} />}
+      />
+
       <div className='table-wrap'>
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>

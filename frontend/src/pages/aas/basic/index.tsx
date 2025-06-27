@@ -19,6 +19,7 @@ import BasicDatePicker from '../../../components/datepicker';
 import { Dayjs } from 'dayjs';
 import AlertModal from '../../../components/modal/alert';
 import { getBasesAPI, deleteBasesAPI } from '../../../apis/api/basic';
+import { SearchBox, ActionBox } from '../../../components/common';
 
 interface Base {
   ab_idx: number;
@@ -232,7 +233,21 @@ export default function BasiccodePage() {
   return (
     <div className='table-outer'>
       <div>
-        <Box sx={{ flexGrow: 1 }} className='sort-box'>
+        <SearchBox
+          buttons={[
+            {
+              text: '검색',
+              onClick: handleSearch,
+              color: 'success',
+            },
+            {
+              text: '초기화',
+              onClick: handleReset,
+              color: 'inherit',
+              variant: 'outlined',
+            },
+          ]}
+        >
           <Grid container spacing={2}>
             <Grid item xs={3}>
               <Grid container spacing={1}>
@@ -240,7 +255,12 @@ export default function BasiccodePage() {
                   <div className='sort-title'>기초코드명</div>
                 </Grid>
                 <Grid item xs={9}>
-                  <TextField size='small' value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value)} />
+                  <TextField
+                    size='small'
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    placeholder='기초코드명을 입력하세요'
+                  />
                 </Grid>
               </Grid>
             </Grid>
@@ -255,34 +275,23 @@ export default function BasiccodePage() {
                 </Grid>
               </Grid>
             </Grid>
+          </Grid>
+        </SearchBox>
 
-            <Grid item xs={3}>
-              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button variant='contained' color='success' onClick={handleSearch}>
-                  검색
-                </Button>
-                <Button variant='contained' color='inherit' onClick={handleReset}>
-                  초기화
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Box>
-        <Box sx={{ flexGrow: 1 }} className='sort-box'>
-          <Grid container spacing={1}>
-            <Grid item xs={8}></Grid>
-            <Grid item xs={4}>
-              <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button variant='contained' color='success' onClick={handleAdd}>
-                  기초코드 등록
-                </Button>
-                <Button variant='contained' color='error' onClick={handleDelete}>
-                  삭제
-                </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Box>
+        <ActionBox
+          buttons={[
+            {
+              text: '기초코드 등록',
+              onClick: handleAdd,
+              color: 'success',
+            },
+            {
+              text: '삭제',
+              onClick: handleDelete,
+              color: 'error',
+            },
+          ]}
+        />
       </div>
 
       <div className='table-wrap'>

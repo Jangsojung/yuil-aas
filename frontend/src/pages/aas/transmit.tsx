@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import TransmitView from '../../section/aas/transmit/view';
-import Box from '@mui/system/Box';
-import Grid from '@mui/system/Grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import SelectAASXFile from '../../components/select/aasx_files';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { aasxDataState, currentFileState, isVerifiedState, navigationResetState } from '../../recoil/atoms';
 import { handleVerifyAPI } from '../../apis/api/transmit';
+import SelectAASXFile from '../../components/select/aasx_files';
+import TransmitView from '../../section/aas/transmit/view';
+import Grid from '@mui/system/Grid';
+import { SearchBox } from '../../components/common';
 
 interface AASXFile {
   af_idx: number;
@@ -190,26 +188,29 @@ export default function TransmitPage() {
 
   return (
     <div>
-      <Box sx={{ flexGrow: 1 }} className='sort-box'>
+      <SearchBox
+        buttons={[
+          {
+            text: '검증하기',
+            onClick: handleVerify,
+            color: 'success',
+            disabled: !currentFile,
+          },
+        ]}
+      >
         <Grid container spacing={1}>
-          <Grid container spacing={1} size={8}>
-            <Grid>
-              <div className='sort-title'>AASX 파일</div>
+          <Grid item xs={8}>
+            <Grid container spacing={1}>
+              <Grid item>
+                <div className='sort-title'>AASX 파일</div>
+              </Grid>
+              <Grid item xs={10}>
+                <SelectAASXFile setSelectedFile={setSelectedFile} />
+              </Grid>
             </Grid>
-            <Grid size={10}>
-              <SelectAASXFile setSelectedFile={setSelectedFile} />
-            </Grid>
-          </Grid>
-
-          <Grid size={4}>
-            <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-              <Button variant='contained' color='success' onClick={handleVerify} disabled={!currentFile}>
-                검증하기
-              </Button>
-            </Stack>
           </Grid>
         </Grid>
-      </Box>
+      </SearchBox>
       <TransmitView />
     </div>
   );
