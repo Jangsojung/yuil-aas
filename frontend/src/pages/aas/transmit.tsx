@@ -24,7 +24,7 @@ export default function TransmitPage() {
   const [selectedFile, setSelectedFile] = useState<AASXFile | undefined>(undefined);
   const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [alertModal, setAlertModal] = useState({
     open: false,
@@ -164,6 +164,16 @@ export default function TransmitPage() {
       setTreeLoading(false);
     }
   };
+
+  const pagedData = aasxData?.AAS?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+
+  const calculatedTotalPages = Math.ceil((aasxData?.AAS?.length || 0) / rowsPerPage);
+
+  useEffect(() => {
+    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
+      setCurrentPage(0);
+    }
+  }, [currentPage, calculatedTotalPages]);
 
   return (
     <div>

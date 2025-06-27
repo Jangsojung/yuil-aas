@@ -64,6 +64,14 @@ export default function BasiccodePage() {
 
   const pagedData = filteredBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
+  const calculatedTotalPages = Math.ceil((filteredBases?.length || 0) / rowsPerPage);
+
+  useEffect(() => {
+    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
+      setCurrentPage(0);
+    }
+  }, [currentPage, calculatedTotalPages]);
+
   useEffect(() => {
     if (selectedBases.length === 0) {
       setSelectAll(false);
@@ -338,7 +346,11 @@ export default function BasiccodePage() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination count={filteredBases ? filteredBases.length : 0} onPageChange={handlePageChange} />
+        <Pagination
+          count={filteredBases ? filteredBases.length : 0}
+          page={currentPage}
+          onPageChange={handlePageChange}
+        />
       </div>
       <AlertModal
         open={alertOpen}

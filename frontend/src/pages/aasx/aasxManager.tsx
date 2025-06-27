@@ -40,7 +40,7 @@ export default function AasxManagerPage() {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [alertModal, setAlertModal] = useState({
     open: false,
@@ -57,6 +57,14 @@ export default function AasxManagerPage() {
   };
 
   const pagedData = files?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+
+  const calculatedTotalPages = Math.ceil((files?.length || 0) / rowsPerPage);
+
+  useEffect(() => {
+    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
+      setCurrentPage(0);
+    }
+  }, [currentPage, calculatedTotalPages]);
 
   const handleInsert = async (file: File) => {
     setFiles((prevFiles) => [file, ...prevFiles]);
@@ -281,7 +289,7 @@ export default function AasxManagerPage() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination count={files ? files.length : 0} onPageChange={handlePageChange} />
+        <Pagination count={files ? files.length : 0} page={currentPage} onPageChange={handlePageChange} />
       </div>
       <CustomizedDialogs
         open={openUpdateModal}

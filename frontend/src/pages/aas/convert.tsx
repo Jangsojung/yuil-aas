@@ -39,7 +39,6 @@ export default function ConvertPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 10;
 
-  // Alert 모달 상태
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
   const [alertContent, setAlertContent] = useState('');
@@ -50,6 +49,14 @@ export default function ConvertPage() {
   };
 
   const pagedData = filteredBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+
+  const calculatedTotalPages = Math.ceil((filteredBases?.length || 0) / rowsPerPage);
+
+  useEffect(() => {
+    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
+      setCurrentPage(0);
+    }
+  }, [currentPage, calculatedTotalPages]);
 
   const startLoading = () => {
     setIsLoading(true);
@@ -324,7 +331,11 @@ export default function ConvertPage() {
               </TableBody>
             </Table>
           </TableContainer>
-          <Pagination count={filteredBases ? filteredBases.length : 0} onPageChange={handlePageChange} />
+          <Pagination
+            count={filteredBases ? filteredBases.length : 0}
+            page={currentPage}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
 

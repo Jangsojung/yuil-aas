@@ -31,7 +31,7 @@ export default function DataManagerPage() {
   const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [showUnmatchedOnly, setShowUnmatchedOnly] = useState(false);
   const [alertModal, setAlertModal] = useState({
@@ -50,12 +50,19 @@ export default function DataManagerPage() {
 
   const pagedData = filteredWords?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
+  const calculatedTotalPages = Math.ceil((filteredWords?.length || 0) / rowsPerPage);
+
+  useEffect(() => {
+    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
+      setCurrentPage(0);
+    }
+  }, [currentPage, calculatedTotalPages]);
+
   const getWords = async () => {
     try {
       const response = await getWordsAPI();
       if (response) {
         setWords(response);
-        // 필터링 상태에 따라 filteredWords 설정
         if (isSelected) {
           const unmatchedWords = response.filter((word) => !word.as_en || word.as_en.trim() === '');
           setFilteredWords(unmatchedWords);
