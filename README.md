@@ -1,7 +1,43 @@
-### Backend 실행 방법 ---
+### 환경변수 설정 ---
 
-- backend/.env 파일 생성 필요
-  - PORT, DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, JWT_SECRET
+#### Backend 환경변수 설정
+
+1. `backend/` 폴더에 `.env` 파일 생성
+2. `backend/env.example` 파일을 참고하여 다음 내용 추가:
+
+```env
+PORT
+DB_HOST
+DB_USER
+DB_PASS
+DB_NAME
+DB_PORT
+JWT_SECRET
+PYTHON_SERVER_URL
+```
+
+#### Frontend 환경변수 설정
+
+1. `frontend/` 폴더에 `.env` 파일 생성
+2. `frontend/env.example` 파일을 참고하여 다음 내용 추가:
+
+```env
+REACT_APP_API_BASE_URL
+REACT_APP_WS_URL
+```
+
+#### Python 환경변수 설정
+
+1. `python/` 폴더에 `.env` 파일 생성
+2. `python/env.example` 파일을 참고하여 다음 내용 추가:
+
+```env
+FLASK_HOST
+FLASK_PORT
+FLASK_DEBUG
+```
+
+### Backend 실행 방법 ---
 
 1. cd backend
 2. npm i
@@ -21,7 +57,8 @@
 2. pip install basyx-python-sdk==1.1.0
 3. pip install flask== 3.1.0
 4. pip install orjson==3.10.16
-5. python main.py
+5. pip install python-dotenv
+6. python main.py
 
 ### 전체적인 페이지 흐름 ---
 
