@@ -27,8 +27,6 @@ export const insertFileToDB = async (fc_idx, fileName, user_idx) => {
       }),
     });
 
-    console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
-
     return {
       success: true,
       fileName: fileName,
@@ -73,8 +71,6 @@ export const updateFileToDB = async (af_idx, fileName, user_idx) => {
       }),
     });
 
-    console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
-
     return {
       success: true,
       fileName: newFileName,
@@ -109,8 +105,6 @@ export const deleteFilesFromDB = async (ids) => {
         paths: filePaths,
       }),
     });
-
-    console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
   } catch (err) {
     console.log('Failed to delete Python JSON Files: ', err);
     throw err;
@@ -177,8 +171,6 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       }),
     });
 
-    console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
-
     return {
       success: true,
       fileName: aasxFileName,
@@ -212,8 +204,6 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
     const old_pythonFilePath = `../files/aasx/${oldFileName}`;
     const pythonFilePath = `../files/aasx/${newFileName}`;
 
-    console.log(old_pythonFilePath, ' ', pythonFilePath);
-
     const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
       method: 'POST',
       headers: {
@@ -225,7 +215,6 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       }),
     });
 
-    console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
     return {
       success: true,
       fileName: newFileName,
@@ -260,8 +249,6 @@ export const deleteAASXFilesFromDB = async (ids) => {
         paths: filePaths,
       }),
     });
-
-    console.log('Python 서버에 경로 전달 성공:', pythonResponse.data);
   } catch (err) {
     console.log('Failed to delete Python JSON Files: ', err);
     throw err;
@@ -383,7 +370,6 @@ export const updateWordsToDB = async (updates) => {
 
     Promise.all(updatePromises)
       .then((results) => {
-        console.log('단어 업데이트 완료:', results);
         resolve({
           success: true,
           updatedCount: results.length,

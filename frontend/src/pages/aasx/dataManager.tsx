@@ -55,10 +55,16 @@ export default function DataManagerPage() {
       const response = await getWordsAPI();
       if (response) {
         setWords(response);
-        setFilteredWords(response);
+        // 필터링 상태에 따라 filteredWords 설정
+        if (isSelected) {
+          const unmatchedWords = response.filter((word) => !word.as_en || word.as_en.trim() === '');
+          setFilteredWords(unmatchedWords);
+        } else {
+          setFilteredWords(response);
+        }
       }
     } catch (error) {
-      console.error('Error fetching words:', error);
+      console.error('단어 목록을 가져오는 중 오류 발생:', error);
     }
   };
 
@@ -78,39 +84,69 @@ export default function DataManagerPage() {
       return;
     }
 
-    try {
-      const updates = Object.keys(modifiedData).map((key) => {
-        const [as_kr, original_as_en] = key.split('|');
-        const new_as_en = modifiedData[key];
+    const invalidEntries = Object.keys(modifiedData).filter((key) => {
+      const [as_kr, original_as_en] = key.split('|');
+      const new_as_en = modifiedData[key];
 
-        return {
-          as_kr: as_kr,
-          original_as_en: original_as_en,
-          new_as_en: new_as_en,
-        };
-      });
+      const validPattern = /^[a-zA-Z0-9_]+$/;
+      return !validPattern.test(new_as_en);
+    });
 
-      await updateWordsAPI(updates);
-
+    if (invalidEntries.length > 0) {
       setAlertModal({
         open: true,
         title: '알림',
-        content: '저장되었습니다.',
+        content: '식별 ID는 영어, 숫자, _만 사용 가능합니다.',
         type: 'alert',
         onConfirm: undefined,
       });
-      setModifiedData({});
-      getWords();
-    } catch (error) {
-      console.error('저장 중 오류 발생:', error);
-      setAlertModal({
-        open: true,
-        title: '오류',
-        content: '저장 중 오류가 발생했습니다.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
+      return;
     }
+
+    setAlertModal({
+      open: true,
+      title: '확인',
+      content: `${Object.keys(modifiedData).length}건의 변경사항을 저장하시겠습니까?`,
+      type: 'confirm',
+      onConfirm: async () => {
+        try {
+          const updates = Object.keys(modifiedData).map((key) => {
+            const [as_kr, original_as_en] = key.split('|');
+            const new_as_en = modifiedData[key];
+
+            return {
+              as_kr: as_kr,
+              original_as_en: original_as_en,
+              new_as_en: new_as_en,
+            };
+          });
+
+          await updateWordsAPI(updates);
+
+          setAlertModal({
+            open: true,
+            title: '알림',
+            content: '저장되었습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
+          setModifiedData({});
+          setEditingValues({});
+          setSelectedItems([]);
+
+          await getWords();
+        } catch (error) {
+          console.error('저장 중 오류 발생:', error);
+          setAlertModal({
+            open: true,
+            title: '오류',
+            content: '저장 중 오류가 발생했습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
+        }
+      },
+    });
   };
 
   const handleUnmatchedOnly = (checked: boolean) => {
@@ -128,7 +164,6 @@ export default function DataManagerPage() {
     setSelectedItems((prev) => {
       const isSelected = prev.some((selected) => selected.as_kr === item.as_kr && selected.as_en === item.as_en);
       if (isSelected) {
-        // 체크박스 해제 시 수정 중인 값 제거
         const key = `${item.as_kr}|${item.as_en}`;
         setModifiedData((prevData) => {
           const newData = { ...prevData };
@@ -154,14 +189,12 @@ export default function DataManagerPage() {
       [key]: newEnglish,
     }));
 
-    // 원래 값과 다를 때만 modifiedData에 추가
     if (newEnglish !== originalData.as_en) {
       setModifiedData((prev) => ({
         ...prev,
         [key]: newEnglish,
       }));
     } else {
-      // 원래 값과 같으면 modifiedData에서 제거
       setModifiedData((prev) => {
         const newData = { ...prev };
         delete newData[key];

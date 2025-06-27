@@ -104,7 +104,6 @@ export default function Edge_Gateway() {
 
   const getEdge = async () => {
     const data: EdgeGateway[] = await getEdgeAPI();
-    console.log('Edge Gateway 데이터:', data);
     setEdgeGateways(data);
   };
 

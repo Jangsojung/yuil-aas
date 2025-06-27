@@ -38,6 +38,14 @@ export default function DataTableRow({
     }
   };
 
+  const isValidEnglish = (value: string) => {
+    const validPattern = /^[a-zA-Z0-9_]*$/;
+    return validPattern.test(value);
+  };
+
+  const currentValue = editingValue || data.as_en;
+  const isInvalid = currentValue && !isValidEnglish(currentValue);
+
   return (
     <TableRow key={data.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell sx={{ minWidth: '150px', width: '150px' }}>
@@ -46,23 +54,33 @@ export default function DataTableRow({
       <TableCell sx={{ width: '50%' }}>{data.as_kr}</TableCell>
       <TableCell sx={{ width: '50%' }}>
         {checked ? (
-          <TextField
-            value={editingValue || data.as_en}
-            onChange={handleEnglishChange}
-            size='small'
-            fullWidth
-            variant='outlined'
-            sx={{
-              '& .MuiInputBase-input': {
-                textAlign: 'center',
-                padding: '4px 8px',
-                fontSize: '14px',
-              },
-              '& .MuiOutlinedInput-root': {
-                height: '32px',
-              },
-            }}
-          />
+          <>
+            <TextField
+              value={currentValue}
+              onChange={handleEnglishChange}
+              size='small'
+              fullWidth
+              variant='outlined'
+              error={isInvalid}
+              sx={{
+                '& .MuiInputBase-input': {
+                  textAlign: 'center',
+                  padding: '4px 8px',
+                  fontSize: '14px',
+                },
+                '& .MuiOutlinedInput-root': {
+                  height: '32px',
+                },
+                '& .MuiFormHelperText-root': {
+                  margin: '2px 0 0 0',
+                  fontSize: '11px',
+                },
+              }}
+            />
+            {isInvalid && (
+              <div style={{ fontSize: '11px', color: '#d32f2f', marginTop: '2px' }}>영어, 숫자, _만 사용 가능</div>
+            )}
+          </>
         ) : (
           data.as_en
         )}

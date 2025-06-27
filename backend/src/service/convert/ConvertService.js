@@ -89,8 +89,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       const faNameEn = fa_alias || sensor.fa_name;
       const snNameEn = sn_alias || sensor.sn_name;
 
-      console.log(fgNameEn, faNameEn, snNameEn);
-
       const [sensorData] = await pool.promise().query(
         `SELECT ROUND(sn_compute_data, 2) AS sn_compute_data, sd_createdAt 
          FROM tb_aasx_sensor_data 
