@@ -1,11 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import Box from '@mui/system/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
@@ -16,30 +13,11 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Pagenation from '../../../components/pagenation';
-import FacilityGroupSelect from '../../../components/select/facility_group';
-import BasicTable from '../../../components/table/basic_code';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  baseEditModeState,
-  navigationResetState,
-  selectedBasesState,
-  selectedBaseState,
-  selectedSensorsState,
-  currentFacilityGroupState,
-  hasBasicsState,
-  userState,
-} from '../../../recoil/atoms';
+import { navigationResetState, selectedBasesState, selectedBaseState } from '../../../recoil/atoms';
 import BasicDatePicker from '../../../components/datepicker';
 import { Dayjs } from 'dayjs';
 import AlertModal from '../../../components/modal/alert';
-import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import LoadingOverlay from '../../../components/loading/LodingOverlay';
-import BasicModal from '../../../components/modal/basicmodal';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 import { getBasesAPI, deleteBasesAPI } from '../../../apis/api/basic';
 
 interface Base {
@@ -50,47 +28,14 @@ interface Base {
   createdAt: Date;
 }
 
-interface Basic {
-  fa_idx: number;
-  fa_name: string;
-}
-
-interface Sensor {
-  sn_idx: number;
-  sn_name: string;
-}
-
-interface FacilityGroupTree {
-  fg_idx: number;
-  fg_name: string;
-  facilities: {
-    fa_idx: number;
-    fa_name: string;
-    sensors: {
-      sn_idx: number;
-      sn_name: string;
-    }[];
-  }[];
-}
-
-const cells = ['기초코드명', '센서 개수', '생성 날짜', '비고'];
+const cells = ['기초코드명', '센서 개수', '생성 일자', '비고'];
 
 export default function BasiccodePage() {
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
-  const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
-  const [name, setName] = useState('');
-  const [facilityName, setFacilityName] = useState('');
-  const [sensorName, setSensorName] = useState('');
   const [bases, setBases] = useState<Base[]>([]);
   const [filteredBases, setFilteredBases] = useState<Base[]>([]);
-  const [basics, setBasics] = useState<Basic[]>([]);
-  const [sensorsByFa, setSensorsByFa] = useState<{ [key: number]: Sensor[] }>({});
   const [selectAll, setSelectAll] = useState(false);
   const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
-  const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
-  const [, setHasBasics] = useRecoilState(hasBasicsState);
-  const userIdx = useRecoilValue(userState)?.user_idx;
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
@@ -105,15 +50,6 @@ export default function BasiccodePage() {
   const [alertContent, setAlertContent] = useState('');
   const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
 
-  const [treeData, setTreeData] = useState<FacilityGroupTree[]>([]);
-  const [treeLoading, setTreeLoading] = useState(false);
-
-  const [basicModalOpen, setBasicModalOpen] = useState(false);
-  const [basicName, setBasicName] = useState('');
-  const [basicDesc, setBasicDesc] = useState('');
-
-  const [selectedFacilityGroups, setSelectedFacilityGroups] = useState<number[]>([]);
-
   useEffect(() => {
     document.title = '기초코드 관리';
   }, []);
@@ -123,14 +59,6 @@ export default function BasiccodePage() {
   };
 
   const handleReset = () => {
-    setSelectedFacilityGroups([]);
-    setFacilityName('');
-    setSensorName('');
-    setTreeData([]);
-    setSelectedSensors([]);
-  };
-
-  const handleMainReset = () => {
     setSearchKeyword('');
     setStartDate(null);
     setEndDate(null);
@@ -162,14 +90,6 @@ export default function BasiccodePage() {
   useEffect(() => {
     if (navigationReset) {
       getBases();
-      setTreeData([]);
-      setSelectedSensors([]);
-      setBasicName('');
-      setBasicDesc('');
-      setBasicModalOpen(false);
-      setSelectedFacilityGroups([]);
-      setFacilityName('');
-      setSensorName('');
       setSearchKeyword('');
       setStartDate(null);
       setEndDate(null);
@@ -183,60 +103,6 @@ export default function BasiccodePage() {
       setBases(data);
     } catch (error) {
       console.error('Error fetching bases:', error);
-    }
-  };
-
-  const getBasicCode = async (fg_idx: number) => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fg_idx: fg_idx,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch basic code');
-      }
-
-      const data = await response.json();
-      setBasics(data);
-      setHasBasics(data !== null && data.length > 0);
-    } catch (error) {
-      console.error('Error fetching basic code:', error);
-    }
-  };
-
-  const getSensorsByFa = async (fa_idx: number) => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fa_idx: fa_idx,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch sensors');
-      }
-
-      const data = await response.json();
-      setSensorsByFa((prev) => ({
-        ...prev,
-        [fa_idx]: Array.isArray(data) ? data : [],
-      }));
-    } catch (error) {
-      console.error('Error fetching sensors:', error);
-      setSensorsByFa((prev) => ({
-        ...prev,
-        [fa_idx]: [],
-      }));
     }
   };
 
@@ -307,19 +173,6 @@ export default function BasiccodePage() {
     }
   };
 
-  const handleAdd = async () => {
-    window.location.href = '/aas/basic/add';
-  };
-
-  const handleBasicModalAdd = async () => {
-    setBasicModalOpen(false);
-  };
-
-  const handleBasicModalReset = () => {
-    setBasicName('');
-    setBasicDesc('');
-  };
-
   const handleSearch = () => {
     let filtered = bases;
 
@@ -355,22 +208,14 @@ export default function BasiccodePage() {
   };
 
   const formatDate = (dateString: string | undefined) => {
-    if (!dateString) {
-      return '-';
-    }
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) {
-        return '-';
-      }
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      });
-    } catch (error) {
-      return '-';
-    }
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
   const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
@@ -394,9 +239,7 @@ export default function BasiccodePage() {
                   <div className='sort-title'>기초코드명</div>
                 </Grid>
                 <Grid item xs={9}>
-                  <FormControl sx={{ width: '100%' }} size='small'>
-                    <TextField size='small' value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value)} />
-                  </FormControl>
+                  <TextField size='small' value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value)} />
                 </Grid>
               </Grid>
             </Grid>
@@ -417,7 +260,7 @@ export default function BasiccodePage() {
                 <Button variant='contained' color='success' onClick={handleSearch}>
                   검색
                 </Button>
-                <Button variant='contained' color='inherit' onClick={handleMainReset}>
+                <Button variant='contained' color='inherit' onClick={handleReset}>
                   초기화
                 </Button>
               </Stack>
@@ -429,9 +272,6 @@ export default function BasiccodePage() {
             <Grid item xs={8}></Grid>
             <Grid item xs={4}>
               <Stack spacing={1} direction='row' style={{ justifyContent: 'flex-end' }}>
-                <Button variant='contained' color='success' onClick={handleAdd}>
-                  기초코드 등록
-                </Button>
                 <Button variant='contained' color='error' onClick={handleDelete}>
                   삭제
                 </Button>

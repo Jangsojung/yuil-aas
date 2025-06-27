@@ -1,34 +1,13 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/system/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
 import { TextField } from '@mui/material';
-import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Pagenation from '../../../components/pagenation';
-import FacilityGroupSelect from '../../../components/select/facility_group';
-import BasicTable from '../../../components/table/basic_code';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  baseEditModeState,
-  navigationResetState,
-  selectedBasesState,
-  selectedBaseState,
-  selectedSensorsState,
-  currentFacilityGroupState,
-  hasBasicsState,
-  userState,
-} from '../../../recoil/atoms';
+import { navigationResetState, selectedSensorsState, userState } from '../../../recoil/atoms';
 import BasicDatePicker from '../../../components/datepicker';
 import { Dayjs } from 'dayjs';
 import AlertModal from '../../../components/modal/alert';
@@ -36,29 +15,9 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import LoadingOverlay from '../../../components/loading/LodingOverlay';
 import BasicModal from '../../../components/modal/basicmodal';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
+import FacilityGroupSelect from '../../../components/select/facility_group';
+import BasicTable from '../../../components/table/basic_code';
 import { insertBaseAPI, getFacilityGroupsAPI, buildTreeDataAPI } from '../../../apis/api/basic';
-
-interface Base {
-  ab_idx: number;
-  ab_name: string;
-  ab_note: string;
-  sn_length: number;
-  createdAt: Date;
-}
-
-interface Basic {
-  fa_idx: number;
-  fa_name: string;
-}
-
-interface Sensor {
-  sn_idx: number;
-  sn_name: string;
-}
 
 interface FacilityGroupTree {
   fg_idx: number;
@@ -73,31 +32,15 @@ interface FacilityGroupTree {
   }[];
 }
 
-const cells = ['기초코드명', '센서 개수', '생성 날짜', '비고'];
-
 export default function BasiccodeAddPage() {
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
-  const [name, setName] = useState('');
   const [facilityName, setFacilityName] = useState('');
   const [sensorName, setSensorName] = useState('');
-  const [bases, setBases] = useState<Base[]>([]);
-  const [filteredBases, setFilteredBases] = useState<Base[]>([]);
-  const [basics, setBasics] = useState<Basic[]>([]);
-  const [sensorsByFa, setSensorsByFa] = useState<{ [key: number]: Sensor[] }>({});
-  const [selectAll, setSelectAll] = useState(false);
-  const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
-  const currentFacilityGroup = useRecoilValue(currentFacilityGroupState);
-  const [, setHasBasics] = useRecoilState(hasBasicsState);
   const userIdx = useRecoilValue(userState)?.user_idx;
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [searchKeyword, setSearchKeyword] = useState('');
-
-  const [currentPage, setCurrentPage] = useState(0);
-  const rowsPerPage = 10;
 
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
@@ -118,10 +61,6 @@ export default function BasiccodeAddPage() {
     getAllFacilityGroups();
   }, []);
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
   const handleReset = () => {
     setSelectedFacilityGroups([]);
     setFacilityName('');
@@ -129,14 +68,6 @@ export default function BasiccodeAddPage() {
     setTreeData([]);
     setSelectedSensors([]);
   };
-
-  const handleMainReset = () => {
-    setSearchKeyword('');
-    setStartDate(null);
-    setEndDate(null);
-  };
-
-  const pagedData = filteredBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
 
   useEffect(() => {
     if (navigationReset) {
@@ -148,7 +79,6 @@ export default function BasiccodeAddPage() {
       setSelectedFacilityGroups([]);
       setFacilityName('');
       setSensorName('');
-      setSearchKeyword('');
       setStartDate(null);
       setEndDate(null);
     }
@@ -214,11 +144,18 @@ export default function BasiccodeAddPage() {
       if (isNaN(date.getTime())) {
         return '-';
       }
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      });
+      return date
+        .toLocaleString('ko-KR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        })
+        .replace(/\. /g, '.')
+        .replace(/\./g, '.')
+        .replace(/ /g, ' ');
     } catch (error) {
       return '-';
     }

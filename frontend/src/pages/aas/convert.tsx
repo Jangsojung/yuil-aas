@@ -167,4 +167,4 @@ export default function ConvertPage() {
   );
 }
 
-const cells = ['기초코드명', '센서 개수', '생성 날짜 및 시간', '시작 날짜', '종료 날짜'];
+const cells = ['기초코드명', '센서 개수', '생성 일자', '시작 날짜', '종료 날짜'];
