@@ -8,11 +8,12 @@ import MenuItem from '@mui/material/MenuItem';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
 
 import Pagination from '../../components/pagination';
-import { getWordsAPI } from '../../apis/api/data_manage';
+import { getWordsAPI, updateWordsAPI } from '../../apis/api/data_manage';
 import DataTableRow from '../../components/aasx/data_management/DataTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 import { SearchBox, FilterBox } from '../../components/common';
+import AlertModal from '../../components/modal/alert';
 
 interface Word {
   as_kr: string;
@@ -24,16 +25,27 @@ export default function DataManagerPage() {
   const [filteredWords, setFilteredWords] = useState<Word[]>([]);
   const [isSelected, setIsSelected] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Word[]>([]);
+  const [modifiedData, setModifiedData] = useState<{ [key: string]: string }>({});
+  const [editingValues, setEditingValues] = useState<{ [key: string]: string }>({});
   const [searchType, setSearchType] = useState('fg_name');
   const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [showUnmatchedOnly, setShowUnmatchedOnly] = useState(false);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
+
   const rowsPerPage = 10;
 
   const handlePageChange = (event: unknown, newPage: number) => {
     setCurrentPage(newPage);
-    setSelectedItems([]);
   };
 
   const pagedData = filteredWords?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
@@ -54,6 +66,53 @@ export default function DataManagerPage() {
     getWords();
   };
 
+  const handleSave = async () => {
+    if (Object.keys(modifiedData).length === 0) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '수정된 데이터가 없습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
+    try {
+      const updates = Object.keys(modifiedData).map((key) => {
+        const [as_kr, original_as_en] = key.split('|');
+        const new_as_en = modifiedData[key];
+
+        return {
+          as_kr: as_kr,
+          original_as_en: original_as_en,
+          new_as_en: new_as_en,
+        };
+      });
+
+      await updateWordsAPI(updates);
+
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '저장되었습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      setModifiedData({});
+      getWords();
+    } catch (error) {
+      console.error('저장 중 오류 발생:', error);
+      setAlertModal({
+        open: true,
+        title: '오류',
+        content: '저장 중 오류가 발생했습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+    }
+  };
+
   const handleUnmatchedOnly = (checked: boolean) => {
     setIsSelected(checked);
     if (checked) {
@@ -69,11 +128,51 @@ export default function DataManagerPage() {
     setSelectedItems((prev) => {
       const isSelected = prev.some((selected) => selected.as_kr === item.as_kr && selected.as_en === item.as_en);
       if (isSelected) {
+        // 체크박스 해제 시 수정 중인 값 제거
+        const key = `${item.as_kr}|${item.as_en}`;
+        setModifiedData((prevData) => {
+          const newData = { ...prevData };
+          delete newData[key];
+          return newData;
+        });
+        setEditingValues((prevData) => {
+          const newData = { ...prevData };
+          delete newData[key];
+          return newData;
+        });
         return prev.filter((selected) => !(selected.as_kr === item.as_kr && selected.as_en === item.as_en));
       } else {
         return [...prev, item];
       }
     });
+  };
+
+  const handleEnglishChange = (originalData: Word, newEnglish: string) => {
+    const key = `${originalData.as_kr}|${originalData.as_en}`;
+    setEditingValues((prev) => ({
+      ...prev,
+      [key]: newEnglish,
+    }));
+
+    // 원래 값과 다를 때만 modifiedData에 추가
+    if (newEnglish !== originalData.as_en) {
+      setModifiedData((prev) => ({
+        ...prev,
+        [key]: newEnglish,
+      }));
+    } else {
+      // 원래 값과 같으면 modifiedData에서 제거
+      setModifiedData((prev) => {
+        const newData = { ...prev };
+        delete newData[key];
+        return newData;
+      });
+    }
+  };
+
+  const getEditingValue = (item: Word) => {
+    const key = `${item.as_kr}|${item.as_en}`;
+    return editingValues[key] || item.as_en;
   };
 
   const handleSelectAll = () => {
@@ -123,12 +222,18 @@ export default function DataManagerPage() {
     return selectedCount > 0 && selectedCount < currentPageItems.length;
   };
 
+  const handleCloseAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
+  };
+
   useEffect(() => {
     getWords();
     setIsSelected(false);
     setCurrentPage(0);
     setSearchType('fg_name');
     setSelectedItems([]);
+    setModifiedData({});
+    setEditingValues({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
@@ -190,15 +295,9 @@ export default function DataManagerPage() {
           }
           buttons={[
             {
-              text: '확인',
-              onClick: handleSearch,
-              color: 'success',
-            },
-            {
-              text: '취소',
-              onClick: () => {},
-              color: 'inherit',
-              variant: 'outlined',
+              text: '저장',
+              onClick: handleSave,
+              color: 'primary',
             },
           ]}
         />
@@ -232,7 +331,9 @@ export default function DataManagerPage() {
                     data={word}
                     totalCount={filteredWords.length}
                     checked={isItemSelected(word)}
+                    editingValue={getEditingValue(word)}
                     onCheckboxChange={handleItemCheckboxChange}
+                    onEnglishChange={handleEnglishChange}
                   />
                 ))
               ) : (
@@ -251,6 +352,15 @@ export default function DataManagerPage() {
           onPageChange={handlePageChange}
         />
       </div>
+
+      <AlertModal
+        open={alertModal.open}
+        handleClose={handleCloseAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
+      />
     </div>
   );
 }

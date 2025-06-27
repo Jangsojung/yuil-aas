@@ -9,6 +9,7 @@ import CustomizedDialogs from '../../components/modal/edgemodal';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 import { ActionBox } from '../../components/common';
+import AlertModal from '../../components/modal/alert';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -33,7 +34,15 @@ export default function Edge_Gateway() {
   const [openModal, setOpenModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
   const rowsPerPage = 10;
 
   const handlePageChange = (page) => {
@@ -52,7 +61,13 @@ export default function Edge_Gateway() {
 
   const handleDelete = async () => {
     if (selectedEdgeGateways.length === 0) {
-      alert('삭제할 Edge Gateway들을 선택해주세요.');
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '삭제할 Edge Gateway들을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 
@@ -60,13 +75,18 @@ export default function Edge_Gateway() {
       return;
     }
 
-    const ids = JSON.stringify({ ids: selectedEdgeGateways });
-    const result = await deleteEdgeAPI(ids);
+    const result = await deleteEdgeAPI({ ids: selectedEdgeGateways });
 
     if (result) {
       setEdgeGateways(edgeGateways.filter((eg) => !selectedEdgeGateways.includes(eg.eg_idx)));
       setSelectedEdgeGateways([]);
-      alert('선택한 항목이 삭제되었습니다.');
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '선택한 항목이 삭제되었습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
     }
   };
 
@@ -126,6 +146,10 @@ export default function Edge_Gateway() {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
+
+  const handleCloseAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   useEffect(() => {
@@ -217,7 +241,7 @@ export default function Edge_Gateway() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination count={edgeGateways ? edgeGateways.length : 0} onPageChange={handlePageChange} />
+        <Pagination page={currentPage} count={totalPages} onPageChange={handlePageChange} />
       </div>
 
       <CustomizedDialogs
@@ -227,6 +251,15 @@ export default function Edge_Gateway() {
         edgeGatewayData={selectedEdgeGateway}
         handleInsert={handleInsert}
         handleUpdate={handleUpdate}
+      />
+
+      <AlertModal
+        open={alertModal.open}
+        handleClose={handleCloseAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
       />
     </div>
   );

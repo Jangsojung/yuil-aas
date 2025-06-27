@@ -352,3 +352,47 @@ export const getSearchFromDB = async (fc_idx, type, text) => {
     });
   });
 };
+
+export const updateWordsToDB = async (updates) => {
+  return new Promise((resolve, reject) => {
+    if (!updates || !Array.isArray(updates) || updates.length === 0) {
+      reject(new Error('업데이트할 데이터가 없습니다.'));
+      return;
+    }
+
+    const updatePromises = updates.map((update) => {
+      return new Promise((resolveUpdate, rejectUpdate) => {
+        const { as_kr, original_as_en, new_as_en } = update;
+
+        if (!as_kr || !original_as_en || !new_as_en) {
+          rejectUpdate(new Error('필수 필드가 누락되었습니다.'));
+          return;
+        }
+
+        const query = `UPDATE tb_aasx_alias SET as_en = ? WHERE as_kr = ? AND as_en = ?`;
+
+        pool.query(query, [new_as_en, as_kr, original_as_en], (err, result) => {
+          if (err) {
+            rejectUpdate(err);
+          } else {
+            resolveUpdate({ as_kr, original_as_en, new_as_en, affectedRows: result.affectedRows });
+          }
+        });
+      });
+    });
+
+    Promise.all(updatePromises)
+      .then((results) => {
+        console.log('단어 업데이트 완료:', results);
+        resolve({
+          success: true,
+          updatedCount: results.length,
+          results: results,
+        });
+      })
+      .catch((error) => {
+        console.error('단어 업데이트 실패:', error);
+        reject(error);
+      });
+  });
+};

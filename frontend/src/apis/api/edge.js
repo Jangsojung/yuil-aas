@@ -19,3 +19,23 @@ export const getEdgeAPI = async () => {
     throw error;
   }
 };
+
+export const insertEdgeAPI = async (data) => {
+  try {
+    const result = await apiHelpers.post(API_ENDPOINTS.EDGE_GATEWAY.INSERT, data);
+    return result;
+  } catch (error) {
+    console.error('Error inserting edge gateway:', error);
+    throw error;
+  }
+};
+
+export const updateEdgeAPI = async (data) => {
+  try {
+    const result = await apiHelpers.put(API_ENDPOINTS.EDGE_GATEWAY.LIST, data);
+    return result;
+  } catch (error) {
+    console.error('Error updating edge gateway:', error);
+    throw error;
+  }
+};

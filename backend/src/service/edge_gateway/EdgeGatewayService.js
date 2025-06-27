@@ -65,7 +65,7 @@ export const deleteEdgeGatewaysFromDB = async (ids) => {
   try {
     if (!ids || ids.length === 0) {
       console.log('No IDs provided for deletion');
-      return;
+      return { success: false, message: '삭제할 ID가 없습니다.' };
     }
 
     const idString = ids.join(',');
@@ -73,6 +73,7 @@ export const deleteEdgeGatewaysFromDB = async (ids) => {
     await pool.promise().query(query);
 
     console.log('Edge Gateway deleted successfully');
+    return { success: true, message: '삭제가 완료되었습니다.' };
   } catch (err) {
     console.log('Failed to delete Edge Gateway: ', err);
     throw err;

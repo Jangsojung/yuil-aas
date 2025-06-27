@@ -10,6 +10,7 @@ import {
   getVerify,
   getWords,
   getSearch,
+  updateWords,
 } from '../../controller/file/FileController.js';
 
 const router = express.Router();
@@ -60,6 +61,11 @@ export default () => {
   router.post('/words', (req, res) => {
     const { fc_idx } = req.body;
     getWords(fc_idx, res);
+  });
+
+  router.put('/words', (req, res) => {
+    const { updates } = req.body;
+    updateWords(updates, res);
   });
 
   router.post('/search', (req, res) => {

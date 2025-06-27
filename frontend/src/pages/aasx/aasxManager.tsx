@@ -19,6 +19,7 @@ import AASXTableRow from '../../components/aasx/aasx_management/AASXTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 import { SearchBox, ActionBox } from '../../components/common';
+import AlertModal from '../../components/modal/alert';
 
 interface File {
   af_idx: number;
@@ -39,7 +40,16 @@ export default function AasxManagerPage() {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
+
   const rowsPerPage = 10;
 
   const handlePageChange = (page) => {
@@ -58,22 +68,47 @@ export default function AasxManagerPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm(`선택한 ${selectedFiles.length}개 항목을 삭제하시겠습니까?`)) {
+    if (selectedFiles.length === 0) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '삭제할 파일을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 
-    const result = await deleteAASXAPI(selectedFiles);
+    try {
+      await Promise.all(selectedFiles.map((id) => deleteAASXAPI(id)));
 
-    if (result) {
-      setFiles(files.filter((f) => !selectedFiles.includes(f.af_idx)));
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '선택한 항목이 삭제되었습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+
       setSelectedFiles([]);
-      alert('선택한 항목이 삭제되었습니다.');
+      getFiles();
+    } catch (error) {
+      console.error('삭제 중 오류 발생:', error);
     }
   };
 
-  const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
+  const handleDateChange = (date: Date | null) => {
+    if (!date) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '날짜를 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+    setSelectedDate(date);
   };
 
   const handleSearch = () => {
@@ -132,6 +167,10 @@ export default function AasxManagerPage() {
   const handleCloseUpdateModal = () => {
     setOpenUpdateModal(false);
     setSelectedFile(null);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   useEffect(() => {
@@ -249,6 +288,14 @@ export default function AasxManagerPage() {
         handleClose={handleCloseUpdateModal}
         fileData={selectedFile}
         handleUpdate={handleUpdate}
+      />
+      <AlertModal
+        open={alertModal.open}
+        handleClose={handleCloseAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
       />
     </div>
   );

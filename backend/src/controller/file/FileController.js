@@ -9,6 +9,7 @@ import {
   getVerifyFromDB,
   getWordsFromDB,
   getSearchFromDB,
+  updateWordsToDB,
 } from '../../service/file/FileService.js';
 
 export const insertFile = async (fc_idx, fileName, user_idx, res) => {
@@ -120,6 +121,17 @@ export const getWords = async (fc_idx, res) => {
 export const getSearch = async (fc_idx, type, text, res) => {
   try {
     const result = await getSearchFromDB(fc_idx, type, text);
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const updateWords = async (updates, res) => {
+  try {
+    const result = await updateWordsToDB(updates);
 
     res.status(200).json(result);
   } catch (err) {

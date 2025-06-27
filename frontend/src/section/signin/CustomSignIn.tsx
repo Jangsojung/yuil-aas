@@ -1,10 +1,24 @@
-import React, { useEffect, Dispatch, SetStateAction } from 'react';
+import React, { useEffect, Dispatch, SetStateAction, useState } from 'react';
 import { Box, Typography, TextField, Button, Paper } from '@mui/material';
 import { useRecoilState } from 'recoil';
 import { userState, User } from '../../recoil/atoms';
 import { useNavigate, NavigateFunction } from 'react-router-dom';
+import AlertModal from '../../components/modal/alert';
 
-const signIn = async (formData: FormData, setUser: Dispatch<SetStateAction<User | null>>, nav: NavigateFunction) => {
+const signIn = async (
+  formData: FormData,
+  setUser: Dispatch<SetStateAction<User | null>>,
+  nav: NavigateFunction,
+  setAlertModal: React.Dispatch<
+    React.SetStateAction<{
+      open: boolean;
+      title: string;
+      content: string;
+      type: 'alert' | 'confirm';
+      onConfirm: (() => void) | undefined;
+    }>
+  >
+) => {
   const email = formData.get('email');
   const password = formData.get('password');
 
@@ -27,17 +41,36 @@ const signIn = async (formData: FormData, setUser: Dispatch<SetStateAction<User 
       setUser(user);
       nav('/dashboard/dashboard');
     } else {
-      alert(`로그인 실패: ${data.message}`);
+      setAlertModal({
+        open: true,
+        title: '로그인 실패',
+        content: data.message,
+        type: 'alert',
+        onConfirm: undefined,
+      });
     }
   } catch (error) {
     console.error('로그인 에러:', error);
-    alert('서버 오류 발생');
+    setAlertModal({
+      open: true,
+      title: '오류',
+      content: '서버 오류 발생',
+      type: 'alert',
+      onConfirm: undefined,
+    });
   }
 };
 
 export default function CustomSignInView() {
   const [user, setUser] = useRecoilState(userState);
   const nav = useNavigate();
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
 
   useEffect(() => {
     if (user) {
@@ -48,7 +81,11 @@ export default function CustomSignInView() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    signIn(formData, setUser, nav);
+    signIn(formData, setUser, nav, setAlertModal);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -86,6 +123,15 @@ export default function CustomSignInView() {
           </Button>
         </form>
       </Paper>
+
+      <AlertModal
+        open={alertModal.open}
+        handleClose={handleCloseAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
+      />
     </Box>
   );
 }

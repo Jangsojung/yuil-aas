@@ -10,6 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import { grey } from '@mui/material/colors';
+import AlertModal from './alert';
 
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { useRecoilValue } from 'recoil';
@@ -51,6 +52,13 @@ export default function CustomizedDialogs({ handleInsert }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<globalThis.File | null>(null);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
   const userIdx = useRecoilValue(userState)?.user_idx;
 
   const handleClickOpen = () => {
@@ -78,12 +86,24 @@ export default function CustomizedDialogs({ handleInsert }) {
 
   const handleAdd = async () => {
     if (!selectedFile) {
-      alert('파일을 선택해주세요.');
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '파일을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 
     if (!selectedFile.name.toLowerCase().endsWith('.json')) {
-      alert('JSON 파일만 업로드 가능합니다.');
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: 'JSON 파일만 업로드 가능합니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 
@@ -116,14 +136,30 @@ export default function CustomizedDialogs({ handleInsert }) {
         createdAt: new Date(),
       };
 
-      alert('성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aasx');
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '성공적으로 json파일을 업로드하였습니다.\n파일 위치: /files/aasx',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       handleInsert(newFile);
       handleClose();
     } catch (err) {
-      alert('업로드 중 오류 발생: ' + err.message);
+      setAlertModal({
+        open: true,
+        title: '오류',
+        content: '업로드 중 오류 발생: ' + err.message,
+        type: 'alert',
+        onConfirm: undefined,
+      });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCloseAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -137,7 +173,7 @@ export default function CustomizedDialogs({ handleInsert }) {
 
       <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
-          제1공장 AASX 등록
+          AASX 파일 추가
         </DialogTitle>
         <IconButton
           aria-label='close'
@@ -151,19 +187,41 @@ export default function CustomizedDialogs({ handleInsert }) {
         >
           <CloseIcon />
         </IconButton>
-        <DialogContent dividers className='file-upload'>
-          <Box sx={{ typography: 'subtitle2' }}>json 파일</Box>
-          <FileUpload {...fileUploadProp} />
+        <DialogContent dividers>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <FileUpload
+              accept='.json'
+              onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                setSelectedFile(file);
+              }}
+              onDrop={(event) => {
+                const file = event.dataTransfer.files[0] || null;
+                setSelectedFile(file);
+              }}
+              selectedFileName={selectedFile?.name}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleAdd} variant='contained' color='primary'>
-            등록
+          <Button onClick={handleAdd} variant='contained' color='primary' disabled={isLoading}>
+            {isLoading ? '업로드 중...' : '추가'}
           </Button>
           <GreyButton variant='outlined' onClick={handleClose}>
             취소
           </GreyButton>
         </DialogActions>
       </BootstrapDialog>
+
+      {/* Alert Modal */}
+      <AlertModal
+        open={alertModal.open}
+        handleClose={handleCloseAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
+      />
     </Fragment>
   );
 }

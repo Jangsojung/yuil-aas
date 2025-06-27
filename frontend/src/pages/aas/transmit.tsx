@@ -6,7 +6,9 @@ import { handleVerifyAPI } from '../../apis/api/transmit';
 import SelectAASXFile from '../../components/select/aasx_files';
 import TransmitView from '../../section/aas/transmit/view';
 import Grid from '@mui/system/Grid';
-import { SearchBox } from '../../components/common';
+import { SearchBox, FilterBox } from '../../components/common';
+import Pagination from '../../components/pagination';
+import AlertModal from '../../components/modal/alert';
 
 interface AASXFile {
   af_idx: number;
@@ -21,10 +23,25 @@ export default function TransmitPage() {
   const [selectedFile, setSelectedFile] = useState<AASXFile | undefined>(undefined);
   const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
 
   const handleVerify = async () => {
-    if (!selectedFile) {
-      alert('선택된 파일이 없습니다.');
+    if (selectedFile === undefined) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '선택된 파일이 없습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 

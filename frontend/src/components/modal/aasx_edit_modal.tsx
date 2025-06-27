@@ -14,6 +14,7 @@ import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import LoadingOverlay from '../loading/LodingOverlay';
+import AlertModal from './alert';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -64,6 +65,13 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   const [uploadFile, setUploadFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [af_idx, setAf_Idx] = useState<number | null>(null);
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
   const userIdx = useRecoilValue(userState)?.user_idx;
 
   const title = selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정';
@@ -87,7 +95,13 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     const { name } = uploadFile;
 
     if (!name.toLowerCase().endsWith('.json')) {
-      alert('JSON 파일만 업로드 가능합니다.');
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: 'JSON 파일만 업로드 가능합니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 
@@ -119,11 +133,23 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         createdAt: fileData?.createdAt || new Date(),
       };
 
-      alert('성공적으로 json파일을 수정하였습니다.\n파일 위치: /files/aas');
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '성공적으로 json파일을 수정하였습니다.\n파일 위치: /files/aas',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       handleUpdate(newFile);
       handleClose();
     } catch (err) {
-      alert('업로드 중 오류 발생: ' + err.message);
+      setAlertModal({
+        open: true,
+        title: '오류',
+        content: '업로드 중 오류 발생: ' + err.message,
+        type: 'alert',
+        onConfirm: undefined,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -133,6 +159,10 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     setSelectedFile(null);
     setUploadFile(null);
     setAf_Idx(null);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   useEffect(() => {
@@ -145,36 +175,48 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   }, [fileData, open]);
 
   return (
-    <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
-      {isLoading && <LoadingOverlay />}
-      <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
-        {title}
-      </DialogTitle>
-      <IconButton
-        aria-label='close'
-        onClick={handleClose}
-        sx={(theme) => ({
-          position: 'absolute',
-          right: 8,
-          top: 8,
-          color: theme.palette.grey[500],
-        })}
-      >
-        <CloseIcon />
-      </IconButton>
-      <DialogContent dividers className='file-upload'>
-        <Box sx={{ typography: 'subtitle2' }}>json 파일</Box>
-        <FileUpload {...fileUploadProp} />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleEdit} variant='contained' color='primary' disabled={uploadFile == null}>
-          확인
-        </Button>
+    <>
+      <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
+        {isLoading && <LoadingOverlay />}
+        <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
+          {title}
+        </DialogTitle>
+        <IconButton
+          aria-label='close'
+          onClick={handleClose}
+          sx={(theme) => ({
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: theme.palette.grey[500],
+          })}
+        >
+          <CloseIcon />
+        </IconButton>
+        <DialogContent dividers className='file-upload'>
+          <Box sx={{ typography: 'subtitle2' }}>json 파일</Box>
+          <FileUpload {...fileUploadProp} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEdit} variant='contained' color='primary' disabled={uploadFile == null}>
+            확인
+          </Button>
 
-        <GreyButton variant='outlined' onClick={handleClose}>
-          취소
-        </GreyButton>
-      </DialogActions>
-    </BootstrapDialog>
+          <GreyButton variant='outlined' onClick={handleClose}>
+            취소
+          </GreyButton>
+        </DialogActions>
+      </BootstrapDialog>
+
+      {/* Alert Modal */}
+      <AlertModal
+        open={alertModal.open}
+        handleClose={handleCloseAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
+      />
+    </>
   );
 }
