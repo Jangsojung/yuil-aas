@@ -2,7 +2,7 @@ import { API_ENDPOINTS, apiHelpers } from '../../config/api';
 
 export const deleteAASXAPI = async (selectedFiles) => {
   try {
-    const result = await apiHelpers.delete(API_ENDPOINTS.FILE.AASX, selectedFiles);
+    const result = await apiHelpers.delete(API_ENDPOINTS.FILE.AASX, { ids: selectedFiles });
     return result;
   } catch (error) {
     console.error('Error deleting AASX files:', error);

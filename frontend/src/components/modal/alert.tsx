@@ -86,7 +86,7 @@ export default function AlertModal({ open, handleClose, title, content, type, on
         ) : (
           <>
             <Button onClick={handleConfirm} variant='contained' color='primary'>
-              저장
+              확인
             </Button>
             <GreyButton variant='outlined' onClick={handleClose}>
               취소

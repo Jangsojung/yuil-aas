@@ -218,6 +218,22 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
     const oldFileName = rows[0].af_name;
     const newFileName = fileName.replace(/\.json$/i, '.aasx');
 
+    // 이전 파일들 삭제
+    const oldAasFileName = oldFileName.replace(/\.aasx$/i, '.json');
+    const oldAasPath = `../files/aas/${oldAasFileName}`;
+    const oldAasxPath = `../files/aasx/${oldFileName}`;
+
+    // Python 서버를 호출해서 이전 파일들 삭제
+    const deleteResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        paths: [oldAasPath, oldAasxPath],
+      }),
+    });
+
     // front 폴더의 JSON 파일 경로
     const frontFilePath = `../files/front/${fileName}`;
 
@@ -272,29 +288,67 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
 
 export const deleteAASXFilesFromDB = async (ids) => {
   try {
+    // 삭제할 파일 정보 조회
     const query = `select af_name from tb_aasx_file where af_idx in (?)`;
     const [results] = await pool.promise().query(query, [ids]);
 
+    if (results.length === 0) {
+      console.log('삭제할 파일이 없습니다.');
+      return {
+        success: true,
+        message: '삭제할 파일이 없습니다.',
+        deletedCount: 0,
+      };
+    }
+
     const fileNames = results.map((row) => row.af_name);
 
-    const query2 = `delete from tb_aasx_file where af_idx in (?)`;
-    await pool.promise().query(query2, [ids]);
+    // DB에서 파일 정보 삭제
+    const deleteQuery = `delete from tb_aasx_file where af_idx in (?)`;
+    await pool.promise().query(deleteQuery, [ids]);
 
-    console.log('Python JSON Files deleted successfully');
+    console.log('DB에서 파일 정보 삭제 완료');
 
-    const filePaths = fileNames.map((name) => `../files/aasx/${name}`);
+    // 삭제할 파일 경로들 준비
+    const deletePaths = [];
 
+    fileNames.forEach((fileName) => {
+      // aasx 파일 경로
+      deletePaths.push(`../files/aasx/${fileName}`);
+
+      // aas 파일 경로 (aasx 확장자를 json으로 변경)
+      const aasFileName = fileName.replace(/\.aasx$/i, '.json');
+      deletePaths.push(`../files/aas/${aasFileName}`);
+
+      // front 파일 경로 (aasx 확장자를 json으로 변경)
+      deletePaths.push(`../files/front/${aasFileName}`);
+    });
+
+    // Python 서버를 호출해서 모든 파일 삭제
     const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        paths: filePaths,
+        paths: deletePaths,
       }),
     });
+
+    if (!pythonResponse.ok) {
+      console.log('Python 서버에서 파일 삭제 중 오류 발생');
+    }
+
+    console.log('모든 파일 삭제 완료');
+
+    return {
+      success: true,
+      message: '파일이 성공적으로 삭제되었습니다.',
+      deletedCount: results.length,
+      deletedFiles: fileNames,
+    };
   } catch (err) {
-    console.log('Failed to delete Python JSON Files: ', err);
+    console.log('Failed to delete AASX Files: ', err);
     throw err;
   }
 };

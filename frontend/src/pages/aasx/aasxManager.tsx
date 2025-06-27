@@ -116,22 +116,37 @@ export default function AasxManagerPage() {
       return;
     }
 
-    try {
-      await Promise.all(selectedFiles.map((id) => deleteAASXAPI(id)));
+    setAlertModal({
+      open: true,
+      title: '파일 삭제',
+      content: `선택한 ${selectedFiles.length}개의 파일을 삭제하시겠습니까?`,
+      type: 'confirm',
+      onConfirm: async () => {
+        try {
+          await deleteAASXAPI(selectedFiles);
 
-      setAlertModal({
-        open: true,
-        title: '알림',
-        content: '선택한 항목이 삭제되었습니다.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
+          setAlertModal({
+            open: true,
+            title: '알림',
+            content: '선택한 항목이 삭제되었습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
 
-      setSelectedFiles([]);
-      getFiles();
-    } catch (error) {
-      console.error('삭제 중 오류 발생:', error);
-    }
+          setSelectedFiles([]);
+          getFiles();
+        } catch (error) {
+          console.error('삭제 중 오류 발생:', error);
+          setAlertModal({
+            open: true,
+            title: '오류',
+            content: '삭제 중 오류가 발생했습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
+        }
+      },
+    });
   };
 
   const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
