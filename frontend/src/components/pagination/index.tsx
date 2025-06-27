@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import TablePagination from '@mui/material/TablePagination';
 
-export default function TablePaginationDemo({ count, onPageChange }) {
-  const [page, setPage] = useState(0);
-  const rowsPerPage = 10;
+interface PaginationProps {
+  count: number;
+  page: number;
+  onPageChange: (event: unknown, newPage: number) => void;
+}
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-    onPageChange(newPage);
-  };
+export default function TablePaginationDemo({ count, page, onPageChange }: PaginationProps) {
+  const rowsPerPage = 10;
 
   return (
     <TablePagination
       component='div'
       count={count}
       page={page}
-      onPageChange={handleChangePage}
+      onPageChange={onPageChange}
       rowsPerPage={rowsPerPage}
       rowsPerPageOptions={[]}
     />
