@@ -352,7 +352,7 @@ export default function BasiccodePage() {
 
   const handleClick = (base: Base) => {
     setSelectedBase(base);
-    window.location.href = `/aas/basic/edit/${base.ab_idx}`;
+    window.location.href = `/aas/basic/edit/${base.ab_idx}/view`;
   };
 
   return (

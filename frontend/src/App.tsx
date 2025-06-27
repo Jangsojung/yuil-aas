@@ -84,7 +84,7 @@ export default function ReactRouter() {
                   element: <BasicCodeAdd />,
                 },
                 {
-                  path: 'basic/edit/:id',
+                  path: 'basic/edit/:id/:mode',
                   element: <BasicCodeEdit />,
                 },
                 {

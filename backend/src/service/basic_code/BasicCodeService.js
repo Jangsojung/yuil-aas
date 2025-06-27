@@ -128,11 +128,17 @@ export const getFacilityGroupsFromDB = async (fc_idx = 3, order = 'asc') => {
 
     const query = `select fg_idx, fg_name from tb_aasx_data_aas where fc_idx = ? order by fg_idx ${validOrder}`;
 
+    console.log('Querying facility groups with fc_idx:', fc_idx);
+    console.log('SQL Query:', query);
+
     pool.query(query, [fc_idx], (err, results) => {
       if (err) {
+        console.error('Error querying facility groups:', err);
         reject(err);
       } else {
+        console.log('Facility groups found:', results);
         if (results.length === 0) {
+          console.log('No facility groups found for fc_idx:', fc_idx);
           resolve(null);
           return;
         }
@@ -144,6 +150,7 @@ export const getFacilityGroupsFromDB = async (fc_idx = 3, order = 'asc') => {
           };
         });
 
+        console.log('Processed facility groups:', facilityGroups);
         resolve(facilityGroups);
       }
     });
@@ -154,11 +161,17 @@ export const getSensorsFromDB = async (fa_idx) => {
   return new Promise((resolve, reject) => {
     const query = 'select sn_idx, sn_name from tb_aasx_data_prop where fa_idx = ?';
 
+    console.log('Querying sensors with fa_idx:', fa_idx);
+    console.log('SQL Query:', query);
+
     pool.query(query, [fa_idx], (err, results) => {
       if (err) {
+        console.error('Error querying sensors:', err);
         reject(err);
       } else {
+        console.log('Sensors found for fa_idx', fa_idx, ':', results);
         if (results.length === 0) {
+          console.log('No sensors found for fa_idx:', fa_idx);
           resolve(null);
           return;
         }
@@ -170,6 +183,7 @@ export const getSensorsFromDB = async (fa_idx) => {
           };
         });
 
+        console.log('Processed sensors:', sensors);
         resolve(sensors);
       }
     });
@@ -180,11 +194,17 @@ export const getBaseCodeFromDB = async (fg_idx) => {
   return new Promise((resolve, reject) => {
     const query = `SELECT fa_idx, fa_name from tb_aasx_data_sm where fg_idx =  ?;`;
 
+    console.log('Querying facilities with fg_idx:', fg_idx);
+    console.log('SQL Query:', query);
+
     pool.query(query, [fg_idx], (err, results) => {
       if (err) {
+        console.error('Error querying facilities:', err);
         reject(err);
       } else {
+        console.log('Facilities found for fg_idx', fg_idx, ':', results);
         if (results.length === 0) {
+          console.log('No facilities found for fg_idx:', fg_idx);
           resolve(null);
           return;
         }
@@ -196,6 +216,7 @@ export const getBaseCodeFromDB = async (fg_idx) => {
           };
         });
 
+        console.log('Processed facilities:', basics);
         resolve(basics);
       }
     });
