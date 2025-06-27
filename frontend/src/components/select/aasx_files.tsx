@@ -5,6 +5,7 @@ import Select from '@mui/material/Select';
 import { useRecoilState } from 'recoil';
 import { currentFileState } from '../../recoil/atoms';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { getAASXFilesListAPI } from '../../apis/api/aasx_manage';
 
 interface AASXFile {
   af_idx: number;
@@ -21,18 +22,7 @@ export default function SelectSmall({ setSelectedFile }: Props) {
 
   const getFiles = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/file/aasxFiles`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch files');
-      }
-
-      const data = await response.json();
+      const data = await getAASXFilesListAPI();
       setFiles(data);
 
       setCurrentFile(null);

@@ -15,6 +15,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import LoadingOverlay from '../loading/LodingOverlay';
 import AlertModal from './alert';
+import { updateAASXFileAPI } from '../../apis/api/aasx_manage';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -108,24 +109,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/api/file/aasx?af_idx=${af_idx}&user_idx=${userIdx}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fileName: name,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to edit Python JSON File`);
-      }
-
-      const result = await response.json();
+      const result = await updateAASXFileAPI(af_idx, name, userIdx);
 
       const newFile = {
         af_idx: fileData!.af_idx,

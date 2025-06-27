@@ -13,6 +13,7 @@ import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { baseEditModeState, selectedBaseState, selectedSensorsState } from '../../recoil/atoms';
+import { getBaseSensorsForTableAPI, getSensorsForTableAPI } from '../../apis/api/sensors';
 
 interface Sensor {
   sn_idx: number;
@@ -49,21 +50,7 @@ export default function BasicTable({
 
   const getSelectedSensors = async (selectedBase: Base) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/bases/sensors`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ab_idx: selectedBase.ab_idx,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch selected sensors');
-      }
-
-      const data = await response.json();
+      const data = await getBaseSensorsForTableAPI(selectedBase.ab_idx);
       setSelectedSensors(data);
     } catch (error) {
       console.error('Error fetching selected sensors:', error);
@@ -72,21 +59,7 @@ export default function BasicTable({
 
   const getSensors = async (fa_idx: number) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/base_code/sensors`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fa_idx: fa_idx,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch sensors');
-      }
-
-      const data = await response.json();
+      const data = await getSensorsForTableAPI(fa_idx);
       setSensors(data);
     } catch (error) {
       console.error('Error fetching sensors:', error);

@@ -61,3 +61,51 @@ export const getAASXFilesAPI = async (start, end) => {
     throw error;
   }
 };
+
+// AASX 파일 업로드
+export const uploadAASXFileAPI = async (fileData, userIdx) => {
+  try {
+    const formData = new FormData();
+    formData.append('fc_idx', '3');
+    formData.append('user_idx', userIdx.toString());
+    formData.append('file', fileData);
+
+    const response = await fetch(API_ENDPOINTS.FILE.AASX, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('파일 업로드 실패');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error uploading AASX file:', error);
+    throw error;
+  }
+};
+
+// AASX 파일 수정
+export const updateAASXFileAPI = async (af_idx, fileName, userIdx) => {
+  try {
+    const result = await apiHelpers.post(`${API_ENDPOINTS.FILE.AASX}?af_idx=${af_idx}&user_idx=${userIdx}`, {
+      fileName,
+    });
+    return result;
+  } catch (error) {
+    console.error('Error updating AASX file:', error);
+    throw error;
+  }
+};
+
+// AASX 파일 목록 조회 (간단한 버전)
+export const getAASXFilesListAPI = async () => {
+  try {
+    const result = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES);
+    return result;
+  } catch (error) {
+    console.error('Error fetching AASX files list:', error);
+    throw error;
+  }
+};

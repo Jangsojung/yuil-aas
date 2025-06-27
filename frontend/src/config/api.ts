@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
   BASE_CODE: {
     BASES: `${API_BASE_URL}/api/base_code/bases`,
     BASES_INSERT: `${API_BASE_URL}/api/base_code/bases/insert`,
+    BASES_SENSORS: `${API_BASE_URL}/api/base_code/bases/sensors`,
     FACILITY_GROUPS: `${API_BASE_URL}/api/base_code/facilityGroups`,
     SENSORS: `${API_BASE_URL}/api/base_code/sensors`,
     BASE_CODE: `${API_BASE_URL}/api/base_code`,

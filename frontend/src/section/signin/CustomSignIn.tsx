@@ -4,6 +4,7 @@ import { useRecoilState } from 'recoil';
 import { userState, User } from '../../recoil/atoms';
 import { useNavigate, NavigateFunction } from 'react-router-dom';
 import AlertModal from '../../components/modal/alert';
+import { signInAPI } from '../../apis/api/signin';
 
 const signIn = async (
   formData: FormData,
@@ -23,15 +24,9 @@ const signIn = async (
   const password = formData.get('password');
 
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/signin`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    const data = await signInAPI(email, password);
 
-    const data = await response.json();
-
-    if (response.ok && data.success) {
+    if (data.success) {
       const user: User = {
         user_idx: data.user_idx,
         user_id: data.user_id,

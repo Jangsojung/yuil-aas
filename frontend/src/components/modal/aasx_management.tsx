@@ -16,6 +16,7 @@ import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import LoadingOverlay from '../loading/LodingOverlay';
+import { uploadAASXFileAPI } from '../../apis/api/aasx_manage';
 
 const GreyButton = styled(Button)<ButtonProps>(() => ({
   color: '#637381',
@@ -110,25 +111,7 @@ export default function CustomizedDialogs({ handleInsert }) {
     setIsLoading(true);
 
     try {
-      const fileName = selectedFile.name;
-
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/file/aasx`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fc_idx: 3,
-          user_idx: userIdx,
-          file: selectedFile,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('파일 업로드 실패');
-      }
-
-      const result = await response.json();
+      const result = await uploadAASXFileAPI(selectedFile, userIdx);
 
       const newFile = {
         af_idx: result.af_idx,
