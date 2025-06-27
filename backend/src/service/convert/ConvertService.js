@@ -37,7 +37,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       [snIdxList]
     );
 
-    // 식별 ID(as_en) 확인
     const [aliasesCheck] = await pool.promise().query(
       `SELECT DISTINCT
         f.fc_name,
@@ -52,7 +51,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       [snIdxList]
     );
 
-    // 각 항목에 대해 as_en이 있는지 확인
     for (const item of aliasesCheck) {
       const [aliasCheck] = await pool.promise().query(
         `SELECT 
@@ -125,7 +123,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       };
     }
 
-    // 데이터가 전혀 없는 경우
     if (!hasData) {
       throw new Error('선택한 날짜 범위에 데이터가 없습니다.');
     }
