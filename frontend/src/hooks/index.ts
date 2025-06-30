@@ -6,3 +6,4 @@ export { useSensorSelection } from './useSensorSelection';
 export { useWordManagement } from './useWordManagement';
 export { useBasicAdd } from './useBasicAdd';
 export { useBasicList } from './useBasicList';
+export { useFacilityManagement } from './useFacilityManagement';

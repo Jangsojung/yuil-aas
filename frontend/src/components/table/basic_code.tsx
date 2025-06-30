@@ -31,10 +31,12 @@ export default function BasicTable({
   sm_idx,
   fa_idx,
   sensors: propSensors,
+  showCheckboxes = true,
 }: {
   sm_idx: string;
   fa_idx: number;
   sensors?: Sensor[];
+  showCheckboxes?: boolean;
 }) {
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
@@ -111,10 +113,12 @@ export default function BasicTable({
                     rowSensors.map((sensor, idx) => (
                       <Grid item xs={2} key={sensor.sn_idx}>
                         <List sx={style} className='basic-checkbox'>
-                          <Checkbox
-                            checked={selectedSensors.includes(sensor.sn_idx)}
-                            onChange={() => handleCheckboxChange(sensor.sn_idx)}
-                          />
+                          {showCheckboxes && (
+                            <Checkbox
+                              checked={selectedSensors.includes(sensor.sn_idx)}
+                              onChange={() => handleCheckboxChange(sensor.sn_idx)}
+                            />
+                          )}
                           <div>
                             <ListItem>
                               <ListItemText secondary={sensor.sn_name} />

@@ -1,99 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { baseEditModeState, navigationResetState, selectedBasesState } from '../../recoil/atoms';
-import Grid from '@mui/material/Grid';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import { TextField } from '@mui/material';
-import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { SearchBox, ActionBox } from '../../components/common';
+import React, { useEffect } from 'react';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../recoil/atoms';
+import { useFacilityManagement } from '../../hooks/useFacilityManagement';
+import { FacilityView } from '../../components/basic/FacilityView';
+import AlertModal from '../../components/modal/alert';
 
-export default function FacilityPage() {
-  const [insertMode, setInsertMode] = useState(false);
-  const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
-  const [, setSelectedBases] = useRecoilState(selectedBasesState);
+export default function FacilityManagementPage() {
   const navigationReset = useRecoilValue(navigationResetState);
 
+  // 커스텀 훅 사용
+  const {
+    treeData,
+    treeLoading,
+    selectedFacilityGroups,
+    setSelectedFacilityGroups,
+    facilityName,
+    setFacilityName,
+    sensorName,
+    setSensorName,
+    handleTreeSearch,
+    handleAddFacility,
+    handleDeleteFacility,
+    handleReset,
+    alertModal,
+    closeAlert,
+  } = useFacilityManagement();
+
+  // 네비게이션 리셋 처리
   useEffect(() => {
-    setInsertMode(false);
-    setBaseEditMode(false);
-    setSelectedBases([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigationReset]);
+    if (navigationReset) {
+      handleReset();
+    }
+  }, [navigationReset, handleReset]);
 
   return (
     <div className='table-outer'>
-      <div>
-        <SearchBox
-          buttons={[
-            {
-              text: '검색',
-              onClick: () => {},
-              color: 'success',
-            },
-          ]}
-        >
-          <Grid container spacing={1}>
-            <Grid item xs={3} container spacing={1}>
-              <Grid item>
-                <div className='sort-title'>설비그룹</div>
-              </Grid>
-              <Grid item xs={9}>
-                <Select />
-              </Grid>
-            </Grid>
-            <Grid item xs={3}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div className='sort-title'>설비명</div>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl sx={{ width: '100%' }} size='small'>
-                    <TextField />
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={3}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div className='sort-title'>센서명</div>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl sx={{ width: '100%' }} size='small'>
-                    <TextField />
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </SearchBox>
+      <FacilityView
+        treeData={treeData}
+        treeLoading={treeLoading}
+        selectedFacilityGroups={selectedFacilityGroups}
+        setSelectedFacilityGroups={setSelectedFacilityGroups}
+        facilityName={facilityName}
+        setFacilityName={setFacilityName}
+        sensorName={sensorName}
+        setSensorName={setSensorName}
+        onTreeSearch={handleTreeSearch}
+        onAddFacility={handleAddFacility}
+        onDeleteFacility={handleDeleteFacility}
+      />
 
-        <ActionBox
-          buttons={[
-            {
-              text: '설비추가',
-              onClick: () => {},
-              color: 'primary',
-            },
-            {
-              text: '설비삭제',
-              onClick: () => {},
-              color: 'error',
-            },
-          ]}
-        />
-      </div>
-
-      <div className='table-wrap'>
-        <SimpleTreeView>
-          <TreeItem itemId='1'>
-            1호기
-            <TreeItem itemId='2'>2온조기</TreeItem>
-          </TreeItem>
-        </SimpleTreeView>
-      </div>
+      <AlertModal
+        open={alertModal.open}
+        handleClose={closeAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
+      />
     </div>
   );
 }
