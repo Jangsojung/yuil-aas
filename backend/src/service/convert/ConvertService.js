@@ -51,6 +51,8 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       [snIdxList]
     );
 
+    const missingAliases = [];
+
     for (const item of aliasesCheck) {
       const [aliasCheck] = await pool.promise().query(
         `SELECT 
@@ -64,8 +66,28 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       const { fg_alias, fa_alias, sn_alias } = aliasCheck[0];
 
       if (!fg_alias || !fa_alias || !sn_alias) {
-        throw new Error('식별 ID가 지정되어있지 않은 항목이 있습니다. 식별 ID 관리 탭에서 지정해주세요.');
+        const missingItems = [];
+        if (!fg_alias) missingItems.push(`설비그룹: ${item.fg_name}`);
+        if (!fa_alias) missingItems.push(`설비: ${item.fa_name}`);
+        if (!sn_alias) missingItems.push(`센서: ${item.sn_name}`);
+
+        missingAliases.push({
+          fg_name: item.fg_name,
+          fa_name: item.fa_name,
+          sn_name: item.sn_name,
+          missing: missingItems,
+        });
       }
+    }
+
+    if (missingAliases.length > 0) {
+      const missingDetails = missingAliases
+        .map((item) => `${item.fg_name} > ${item.fa_name} > ${item.sn_name} (${item.missing.join(', ')})`)
+        .join('\n');
+
+      throw new Error(
+        `식별 ID가 지정되어있지 않은 항목이 있습니다. 식별 ID 관리 탭에서 지정해주세요.\n\n설정되지 않은 식별 ID:\n${missingDetails}`
+      );
     }
 
     const jsonStructure = {};
