@@ -1,29 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
-import FormControl from '@mui/material/FormControl';
-import { TextField } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import FacilityGroupSelect from '../../../components/select/facility_group';
-import BasicTable from '../../../components/table/basic_code';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedSensorsState, userState } from '../../../recoil/atoms';
-import AlertModal from '../../../components/modal/alert';
-import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import LoadingOverlay from '../../../components/loading/LodingOverlay';
-import BasicModal from '../../../components/modal/basicmodal';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
+import { useAlertModal } from '../../../hooks/useAlertModal';
+import { useSensorSelection } from '../../../hooks/useSensorSelection';
+import { Base, FacilityGroupTree } from '../../../types/api';
+import { DetailView } from '../../../components/basic/DetailView';
+import { EditView } from '../../../components/basic/EditView';
 import {
   updateBaseAPI,
   getBaseSensorsAPI,
@@ -31,30 +14,6 @@ import {
   buildTreeFromSensorIdsAPI,
   buildTreeDataAPI,
 } from '../../../apis/api/basic';
-import { SearchBox, ActionBox } from '../../../components/common';
-
-interface Base {
-  ab_idx: number;
-  ab_name: string;
-  ab_note: string;
-  sn_length: number;
-  createdAt: Date;
-}
-
-interface FacilityGroupTree {
-  fg_idx: number;
-  fg_name: string;
-  facilities: {
-    fa_idx: number;
-    fa_name: string;
-    sensors: {
-      sn_idx: number;
-      sn_name: string;
-    }[];
-  }[];
-}
-
-const cells = ['기초코드명', '센서 개수', '생성 일자', '비고'];
 
 export default function BasiccodeEditPage() {
   const { id, mode } = useParams<{ id: string; mode?: string }>();
@@ -65,25 +24,24 @@ export default function BasiccodeEditPage() {
   const [sensorName, setSensorName] = useState('');
   const userIdx = useRecoilValue(userState)?.user_idx;
 
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertContent, setAlertContent] = useState('');
-  const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
+  // 커스텀 훅 사용
+  const { alertModal, showAlert, closeAlert } = useAlertModal();
+  const { handleGroupSelectAll, handleFacilitySelectAll, isAllSensorsSelectedInGroup, isAllSensorsSelectedInFacility } =
+    useSensorSelection();
 
+  // 상태 관리
   const [treeData, setTreeData] = useState<FacilityGroupTree[]>([]);
   const [treeLoading, setTreeLoading] = useState(false);
-
   const [basicModalOpen, setBasicModalOpen] = useState(false);
   const [basicName, setBasicName] = useState('');
   const [basicDesc, setBasicDesc] = useState('');
-
   const [selectedFacilityGroups, setSelectedFacilityGroups] = useState<number[]>([]);
-
   const [editingBase, setEditingBase] = useState<Base | null>(null);
   const [selectedBaseForDetail, setSelectedBaseForDetail] = useState<Base | null>(null);
   const [detailTreeData, setDetailTreeData] = useState<FacilityGroupTree[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
 
+  // 모드 설정
   useEffect(() => {
     if (id) {
       const baseId = parseInt(id);
@@ -99,16 +57,7 @@ export default function BasiccodeEditPage() {
     }
   }, [id, mode]);
 
-  // useEffect(() => {
-  //   if (detailMode && selectedBaseForDetail) {
-  //     document.title = `기초코드 관리 > ${selectedBaseForDetail.ab_name}`;
-  //   } else if (editMode && editingBase) {
-  //     document.title = `기초코드 관리 > ${editingBase.ab_name} 수정`;
-  //   } else {
-  //     document.title = '기초코드 관리';
-  //   }
-  // }, [detailMode, selectedBaseForDetail, editMode, editingBase]);
-
+  // 데이터 로딩 함수들
   const loadBaseForDetail = async (baseId: number) => {
     setDetailLoading(true);
     try {
@@ -116,10 +65,7 @@ export default function BasiccodeEditPage() {
       const targetBase = basesData.find((base: Base) => base.ab_idx === baseId);
 
       if (!targetBase) {
-        setAlertTitle('오류');
-        setAlertContent('기초코드를 찾을 수 없습니다.');
-        setAlertType('alert');
-        setAlertOpen(true);
+        showAlert('오류', '기초코드를 찾을 수 없습니다.');
         return;
       }
 
@@ -146,10 +92,7 @@ export default function BasiccodeEditPage() {
       const targetBase = basesData.find((base: Base) => base.ab_idx === baseId);
 
       if (!targetBase) {
-        setAlertTitle('오류');
-        setAlertContent('기초코드를 찾을 수 없습니다.');
-        setAlertType('alert');
-        setAlertOpen(true);
+        showAlert('오류', '기초코드를 찾을 수 없습니다.');
         return;
       }
 
@@ -163,14 +106,10 @@ export default function BasiccodeEditPage() {
         : [];
 
       setSelectedSensors(sensorIdList);
-
       await loadAllFacilityGroupsForEdit(sensorIdList);
     } catch (err: any) {
-      console.log('수정 모드 초기화 에러:', err.message);
-      setAlertTitle('오류');
-      setAlertContent('기초코드 정보를 불러오는데 실패했습니다.');
-      setAlertType('alert');
-      setAlertOpen(true);
+      console.error('수정 모드 초기화 에러:', err.message);
+      showAlert('오류', '기초코드 정보를 불러오는데 실패했습니다.');
     }
   };
 
@@ -192,445 +131,126 @@ export default function BasiccodeEditPage() {
 
       setSelectedFacilityGroups(Array.from(relevantFacilityGroups));
     } catch (err) {
-      console.log('설비그룹 로드 에러:', err.message);
+      console.error('설비그룹 로드 에러:', err);
     }
   };
 
+  // 이벤트 핸들러들
   const handleUpdate = async () => {
-    if (selectedSensors.length === 0) {
-      setAlertTitle('알림');
-      setAlertContent('센서를 선택해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
-      return;
-    }
-
-    if (!basicName.trim()) {
-      setAlertTitle('알림');
-      setAlertContent('기초코드명을 입력해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
-      return;
-    }
-
-    if (!editingBase) {
-      console.error('No base selected for update');
-      return;
-    }
+    if (!editingBase) return;
 
     try {
       await updateBaseAPI({
-        user_idx: userIdx,
         ab_idx: editingBase.ab_idx,
+        user_idx: userIdx,
         name: basicName,
         note: basicDesc,
         ids: selectedSensors,
       });
 
-      console.log('Base updated successfully');
-      setBasicName('');
-      setBasicDesc('');
-      setSelectedSensors([]);
+      showAlert('알림', '기초코드가 수정되었습니다.');
       window.location.href = '/aas/basic';
     } catch (error) {
-      console.error('Error updating base:', error);
+      console.error('수정 중 오류 발생:', error);
+      showAlert('오류', '기초코드 수정 중 오류가 발생했습니다.');
     }
   };
 
   const handleBasicModalAdd = async () => {
-    try {
-      await handleUpdate();
-      setBasicModalOpen(false);
-      window.location.href = '/aas/basic';
-    } catch (error) {
-      console.error('Error updating base:', error);
-    }
+    await handleUpdate();
   };
 
   const handleBasicModalReset = () => {
-    if (editingBase) {
-      setBasicName(editingBase.ab_name);
-      setBasicDesc(editingBase.ab_note || '');
-    } else {
-      setBasicName('');
-      setBasicDesc('');
-    }
+    setBasicName('');
+    setBasicDesc('');
   };
 
   const handleTreeSearch = async () => {
     if (!facilityName.trim() && !sensorName.trim() && selectedFacilityGroups.length === 0) {
-      setAlertTitle('알림');
-      setAlertContent('검색 조건을 입력해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
+      showAlert('알림', '검색 조건을 입력해주세요.');
       return;
     }
 
     setTreeLoading(true);
-
     try {
       const finalFilteredData = await buildTreeDataAPI(selectedFacilityGroups, facilityName, sensorName);
       setTreeData(finalFilteredData);
     } catch (err) {
-      console.log('검색 에러:', err.message);
+      console.error('검색 에러:', err);
       setTreeData([]);
+      showAlert('오류', '검색 중 오류가 발생했습니다.');
     } finally {
       setTreeLoading(false);
     }
   };
 
-  const handleFacilityGroupSelectAll = (fgIdx: number, checked: boolean) => {
-    const fg = treeData[fgIdx];
-    if (!fg) return;
-
-    const allSensorIds: number[] = [];
-    fg.facilities.forEach((fa) => {
-      fa.sensors.forEach((sensor) => {
-        allSensorIds.push(sensor.sn_idx);
-      });
-    });
-
-    setSelectedSensors((prevSelected) => {
-      if (checked) {
-        const newSelected = [...prevSelected];
-        allSensorIds.forEach((id) => {
-          if (!newSelected.includes(id)) {
-            newSelected.push(id);
-          }
-        });
-        return newSelected;
-      } else {
-        return prevSelected.filter((id) => !allSensorIds.includes(id));
-      }
-    });
+  const handleBackToList = () => {
+    window.location.href = '/aas/basic';
   };
 
-  const isAllSensorsSelectedInGroup = (fgIdx: number) => {
-    const fg = treeData[fgIdx];
-    if (!fg) return false;
-
-    const allSensorIds: number[] = [];
-    fg.facilities.forEach((fa) => {
-      fa.sensors.forEach((sensor) => {
-        allSensorIds.push(sensor.sn_idx);
-      });
-    });
-
-    return allSensorIds.length > 0 && allSensorIds.every((id) => selectedSensors.includes(id));
+  const handleEdit = () => {
+    if (selectedBaseForDetail) {
+      window.location.href = `/aas/basic/edit/${selectedBaseForDetail.ab_idx}/edit`;
+    }
   };
 
-  const handleFacilitySelectAll = (fgIdx: number, faIdx: number, checked: boolean) => {
-    const fg = treeData[fgIdx];
-    if (!fg || !fg.facilities[faIdx]) return;
-
-    const fa = fg.facilities[faIdx];
-    const sensorIds = fa.sensors.map((sensor) => sensor.sn_idx);
-
-    setSelectedSensors((prevSelected) => {
-      if (checked) {
-        const newSelected = [...prevSelected];
-        sensorIds.forEach((id) => {
-          if (!newSelected.includes(id)) {
-            newSelected.push(id);
-          }
-        });
-        return newSelected;
-      } else {
-        return prevSelected.filter((id) => !sensorIds.includes(id));
-      }
-    });
+  // 센서 선택 핸들러들
+  const handleGroupSelectAllWrapper = (fgIdx: number, checked: boolean) => {
+    handleGroupSelectAll(treeData, fgIdx, checked);
   };
 
-  const isAllSensorsSelectedInFacility = (fgIdx: number, faIdx: number) => {
-    const fg = treeData[fgIdx];
-    if (!fg || !fg.facilities[faIdx]) return false;
-
-    const fa = fg.facilities[faIdx];
-    return fa.sensors.length > 0 && fa.sensors.every((sensor) => selectedSensors.includes(sensor.sn_idx));
+  const handleFacilitySelectAllWrapper = (fgIdx: number, faIdx: number, checked: boolean) => {
+    handleFacilitySelectAll(treeData, fgIdx, faIdx, checked);
   };
 
+  const isAllSensorsSelectedInGroupWrapper = (fgIdx: number) => {
+    return isAllSensorsSelectedInGroup(treeData, fgIdx);
+  };
+
+  const isAllSensorsSelectedInFacilityWrapper = (fgIdx: number, faIdx: number) => {
+    return isAllSensorsSelectedInFacility(treeData, fgIdx, faIdx);
+  };
+
+  // 렌더링
   if (detailMode) {
     return (
-      <div className='table-outer'>
-        <div>
-          <ActionBox
-            buttons={[
-              {
-                text: '수정',
-                onClick: () => {
-                  if (selectedBaseForDetail) {
-                    window.location.href = `/aas/basic/edit/${selectedBaseForDetail.ab_idx}/edit`;
-                  }
-                },
-                color: 'success',
-              },
-              {
-                text: '목록',
-                onClick: () => {
-                  window.location.href = '/aas/basic';
-                },
-                color: 'inherit',
-                variant: 'outlined',
-              },
-            ]}
-          />
-        </div>
-
-        <div className='table-wrap'>
-          {detailLoading ? (
-            <LoadingOverlay />
-          ) : detailTreeData.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#888', padding: '40px 0' }}>센서 데이터가 없습니다.</div>
-          ) : (
-            <SimpleTreeView
-              defaultExpandedItems={detailTreeData.flatMap((fg, fgIdx) => [
-                `detail-${fgIdx}`,
-                ...fg.facilities.map((fa, faIdx) => `detail-sub-${fgIdx}-${faIdx}`),
-              ])}
-            >
-              {detailTreeData.map((fg, fgIdx) => (
-                <TreeItem key={fg.fg_idx} itemId={`detail-${fgIdx}`} label={<span>{fg.fg_name}</span>}>
-                  {fg.facilities.map((fa, faIdx) => (
-                    <TreeItem key={fa.fa_idx} itemId={`detail-sub-${fgIdx}-${faIdx}`} label={<span>{fa.fa_name}</span>}>
-                      <div style={{ padding: '8px 0' }}>
-                        <TableContainer component={Paper}>
-                          <Table size='small'>
-                            <TableBody>
-                              {(() => {
-                                const sensors = fa.sensors || [];
-                                const rows: (typeof sensors)[] = [];
-                                for (let i = 0; i < sensors.length; i += 6) {
-                                  const rowSensors = sensors.slice(i, i + 6);
-                                  rows.push(rowSensors);
-                                }
-                                return rows.map((rowSensors, rowIndex) => (
-                                  <TableRow key={rowIndex}>
-                                    <TableCell colSpan={3}>
-                                      <Grid container spacing={1}>
-                                        {rowSensors.map((sensor, idx) => (
-                                          <Grid item xs={2} key={sensor.sn_idx}>
-                                            <List
-                                              sx={{
-                                                width: '100%',
-                                                bgcolor: 'background.paper',
-                                                border: '1px solid #e0e0e0',
-                                                borderRadius: 1,
-                                              }}
-                                              className='basic-checkbox'
-                                            >
-                                              <div>
-                                                <ListItem>
-                                                  <ListItemText secondary={sensor.sn_name} />
-                                                </ListItem>
-                                                <Divider variant='middle' component='li' />
-                                                <ListItem>
-                                                  <ListItemText
-                                                    secondary={
-                                                      'Prop 1.' +
-                                                      (fgIdx + 1) +
-                                                      '.' +
-                                                      (faIdx + 1) +
-                                                      '.' +
-                                                      (rowIndex * 6 + idx + 1)
-                                                    }
-                                                  />
-                                                </ListItem>
-                                              </div>
-                                            </List>
-                                          </Grid>
-                                        ))}
-                                      </Grid>
-                                    </TableCell>
-                                  </TableRow>
-                                ));
-                              })()}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      </div>
-                    </TreeItem>
-                  ))}
-                </TreeItem>
-              ))}
-            </SimpleTreeView>
-          )}
-        </div>
-      </div>
+      <DetailView
+        detailTreeData={detailTreeData}
+        detailLoading={detailLoading}
+        selectedBaseForDetail={selectedBaseForDetail}
+        onEdit={handleEdit}
+        onBackToList={handleBackToList}
+      />
     );
   }
 
   if (editMode) {
     return (
-      <div className='table-outer'>
-        <div>
-          <SearchBox
-            buttons={[
-              {
-                text: '검색',
-                onClick: handleTreeSearch,
-                color: 'success',
-              },
-            ]}
-          >
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Grid container spacing={1}>
-                  <Grid item>
-                    <div className='sort-title'>설비그룹</div>
-                  </Grid>
-                  <Grid item xs={9}>
-                    <FacilityGroupSelect
-                      selectedFacilityGroups={selectedFacilityGroups}
-                      setSelectedFacilityGroups={setSelectedFacilityGroups}
-                    />
-                  </Grid>
-                </Grid>
-              </Grid>
-
-              <Grid item xs={3}>
-                <Grid container spacing={1}>
-                  <Grid item>
-                    <div className='sort-title'>설비명</div>
-                  </Grid>
-                  <Grid item xs={9}>
-                    <FormControl sx={{ width: '100%' }} size='small'>
-                      <TextField
-                        size='small'
-                        value={facilityName}
-                        onChange={(e) => setFacilityName(e.target.value)}
-                        placeholder='설비명을 입력하세요'
-                      />
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Grid>
-
-              <Grid item xs={3}>
-                <Grid container spacing={1}>
-                  <Grid item>
-                    <div className='sort-title'>센서명</div>
-                  </Grid>
-                  <Grid item xs={9}>
-                    <FormControl sx={{ width: '100%' }} size='small'>
-                      <TextField
-                        size='small'
-                        value={sensorName}
-                        onChange={(e) => setSensorName(e.target.value)}
-                        placeholder='센서명을 입력하세요'
-                      />
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </SearchBox>
-
-          <ActionBox
-            buttons={[
-              {
-                text: '저장',
-                onClick: () => {
-                  if (selectedSensors.length === 0) {
-                    setAlertTitle('알림');
-                    setAlertContent('센서를 선택해주세요.');
-                    setAlertType('alert');
-                    setAlertOpen(true);
-                  } else {
-                    setBasicModalOpen(true);
-                  }
-                },
-                color: 'primary',
-              },
-              {
-                text: '목록',
-                onClick: () => {
-                  window.location.href = '/aas/basic';
-                },
-                color: 'inherit',
-                variant: 'outlined',
-              },
-            ]}
-          />
-        </div>
-
-        <div className='table-wrap'>
-          {treeLoading ? (
-            <LoadingOverlay />
-          ) : treeData.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#888', padding: '40px 0' }}>조회 결과 없음</div>
-          ) : (
-            <SimpleTreeView
-              defaultExpandedItems={treeData.flatMap((fg, fgIdx) => [
-                `aas-${fgIdx}`,
-                ...fg.facilities.map((fa, faIdx) => `submodal-${fgIdx}-${faIdx}`),
-              ])}
-            >
-              {treeData.map((fg, fgIdx) => (
-                <TreeItem
-                  key={fg.fg_idx}
-                  itemId={`aas-${fgIdx}`}
-                  label={
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Checkbox
-                        checked={isAllSensorsSelectedInGroup(fgIdx)}
-                        indeterminate={false}
-                        onChange={(e) => handleFacilityGroupSelectAll(fgIdx, e.target.checked)}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ marginRight: '8px' }}
-                      />
-                      <span>{fg.fg_name}</span>
-                    </div>
-                  }
-                >
-                  {fg.facilities.map((fa, faIdx) => (
-                    <TreeItem
-                      key={fa.fa_idx}
-                      itemId={`submodal-${fgIdx}-${faIdx}`}
-                      label={
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <Checkbox
-                            checked={isAllSensorsSelectedInFacility(fgIdx, faIdx)}
-                            indeterminate={false}
-                            onChange={(e) => handleFacilitySelectAll(fgIdx, faIdx, e.target.checked)}
-                            onClick={(e) => e.stopPropagation()}
-                            style={{ marginRight: '8px' }}
-                          />
-                          <span>{fa.fa_name}</span>
-                        </div>
-                      }
-                    >
-                      <div style={{ padding: '8px 0' }}>
-                        <BasicTable sm_idx={`${fgIdx + 1}.${faIdx + 1}`} fa_idx={fa.fa_idx} sensors={fa.sensors} />
-                      </div>
-                    </TreeItem>
-                  ))}
-                </TreeItem>
-              ))}
-            </SimpleTreeView>
-          )}
-        </div>
-
-        <BasicModal
-          open={basicModalOpen}
-          handleClose={() => setBasicModalOpen(false)}
-          handleAdd={handleBasicModalAdd}
-          handleReset={handleBasicModalReset}
-          selectedSensorCount={selectedSensors.length}
-          name={basicName}
-          setName={setBasicName}
-          desc={basicDesc}
-          setDesc={setBasicDesc}
-          isEditMode={true}
-        />
-        <AlertModal
-          open={alertOpen}
-          handleClose={() => setAlertOpen(false)}
-          title={alertTitle}
-          content={alertContent}
-          type={alertType}
-          onConfirm={alertType === 'confirm' ? undefined : undefined}
-        />
-      </div>
+      <EditView
+        treeData={treeData}
+        treeLoading={treeLoading}
+        selectedFacilityGroups={selectedFacilityGroups}
+        setSelectedFacilityGroups={setSelectedFacilityGroups}
+        facilityName={facilityName}
+        setFacilityName={setFacilityName}
+        sensorName={sensorName}
+        setSensorName={setSensorName}
+        basicModalOpen={basicModalOpen}
+        setBasicModalOpen={setBasicModalOpen}
+        basicName={basicName}
+        setBasicName={setBasicName}
+        basicDesc={basicDesc}
+        setBasicDesc={setBasicDesc}
+        selectedSensors={selectedSensors}
+        onTreeSearch={handleTreeSearch}
+        onGroupSelectAll={handleGroupSelectAllWrapper}
+        onFacilitySelectAll={handleFacilitySelectAllWrapper}
+        isAllSensorsSelectedInGroup={isAllSensorsSelectedInGroupWrapper}
+        isAllSensorsSelectedInFacility={isAllSensorsSelectedInFacilityWrapper}
+        onBasicModalAdd={handleBasicModalAdd}
+        onBasicModalReset={handleBasicModalReset}
+        onBackToList={handleBackToList}
+      />
     );
   }
 
