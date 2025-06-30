@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
 import Pagination from '../../components/pagination';
 import DataTableRow from '../../components/aasx/data_management/DataTableRow';
@@ -20,9 +17,9 @@ interface Word {
 }
 
 export default function DataManagerPage() {
-  const [searchType, setSearchType] = useState('fg_name');
   const navigationReset = useRecoilValue(navigationResetState);
   const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
   // 커스텀 훅 사용
@@ -34,6 +31,7 @@ export default function DataManagerPage() {
     modifiedData,
     editingValues,
     showUnmatchedOnly,
+    searchKeyword,
     getWords,
     handleUnmatchedOnly,
     handleItemCheckboxChange,
@@ -44,12 +42,17 @@ export default function DataManagerPage() {
     isItemSelected,
     isAllCurrentPageSelected,
     isSomeCurrentPageSelected,
+    handleSearchKeywordChange,
+    handleSearch,
   } = useWordManagement();
-
-  const rowsPerPage = 10;
 
   const handlePageChange = (event: unknown, newPage: number) => {
     setCurrentPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(0);
   };
 
   const pagedData = filteredWords?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
@@ -64,10 +67,6 @@ export default function DataManagerPage() {
   useEffect(() => {
     getWords();
   }, [getWords]);
-
-  const handleSearch = () => {
-    getWords();
-  };
 
   const handleSaveClick = async () => {
     const result = await handleSave();
@@ -109,16 +108,15 @@ export default function DataManagerPage() {
           <Grid item xs={3}>
             <Grid container spacing={1}>
               <Grid item>
-                <div className='sort-title'>검색구분</div>
+                <div className='sort-title'>검색어</div>
               </Grid>
               <Grid item xs={9}>
-                <FormControl sx={{ width: '100%' }} size='small'>
-                  <Select value={searchType} onChange={(e) => setSearchType(e.target.value)} displayEmpty>
-                    <MenuItem value='fg_name'>설비그룹</MenuItem>
-                    <MenuItem value='fa_name'>설비명</MenuItem>
-                    <MenuItem value='sn_name'>센서명</MenuItem>
-                  </Select>
-                </FormControl>
+                <TextField
+                  size='small'
+                  value={searchKeyword}
+                  onChange={(e) => handleSearchKeywordChange(e.target.value)}
+                  placeholder='검색어 입력'
+                />
               </Grid>
             </Grid>
           </Grid>
@@ -181,7 +179,13 @@ export default function DataManagerPage() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination count={filteredWords?.length || 0} page={currentPage} onPageChange={handlePageChange} />
+        <Pagination
+          count={filteredWords?.length || 0}
+          page={currentPage}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
       </div>
 
       <AlertModal

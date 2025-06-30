@@ -13,18 +13,14 @@ export const useWordManagement = () => {
   const [modifiedData, setModifiedData] = useState<{ [key: string]: string }>({});
   const [editingValues, setEditingValues] = useState<{ [key: string]: string }>({});
   const [showUnmatchedOnly, setShowUnmatchedOnly] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   const getWords = useCallback(async () => {
     try {
       const response = await getWordsAPI();
       if (response && Array.isArray(response)) {
         setWords(response);
-        if (showUnmatchedOnly) {
-          const unmatchedWords = response.filter((word) => !word.as_en || word.as_en.trim() === '');
-          setFilteredWords(unmatchedWords);
-        } else {
-          setFilteredWords(response);
-        }
+        applyFilters(response);
       } else {
         setWords([]);
         setFilteredWords([]);
@@ -34,22 +30,45 @@ export const useWordManagement = () => {
       setWords([]);
       setFilteredWords([]);
     }
-  }, [showUnmatchedOnly]);
+  }, []);
+
+  const applyFilters = useCallback(
+    (wordList: Word[]) => {
+      let filtered = wordList;
+
+      if (searchKeyword.trim()) {
+        const keyword = searchKeyword.toLowerCase();
+        filtered = filtered.filter(
+          (word) => word.as_kr.toLowerCase().includes(keyword) || word.as_en.toLowerCase().includes(keyword)
+        );
+      }
+
+      if (showUnmatchedOnly) {
+        filtered = filtered.filter((word) => !word.as_en || word.as_en.trim() === '');
+      }
+
+      setFilteredWords(filtered);
+    },
+    [searchKeyword, showUnmatchedOnly]
+  );
+
+  const handleSearchKeywordChange = useCallback((keyword: string) => {
+    setSearchKeyword(keyword);
+  }, []);
+
+  const handleSearch = useCallback(() => {
+    applyFilters(words);
+  }, [applyFilters, words]);
 
   const handleUnmatchedOnly = useCallback(
     (checked: boolean) => {
       setShowUnmatchedOnly(checked);
-      if (checked) {
-        const unmatchedWords = words.filter((word) => !word.as_en || word.as_en.trim() === '');
-        setFilteredWords(unmatchedWords);
-      } else {
-        setFilteredWords(words);
-      }
+      applyFilters(words);
       setSelectedItems([]);
       setModifiedData({});
       setEditingValues({});
     },
-    [words]
+    [words, applyFilters]
   );
 
   const handleItemCheckboxChange = useCallback((item: Word) => {
@@ -197,6 +216,7 @@ export const useWordManagement = () => {
     modifiedData,
     editingValues,
     showUnmatchedOnly,
+    searchKeyword,
     getWords,
     handleUnmatchedOnly,
     handleItemCheckboxChange,
@@ -207,5 +227,7 @@ export const useWordManagement = () => {
     isItemSelected,
     isAllCurrentPageSelected,
     isSomeCurrentPageSelected,
+    handleSearchKeywordChange,
+    handleSearch,
   };
 };
