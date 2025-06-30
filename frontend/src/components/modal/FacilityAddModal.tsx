@@ -201,7 +201,15 @@ export default function FacilityAddModal({
                           value={facilityValue}
                           onChange={(e) => setFacilityValue(e.target.value as string)}
                           displayEmpty
-                          sx={{ background: '#fff', borderRadius: 1 }}
+                          disabled={!groupValue || groupValue === ''}
+                          sx={{
+                            background: '#fff',
+                            borderRadius: 1,
+                            '&.Mui-disabled': {
+                              backgroundColor: '#f5f5f5',
+                              color: '#999',
+                            },
+                          }}
                         >
                           <MenuItem value='신규등록'>신규등록</MenuItem>
                           {facilityList.map((f) => (
@@ -219,8 +227,16 @@ export default function FacilityAddModal({
                         size='small'
                         fullWidth
                         placeholder='설비명 입력'
-                        disabled={facilityValue !== '신규등록'}
-                        sx={{ background: facilityValue === '신규등록' ? '#fff' : '#f0f0f0', borderRadius: 1 }}
+                        disabled={facilityValue !== '신규등록' || !groupValue || groupValue === ''}
+                        sx={{
+                          background:
+                            facilityValue === '신규등록' && groupValue && groupValue !== '' ? '#fff' : '#f0f0f0',
+                          borderRadius: 1,
+                          '& .MuiInputBase-input.Mui-disabled': {
+                            backgroundColor: '#f5f5f5',
+                            color: '#999',
+                          },
+                        }}
                       />
                     </Grid>
                   </Grid>
@@ -253,7 +269,15 @@ export default function FacilityAddModal({
                     size='small'
                     fullWidth
                     placeholder='센서명을 입력하세요'
-                    sx={{ background: '#fff', borderRadius: 1 }}
+                    disabled={!groupValue || !facilityValue || groupValue === '' || facilityValue === ''}
+                    sx={{
+                      background: '#fff',
+                      borderRadius: 1,
+                      '& .MuiInputBase-input.Mui-disabled': {
+                        backgroundColor: '#f5f5f5',
+                        color: '#999',
+                      },
+                    }}
                   />
                 </TableCell>
               </TableRow>
