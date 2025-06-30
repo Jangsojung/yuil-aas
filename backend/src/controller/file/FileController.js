@@ -1,7 +1,4 @@
 import {
-  insertFileToDB,
-  updateFileToDB,
-  deleteFilesFromDB,
   getAASXFilesFromDB,
   insertAASXFileToDB,
   updateAASXFileToDB,
@@ -17,39 +14,6 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-export const insertFile = async (fc_idx, fileName, user_idx, res) => {
-  try {
-    const result = await insertFileToDB(fc_idx, fileName, user_idx);
-
-    res.status(200).json(result);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-export const updateFile = async (af_idx, fileName, user_idx, res) => {
-  try {
-    const result = await updateFileToDB(af_idx, fileName, user_idx);
-
-    res.status(200).json(result);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-};
-
-export const deleteFiles = async (ids, res) => {
-  try {
-    const result = await deleteFilesFromDB(ids);
-
-    res.status(200).json(result);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ err: 'Internal Server Error' });
-  }
-};
 
 export const getAASXFiles = async (af_kind, fc_idx, startDate, endDate, res) => {
   try {
