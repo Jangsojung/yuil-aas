@@ -7,7 +7,7 @@ import { FacilityGroupTree } from '../types/api';
 
 export const useFacilityManagement = () => {
   const userIdx = useRecoilValue(userState)?.user_idx;
-  const { alertModal, showAlert, closeAlert } = useAlertModal();
+  const { alertModal, closeAlert } = useAlertModal();
 
   // 상태 관리
   const [treeData, setTreeData] = useState<FacilityGroupTree[]>([]);
@@ -36,16 +36,6 @@ export const useFacilityManagement = () => {
     }
   }, [selectedFacilityGroups, facilityName, sensorName]);
 
-  // 설비 추가
-  const handleAddFacility = useCallback(() => {
-    showAlert('알림', '설비 추가 기능은 개발 중입니다.');
-  }, [showAlert]);
-
-  // 설비 삭제
-  const handleDeleteFacility = useCallback(() => {
-    showAlert('알림', '설비 삭제 기능은 개발 중입니다.');
-  }, [showAlert]);
-
   // 초기화
   const handleReset = useCallback(() => {
     setTreeData([]);
@@ -67,8 +57,6 @@ export const useFacilityManagement = () => {
 
     // 핸들러
     handleTreeSearch,
-    handleAddFacility,
-    handleDeleteFacility,
     handleReset,
 
     // 알림
