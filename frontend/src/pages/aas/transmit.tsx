@@ -6,15 +6,14 @@ import { handleVerifyAPI } from '../../apis/api/transmit';
 import SelectAASXFile from '../../components/select/aasx_files';
 import TransmitView from '../../section/aas/transmit/view';
 import { Grid } from '@mui/material';
-import { SearchBox, FilterBox } from '../../components/common';
-import Pagination from '../../components/pagination';
+import { SearchBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { buildTransmitTreeDataAPI } from '../../apis/api/transmit';
-
-interface AASXFile {
-  af_idx: number;
-  af_name: string;
-}
+import { AASXFile, AASXData } from '../../types/api';
+import { transformAASXData } from '../../utils/aasxTransform';
+import { useAlertModal } from '../../hooks/useAlertModal';
+import { usePagination } from '../../hooks/usePagination';
+import { PAGINATION } from '../../constants';
 
 export default function TransmitPage() {
   const currentFile = useRecoilValue(currentFileState);
@@ -25,137 +24,42 @@ export default function TransmitPage() {
   const [selectedFile, setSelectedFile] = useState<AASXFile | undefined>(undefined);
   const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [rowsPerPage] = useState(10);
+
+  // 커스텀 훅 사용
+  const { alertModal, showAlert, closeAlert } = useAlertModal();
+  const { currentPage, totalPages, goToPage } = usePagination(
+    aasxData?.AAS?.length || 0,
+    PAGINATION.DEFAULT_ROWS_PER_PAGE
+  );
+
+  // 상태 관리
   const [insertMode, setInsertMode] = useState(false);
   const [treeLoading, setTreeLoading] = useState(false);
   const [treeData, setTreeData] = useState<any[]>([]);
-  const [alertModal, setAlertModal] = useState({
-    open: false,
-    title: '',
-    content: '',
-    type: 'alert' as 'alert' | 'confirm',
-    onConfirm: undefined as (() => void) | undefined,
-  });
 
   const handleVerify = async () => {
-    if (selectedFile === undefined) {
-      setAlertModal({
-        open: true,
-        title: '알림',
-        content: '선택된 파일이 없습니다.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
+    if (!selectedFile) {
+      showAlert('알림', '선택된 파일이 없습니다.');
       return;
     }
 
-    const rawData = await handleVerifyAPI(selectedFile);
-    if (rawData) {
-      const transformedData = transformAASXData(rawData);
-
-      setAasxData(transformedData);
-      setIsVerified(true);
-      setSelectedFile(undefined);
+    try {
+      const rawData = await handleVerifyAPI(selectedFile);
+      if (rawData) {
+        const transformedData = transformAASXData(rawData);
+        if (transformedData) {
+          setAasxData(transformedData);
+          setIsVerified(true);
+          setSelectedFile(undefined);
+        } else {
+          showAlert('오류', 'AASX 데이터 변환에 실패했습니다.');
+        }
+      }
+    } catch (error) {
+      console.error('검증 중 오류 발생:', error);
+      showAlert('오류', '파일 검증 중 오류가 발생했습니다.');
     }
   };
-
-  const transformAASXData = (rawData: any) => {
-    if (!rawData || !rawData.assetAdministrationShells || !rawData.submodels) {
-      console.error('유효하지 않은 AASX 데이터 형식');
-      return null;
-    }
-
-    const result: any = {
-      AAS: [],
-    };
-
-    rawData.assetAdministrationShells.forEach((aas: any) => {
-      const aasItem = {
-        name: aas.idShort || 'AAS',
-        url: aas.id,
-        of: aas.assetInformation?.assetKind || '',
-        AssetInformation: {
-          Unit1: aas.assetInformation?.globalAssetId || '',
-        },
-        submodelRefs: aas.submodels?.map((sm: any) => sm.keys[0]?.value) || [],
-      };
-
-      result.AAS.push(aasItem);
-    });
-
-    result.SM = [];
-
-    rawData.submodels.forEach((submodel: any) => {
-      const smResult: any = {
-        name: submodel.idShort,
-        url: submodel.id,
-      };
-
-      if (submodel.submodelElements && submodel.submodelElements.length > 0) {
-        smResult.SMC = [];
-
-        submodel.submodelElements.forEach((element: any) => {
-          if (element.modelType === 'SubmodelElementCollection') {
-            const smcResult: any = {
-              name: element.idShort,
-              elements: element.value?.length || 0,
-            };
-
-            if (element.value && element.value.length > 0) {
-              smcResult.items = [];
-
-              element.value.forEach((item: any) => {
-                if (item.modelType === 'SubmodelElementCollection') {
-                  const childCollection: any = {
-                    name: item.idShort,
-                    elements: item.value?.length || 0,
-                  };
-
-                  if (item.value && item.value.length > 0) {
-                    childCollection.Prop = item.value.map((prop: any) => ({
-                      name: prop.idShort,
-                      value: prop.value,
-                    }));
-                  }
-
-                  smcResult.items.push(childCollection);
-                }
-              });
-            }
-
-            smResult.SMC.push(smcResult);
-          }
-        });
-      }
-
-      const parentAAS = result.AAS.filter((aas: any) => aas.submodelRefs && aas.submodelRefs.includes(submodel.id));
-
-      if (parentAAS.length > 0) {
-        smResult.parentAAS = parentAAS.map((aas: any) => aas.url);
-      }
-
-      result.SM.push(smResult);
-    });
-
-    return result;
-  };
-
-  useEffect(() => {
-    if (currentFile) {
-      setIsVerified(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentFile]);
-
-  useEffect(() => {
-    setSelectedFile(undefined);
-    setAasxData(null);
-    setIsVerified(false);
-    setCurrentFile(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigationReset]);
 
   const handleInsertMode = async () => {
     setInsertMode(true);
@@ -164,21 +68,35 @@ export default function TransmitPage() {
       const facilitiesAll = await buildTransmitTreeDataAPI();
       setTreeData(facilitiesAll);
     } catch (err) {
+      console.error('트리 데이터 로딩 실패:', err);
       setTreeData([]);
+      showAlert('오류', '설비 데이터를 불러오는데 실패했습니다.');
     } finally {
       setTreeLoading(false);
     }
   };
 
-  const pagedData = aasxData?.AAS?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-
-  const calculatedTotalPages = Math.ceil((aasxData?.AAS?.length || 0) / rowsPerPage);
-
+  // 페이지 변경 시 현재 페이지 조정
   useEffect(() => {
-    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
-      setCurrentPage(0);
+    if (currentPage >= totalPages && totalPages > 0) {
+      goToPage(0);
     }
-  }, [currentPage, calculatedTotalPages]);
+  }, [currentPage, totalPages, goToPage]);
+
+  // 네비게이션 리셋 시 상태 초기화
+  useEffect(() => {
+    setSelectedFile(undefined);
+    setAasxData(null);
+    setIsVerified(false);
+    setCurrentFile(null);
+  }, [navigationReset, setAasxData, setIsVerified, setCurrentFile]);
+
+  // 현재 파일 변경 시 검증 상태 리셋
+  useEffect(() => {
+    if (currentFile) {
+      setIsVerified(false);
+    }
+  }, [currentFile, setIsVerified]);
 
   return (
     <div>
@@ -206,6 +124,15 @@ export default function TransmitPage() {
         </Grid>
       </SearchBox>
       <TransmitView />
+
+      <AlertModal
+        open={alertModal.open}
+        handleClose={closeAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
+      />
     </div>
   );
 }

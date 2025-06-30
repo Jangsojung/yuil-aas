@@ -17,19 +17,8 @@ import FacilityGroupSelect from '../../../components/select/facility_group';
 import BasicTable from '../../../components/table/basic_code';
 import { insertBaseAPI, buildTreeDataAPI } from '../../../apis/api/basic';
 import { SearchBox, ActionBox } from '../../../components/common';
-
-interface FacilityGroupTree {
-  fg_idx: number;
-  fg_name: string;
-  facilities: {
-    fa_idx: number;
-    fa_name: string;
-    sensors: {
-      sn_idx: number;
-      sn_name: string;
-    }[];
-  }[];
-}
+import { FacilityGroupTree } from '../../../types/api';
+import { useAlertModal } from '../../../hooks/useAlertModal';
 
 export default function BasiccodeAddPage() {
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
@@ -38,10 +27,8 @@ export default function BasiccodeAddPage() {
   const userIdx = useRecoilValue(userState)?.user_idx;
   const navigationReset = useRecoilValue(navigationResetState);
 
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertContent, setAlertContent] = useState('');
-  const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
+  // 커스텀 훅 사용
+  const { alertModal, showAlert, closeAlert } = useAlertModal();
 
   const [treeData, setTreeData] = useState<FacilityGroupTree[]>([]);
   const [treeLoading, setTreeLoading] = useState(false);
@@ -63,22 +50,16 @@ export default function BasiccodeAddPage() {
       setFacilityName('');
       setSensorName('');
     }
-  }, [navigationReset]);
+  }, [navigationReset, setSelectedSensors]);
 
   const handleAdd = async () => {
     if (selectedSensors.length === 0) {
-      setAlertTitle('알림');
-      setAlertContent('센서를 선택해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
+      showAlert('알림', '센서를 선택해주세요.');
       return;
     }
 
     if (!basicName.trim()) {
-      setAlertTitle('알림');
-      setAlertContent('기초코드명을 입력해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
+      showAlert('알림', '기초코드명을 입력해주세요.');
       return;
     }
 
@@ -97,6 +78,7 @@ export default function BasiccodeAddPage() {
       window.location.href = '/aas/basic';
     } catch (error) {
       console.error('Error inserting base:', error);
+      showAlert('오류', '기초코드 등록 중 오류가 발생했습니다.');
     }
   };
 
@@ -115,10 +97,7 @@ export default function BasiccodeAddPage() {
 
   const handleTreeSearch = async () => {
     if (!facilityName.trim() && !sensorName.trim() && selectedFacilityGroups.length === 0) {
-      setAlertTitle('알림');
-      setAlertContent('검색 조건을 입력해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
+      showAlert('알림', '검색 조건을 입력해주세요.');
       return;
     }
 
@@ -128,8 +107,9 @@ export default function BasiccodeAddPage() {
       const finalFilteredData = await buildTreeDataAPI(selectedFacilityGroups, facilityName, sensorName);
       setTreeData(finalFilteredData);
     } catch (err) {
-      console.log('검색 에러:', err.message);
+      console.error('검색 에러:', err);
       setTreeData([]);
+      showAlert('오류', '검색 중 오류가 발생했습니다.');
     } finally {
       setTreeLoading(false);
     }
@@ -305,10 +285,7 @@ export default function BasiccodeAddPage() {
               text: '기초코드 등록',
               onClick: () => {
                 if (selectedSensors.length === 0) {
-                  setAlertTitle('알림');
-                  setAlertContent('센서를 선택해주세요.');
-                  setAlertType('alert');
-                  setAlertOpen(true);
+                  showAlert('알림', '센서를 선택해주세요.');
                 } else {
                   setBasicModalOpen(true);
                 }
@@ -395,12 +372,12 @@ export default function BasiccodeAddPage() {
         isEditMode={false}
       />
       <AlertModal
-        open={alertOpen}
-        handleClose={() => setAlertOpen(false)}
-        title={alertTitle}
-        content={alertContent}
-        type={alertType}
-        onConfirm={alertType === 'confirm' ? undefined : undefined}
+        open={alertModal.open}
+        handleClose={closeAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
       />
     </div>
   );
