@@ -5,7 +5,7 @@ import { aasxDataState, currentFileState, isVerifiedState, navigationResetState 
 import { handleVerifyAPI } from '../../apis/api/transmit';
 import SelectAASXFile from '../../components/select/aasx_files';
 import TransmitView from '../../section/aas/transmit/view';
-import Grid from '@mui/system/Grid';
+import { Grid } from '@mui/material';
 import { SearchBox, FilterBox } from '../../components/common';
 import Pagination from '../../components/pagination';
 import AlertModal from '../../components/modal/alert';
@@ -18,6 +18,7 @@ interface AASXFile {
 
 export default function TransmitPage() {
   const currentFile = useRecoilValue(currentFileState);
+  const aasxData = useRecoilValue(aasxDataState);
   const [, setAasxData] = useRecoilState(aasxDataState);
   const [, setIsVerified] = useRecoilState(isVerifiedState);
   const [, setCurrentFile] = useRecoilState(currentFileState);
@@ -26,6 +27,10 @@ export default function TransmitPage() {
   const navigationReset = useRecoilValue(navigationResetState);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage] = useState(10);
+  const [insertMode, setInsertMode] = useState(false);
+  const [treeLoading, setTreeLoading] = useState(false);
+  const [treeData, setTreeData] = useState<any[]>([]);
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -56,17 +61,17 @@ export default function TransmitPage() {
     }
   };
 
-  const transformAASXData = (rawData) => {
+  const transformAASXData = (rawData: any) => {
     if (!rawData || !rawData.assetAdministrationShells || !rawData.submodels) {
       console.error('유효하지 않은 AASX 데이터 형식');
       return null;
     }
 
-    const result = {
+    const result: any = {
       AAS: [],
     };
 
-    rawData.assetAdministrationShells.forEach((aas) => {
+    rawData.assetAdministrationShells.forEach((aas: any) => {
       const aasItem = {
         name: aas.idShort || 'AAS',
         url: aas.id,
@@ -74,7 +79,7 @@ export default function TransmitPage() {
         AssetInformation: {
           Unit1: aas.assetInformation?.globalAssetId || '',
         },
-        submodelRefs: aas.submodels?.map((sm) => sm.keys[0]?.value) || [],
+        submodelRefs: aas.submodels?.map((sm: any) => sm.keys[0]?.value) || [],
       };
 
       result.AAS.push(aasItem);
@@ -82,8 +87,8 @@ export default function TransmitPage() {
 
     result.SM = [];
 
-    rawData.submodels.forEach((submodel) => {
-      const smResult = {
+    rawData.submodels.forEach((submodel: any) => {
+      const smResult: any = {
         name: submodel.idShort,
         url: submodel.id,
       };
@@ -91,9 +96,9 @@ export default function TransmitPage() {
       if (submodel.submodelElements && submodel.submodelElements.length > 0) {
         smResult.SMC = [];
 
-        submodel.submodelElements.forEach((element) => {
+        submodel.submodelElements.forEach((element: any) => {
           if (element.modelType === 'SubmodelElementCollection') {
-            const smcResult = {
+            const smcResult: any = {
               name: element.idShort,
               elements: element.value?.length || 0,
             };
@@ -101,15 +106,15 @@ export default function TransmitPage() {
             if (element.value && element.value.length > 0) {
               smcResult.items = [];
 
-              element.value.forEach((item) => {
+              element.value.forEach((item: any) => {
                 if (item.modelType === 'SubmodelElementCollection') {
-                  const childCollection = {
+                  const childCollection: any = {
                     name: item.idShort,
                     elements: item.value?.length || 0,
                   };
 
                   if (item.value && item.value.length > 0) {
-                    childCollection.Prop = item.value.map((prop) => ({
+                    childCollection.Prop = item.value.map((prop: any) => ({
                       name: prop.idShort,
                       value: prop.value,
                     }));
@@ -125,10 +130,10 @@ export default function TransmitPage() {
         });
       }
 
-      const parentAAS = result.AAS.filter((aas) => aas.submodelRefs && aas.submodelRefs.includes(submodel.id));
+      const parentAAS = result.AAS.filter((aas: any) => aas.submodelRefs && aas.submodelRefs.includes(submodel.id));
 
       if (parentAAS.length > 0) {
-        smResult.parentAAS = parentAAS.map((aas) => aas.url);
+        smResult.parentAAS = parentAAS.map((aas: any) => aas.url);
       }
 
       result.SM.push(smResult);

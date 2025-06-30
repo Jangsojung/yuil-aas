@@ -94,7 +94,7 @@ export const getVerify = async (file, res) => {
       return res.status(400).json({ error: '파일 정보가 필요합니다' });
     }
 
-    return res.json(result);
+    res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
     if (res) {
