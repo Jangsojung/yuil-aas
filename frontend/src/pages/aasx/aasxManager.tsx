@@ -1,11 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
-
 import BasicDatePicker from '../../components/datepicker';
-
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../components/pagination';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
@@ -35,7 +32,6 @@ export default function AasxManagerPage() {
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [selectAll, setSelectAll] = useState(false);
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [openUpdateModal, setOpenUpdateModal] = useState(false);

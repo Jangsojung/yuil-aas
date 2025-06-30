@@ -1,7 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { deleteEdgeAPI, getEdgeAPI } from '../../apis/api/edge';
-
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
@@ -28,7 +26,6 @@ export default function Edge_Gateway() {
   const [edgeGateways, setEdgeGateways] = useState<EdgeGateway[]>([]);
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useState<number[]>([]);
   const [selectedEdgeGateway, setSelectedEdgeGateway] = useState<EdgeGateway | null>(null);
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [openModal, setOpenModal] = useState(false);

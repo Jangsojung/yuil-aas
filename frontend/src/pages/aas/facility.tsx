@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { baseEditModeState, navigationResetState, selectedBasesState } from '../../recoil/atoms';
-
 import Grid from '@mui/material/Grid';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { TextField } from '@mui/material';
-
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { SearchBox, ActionBox } from '../../components/common';
@@ -16,7 +13,6 @@ export default function FacilityPage() {
   const [insertMode, setInsertMode] = useState(false);
   const [baseEditMode, setBaseEditMode] = useRecoilState(baseEditModeState);
   const [, setSelectedBases] = useRecoilState(selectedBasesState);
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
   useEffect(() => {

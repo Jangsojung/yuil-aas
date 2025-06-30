@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { getBasesAPI, insertBaseAPI } from '../../apis/api/convert';
-
 import { Dayjs } from 'dayjs';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -30,7 +28,6 @@ export default function ConvertPage() {
   const [filteredBases, setFilteredBases] = useState<Base[]>([]);
   const [baseDates, setBaseDates] = useState<{ [key: number]: { startDate: Dayjs | null; endDate: Dayjs | null } }>({});
   const userIdx = useRecoilValue(userState)?.user_idx;
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [searchKeyword, setSearchKeyword] = useState('');

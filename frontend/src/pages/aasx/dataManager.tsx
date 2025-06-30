@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
-
 import Pagination from '../../components/pagination';
 import { getWordsAPI, updateWordsAPI } from '../../apis/api/data_manage';
 import DataTableRow from '../../components/aasx/data_management/DataTableRow';
@@ -28,7 +26,6 @@ export default function DataManagerPage() {
   const [modifiedData, setModifiedData] = useState<{ [key: string]: string }>({});
   const [editingValues, setEditingValues] = useState<{ [key: string]: string }>({});
   const [searchType, setSearchType] = useState('fg_name');
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [currentPage, setCurrentPage] = useState(0);

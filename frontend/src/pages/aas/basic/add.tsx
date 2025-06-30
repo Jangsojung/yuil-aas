@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Box from '@mui/system/Box';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
@@ -27,7 +24,6 @@ export default function BasiccodeAddPage() {
   const userIdx = useRecoilValue(userState)?.user_idx;
   const navigationReset = useRecoilValue(navigationResetState);
 
-  // 커스텀 훅 사용
   const { alertModal, showAlert, closeAlert } = useAlertModal();
 
   const [treeData, setTreeData] = useState<FacilityGroupTree[]>([]);
