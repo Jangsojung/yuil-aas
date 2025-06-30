@@ -3,10 +3,10 @@ import { API_ENDPOINTS, apiHelpers } from '../../config/api';
 export const getBasesAPI = async () => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES);
-    return data;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error fetching bases:', error);
-    throw error;
+    return [];
   }
 };
 

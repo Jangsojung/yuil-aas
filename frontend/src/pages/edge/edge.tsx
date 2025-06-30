@@ -59,7 +59,7 @@ export default function Edge_Gateway() {
     }
   }, [currentPage, calculatedTotalPages]);
 
-  const handleInsert = async (eg: EdgeGateway) => {
+  const handleInsert = async () => {
     await getEdge();
   };
 
@@ -111,8 +111,13 @@ export default function Edge_Gateway() {
   };
 
   const getEdge = async () => {
-    const data: EdgeGateway[] = await getEdgeAPI();
-    setEdgeGateways(data);
+    try {
+      const data: EdgeGateway[] = await getEdgeAPI();
+      setEdgeGateways(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching edge gateways:', error);
+      setEdgeGateways([]);
+    }
   };
 
   const handleSelectAll = (e: ChangeEvent<HTMLInputElement>) => {
@@ -136,10 +141,11 @@ export default function Edge_Gateway() {
 
   const handleCheckboxChange = (edgeIdx: number) => {
     setSelectedEdgeGateways((prevSelected) => {
-      if (prevSelected.includes(edgeIdx)) {
-        return prevSelected.filter((idx) => idx !== edgeIdx);
+      const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
+      if (prevArray.includes(edgeIdx)) {
+        return prevArray.filter((idx) => idx !== edgeIdx);
       } else {
-        return [...prevSelected, edgeIdx];
+        return [...prevArray, edgeIdx];
       }
     });
   };

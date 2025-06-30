@@ -13,10 +13,10 @@ export const deleteEdgeAPI = async (data) => {
 export const getEdgeAPI = async () => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.EDGE_GATEWAY.LIST);
-    return data;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error fetching edge gateways:', error);
-    throw error;
+    return [];
   }
 };
 

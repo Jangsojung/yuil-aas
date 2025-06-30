@@ -34,6 +34,7 @@ export const getFilesAPI = async (start, end) => {
     return data;
   } catch (error) {
     console.error(error.message);
+    return [];
   }
 };
 

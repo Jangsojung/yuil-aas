@@ -105,9 +105,10 @@ export default function BasiccodePage() {
   const getBases = async () => {
     try {
       const data = await getBasesAPI();
-      setBases(data);
+      setBases(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching bases:', error);
+      setBases([]);
     }
   };
 
@@ -117,8 +118,9 @@ export default function BasiccodePage() {
     if (checked) {
       if (pagedData && pagedData.length > 0) {
         setSelectedBases((prevSelected) => {
+          const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
           const currentPageIds = pagedData.map((base) => base.ab_idx);
-          const newSelected = [...prevSelected];
+          const newSelected = [...prevArray];
           currentPageIds.forEach((id) => {
             if (!newSelected.includes(id)) {
               newSelected.push(id);
@@ -130,17 +132,21 @@ export default function BasiccodePage() {
     } else {
       if (pagedData && pagedData.length > 0) {
         const currentPageIds = pagedData.map((base) => base.ab_idx);
-        setSelectedBases((prevSelected) => prevSelected.filter((id) => !currentPageIds.includes(id)));
+        setSelectedBases((prevSelected) => {
+          const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
+          return prevArray.filter((id) => !currentPageIds.includes(id));
+        });
       }
     }
   };
 
   const handleCheckboxChange = (baseIdx: number) => {
     setSelectedBases((prevSelected) => {
-      if (prevSelected.includes(baseIdx)) {
-        return prevSelected.filter((idx) => idx !== baseIdx);
+      const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
+      if (prevArray.includes(baseIdx)) {
+        return prevArray.filter((idx) => idx !== baseIdx);
       } else {
-        return [...prevSelected, baseIdx];
+        return [...prevArray, baseIdx];
       }
     });
   };

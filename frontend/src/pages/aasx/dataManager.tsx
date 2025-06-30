@@ -61,7 +61,7 @@ export default function DataManagerPage() {
   const getWords = async () => {
     try {
       const response = await getWordsAPI();
-      if (response) {
+      if (response && Array.isArray(response)) {
         setWords(response);
         if (isSelected) {
           const unmatchedWords = response.filter((word) => !word.as_en || word.as_en.trim() === '');
@@ -69,9 +69,14 @@ export default function DataManagerPage() {
         } else {
           setFilteredWords(response);
         }
+      } else {
+        setWords([]);
+        setFilteredWords([]);
       }
     } catch (error) {
       console.error('단어 목록을 가져오는 중 오류 발생:', error);
+      setWords([]);
+      setFilteredWords([]);
     }
   };
 
@@ -169,7 +174,8 @@ export default function DataManagerPage() {
 
   const handleItemCheckboxChange = (item: Word) => {
     setSelectedItems((prev) => {
-      const isSelected = prev.some((selected) => selected.as_kr === item.as_kr && selected.as_en === item.as_en);
+      const prevArray = Array.isArray(prev) ? prev : [];
+      const isSelected = prevArray.some((selected) => selected.as_kr === item.as_kr && selected.as_en === item.as_en);
       if (isSelected) {
         const key = `${item.as_kr}|${item.as_en}`;
         setModifiedData((prevData) => {
@@ -182,9 +188,9 @@ export default function DataManagerPage() {
           delete newData[key];
           return newData;
         });
-        return prev.filter((selected) => !(selected.as_kr === item.as_kr && selected.as_en === item.as_en));
+        return prevArray.filter((selected) => !(selected.as_kr === item.as_kr && selected.as_en === item.as_en));
       } else {
-        return [...prev, item];
+        return [...prevArray, item];
       }
     });
   };
@@ -218,15 +224,16 @@ export default function DataManagerPage() {
   const handleSelectAll = () => {
     const currentPageItems = pagedData || [];
     const currentPageSelected = selectedItems.filter((item) =>
-      currentPageItems.some((pageItem) => pageItem.as_kr === item.as_kr && pageItem.as_en === item.as_en)
+      currentPageItems.some((pageItem) => pageItem.as_kr === item.as_kr && item.as_en === pageItem.as_en)
     );
 
     if (currentPageSelected.length === currentPageItems.length) {
-      setSelectedItems((prev) =>
-        prev.filter(
-          (item) => !currentPageItems.some((pageItem) => pageItem.as_kr === item.as_kr && pageItem.as_en === item.as_en)
-        )
-      );
+      setSelectedItems((prev) => {
+        const prevArray = Array.isArray(prev) ? prev : [];
+        return prevArray.filter(
+          (item) => !currentPageItems.some((pageItem) => pageItem.as_kr === item.as_kr && item.as_en === pageItem.as_en)
+        );
+      });
     } else {
       const newSelectedItems = [...selectedItems];
       currentPageItems.forEach((item) => {

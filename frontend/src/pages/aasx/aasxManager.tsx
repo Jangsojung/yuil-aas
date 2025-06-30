@@ -1,19 +1,10 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import Box from '@mui/system/Box';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
-import { TextField } from '@mui/material';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 
 import BasicDatePicker from '../../components/datepicker';
-import ModalBasic from '../../components/modal/aasx_management';
-import RemoveIcon from '@mui/icons-material/Remove';
 
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../components/pagination';
@@ -78,17 +69,23 @@ export default function AasxManagerPage() {
   }, [currentPage, calculatedTotalPages]);
 
   const handleInsert = async (file: File) => {
-    setFiles((prevFiles) => [file, ...prevFiles]);
+    setFiles((prevFiles) => {
+      const filesArray = Array.isArray(prevFiles) ? prevFiles : [];
+      return [file, ...filesArray];
+    });
   };
 
   const handleInsertFile = (file: AASXFile) => {
     const newFile: File = {
       af_idx: file.af_idx,
       af_name: file.af_name,
-      af_size: 0, // 기본값 설정
+      af_size: 0,
       createdAt: file.createdAt.toISOString(),
     };
-    setFiles((prevFiles) => [newFile, ...prevFiles]);
+    setFiles((prevFiles) => {
+      const filesArray = Array.isArray(prevFiles) ? prevFiles : [];
+      return [newFile, ...filesArray];
+    });
   };
 
   const handleUpdate = (newFile: AASXFile) => {
@@ -177,7 +174,7 @@ export default function AasxManagerPage() {
     const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
 
     const data: File[] = await getFilesAPI(startDateStr, endDateStr);
-    setFiles(data);
+    setFiles(Array.isArray(data) ? data : []);
   };
 
   const handleSelectAllChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -194,10 +191,11 @@ export default function AasxManagerPage() {
 
   const handleCheckboxChange = (fileIdx: number) => {
     setSelectedFiles((prevSelected) => {
-      if (prevSelected.includes(fileIdx)) {
-        return prevSelected.filter((idx) => idx !== fileIdx);
+      const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
+      if (prevArray.includes(fileIdx)) {
+        return prevArray.filter((idx) => idx !== fileIdx);
       } else {
-        return [...prevSelected, fileIdx];
+        return [...prevArray, fileIdx];
       }
     });
   };

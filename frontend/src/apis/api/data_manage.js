@@ -13,10 +13,10 @@ export const deleteDataAPI = async (selectedFiles) => {
 export const getDataAPI = async () => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.ROOT);
-    return data;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error fetching data:', error);
-    throw error;
+    return [];
   }
 };
 
@@ -28,10 +28,10 @@ export const getAASXFilesAPI = async (start, end) => {
       startDate: start,
       endDate: end,
     });
-    return data;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error fetching AASX files:', error);
-    throw error;
+    return [];
   }
 };
 
@@ -40,10 +40,10 @@ export const getWordsAPI = async () => {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.WORDS, {
       fc_idx: 3,
     });
-    return data;
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error fetching words:', error);
-    throw error;
+    return [];
   }
 };
 
