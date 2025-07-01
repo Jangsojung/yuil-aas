@@ -70,6 +70,9 @@ export const apiHelpers = {
           if (errorData.message) {
             errorMessage = errorData.message;
           }
+          if (errorData.error) {
+            errorMessage = errorData.error;
+          }
         } catch (e) {
           // JSON 파싱 실패 시 기본 메시지 사용
         }

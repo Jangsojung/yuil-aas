@@ -68,10 +68,12 @@ export const uploadAASXFile = async (req, res) => {
 export const updateAASXFile = async (af_idx, fileName, user_idx, res) => {
   try {
     const result = await updateAASXFileToDB(af_idx, fileName, user_idx);
-
     res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
+    if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
+      return res.status(400).json({ error: err.message });
+    }
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

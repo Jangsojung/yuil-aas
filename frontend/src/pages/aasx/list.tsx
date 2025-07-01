@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
@@ -31,7 +31,7 @@ interface AASXListProps {
   onAddClick: () => void;
 }
 
-export default function AASXList({ onEditClick, onAddClick }: AASXListProps) {
+const AASXList = forwardRef(function AASXList({ onEditClick, onAddClick }: AASXListProps, ref) {
   const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -186,6 +186,11 @@ export default function AASXList({ onEditClick, onAddClick }: AASXListProps) {
     }
   }, [selectedFiles, files]);
 
+  // getFiles를 ref로 노출
+  useImperativeHandle(ref, () => ({
+    refresh: getFiles,
+  }));
+
   return (
     <div className='table-outer'>
       <SearchBox
@@ -291,6 +296,8 @@ export default function AASXList({ onEditClick, onAddClick }: AASXListProps) {
       />
     </div>
   );
-}
+});
+
+export default AASXList;
 
 const cells = ['파일명', '생성 일자'];

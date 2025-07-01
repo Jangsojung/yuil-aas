@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import AASXList from './list';
 import AASXAdd from './add';
 import AASXEdit from './edit';
@@ -21,6 +21,7 @@ export default function AASXManagerPage() {
   const [openInsertModal, setOpenInsertModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<AASXFile | null>(null);
   const [files, setFiles] = useState<File[]>([]);
+  const listRef = useRef<any>(null);
 
   const handleInsertFile = (file: AASXFile) => {
     const newFile: File = {
@@ -33,6 +34,10 @@ export default function AASXManagerPage() {
       const filesArray = Array.isArray(prevFiles) ? prevFiles : [];
       return [newFile, ...filesArray];
     });
+    // 등록 후 목록 새로고침
+    if (listRef.current && listRef.current.refresh) {
+      listRef.current.refresh();
+    }
   };
 
   const handleUpdate = (newFile: AASXFile) => {
@@ -68,7 +73,7 @@ export default function AASXManagerPage() {
 
   return (
     <>
-      <AASXList onEditClick={handleEditClick} onAddClick={handleAddClick} />
+      <AASXList ref={listRef} onEditClick={handleEditClick} onAddClick={handleAddClick} />
       <AASXEdit
         open={openUpdateModal}
         onClose={handleCloseUpdateModal}

@@ -152,6 +152,18 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
 export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
   try {
+    // 새 파일명으로 이미 존재하는 파일이 있는지 체크
+    const newAasxFileName = fileName.replace(/\.json$/i, '.aasx');
+    const [existing] = await pool
+      .promise()
+      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = 2 OR af_kind = 3) AND af_idx != ?', [
+        newAasxFileName,
+        af_idx,
+      ]);
+    if (existing.length > 0) {
+      throw new Error('이미 생성되어있는 파일입니다.');
+    }
+
     const [aasxRows] = await pool
       .promise()
       .query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ? AND af_kind = 3', [af_idx]);
@@ -163,7 +175,6 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
     const oldAasxFileName = aasxRows[0].af_name;
     const oldAasFileName = oldAasxFileName.replace(/\.aasx$/i, '.json');
     const newAasFileName = fileName;
-    const newAasxFileName = fileName.replace(/\.json$/i, '.aasx');
 
     const oldAasPath = `../files/aas/${oldAasFileName}`;
     const oldAasxPath = `../files/aasx/${oldAasxFileName}`;
