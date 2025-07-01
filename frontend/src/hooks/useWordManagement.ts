@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { getWordsAPI, updateWordsAPI } from '../apis/api/data_manage';
 
 interface Word {
@@ -61,16 +61,17 @@ export const useWordManagement = () => {
     applyFilters(words);
   }, [applyFilters, words]);
 
-  const handleUnmatchedOnly = useCallback(
-    (checked: boolean) => {
-      setShowUnmatchedOnly(checked);
-      applyFilters(words);
-      setSelectedItems([]);
-      setModifiedData({});
-      setEditingValues({});
-    },
-    [words, applyFilters]
-  );
+  const handleUnmatchedOnly = useCallback((checked: boolean) => {
+    setShowUnmatchedOnly(checked);
+    setSelectedItems([]);
+    setModifiedData({});
+    setEditingValues({});
+  }, []);
+
+  useEffect(() => {
+    applyFilters(words);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showUnmatchedOnly, words]);
 
   const handleItemCheckboxChange = useCallback((item: Word) => {
     setSelectedItems((prev) => {
@@ -186,7 +187,7 @@ export const useWordManagement = () => {
   const getEditingValue = useCallback(
     (item: Word) => {
       const key = `${item.as_kr}|${item.as_en}`;
-      return editingValues[key] || '';
+      return editingValues[key] !== undefined ? editingValues[key] : item.as_en;
     },
     [editingValues]
   );
