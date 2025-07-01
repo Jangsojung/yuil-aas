@@ -5,7 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export const getUserFromDB = async (email, password) => {
   return new Promise((resolve, reject) => {
-    const query = 'select user_idx, user_id, user_pw, user_name from tb_user_info where user_id = ?';
+    const query = 'select user_idx, user_id, user_pw, user_name, cm_idx from tb_user_info where user_id = ?';
 
     pool.query(query, [email], async (err, results) => {
       if (err) {
@@ -22,7 +22,13 @@ export const getUserFromDB = async (email, password) => {
       const hashedPassword = crypto.createHash('md5').update(password).digest('hex');
 
       if (hashedPassword === user.user_pw) {
-        resolve({ success: true, user_idx: user.user_idx, user_id: user.user_id, user_name: user.user_name });
+        resolve({
+          success: true,
+          user_idx: user.user_idx,
+          user_id: user.user_id,
+          user_name: user.user_name,
+          cm_idx: user.cm_idx,
+        });
       } else {
         resolve({ success: false, message: '비밀번호가 틀렸습니다.' });
       }

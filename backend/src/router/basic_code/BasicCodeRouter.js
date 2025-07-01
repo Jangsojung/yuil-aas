@@ -9,6 +9,7 @@ import {
   getSensors,
   getBaseCode,
   getAllSensorsInGroup,
+  getFactoriesByCmIdx,
 } from '../../controller/basic_code/BasicCodeController.js';
 
 const router = express.Router();
@@ -63,6 +64,11 @@ export default () => {
   router.post('/allSensorsInGroup', (req, res) => {
     const { fg_idx } = req.body;
     getAllSensorsInGroup(fg_idx, res);
+  });
+
+  router.get('/factories/:cm_idx', async (req, res) => {
+    const { cm_idx } = req.params;
+    await getFactoriesByCmIdx(cm_idx, res);
   });
 
   return router;

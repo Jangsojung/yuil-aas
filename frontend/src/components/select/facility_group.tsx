@@ -17,19 +17,31 @@ interface FacilityGroup {
 type Props = {
   selectedFacilityGroups: number[];
   setSelectedFacilityGroups: Dispatch<SetStateAction<number[]>>;
+  selectedFactory?: number | '';
 };
 
-export default function FacilityGroupSelect({ selectedFacilityGroups, setSelectedFacilityGroups }: Props) {
+export default function FacilityGroupSelect({
+  selectedFacilityGroups,
+  setSelectedFacilityGroups,
+  selectedFactory,
+}: Props) {
   const [facilityGroups, setFacilityGroups] = useState<FacilityGroup[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const getFacilityGroups = async () => {
+  const getFacilityGroups = async (fc_idx?: number) => {
     setLoading(true);
     try {
-      const data = await getFacilityGroupsAPI(3);
+      // 공장이 선택되지 않았으면 빈 배열 반환
+      if (!fc_idx) {
+        setFacilityGroups([]);
+        return;
+      }
+
+      const data = await getFacilityGroupsAPI(fc_idx);
       setFacilityGroups(data);
     } catch (error) {
       console.error('Error fetching facility groups:', error);
+      setFacilityGroups([]);
     } finally {
       setLoading(false);
     }
@@ -60,8 +72,8 @@ export default function FacilityGroupSelect({ selectedFacilityGroups, setSelecte
   };
 
   useEffect(() => {
-    getFacilityGroups();
-  }, []);
+    getFacilityGroups(selectedFactory as number);
+  }, [selectedFactory]);
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -86,6 +98,10 @@ export default function FacilityGroupSelect({ selectedFacilityGroups, setSelecte
             <MenuItem disabled value=''>
               로딩 중...
             </MenuItem>
+          ) : !selectedFactory ? (
+            <MenuItem disabled value=''>
+              공장을 먼저 선택해주세요.
+            </MenuItem>
           ) : facilityGroups && facilityGroups.length > 0 ? (
             facilityGroups.map((fg) => (
               <MenuItem key={fg.fg_idx} value={fg.fg_idx}>
@@ -95,12 +111,12 @@ export default function FacilityGroupSelect({ selectedFacilityGroups, setSelecte
             ))
           ) : (
             <MenuItem disabled value=''>
-              설비그룹이 없습니다.
+              해당 공장에 설비그룹이 없습니다.
             </MenuItem>
           )}
         </Select>
       </FormControl>
-      {facilityGroups && facilityGroups.length > 0 && (
+      {selectedFactory && facilityGroups && facilityGroups.length > 0 && (
         <Button
           size='small'
           onClick={handleSelectAll}

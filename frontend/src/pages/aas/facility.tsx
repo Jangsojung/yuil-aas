@@ -34,6 +34,8 @@ export default function FacilityManagementPage() {
     setFacilityName,
     sensorName: searchSensorName,
     setSensorName: setSearchSensorName,
+    selectedFactory,
+    setSelectedFactory,
     handleTreeSearch,
     handleReset,
     alertModal,
@@ -225,6 +227,8 @@ export default function FacilityManagementPage() {
         setSensorName={setSearchSensorName}
         selectedSensors={selectedSensors}
         setSelectedSensors={setSelectedSensors}
+        selectedFactory={selectedFactory}
+        setSelectedFactory={setSelectedFactory}
         onTreeSearch={handleTreeSearch}
         onAddFacility={handleOpenAddModal}
         onDeleteFacility={handleDeleteFacility}

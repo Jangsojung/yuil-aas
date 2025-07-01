@@ -56,6 +56,11 @@ export interface Base {
   createdAt: Date;
 }
 
+export interface FacilityGroup {
+  fg_idx: number;
+  fg_name: string;
+}
+
 export interface FacilityGroupTree {
   fg_idx: number;
   fg_name: string;
@@ -101,4 +106,16 @@ export interface PaginationState {
   currentPage: number;
   totalPages: number;
   rowsPerPage: number;
+}
+
+export interface Factory {
+  fc_idx: number;
+  fc_name: string;
+}
+
+export interface User {
+  user_idx: number;
+  user_id: string;
+  user_name: string;
+  cm_idx?: number;
 }

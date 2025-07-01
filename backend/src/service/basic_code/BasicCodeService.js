@@ -239,3 +239,30 @@ export const getAllSensorsInGroupFromDB = async (fg_idx) => {
     });
   });
 };
+
+export const getFactoriesByCmIdxFromDB = async (cm_idx) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT fc_idx, fc_name FROM tb_factory_info WHERE cm_idx = ? ORDER BY fc_idx`;
+
+    pool.query(query, [cm_idx], (err, results) => {
+      if (err) {
+        console.error('Error querying factories:', err);
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        const factories = results.map((factory) => {
+          return {
+            fc_idx: factory.fc_idx,
+            fc_name: factory.fc_name,
+          };
+        });
+
+        resolve(factories);
+      }
+    });
+  });
+};

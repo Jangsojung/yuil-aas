@@ -31,6 +31,7 @@ const signIn = async (
         user_idx: data.user_idx,
         user_id: data.user_id,
         user_name: data.user_name,
+        cm_idx: data.cm_idx,
       };
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);

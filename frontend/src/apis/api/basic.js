@@ -91,10 +91,10 @@ export const getSensorsAPI = async (fa_idx) => {
 };
 
 // 트리 데이터 구축을 위한 통합 API
-export const buildTreeDataAPI = async (selectedFacilityGroups = [], facilityName = '', sensorName = '') => {
+export const buildTreeDataAPI = async (selectedFacilityGroups = [], facilityName = '', sensorName = '', fc_idx = 3) => {
   try {
     // 1. 모든 설비그룹 조회
-    const allFacilityGroups = await getFacilityGroupsAPI(3);
+    const allFacilityGroups = await getFacilityGroupsAPI(fc_idx);
 
     // 2. 필터링된 설비그룹
     let filteredFacilityGroups = allFacilityGroups;
@@ -154,10 +154,10 @@ export const buildTreeDataAPI = async (selectedFacilityGroups = [], facilityName
 };
 
 // 센서 ID로부터 트리 데이터 구축
-export const buildTreeFromSensorIdsAPI = async (sensorIds) => {
+export const buildTreeFromSensorIdsAPI = async (sensorIds, fc_idx = 3) => {
   try {
     // 1. 모든 설비그룹 조회
-    const allFacilityGroups = await getFacilityGroupsAPI(3);
+    const allFacilityGroups = await getFacilityGroupsAPI(fc_idx);
 
     // 2. 각 설비그룹별로 설비와 센서 정보 조회
     const facilitiesAll = await Promise.all(
@@ -226,5 +226,17 @@ export const getSensorsForTableAPI = async (fa_idx) => {
   } catch (error) {
     console.error('Error fetching sensors for table:', error);
     return [];
+  }
+};
+
+export const getFactoriesByCmIdxAPI = async (cm_idx) => {
+  try {
+    const result = await apiHelpers.fetchWithConfig(`/api/base_code/factories/${cm_idx}`, {
+      method: 'GET',
+    });
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error('Error fetching factories:', error);
+    throw error;
   }
 };

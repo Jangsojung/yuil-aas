@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Grid from '@mui/material/Grid';
 import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
@@ -6,6 +6,7 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import LoadingOverlay from '../loading/LodingOverlay';
 import FacilityGroupSelect from '../select/facility_group';
+import FactorySelect from '../select/factory_select';
 import BasicTable from '../table/basic_code';
 import { SearchBox, ActionBox } from '../common';
 import { FacilityGroupTree } from '../../types/api';
@@ -23,6 +24,8 @@ interface FacilityViewProps {
   setSensorName: (name: string) => void;
   selectedSensors: number[];
   setSelectedSensors: Dispatch<SetStateAction<number[]>>;
+  selectedFactory?: number | '';
+  setSelectedFactory?: (factory: number | '') => void;
 
   // 핸들러
   onTreeSearch: () => Promise<{ success: boolean; message?: string }>;
@@ -41,6 +44,8 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   setSensorName,
   selectedSensors,
   setSelectedSensors,
+  selectedFactory = '',
+  setSelectedFactory,
   onTreeSearch,
   onAddFacility,
   onDeleteFacility,
@@ -50,6 +55,14 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
     if (!result.success && result.message) {
       // 에러 메시지는 상위에서 처리
       console.error(result.message);
+    }
+  };
+
+  const handleFactoryChange = (factory: number) => {
+    if (setSelectedFactory) {
+      setSelectedFactory(factory);
+      // 공장이 변경되면 설비그룹 선택 초기화
+      setSelectedFacilityGroups([]);
     }
   };
 
@@ -66,6 +79,21 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
           ]}
         >
           <Grid container spacing={2}>
+            <Grid item xs={2}>
+              <Grid container spacing={1}>
+                <Grid item>
+                  <div className='sort-title'>공장</div>
+                </Grid>
+                <Grid item xs={9}>
+                  <FactorySelect
+                    value={selectedFactory}
+                    onChange={handleFactoryChange}
+                    placeholder='공장을 선택해주세요'
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
             <Grid item xs={3}>
               <Grid container spacing={1}>
                 <Grid item>
@@ -75,6 +103,7 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
                   <FacilityGroupSelect
                     selectedFacilityGroups={selectedFacilityGroups}
                     setSelectedFacilityGroups={setSelectedFacilityGroups}
+                    selectedFactory={selectedFactory}
                   />
                 </Grid>
               </Grid>
