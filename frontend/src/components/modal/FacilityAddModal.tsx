@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -19,6 +19,17 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../recoil/atoms';
+import {
+  getFactoriesByCmIdxAPI,
+  getFacilityGroupsAPI,
+  getFacilitiesAPI,
+  insertFactoryAPI,
+  insertFacilityGroupAPI,
+  insertFacilityAPI,
+  insertSensorAPI,
+} from '../../apis/api/basic';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -53,46 +64,288 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 interface FacilityAddModalProps {
   open: boolean;
-  handleClose: () => void;
-  handleAdd: (
-    selectedGroup?: { fg_idx: number; fg_name: string },
-    selectedFacility?: { fa_idx: number; fa_name: string }
-  ) => void;
-  handleReset: () => void;
-  groupList: { fg_idx: number; fg_name: string }[];
-  facilityList: { fa_idx: number; fa_name: string }[];
-  groupValue: string;
-  setGroupValue: (v: string) => void;
-  groupInput: string;
-  setGroupInput: (v: string) => void;
-  facilityValue: string;
-  setFacilityValue: (v: string) => void;
-  facilityInput: string;
-  setFacilityInput: (v: string) => void;
-  sensorName: string;
-  setSensorName: (v: string) => void;
-  isAddDisabled: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
-export default function FacilityAddModal({
-  open,
-  handleClose,
-  handleAdd,
-  handleReset,
-  groupList,
-  facilityList,
-  groupValue,
-  setGroupValue,
-  groupInput,
-  setGroupInput,
-  facilityValue,
-  setFacilityValue,
-  facilityInput,
-  setFacilityInput,
-  sensorName,
-  setSensorName,
-  isAddDisabled,
-}: FacilityAddModalProps) {
+export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityAddModalProps) {
+  const user = useRecoilValue(userState);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 공장 관련 상태
+  const [factories, setFactories] = useState<Array<{ fc_idx: number; fc_name: string }>>([]);
+  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
+  const [newFactoryName, setNewFactoryName] = useState('');
+  const [isNewFactory, setIsNewFactory] = useState(false);
+
+  // factories 상태 변경 감지
+  useEffect(() => {
+    console.log('factories 상태 변경:', factories);
+  }, [factories]);
+
+  // 설비그룹 관련 상태
+  const [groupList, setGroupList] = useState<{ fg_idx: number; fg_name: string }[]>([]);
+  const [facilityList, setFacilityList] = useState<{ fa_idx: number; fa_name: string }[]>([]);
+  const [groupValue, setGroupValue] = useState('');
+  const [groupInput, setGroupInput] = useState('');
+  const [facilityValue, setFacilityValue] = useState('');
+  const [facilityInput, setFacilityInput] = useState('');
+  const [sensorName, setSensorName] = useState('');
+
+  const fetchFactories = useCallback(async () => {
+    try {
+      const data = await getFactoriesByCmIdxAPI(user!.cm_idx);
+      console.log('공장 목록 갱신:', data);
+      setFactories(data);
+    } catch (error) {
+      console.error('공장 목록 조회 실패:', error);
+      setError('공장 목록을 불러오는데 실패했습니다.');
+    }
+  }, [user?.cm_idx]);
+
+  const fetchFacilityGroups = useCallback(
+    async (fc_idx?: number) => {
+      const targetFcIdx = fc_idx || selectedFactory;
+      if (!targetFcIdx) return;
+
+      try {
+        const data = await getFacilityGroupsAPI(targetFcIdx as number);
+        console.log('설비그룹 목록 갱신:', data);
+        setGroupList(data.map((g: any) => ({ fg_idx: g.fg_idx, fg_name: g.fg_name })));
+      } catch (error) {
+        console.error('설비그룹 목록 조회 실패:', error);
+        setError('설비그룹 목록을 불러오는데 실패했습니다.');
+      }
+    },
+    [selectedFactory]
+  );
+
+  // 공장 목록 조회
+  useEffect(() => {
+    if (open && user?.cm_idx) {
+      console.log('모달 열림, 공장 목록 조회 시작:', user.cm_idx);
+      fetchFactories();
+    }
+  }, [open, user?.cm_idx]);
+
+  // 설비그룹 목록 조회
+  useEffect(() => {
+    if (selectedFactory && !isNewFactory) {
+      fetchFacilityGroups();
+    } else {
+      setGroupList([]);
+    }
+  }, [selectedFactory, isNewFactory]);
+
+  // 설비그룹 선택 시 설비명 목록 fetch
+  const handleGroupValueChange = async (value: string) => {
+    setGroupValue(value);
+    setGroupInput('');
+    setFacilityValue('');
+    setFacilityInput('');
+    if (value && value !== '신규등록') {
+      const group = groupList.find((g) => g.fg_name === value);
+      if (group) {
+        const facilities = await getFacilitiesAPI(group.fg_idx);
+        setFacilityList(facilities.map((f: any) => ({ fa_idx: f.fa_idx, fa_name: f.fa_name })));
+      }
+    } else {
+      setFacilityList([]);
+    }
+  };
+
+  // 설비명 select 연동
+  const handleFacilityValueChange = (value: string) => {
+    setFacilityValue(value);
+    setFacilityInput('');
+  };
+
+  const handleAdd = async () => {
+    // 검증
+    if (isNewFactory && !newFactoryName.trim()) {
+      setError('공장명을 입력해주세요.');
+      return;
+    }
+    if (!isNewFactory && !selectedFactory) {
+      setError('공장을 선택해주세요.');
+      return;
+    }
+    if (!groupValue) {
+      setError('설비그룹을 선택해주세요.');
+      return;
+    }
+    if (groupValue === '신규등록' && !groupInput.trim()) {
+      setError('설비그룹명을 입력해주세요.');
+      return;
+    }
+    if (!facilityValue) {
+      setError('설비명을 선택해주세요.');
+      return;
+    }
+    if (facilityValue === '신규등록' && !facilityInput.trim()) {
+      setError('설비명을 입력해주세요.');
+      return;
+    }
+    if (!sensorName.trim()) {
+      setError('센서명을 입력해주세요.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      let currentFcIdx = selectedFactory as number;
+      let currentFgIdx: number;
+      let currentFaIdx: number;
+
+      // 1. 공장 추가 (신규인 경우)
+      if (isNewFactory) {
+        const factoryResult = await insertFactoryAPI(user!.cm_idx, newFactoryName);
+        currentFcIdx = factoryResult.fc_idx;
+
+        console.log('공장 추가 성공:', factoryResult);
+
+        // 공장 목록을 직접 다시 조회하고 강제로 상태 업데이트
+        try {
+          const updatedFactories = await getFactoriesByCmIdxAPI(user!.cm_idx);
+          console.log('업데이트된 공장 목록:', updatedFactories);
+
+          // 강제로 상태 업데이트
+          setFactories([...updatedFactories]);
+
+          // 새로 추가된 공장을 선택하고 신규등록 모드 해제
+          setIsNewFactory(false);
+          setNewFactoryName(''); // 입력 필드 초기화
+          setSelectedFactory(currentFcIdx);
+
+          console.log('공장 추가 후 상태 업데이트:', { currentFcIdx, isNewFactory: false });
+
+          // 추가 대기 시간으로 상태 업데이트 완료 보장
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        } catch (error) {
+          console.error('공장 목록 갱신 실패:', error);
+        }
+      }
+
+      // 2. 설비그룹 처리
+      if (groupValue === '신규등록') {
+        const facilityGroupResult = await insertFacilityGroupAPI(currentFcIdx, groupInput);
+        currentFgIdx = facilityGroupResult.fg_idx;
+
+        console.log('설비그룹 추가 성공:', facilityGroupResult);
+
+        // 설비그룹 목록을 직접 다시 조회
+        try {
+          await fetchFacilityGroups(currentFcIdx);
+
+          // 새로 추가된 설비그룹을 선택
+          setGroupValue(groupInput);
+          setGroupInput('');
+
+          console.log('설비그룹 추가 후 상태 업데이트:', { currentFgIdx, groupName: groupInput });
+
+          // 추가 대기 시간으로 상태 업데이트 완료 보장
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        } catch (error) {
+          console.error('설비그룹 목록 갱신 실패:', error);
+        }
+      } else {
+        const selectedGroup = groupList.find((g) => g.fg_name === groupValue);
+        currentFgIdx = selectedGroup!.fg_idx;
+      }
+
+      // 3. 설비 처리
+      if (facilityValue === '신규등록') {
+        const facilityResult = await insertFacilityAPI(currentFgIdx, facilityInput);
+        currentFaIdx = facilityResult.fa_idx;
+
+        console.log('설비 추가 성공:', facilityResult);
+
+        // 설비 목록을 직접 다시 조회
+        try {
+          const facilities = await getFacilitiesAPI(currentFgIdx);
+          console.log('업데이트된 설비 목록:', facilities);
+
+          // 강제로 상태 업데이트
+          setFacilityList([...facilities.map((f: any) => ({ fa_idx: f.fa_idx, fa_name: f.fa_name }))]);
+
+          // 새로 추가된 설비를 선택
+          setFacilityValue(facilityInput);
+          setFacilityInput('');
+
+          console.log('설비 추가 후 상태 업데이트:', { currentFaIdx, facilityName: facilityInput });
+
+          // 추가 대기 시간으로 상태 업데이트 완료 보장
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        } catch (error) {
+          console.error('설비 목록 갱신 실패:', error);
+        }
+      } else {
+        const selectedFacility = facilityList.find((f) => f.fa_name === facilityValue);
+        currentFaIdx = selectedFacility!.fa_idx;
+      }
+
+      // 4. 센서 추가
+      await insertSensorAPI(currentFaIdx, sensorName);
+
+      console.log('센서 추가 완료');
+
+      // 성공 메시지 표시
+      setError(null);
+      onSuccess();
+
+      // 모달 닫기
+      handleClose();
+    } catch (error) {
+      console.error('설비 추가 실패:', error);
+      setError('설비 추가 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedFactory('');
+    setNewFactoryName('');
+    setIsNewFactory(false);
+    setGroupValue('');
+    setGroupInput('');
+    setFacilityValue('');
+    setFacilityInput('');
+    setSensorName('');
+    setError(null);
+    onClose();
+  };
+
+  const handleReset = () => {
+    setSelectedFactory('');
+    setNewFactoryName('');
+    setIsNewFactory(false);
+    setGroupValue('');
+    setGroupInput('');
+    setFacilityValue('');
+    setFacilityInput('');
+    setSensorName('');
+    setError(null);
+  };
+
+  // 등록 버튼 활성화 조건
+  const isAddDisabled =
+    // 공장
+    (isNewFactory && !newFactoryName.trim()) ||
+    (!isNewFactory && !selectedFactory) ||
+    // 설비그룹
+    !groupValue ||
+    (groupValue === '신규등록' && !groupInput.trim()) ||
+    // 설비명
+    !facilityValue ||
+    (facilityValue === '신규등록' && !facilityInput.trim()) ||
+    // 센서명
+    !sensorName.trim() ||
+    loading;
+
   return (
     <BootstrapDialog open={open} onClose={handleClose}>
       <DialogTitle sx={{ m: 0, p: 2, borderBottom: '1px solid #e0e0e0', fontWeight: 700, fontSize: '1.1rem' }}>
@@ -135,6 +388,69 @@ export default function FacilityAddModal({
                   }}
                   align='left'
                 >
+                  공장
+                </TableCell>
+                <TableCell
+                  sx={{
+                    borderBottom: '1px solid #e0e0e0',
+                    padding: '10px 16px',
+                    background: '#fff',
+                  }}
+                >
+                  <Grid container spacing={1} alignItems='center'>
+                    <Grid item xs={7}>
+                      <FormControl fullWidth size='small'>
+                        <Select
+                          key={`factory-select-${factories.length}`} // 강제 리렌더링을 위한 key
+                          value={isNewFactory ? '신규등록' : selectedFactory || ''}
+                          onChange={(e) => {
+                            if (e.target.value === '신규등록') {
+                              setIsNewFactory(true);
+                              setSelectedFactory('');
+                            } else {
+                              setIsNewFactory(false);
+                              setSelectedFactory(e.target.value as number);
+                            }
+                          }}
+                          displayEmpty
+                          sx={{ background: '#fff', borderRadius: 1 }}
+                        >
+                          <MenuItem value='신규등록'>신규등록</MenuItem>
+                          {factories.map((factory) => (
+                            <MenuItem key={factory.fc_idx} value={factory.fc_idx}>
+                              {factory.fc_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <TextField
+                        value={newFactoryName}
+                        onChange={(e) => setNewFactoryName(e.target.value)}
+                        size='small'
+                        fullWidth
+                        placeholder='공장명 입력'
+                        disabled={!isNewFactory}
+                        sx={{ background: isNewFactory ? '#fff' : '#f0f0f0', borderRadius: 1 }}
+                      />
+                    </Grid>
+                  </Grid>
+                </TableCell>
+              </TableRow>
+
+              <TableRow sx={{ background: '#fff' }}>
+                <TableCell
+                  sx={{
+                    color: '#222',
+                    fontSize: 15,
+                    borderRight: '1px solid #e0e0e0',
+                    borderBottom: '1px solid #e0e0e0',
+                    padding: '10px 16px',
+                    background: '#f7f7f7',
+                  }}
+                  align='left'
+                >
                   설비그룹
                 </TableCell>
                 <TableCell
@@ -148,10 +464,19 @@ export default function FacilityAddModal({
                     <Grid item xs={7}>
                       <FormControl fullWidth size='small'>
                         <Select
+                          key={`group-select-${groupList.length}`} // 강제 리렌더링을 위한 key
                           value={groupValue}
-                          onChange={(e) => setGroupValue(e.target.value as string)}
+                          onChange={(e) => handleGroupValueChange(e.target.value as string)}
                           displayEmpty
-                          sx={{ background: '#fff', borderRadius: 1 }}
+                          disabled={!selectedFactory && !isNewFactory}
+                          sx={{
+                            background: '#fff',
+                            borderRadius: 1,
+                            '&.Mui-disabled': {
+                              backgroundColor: '#f5f5f5',
+                              color: '#999',
+                            },
+                          }}
                         >
                           <MenuItem value='신규등록'>신규등록</MenuItem>
                           {groupList.map((g) => (
@@ -169,13 +494,18 @@ export default function FacilityAddModal({
                         size='small'
                         fullWidth
                         placeholder='설비그룹명 입력'
-                        disabled={groupValue !== '신규등록'}
-                        sx={{ background: groupValue === '신규등록' ? '#fff' : '#f0f0f0', borderRadius: 1 }}
+                        disabled={groupValue !== '신규등록' || (!selectedFactory && !isNewFactory)}
+                        sx={{
+                          background:
+                            groupValue === '신규등록' && (selectedFactory || isNewFactory) ? '#fff' : '#f0f0f0',
+                          borderRadius: 1,
+                        }}
                       />
                     </Grid>
                   </Grid>
                 </TableCell>
               </TableRow>
+
               <TableRow sx={{ background: '#fff' }}>
                 <TableCell
                   sx={{
@@ -201,8 +531,9 @@ export default function FacilityAddModal({
                     <Grid item xs={7}>
                       <FormControl fullWidth size='small'>
                         <Select
+                          key={`facility-select-${facilityList.length}`} // 강제 리렌더링을 위한 key
                           value={facilityValue}
-                          onChange={(e) => setFacilityValue(e.target.value as string)}
+                          onChange={(e) => handleFacilityValueChange(e.target.value as string)}
                           displayEmpty
                           disabled={!groupValue || groupValue === ''}
                           sx={{
@@ -245,6 +576,7 @@ export default function FacilityAddModal({
                   </Grid>
                 </TableCell>
               </TableRow>
+
               <TableRow sx={{ background: '#fff' }}>
                 <TableCell
                   sx={{
@@ -289,17 +621,7 @@ export default function FacilityAddModal({
         </TableContainer>
       </DialogContent>
       <DialogActions sx={{ borderTop: '1px solid #e0e0e0' }}>
-        <Button
-          variant='contained'
-          color='primary'
-          onClick={() => {
-            const selectedGroup =
-              groupValue === '신규등록' ? undefined : groupList.find((g) => g.fg_name === groupValue);
-            const selectedFacility =
-              facilityValue === '신규등록' ? undefined : facilityList.find((f) => f.fa_name === facilityValue);
-            handleAdd(selectedGroup, selectedFacility);
-          }}
-        >
+        <Button variant='contained' color='primary' onClick={handleAdd} disabled={isAddDisabled}>
           등록
         </Button>
         <GreyButton variant='outlined' onClick={handleReset}>

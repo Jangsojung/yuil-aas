@@ -16,6 +16,7 @@ export const useFacilityManagement = () => {
   const [facilityName, setFacilityName] = useState('');
   const [sensorName, setSensorName] = useState('');
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
+  const [facilityAddModalOpen, setFacilityAddModalOpen] = useState(false);
 
   // 트리 검색
   const handleTreeSearch = useCallback(async () => {
@@ -55,6 +56,21 @@ export const useFacilityManagement = () => {
     setSelectedFactory('');
   }, []);
 
+  // 설비 추가 모달
+  const handleAddFacility = useCallback(() => {
+    setFacilityAddModalOpen(true);
+  }, []);
+
+  const handleCloseFacilityAddModal = useCallback(() => {
+    setFacilityAddModalOpen(false);
+  }, []);
+
+  const handleFacilityAddSuccess = useCallback(() => {
+    setFacilityAddModalOpen(false);
+    // 설비 추가 후 트리 데이터 새로고침
+    handleTreeSearch();
+  }, [handleTreeSearch]);
+
   return {
     // 상태
     treeData,
@@ -67,10 +83,14 @@ export const useFacilityManagement = () => {
     setSensorName,
     selectedFactory,
     setSelectedFactory,
+    facilityAddModalOpen,
 
     // 핸들러
     handleTreeSearch,
     handleReset,
+    handleAddFacility,
+    handleCloseFacilityAddModal,
+    handleFacilityAddSuccess,
 
     // 알림
     alertModal,

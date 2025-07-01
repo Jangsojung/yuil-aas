@@ -242,7 +242,14 @@ export const getAllSensorsInGroupFromDB = async (fg_idx) => {
 
 export const getFactoriesByCmIdxFromDB = async (cm_idx) => {
   return new Promise((resolve, reject) => {
-    const query = `SELECT fc_idx, fc_name FROM tb_factory_info WHERE cm_idx = ? ORDER BY fc_idx`;
+    // tb_aasx_data에서 공장 목록 조회 (외래키 제약 조건을 만족하기 위해)
+    const query = `
+      SELECT DISTINCT a.fc_idx, a.fc_name 
+      FROM tb_aasx_data a
+      INNER JOIN tb_factory_info f ON a.fc_idx = f.fc_idx
+      WHERE f.cm_idx = ? 
+      ORDER BY a.fc_idx
+    `;
 
     pool.query(query, [cm_idx], (err, results) => {
       if (err) {
@@ -264,5 +271,193 @@ export const getFactoriesByCmIdxFromDB = async (cm_idx) => {
         resolve(factories);
       }
     });
+  });
+};
+
+// 공장 추가
+export const insertFactoryToDB = async (cm_idx, fc_name) => {
+  return new Promise(async (resolve, reject) => {
+    const connection = await pool.promise().getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // 최대 fc_idx 조회 (두 테이블 중 더 큰 값 사용)
+      const maxFactoryQuery = 'SELECT MAX(fc_idx) as max_fc_idx FROM tb_factory_info';
+      const maxAasxQuery = 'SELECT MAX(fc_idx) as max_fc_idx FROM tb_aasx_data';
+
+      const [maxFactoryResult] = await connection.query(maxFactoryQuery);
+      const [maxAasxResult] = await connection.query(maxAasxQuery);
+
+      const maxFactoryIdx = maxFactoryResult[0].max_fc_idx || 0;
+      const maxAasxIdx = maxAasxResult[0].max_fc_idx || 0;
+      const nextFcIdx = Math.max(maxFactoryIdx, maxAasxIdx) + 1;
+
+      // tb_aasx_data에 먼저 공장 정보 추가 (외래키 제약 조건을 위해)
+      const insertAasxQuery = 'INSERT INTO tb_aasx_data (fc_idx, fc_name) VALUES (?, ?)';
+      await connection.query(insertAasxQuery, [nextFcIdx, fc_name]);
+
+      // tb_factory_info에 공장 추가
+      const insertQuery = 'INSERT INTO tb_factory_info (cm_idx, fc_idx, fc_name) VALUES (?, ?, ?)';
+      await connection.query(insertQuery, [cm_idx, nextFcIdx, fc_name]);
+
+      await connection.commit();
+
+      resolve({
+        success: true,
+        fc_idx: nextFcIdx,
+        fc_name: fc_name,
+        message: '공장이 성공적으로 추가되었습니다.',
+      });
+    } catch (err) {
+      await connection.rollback();
+      console.error('Failed to insert factory:', err);
+      reject(err);
+    } finally {
+      connection.release();
+    }
+  });
+};
+
+// 설비그룹 추가
+export const insertFacilityGroupToDB = async (fc_idx, fg_name) => {
+  return new Promise(async (resolve, reject) => {
+    const connection = await pool.promise().getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // 최대 fg_idx 조회
+      const maxQuery = 'SELECT MAX(fg_idx) as max_fg_idx FROM tb_aasx_data_aas';
+      const [maxResult] = await connection.query(maxQuery);
+      const nextFgIdx = (maxResult[0].max_fg_idx || 0) + 1;
+
+      // 설비그룹 추가
+      const insertQuery = 'INSERT INTO tb_aasx_data_aas (fc_idx, fg_idx, fg_name) VALUES (?, ?, ?)';
+      await connection.query(insertQuery, [fc_idx, nextFgIdx, fg_name]);
+
+      await connection.commit();
+
+      resolve({
+        success: true,
+        fg_idx: nextFgIdx,
+        fg_name: fg_name,
+        message: '설비그룹이 성공적으로 추가되었습니다.',
+      });
+    } catch (err) {
+      await connection.rollback();
+      console.error('Failed to insert facility group:', err);
+      reject(err);
+    } finally {
+      connection.release();
+    }
+  });
+};
+
+// 설비 추가
+export const insertFacilityToDB = async (fg_idx, fa_name) => {
+  return new Promise(async (resolve, reject) => {
+    const connection = await pool.promise().getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // 최대 fa_idx 조회
+      const maxQuery = 'SELECT MAX(fa_idx) as max_fa_idx FROM tb_aasx_data_sm';
+      const [maxResult] = await connection.query(maxQuery);
+      const nextFaIdx = (maxResult[0].max_fa_idx || 0) + 1;
+
+      // 설비 추가
+      const insertQuery = 'INSERT INTO tb_aasx_data_sm (fg_idx, fa_idx, fa_name) VALUES (?, ?, ?)';
+      await connection.query(insertQuery, [fg_idx, nextFaIdx, fa_name]);
+
+      await connection.commit();
+
+      resolve({
+        success: true,
+        fa_idx: nextFaIdx,
+        fa_name: fa_name,
+        message: '설비가 성공적으로 추가되었습니다.',
+      });
+    } catch (err) {
+      await connection.rollback();
+      console.error('Failed to insert facility:', err);
+      reject(err);
+    } finally {
+      connection.release();
+    }
+  });
+};
+
+// 센서 추가
+export const insertSensorToDB = async (fa_idx, sn_name) => {
+  return new Promise(async (resolve, reject) => {
+    const connection = await pool.promise().getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // 최대 sn_idx 조회
+      const maxQuery = 'SELECT MAX(sn_idx) as max_sn_idx FROM tb_aasx_data_prop';
+      const [maxResult] = await connection.query(maxQuery);
+      const nextSnIdx = (maxResult[0].max_sn_idx || 0) + 1;
+
+      // 센서 추가
+      const insertQuery = 'INSERT INTO tb_aasx_data_prop (fa_idx, sn_idx, sn_name) VALUES (?, ?, ?)';
+      await connection.query(insertQuery, [fa_idx, nextSnIdx, sn_name]);
+
+      await connection.commit();
+
+      resolve({
+        success: true,
+        sn_idx: nextSnIdx,
+        sn_name: sn_name,
+        message: '센서가 성공적으로 추가되었습니다.',
+      });
+    } catch (err) {
+      await connection.rollback();
+      console.error('Failed to insert sensor:', err);
+      reject(err);
+    } finally {
+      connection.release();
+    }
+  });
+};
+
+// 기존 공장들을 tb_aasx_data에 동기화
+export const syncFactoriesToAasxData = async () => {
+  return new Promise(async (resolve, reject) => {
+    const connection = await pool.promise().getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // tb_factory_info에 있는 공장들을 조회
+      const factoryQuery = 'SELECT fc_idx, fc_name FROM tb_factory_info';
+      const [factoryResult] = await connection.query(factoryQuery);
+
+      let syncedCount = 0;
+      for (const factory of factoryResult) {
+        // tb_aasx_data에 이미 있는지 확인
+        const checkQuery = 'SELECT fc_idx FROM tb_aasx_data WHERE fc_idx = ?';
+        const [checkResult] = await connection.query(checkQuery, [factory.fc_idx]);
+
+        if (checkResult.length === 0) {
+          // 없으면 추가
+          const insertQuery = 'INSERT INTO tb_aasx_data (fc_idx, fc_name) VALUES (?, ?)';
+          await connection.query(insertQuery, [factory.fc_idx, factory.fc_name]);
+          syncedCount++;
+        }
+      }
+
+      await connection.commit();
+
+      resolve({
+        success: true,
+        syncedCount: syncedCount,
+        message: `${syncedCount}개의 공장이 tb_aasx_data에 동기화되었습니다.`,
+      });
+    } catch (err) {
+      await connection.rollback();
+      console.error('Failed to sync factories:', err);
+      reject(err);
+    } finally {
+      connection.release();
+    }
   });
 };

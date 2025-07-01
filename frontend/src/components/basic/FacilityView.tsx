@@ -9,6 +9,7 @@ import FacilityGroupSelect from '../select/facility_group';
 import FactorySelect from '../select/factory_select';
 import BasicTable from '../table/basic_code';
 import { SearchBox, ActionBox } from '../common';
+import FacilityAddModal from '../modal/FacilityAddModal';
 import { FacilityGroupTree } from '../../types/api';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -26,11 +27,14 @@ interface FacilityViewProps {
   setSelectedSensors: Dispatch<SetStateAction<number[]>>;
   selectedFactory?: number | '';
   setSelectedFactory?: (factory: number | '') => void;
+  facilityAddModalOpen?: boolean;
 
   // 핸들러
   onTreeSearch: () => Promise<{ success: boolean; message?: string }>;
   onAddFacility: () => void;
   onDeleteFacility: () => void;
+  onCloseFacilityAddModal?: () => void;
+  onFacilityAddSuccess?: () => void;
 }
 
 export const FacilityView: React.FC<FacilityViewProps> = ({
@@ -46,9 +50,12 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   setSelectedSensors,
   selectedFactory = '',
   setSelectedFactory,
+  facilityAddModalOpen = false,
   onTreeSearch,
   onAddFacility,
   onDeleteFacility,
+  onCloseFacilityAddModal,
+  onFacilityAddSuccess,
 }) => {
   const handleSearch = async () => {
     const result = await onTreeSearch();
@@ -212,6 +219,12 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
           </SimpleTreeView>
         )}
       </div>
+
+      <FacilityAddModal
+        open={facilityAddModalOpen}
+        onClose={onCloseFacilityAddModal || (() => {})}
+        onSuccess={onFacilityAddSuccess || (() => {})}
+      />
     </>
   );
 };

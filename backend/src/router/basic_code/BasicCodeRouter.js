@@ -10,6 +10,11 @@ import {
   getBaseCode,
   getAllSensorsInGroup,
   getFactoriesByCmIdx,
+  insertFactory,
+  insertFacilityGroup,
+  insertFacility,
+  insertSensor,
+  syncFactories,
 } from '../../controller/basic_code/BasicCodeController.js';
 
 const router = express.Router();
@@ -69,6 +74,32 @@ export default () => {
   router.get('/factories/:cm_idx', async (req, res) => {
     const { cm_idx } = req.params;
     await getFactoriesByCmIdx(cm_idx, res);
+  });
+
+  // 설비 추가 관련 엔드포인트
+  router.post('/factory', async (req, res) => {
+    const { cm_idx, fc_name } = req.body;
+    await insertFactory(cm_idx, fc_name, res);
+  });
+
+  router.post('/facilityGroup', async (req, res) => {
+    const { fc_idx, fg_name } = req.body;
+    await insertFacilityGroup(fc_idx, fg_name, res);
+  });
+
+  router.post('/facility', async (req, res) => {
+    const { fg_idx, fa_name } = req.body;
+    await insertFacility(fg_idx, fa_name, res);
+  });
+
+  router.post('/sensor', async (req, res) => {
+    const { fa_idx, sn_name } = req.body;
+    await insertSensor(fa_idx, sn_name, res);
+  });
+
+  // 공장 동기화 엔드포인트
+  router.post('/sync-factories', async (req, res) => {
+    await syncFactories(res);
   });
 
   return router;

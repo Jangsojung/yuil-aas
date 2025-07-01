@@ -9,6 +9,11 @@ import {
   getBaseCodeFromDB,
   getAllSensorsInGroupFromDB,
   getFactoriesByCmIdxFromDB,
+  insertFactoryToDB,
+  insertFacilityGroupToDB,
+  insertFacilityToDB,
+  insertSensorToDB,
+  syncFactoriesToAasxData,
 } from '../../service/basic_code/BasicCodeService.js';
 
 export const getBases = async (res) => {
@@ -118,5 +123,55 @@ export const getFactoriesByCmIdx = async (cm_idx, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const insertFactory = async (cm_idx, fc_name, res) => {
+  try {
+    const result = await insertFactoryToDB(cm_idx, fc_name);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: '공장 추가 중 오류가 발생했습니다.' });
+  }
+};
+
+export const insertFacilityGroup = async (fc_idx, fg_name, res) => {
+  try {
+    const result = await insertFacilityGroupToDB(fc_idx, fg_name);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: '설비그룹 추가 중 오류가 발생했습니다.' });
+  }
+};
+
+export const insertFacility = async (fg_idx, fa_name, res) => {
+  try {
+    const result = await insertFacilityToDB(fg_idx, fa_name);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: '설비 추가 중 오류가 발생했습니다.' });
+  }
+};
+
+export const insertSensor = async (fa_idx, sn_name, res) => {
+  try {
+    const result = await insertSensorToDB(fa_idx, sn_name);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: '센서 추가 중 오류가 발생했습니다.' });
+  }
+};
+
+export const syncFactories = async (res) => {
+  try {
+    const result = await syncFactoriesToAasxData();
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, message: '공장 동기화 중 오류가 발생했습니다.' });
   }
 };

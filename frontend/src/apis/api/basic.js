@@ -240,3 +240,44 @@ export const getFactoriesByCmIdxAPI = async (cm_idx) => {
     throw error;
   }
 };
+
+// 설비 추가 관련 API
+export const insertFactoryAPI = async (cm_idx, fc_name) => {
+  try {
+    const result = await apiHelpers.post('/api/base_code/factory', { cm_idx, fc_name });
+    return result;
+  } catch (error) {
+    console.error('Error inserting factory:', error);
+    throw error;
+  }
+};
+
+export const insertFacilityGroupAPI = async (fc_idx, fg_name) => {
+  try {
+    const result = await apiHelpers.post('/api/base_code/facilityGroup', { fc_idx, fg_name });
+    return result;
+  } catch (error) {
+    console.error('Error inserting facility group:', error);
+    throw error;
+  }
+};
+
+export const insertFacilityAPI = async (fg_idx, fa_name) => {
+  try {
+    const result = await apiHelpers.post('/api/base_code/facility', { fg_idx, fa_name });
+    return result;
+  } catch (error) {
+    console.error('Error inserting facility:', error);
+    throw error;
+  }
+};
+
+export const insertSensorAPI = async (fa_idx, sn_name) => {
+  try {
+    const result = await apiHelpers.post('/api/base_code/sensor', { fa_idx, sn_name });
+    return result;
+  } catch (error) {
+    console.error('Error inserting sensor:', error);
+    throw error;
+  }
+};
