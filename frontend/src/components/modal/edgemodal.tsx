@@ -283,12 +283,10 @@ export default function CustomizedDialogs({
                 <TableRow>
                   <TableCell>네트워크상태</TableCell>
                   <TableCell>
-                    <FormGroup>
-                      <FormControlLabel
-                        control={<IOSSwitch checked={networkStatus} onChange={handleNetworkStatusChange} />}
-                        label={networkStatus ? '연결 됨' : '연결 안 됨'}
-                      />
-                    </FormGroup>
+                    <div className='d-flex gap-5 flex-start'>
+                      <IOSSwitch checked={networkStatus} onChange={handleNetworkStatusChange} {...({} as any)} />
+                      <span>{networkStatus ? '연결 됨' : '연결 안 됨'}</span>
+                    </div>
                   </TableCell>
                 </TableRow>
                 <TableRow>
