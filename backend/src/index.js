@@ -39,7 +39,7 @@ const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws) => {
   ws.on('message', (message) => {
-    console.log('Back Received:', message.toString());
+    // console.log('Back Received:', message.toString());
   });
 
   ws.on('close', () => {});

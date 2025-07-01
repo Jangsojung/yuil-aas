@@ -7,7 +7,6 @@ export const deleteAASXAPI = async (ids) => {
     const result = await apiHelpers.delete('/api/file/files', { ids });
     return result;
   } catch (error) {
-    console.error('Error deleting files:', error);
     throw error;
   }
 };
@@ -22,7 +21,6 @@ export const getFilesAPI = async (startDate, endDate, af_kind = DEFAULTS.AASX_KI
     });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching files:', error);
     return [];
   }
 };
@@ -32,7 +30,6 @@ export const getAASXAPI = async () => {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX);
     return data;
   } catch (error) {
-    console.error('Error fetching AASX:', error);
     throw error;
   }
 };
@@ -47,7 +44,6 @@ export const getAASXFilesAPI = async (start, end) => {
     });
     return data;
   } catch (error) {
-    console.error('Error fetching AASX files:', error);
     throw error;
   }
 };
@@ -66,12 +62,16 @@ export const uploadAASXFileAPI = async (fileData, userIdx) => {
     });
 
     if (!response.ok) {
-      throw new Error('파일 업로드 실패');
+      let errorMsg = '파일 업로드 실패';
+      try {
+        const errorData = await response.json();
+        if (errorData.error) errorMsg = errorData.error;
+      } catch (e) {}
+      throw new Error(errorMsg);
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error uploading AASX file:', error);
     throw error;
   }
 };
@@ -84,7 +84,6 @@ export const updateAASXFileAPI = async (af_idx, fileName, userIdx) => {
     });
     return result;
   } catch (error) {
-    console.error('Error updating AASX file:', error);
     throw error;
   }
 };
@@ -95,7 +94,6 @@ export const getAASXFilesListAPI = async () => {
     const result = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES);
     return result;
   } catch (error) {
-    console.error('Error fetching AASX files list:', error);
     throw error;
   }
 };

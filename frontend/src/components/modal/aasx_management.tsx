@@ -119,14 +119,25 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
       });
       handleInsert(newFile);
       handleClose();
-    } catch (err) {
-      setAlertModal({
-        open: true,
-        title: '오류',
-        content: '업로드 중 오류 발생: ' + (err instanceof Error ? err.message : '알 수 없는 오류'),
-        type: 'alert',
-        onConfirm: undefined,
-      });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || (typeof err === 'string' ? err : '알 수 없는 오류');
+      if (msg.includes('이미 생성되어있는 파일입니다.')) {
+        setAlertModal({
+          open: true,
+          title: '알림',
+          content: '이미 생성되어있는 파일입니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+      } else {
+        setAlertModal({
+          open: true,
+          title: '오류',
+          content: '업로드 중 오류 발생: ' + msg,
+          type: 'alert',
+          onConfirm: undefined,
+        });
+      }
     } finally {
       setIsLoading(false);
     }

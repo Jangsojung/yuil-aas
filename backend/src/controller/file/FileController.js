@@ -29,10 +29,12 @@ export const getFiles = async (af_kind, fc_idx, startDate, endDate, res) => {
 export const insertAASXFile = async (fc_idx, fileName, user_idx, res) => {
   try {
     const result = await insertAASXFileToDB(fc_idx, fileName, user_idx);
-
     res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
+    if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
+      return res.status(400).json({ error: err.message });
+    }
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -42,25 +44,23 @@ export const uploadAASXFile = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: '파일이 업로드되지 않았습니다.' });
     }
-
     const { fc_idx, user_idx } = req.body;
     const fileName = req.file.originalname;
-
     // front 폴더에 파일 저장
     const frontDir = path.join(__dirname, '../../../../files/front');
     if (!fs.existsSync(frontDir)) {
       fs.mkdirSync(frontDir, { recursive: true });
     }
-
     const frontFilePath = path.join(frontDir, fileName);
     fs.writeFileSync(frontFilePath, req.file.buffer);
-
     // AASX 파일 생성 및 DB 저장
     const result = await insertAASXFileToDB(fc_idx, fileName, user_idx);
-
     res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
+    if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
+      return res.status(400).json({ error: err.message });
+    }
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

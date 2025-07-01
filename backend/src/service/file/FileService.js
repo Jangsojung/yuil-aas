@@ -90,6 +90,14 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
 
 export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
   try {
+    // 파일명 중복 체크
+    const [existing] = await pool
+      .promise()
+      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = 2 OR af_kind = 3)', [fileName]);
+    if (existing.length > 0) {
+      throw new Error('이미 생성되어있는 파일입니다.');
+    }
+
     const frontFilePath = `../files/front/${fileName}`;
 
     const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {

@@ -146,6 +146,14 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
     const file_name = `${selectedConvert}-${startDate}-${endDate}.json`;
     const filePath = path.join(__dirname, '..', '..', '..', '..', 'files', 'front', file_name);
 
+    // 파일명 중복 체크
+    const [existing] = await pool
+      .promise()
+      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 1', [file_name]);
+    if (existing.length > 0) {
+      throw new Error('이미 생성되어있는 파일입니다.');
+    }
+
     const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
