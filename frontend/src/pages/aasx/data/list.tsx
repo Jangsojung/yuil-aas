@@ -2,15 +2,15 @@ import React, { useEffect } from 'react';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
-import Pagination from '../../components/pagination';
-import DataTableRow from '../../components/tableRow/DataTableRow';
-import { SearchBox, FilterBox } from '../../components/common';
-import AlertModal from '../../components/modal/alert';
-import { useWordManagement } from '../../hooks/useWordManagement';
-import { useAlertModal } from '../../hooks/useAlertModal';
-import { usePagination } from '../../hooks/usePagination';
+import Pagination from '../../../components/pagination';
+import DataTableRow from '../../../components/tableRow/DataTableRow';
+import { SearchBox, FilterBox } from '../../../components/common';
+import AlertModal from '../../../components/modal/alert';
+import { useWordManagement } from '../../../hooks/useWordManagement';
+import { useAlertModal } from '../../../hooks/useAlertModal';
+import { usePagination } from '../../../hooks/usePagination';
 
-export default function DataManagerPage() {
+export default function DataList() {
   // 커스텀 훅 사용
   const { alertModal, showAlert, closeAlert } = useAlertModal();
   const {

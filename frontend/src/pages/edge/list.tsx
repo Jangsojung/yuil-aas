@@ -3,7 +3,6 @@ import { deleteEdgeAPI, getEdgeAPI } from '../../apis/api/edge';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
-import CustomizedDialogs from '../../components/modal/edgemodal';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 import { ActionBox } from '../../components/common';
@@ -24,14 +23,16 @@ interface EdgeGateway {
   date?: string;
 }
 
-export default function Edge_Gateway() {
+interface EdgeListProps {
+  onAddClick: () => void;
+  onEditClick: (edgeGateway: EdgeGateway) => void;
+}
+
+export default function EdgeList({ onAddClick, onEditClick }: EdgeListProps) {
   const [edgeGateways, setEdgeGateways] = useState<EdgeGateway[]>([]);
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useState<number[]>([]);
-  const [selectedEdgeGateway, setSelectedEdgeGateway] = useState<EdgeGateway | null>(null);
   const navigationReset = useRecoilValue(navigationResetState);
 
-  const [openModal, setOpenModal] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [alertModal, setAlertModal] = useState({
     open: false,
@@ -46,14 +47,6 @@ export default function Edge_Gateway() {
   );
 
   const pagedData = paginatedData(edgeGateways || []);
-
-  const handleInsert = async () => {
-    await getEdge();
-  };
-
-  const handleUpdate = async () => {
-    await getEdge();
-  };
 
   const handleDelete = async () => {
     if (selectedEdgeGateways.length === 0) {
@@ -86,24 +79,11 @@ export default function Edge_Gateway() {
     }
   };
 
-  const handleOpenModal = () => {
-    setIsEditMode(false);
-    setSelectedEdgeGateway(null);
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setIsEditMode(false);
-    setSelectedEdgeGateway(null);
-  };
-
   const getEdge = async () => {
     try {
       const data: EdgeGateway[] = await getEdgeAPI();
       setEdgeGateways(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching edge gateways:', error);
       setEdgeGateways([]);
     }
   };
@@ -122,9 +102,7 @@ export default function Edge_Gateway() {
   };
 
   const handleRowClick = (edgeGateway: EdgeGateway) => {
-    setSelectedEdgeGateway(edgeGateway);
-    setIsEditMode(true);
-    setOpenModal(true);
+    onEditClick(edgeGateway);
   };
 
   const handleCheckboxChange = (edgeIdx: number) => {
@@ -157,9 +135,6 @@ export default function Edge_Gateway() {
     setSelectedEdgeGateways([]);
     setSelectAll(false);
     goToPage(0);
-    setOpenModal(false);
-    setIsEditMode(false);
-    setSelectedEdgeGateway(null);
   };
 
   useEffect(() => {
@@ -187,7 +162,7 @@ export default function Edge_Gateway() {
         buttons={[
           {
             text: '등록',
-            onClick: handleOpenModal,
+            onClick: onAddClick,
             color: 'success',
           },
           {
@@ -245,15 +220,6 @@ export default function Edge_Gateway() {
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </div>
-
-      <CustomizedDialogs
-        modalType={isEditMode ? 'update' : 'insert'}
-        open={openModal}
-        handleClose={handleCloseModal}
-        edgeGatewayData={selectedEdgeGateway}
-        handleInsert={handleInsert}
-        handleUpdate={handleUpdate}
-      />
 
       <AlertModal
         open={alertModal.open}

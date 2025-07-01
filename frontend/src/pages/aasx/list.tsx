@@ -7,7 +7,6 @@ import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, Table
 import Pagination from '../../components/pagination';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
 import { usePagination } from '../../hooks/usePagination';
-import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
 import AASXTableRow from '../../components/tableRow/AASXTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
@@ -27,17 +26,18 @@ interface AASXFile {
   createdAt: Date;
 }
 
-export default function AasxManagerPage() {
+interface AASXListProps {
+  onEditClick: (file: AASXFile) => void;
+  onAddClick: () => void;
+}
+
+export default function AASXList({ onEditClick, onAddClick }: AASXListProps) {
   const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const navigationReset = useRecoilValue(navigationResetState);
-
-  const [openUpdateModal, setOpenUpdateModal] = useState(false);
-  const [openInsertModal, setOpenInsertModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<AASXFile | null>(null);
 
   const [alertModal, setAlertModal] = useState({
     open: false,
@@ -52,32 +52,6 @@ export default function AasxManagerPage() {
   );
 
   const pagedData = paginatedData(files || []);
-
-  const handleInsertFile = (file: AASXFile) => {
-    const newFile: File = {
-      af_idx: file.af_idx,
-      af_name: file.af_name,
-      af_size: 0,
-      createdAt: file.createdAt.toISOString(),
-    };
-    setFiles((prevFiles) => {
-      const filesArray = Array.isArray(prevFiles) ? prevFiles : [];
-      return [newFile, ...filesArray];
-    });
-  };
-
-  const handleUpdate = (newFile: AASXFile) => {
-    const newFiles = files.map((file) =>
-      file.af_idx === newFile.af_idx
-        ? {
-            ...file,
-            af_name: newFile.af_name,
-            createdAt: newFile.createdAt.toISOString(),
-          }
-        : file
-    );
-    setFiles(newFiles);
-  };
 
   const handleDelete = async () => {
     if (selectedFiles.length === 0) {
@@ -111,7 +85,6 @@ export default function AasxManagerPage() {
           setSelectedFiles([]);
           getFiles();
         } catch (error) {
-          console.error('삭제 중 오류 발생:', error);
           setAlertModal({
             open: true,
             title: '오류',
@@ -184,17 +157,7 @@ export default function AasxManagerPage() {
       af_name: file.af_name,
       createdAt: new Date(file.createdAt),
     };
-    setSelectedFile(aasxFile);
-    setOpenUpdateModal(true);
-  };
-
-  const handleCloseUpdateModal = () => {
-    setOpenUpdateModal(false);
-    setSelectedFile(null);
-  };
-
-  const handleCloseInsertModal = () => {
-    setOpenInsertModal(false);
+    onEditClick(aasxFile);
   };
 
   const handleCloseAlert = () => {
@@ -205,9 +168,6 @@ export default function AasxManagerPage() {
     setSelectedFiles([]);
     setSelectAll(false);
     goToPage(0);
-    setOpenUpdateModal(false);
-    setOpenInsertModal(false);
-    setSelectedFile(null);
     handleReset();
   };
 
@@ -261,7 +221,7 @@ export default function AasxManagerPage() {
         buttons={[
           {
             text: '파일등록',
-            onClick: () => setOpenInsertModal(true),
+            onClick: onAddClick,
             color: 'success',
           },
           {
@@ -320,18 +280,7 @@ export default function AasxManagerPage() {
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </div>
-      <CustomizedDialogs
-        open={openUpdateModal}
-        handleClose={handleCloseUpdateModal}
-        fileData={selectedFile}
-        handleUpdate={handleUpdate}
-      />
-      <CustomizedDialogs
-        open={openInsertModal}
-        handleClose={handleCloseInsertModal}
-        fileData={null}
-        handleUpdate={handleInsertFile}
-      />
+
       <AlertModal
         open={alertModal.open}
         handleClose={handleCloseAlert}

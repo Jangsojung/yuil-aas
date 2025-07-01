@@ -2,16 +2,16 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
-import BasicDatePicker from '../../components/datepicker';
+import BasicDatePicker from '../../../components/datepicker';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import Pagination from '../../components/pagination';
-import { usePagination } from '../../hooks/usePagination';
-import { deleteJSONAPI, getJSONFilesAPI } from '../../apis/api/json_manage';
-import JSONTableRow from '../../components/tableRow/JSONTableRow';
+import Pagination from '../../../components/pagination';
+import { usePagination } from '../../../hooks/usePagination';
+import { deleteJSONAPI, getJSONFilesAPI } from '../../../apis/api/json_manage';
+import JSONTableRow from '../../../components/tableRow/JSONTableRow';
 import { useRecoilValue } from 'recoil';
-import { navigationResetState } from '../../recoil/atoms';
-import { SearchBox, ActionBox } from '../../components/common';
-import AlertModal from '../../components/modal/alert';
+import { navigationResetState } from '../../../recoil/atoms';
+import { SearchBox, ActionBox } from '../../../components/common';
+import AlertModal from '../../../components/modal/alert';
 
 interface File {
   af_idx: number;
@@ -22,7 +22,7 @@ interface File {
   sensor_count?: number;
 }
 
-export default function JsonManagerPage() {
+export default function JSONList() {
   const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -76,7 +76,6 @@ export default function JsonManagerPage() {
           setSelectedFiles([]);
           getFiles();
         } catch (error) {
-          console.error('삭제 중 오류 발생:', error);
           setAlertModal({
             open: true,
             title: '오류',
@@ -144,7 +143,7 @@ export default function JsonManagerPage() {
   };
 
   const handleCloseAlert = () => {
-    setAlertModal({ ...alertModal, open: false });
+    setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   const handleNavigationReset = () => {

@@ -8,12 +8,13 @@ import AuthLayout from './layouts/auth';
 import DashboardPage from './pages/dashboard/dashboard';
 import ConvertPage from './pages/aas/convert';
 import TransmitPage from './pages/aas/transmit';
-import AasxManagerPage from './pages/aasx/aasxManager';
-import DataManagerPage from './pages/aasx/dataManager';
-import EdgePage from './pages/edge/edge';
+import AasxManagerPage from './pages/aasx';
+import DataManagerPage from './pages/aasx/data';
+import JSONManagerPage from './pages/aasx/json';
+import EdgePage from './pages/edge';
 import SignInPage from './pages/signIn/sign';
 import ProtectedRoute from './components/route/ProtectedRoute';
-import JsonPage from './pages/aasx/jsonManager';
+
 import FacilityPage from './pages/aas/facility';
 import BasicCodeIndex from './pages/aas/basic';
 import BasicCodeAdd from './pages/aas/basic/add';
@@ -111,7 +112,7 @@ export default function ReactRouter() {
                 },
                 {
                   path: 'jsonManager',
-                  element: <JsonPage />,
+                  element: <JSONManagerPage />,
                 },
               ],
             },
