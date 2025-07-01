@@ -8,7 +8,7 @@ interface JSONTableRowProps {
     af_size: number;
     createdAt: string;
     base_name?: string;
-    sensor_count?: number;
+    sn_length?: number;
   };
   onCheckboxChange: (id: number) => void;
   checked: boolean;
@@ -33,8 +33,8 @@ export default function JSONTableRow({ file, onCheckboxChange, checked, totalCou
         <Checkbox checked={checked} onChange={() => onCheckboxChange(file.af_idx)} />
       </TableCell>
       <TableCell>{file.af_name}</TableCell>
-      <TableCell>{file.base_name || '기초코드 없음'}</TableCell>
-      <TableCell>{file.sensor_count || 0}</TableCell>
+      <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
+      <TableCell>{file.sn_length || 0}</TableCell>
       <TableCell>{formatDate(file.createdAt)}</TableCell>
     </TableRow>
   );

@@ -7,7 +7,7 @@ import BasicDatePicker from '../../components/datepicker';
 import Pagination from '../../components/pagination';
 import { usePagination } from '../../hooks/usePagination';
 import Paper from '@mui/material/Paper';
-import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
+import ConvertTableRow from '../../components/tableRow/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
 import { userState, navigationResetState } from '../../recoil/atoms';
 import LoadingOverlay from '../../components/loading/LodingOverlay';

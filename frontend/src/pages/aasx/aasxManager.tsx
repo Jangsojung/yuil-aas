@@ -8,7 +8,7 @@ import Pagination from '../../components/pagination';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
 import { usePagination } from '../../hooks/usePagination';
 import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
-import AASXTableRow from '../../components/aasx/aasx_management/AASXTableRow';
+import AASXTableRow from '../../components/tableRow/AASXTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 import { SearchBox, ActionBox } from '../../components/common';

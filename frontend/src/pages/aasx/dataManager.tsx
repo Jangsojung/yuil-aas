@@ -3,7 +3,7 @@ import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
 import Pagination from '../../components/pagination';
-import DataTableRow from '../../components/aasx/data_management/DataTableRow';
+import DataTableRow from '../../components/tableRow/DataTableRow';
 import { SearchBox, FilterBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { useWordManagement } from '../../hooks/useWordManagement';

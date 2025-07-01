@@ -3,7 +3,7 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Checkbox from '@mui/material/Checkbox';
 import { Dayjs } from 'dayjs';
-import SingleDatePicker from '../../datepicker/SingleDatePicker';
+import SingleDatePicker from '../datepicker/SingleDatePicker';
 
 interface ConvertTableRowProps {
   base: {

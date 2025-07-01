@@ -32,7 +32,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
           f.af_name, 
           f.createdAt,
           b.ab_name AS base_name,
-          COUNT(bs.sn_idx) AS sn_length
+           COUNT(DISTINCT bs.sn_idx) AS sn_length
         FROM tb_aasx_file f
         LEFT JOIN tb_aasx_base b 
           ON b.ab_idx = CAST(SUBSTRING_INDEX(f.af_name, '-', 1) AS UNSIGNED)
@@ -71,7 +71,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
             af_idx: file.af_idx,
             af_name: file.af_name,
             createdAt: file.createdAt,
-            base_name: file.base_name || '기초코드 없음',
+            base_name: file.base_name || '삭제된 기초코드',
             sn_length: Number(file.sn_length) || 0,
           };
         } else {

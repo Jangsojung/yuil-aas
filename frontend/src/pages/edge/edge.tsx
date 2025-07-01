@@ -9,6 +9,7 @@ import { navigationResetState } from '../../recoil/atoms';
 import { ActionBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { usePagination } from '../../hooks/usePagination';
+import EdgeTableRow from '../../components/tableRow/EdgeTableRow';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -217,26 +218,14 @@ export default function Edge_Gateway() {
             <TableBody>
               {pagedData && pagedData.length > 0 ? (
                 pagedData.map((eg, idx) => (
-                  <TableRow
+                  <EdgeTableRow
                     key={eg.eg_idx}
-                    sx={{
-                      '&:last-child td, &:last-child th': { border: 0 },
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => handleRowClick(eg)}
-                  >
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedEdgeGateways.includes(eg.eg_idx)}
-                        onChange={() => handleCheckboxChange(eg.eg_idx)}
-                      />
-                    </TableCell>
-                    <TableCell>{eg.eg_server_temp} °C</TableCell>
-                    <TableCell>{eg.eg_network === 1 ? '연결 됨' : '연결 안 됨'}</TableCell>
-                    <TableCell>{eg.eg_pc_temp} °C</TableCell>
-                    <TableCell>{eg.eg_ip_port}</TableCell>
-                    <TableCell>{eg.createdAt ? formatDate(eg.createdAt) : ''}</TableCell>
-                  </TableRow>
+                    edgeGateway={eg}
+                    checked={selectedEdgeGateways.includes(eg.eg_idx)}
+                    onCheckboxChange={handleCheckboxChange}
+                    onRowClick={handleRowClick}
+                    formatDate={formatDate}
+                  />
                 ))
               ) : (
                 <TableRow>

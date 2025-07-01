@@ -7,7 +7,7 @@ import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, Table
 import Pagination from '../../components/pagination';
 import { usePagination } from '../../hooks/usePagination';
 import { deleteJSONAPI, getJSONFilesAPI } from '../../apis/api/json_manage';
-import JSONTableRow from '../../components/aasx/json_management/JSONTableRow';
+import JSONTableRow from '../../components/tableRow/JSONTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 import { SearchBox, ActionBox } from '../../components/common';
