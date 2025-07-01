@@ -77,9 +77,7 @@ export default function DataTableRow({
                 },
               }}
             />
-            {isInvalid && (
-              <div style={{ fontSize: '11px', color: '#d32f2f', marginTop: '2px' }}>영어, 숫자, _만 사용 가능</div>
-            )}
+            {isInvalid && <div className='error-message'>영어, 숫자, _만 사용 가능</div>}
           </>
         ) : (
           data.as_en

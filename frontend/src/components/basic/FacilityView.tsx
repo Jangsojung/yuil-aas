@@ -138,7 +138,7 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
         {treeLoading ? (
           <LoadingOverlay />
         ) : treeData.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#888', padding: '40px 0' }}>조회 결과 없음</div>
+          <div className='text-center text-muted padding-lg'>조회 결과 없음</div>
         ) : (
           <SimpleTreeView
             defaultExpandedItems={treeData.flatMap((fg, fgIdx) => [
@@ -151,8 +151,8 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
                 key={fg.fg_idx}
                 itemId={`facility-${fgIdx}`}
                 label={
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{fg.fg_name}</span>
+                  <div className='flex-center'>
+                    <span className='text-bold text-large'>{fg.fg_name}</span>
                   </div>
                 }
               >
@@ -161,12 +161,12 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
                     key={fa.fa_idx}
                     itemId={`subfacility-${fgIdx}-${faIdx}`}
                     label={
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ fontWeight: '500', fontSize: '14px' }}>{fa.fa_name}</span>
+                      <div className='flex-center'>
+                        <span className='text-medium text-small'>{fa.fa_name}</span>
                       </div>
                     }
                   >
-                    <div style={{ padding: '8px 0' }}>
+                    <div className='padding-y'>
                       <BasicTable
                         sm_idx={`${fgIdx + 1}.${faIdx + 1}`}
                         fa_idx={fa.fa_idx}

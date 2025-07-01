@@ -158,7 +158,7 @@ export const EditView: React.FC<EditViewProps> = ({
         {treeLoading ? (
           <LoadingOverlay />
         ) : treeData.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#888', padding: '40px 0' }}>조회 결과 없음</div>
+          <div className='text-center text-muted padding-lg'>조회 결과 없음</div>
         ) : (
           <FacilityTreeView
             treeData={treeData}

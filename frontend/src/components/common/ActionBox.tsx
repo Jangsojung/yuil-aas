@@ -39,7 +39,7 @@ export default function ActionBox({ buttons, align = 'right', leftContent }: Act
           </Grid>
         )}
         <Grid item xs={leftContent ? 4 : 12}>
-          <Stack spacing={1} direction='row' style={{ justifyContent: getAlignment() }}>
+          <Stack spacing={1} direction='row' sx={{ justifyContent: getAlignment() }}>
             {buttons.map((button, index) => (
               <Button
                 key={index}

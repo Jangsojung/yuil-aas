@@ -33,13 +33,13 @@ export const FacilityTreeView: React.FC<FacilityTreeViewProps> = ({
           key={fg.fg_idx}
           itemId={`aas-${fgIdx}`}
           label={
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div className='flex-center'>
               <Checkbox
                 checked={isAllSensorsSelectedInGroup(fgIdx)}
                 indeterminate={false}
                 onChange={(e) => onGroupSelectAll(fgIdx, e.target.checked)}
                 onClick={(e) => e.stopPropagation()}
-                style={{ marginRight: '8px' }}
+                className='margin-right-sm'
               />
               <span>{fg.fg_name}</span>
             </div>
@@ -50,19 +50,19 @@ export const FacilityTreeView: React.FC<FacilityTreeViewProps> = ({
               key={fa.fa_idx}
               itemId={`submodal-${fgIdx}-${faIdx}`}
               label={
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div className='flex-center'>
                   <Checkbox
                     checked={isAllSensorsSelectedInFacility(fgIdx, faIdx)}
                     indeterminate={false}
                     onChange={(e) => onFacilitySelectAll(fgIdx, faIdx, e.target.checked)}
                     onClick={(e) => e.stopPropagation()}
-                    style={{ marginRight: '8px' }}
+                    className='margin-right-sm'
                   />
                   <span>{fa.fa_name}</span>
                 </div>
               }
             >
-              <div style={{ padding: '8px 0' }}>
+              <div className='padding-y'>
                 <BasicTable sm_idx={`${fgIdx + 1}.${faIdx + 1}`} fa_idx={fa.fa_idx} sensors={fa.sensors} />
               </div>
             </TreeItem>

@@ -25,7 +25,9 @@ const GreyButton = styled(Button)<ButtonProps>(() => ({
 function CustomAppTitle() {
   return (
     <div className='logo'>
-      <Link to='/dashboard/dashboard'><img src={Logo} alt='삼보에이앤티' /></Link>
+      <Link to='/dashboard/dashboard'>
+        <img src={Logo} alt='삼보에이앤티' />
+      </Link>
     </div>
   );
 }
@@ -43,7 +45,7 @@ function ToolbarActionsAdmin({ user }) {
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+    <div className='flex-center-gap'>
       <span>{user}</span>
       <GreyButton variant='outlined' onClick={handleLogout}>
         로그아웃

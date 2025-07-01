@@ -51,7 +51,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
         {detailLoading ? (
           <LoadingOverlay />
         ) : detailTreeData.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#888', padding: '40px 0' }}>센서 데이터가 없습니다.</div>
+          <div className='text-center text-muted padding-lg'>센서 데이터가 없습니다.</div>
         ) : (
           <SimpleTreeView
             defaultExpandedItems={detailTreeData.flatMap((fg, fgIdx) => [
@@ -63,7 +63,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
               <TreeItem key={fg.fg_idx} itemId={`detail-${fgIdx}`} label={<span>{fg.fg_name}</span>}>
                 {fg.facilities.map((fa, faIdx) => (
                   <TreeItem key={fa.fa_idx} itemId={`detail-sub-${fgIdx}-${faIdx}`} label={<span>{fa.fa_name}</span>}>
-                    <div style={{ padding: '8px 0' }}>
+                    <div className='padding-y'>
                       <TableContainer component={Paper}>
                         <Table size='small'>
                           <TableBody>

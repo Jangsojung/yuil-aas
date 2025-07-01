@@ -66,38 +66,15 @@ export const FileUpload: FC<FileUploadProps> = ({
 
   return (
     <div
-      style={{
-        width,
-        height,
-        backgroundColor: isDragOver ? '#e0e0e0' : backgroundColor,
-        border: isDragOver ? '2px solid #1976d2' : '2px dashed #bdbdbd',
-        borderRadius: '6px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        transition: 'all 0.2s',
-        position: 'relative',
-        fontSize: '1rem',
-        color: '#333',
-      }}
+      className={`file-upload-container ${isDragOver ? 'drag-over' : ''}`}
+      style={{ width, height, backgroundColor: isDragOver ? '#e0e0e0' : backgroundColor }}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <input onChange={handleChange} accept={accept} id='file-upload' type='file' style={{ display: 'none' }} />
-      <label
-        htmlFor='file-upload'
-        style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-        }}
-      >
+      <input onChange={handleChange} accept={accept} id='file-upload' type='file' className='file-upload-input' />
+      <label htmlFor='file-upload' className='file-upload-label'>
         {selectedFileName ? selectedFileName : labelText}
       </label>
     </div>

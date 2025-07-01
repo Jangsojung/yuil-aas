@@ -37,7 +37,7 @@ export default function SearchBox({ children, buttons = [], buttonAlign = 'right
         </Grid>
         {buttons.length > 0 && (
           <Grid item xs={2}>
-            <Stack spacing={1} direction='row' style={{ justifyContent: getAlignment() }}>
+            <Stack spacing={1} direction='row' sx={{ justifyContent: getAlignment() }}>
               {buttons.map((button, index) => (
                 <Button
                   key={index}

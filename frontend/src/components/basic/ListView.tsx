@@ -92,7 +92,7 @@ export const ListView: React.FC<ListViewProps> = ({
         >
           <Grid container spacing={2} alignItems='center'>
             <Grid item xs={3}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className='flex-center-gap'>
                 <div className='sort-title'>기초코드명</div>
                 <TextField
                   size='small'
@@ -105,7 +105,7 @@ export const ListView: React.FC<ListViewProps> = ({
             </Grid>
 
             <Grid item xs={6}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className='flex-center-gap'>
                 <div className='sort-title'>날짜</div>
                 <BasicDatePicker onDateChange={onDateChange} startDate={startDate} endDate={endDate} />
               </div>
@@ -149,7 +149,7 @@ export const ListView: React.FC<ListViewProps> = ({
                     key={base.ab_idx}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     onClick={() => onClick(base)}
-                    style={{ cursor: 'pointer' }}
+                    className='cursor-pointer'
                   >
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <Checkbox

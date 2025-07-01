@@ -256,7 +256,7 @@ export default function BasiccodeEditPage() {
 
   return (
     <div className='table-outer'>
-      <div style={{ textAlign: 'center', color: '#888', padding: '40px 0' }}>로딩 중...</div>
+      <div className='text-center text-muted padding-lg'>로딩 중...</div>
     </div>
   );
 }

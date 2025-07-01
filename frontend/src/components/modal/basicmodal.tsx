@@ -89,12 +89,12 @@ export default function BasicModal({
       </DialogTitle>
       <DialogContent dividers>
         <Box sx={{ mb: 2 }}>
-          <span style={{ color: '#637381', fontWeight: 500 }}>선택한 센서 개수</span>
-          <span style={{ marginLeft: 8, color: '#222', fontWeight: 700 }}>{selectedSensorCount}개</span>
+          <span className='sensor-count'>선택한 센서 개수</span>
+          <span className='sensor-count-value'>{selectedSensorCount}개</span>
         </Box>
         <Box component='form' noValidate autoComplete='off'>
           <Grid container spacing={2} alignItems='center'>
-            <Grid item xs={3} style={{ color: '#637381', fontWeight: 500 }}>
+            <Grid item xs={3} className='form-label'>
               기초코드명
             </Grid>
             <Grid item xs={9}>
@@ -106,7 +106,7 @@ export default function BasicModal({
                 placeholder='기초코드명을 입력하세요'
               />
             </Grid>
-            <Grid item xs={3} style={{ color: '#637381', fontWeight: 500 }}>
+            <Grid item xs={3} className='form-label'>
               비고
             </Grid>
             <Grid item xs={9}>

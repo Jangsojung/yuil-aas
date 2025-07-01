@@ -230,10 +230,10 @@ export default function ConvertPage() {
   }, [bases]);
 
   return (
-    <div style={{ position: 'relative', height: '100%' }}>
+    <div className='position-relative height-100'>
       {isLoading && <LoadingOverlay />}
 
-      <div style={{ pointerEvents: isLoading ? 'none' : 'auto' }} className='table-outer'>
+      <div className={`table-outer ${isLoading ? 'pointer-events-none' : 'pointer-events-auto'}`}>
         <SearchBox
           buttons={[
             {
@@ -251,7 +251,7 @@ export default function ConvertPage() {
         >
           <Grid container spacing={2} alignItems='center'>
             <Grid item xs={3}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className='flex-center-gap'>
                 <div className='sort-title'>기초코드명</div>
                 <TextField
                   size='small'
@@ -264,7 +264,7 @@ export default function ConvertPage() {
             </Grid>
 
             <Grid item xs={6}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className='flex-center-gap'>
                 <div className='sort-title'>생성 날짜</div>
                 <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
               </div>

@@ -266,7 +266,7 @@ export default function CustomizedDialogs({
                 <TableRow>
                   <TableCell>서버온도</TableCell>
                   <TableCell>
-                    <div className='d-flex gap-5' style={{ alignItems: 'flex-start' }}>
+                    <div className='d-flex gap-5 flex-start'>
                       <TextField
                         hiddenLabel
                         type='number'
@@ -274,7 +274,7 @@ export default function CustomizedDialogs({
                         size='small'
                         value={serverTemp}
                         onChange={(e) => setServerTemp(e.target.value)}
-                        style={{ width: 50 }}
+                        className='width-50'
                       />
                       <span>℃</span>
                     </div>
@@ -294,7 +294,7 @@ export default function CustomizedDialogs({
                 <TableRow>
                   <TableCell>PC 온도</TableCell>
                   <TableCell>
-                    <div className='d-flex gap-5' style={{ alignItems: 'flex-start' }}>
+                    <div className='d-flex gap-5 flex-start'>
                       <TextField
                         hiddenLabel
                         type='number'
@@ -302,7 +302,7 @@ export default function CustomizedDialogs({
                         size='small'
                         value={pcTemp}
                         onChange={(e) => setPcTemp(e.target.value)}
-                        style={{ width: 50 }}
+                        className='width-50'
                       />
                       <span>℃</span>
                     </div>
@@ -311,7 +311,7 @@ export default function CustomizedDialogs({
                 <TableRow>
                   <TableCell>PC IP:PORT</TableCell>
                   <TableCell>
-                    <div className='d-flex gap-5' style={{ alignItems: 'center' }}>
+                    <div className='d-flex gap-5 flex-center'>
                       <TextField
                         hiddenLabel
                         id='outlined-size-small'
@@ -319,7 +319,7 @@ export default function CustomizedDialogs({
                         value={pcIp}
                         onChange={(e) => setPcIp(e.target.value)}
                         placeholder='예: 192.168.0.1'
-                        style={{ width: 120 }}
+                        className='width-120'
                       />
                       <span>:</span>
                       <TextField
@@ -329,7 +329,7 @@ export default function CustomizedDialogs({
                         size='small'
                         value={pcPort}
                         onChange={(e) => setPcPort(e.target.value)}
-                        style={{ width: 120 }}
+                        className='width-120'
                       />
                     </div>
                   </TableCell>

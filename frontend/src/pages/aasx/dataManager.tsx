@@ -125,7 +125,7 @@ export default function DataManagerPage() {
 
       <FilterBox
         leftContent={
-          <Grid container spacing={1} style={{ gap: '20px' }}>
+          <Grid container spacing={1} className='flex-center-gap-lg'>
             <Grid item>
               <Grid container spacing={1}>
                 <Grid item className='d-flex gap-5'>
