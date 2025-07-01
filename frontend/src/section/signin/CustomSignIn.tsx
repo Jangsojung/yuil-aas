@@ -86,7 +86,13 @@ export default function CustomSignInView() {
 
   return (
     <Box
-      sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#ffffff' }}
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#ffffff',
+      }}
     >
       <Paper elevation={3} sx={{ p: 4, width: 400 }}>
         <Typography variant='h4' fontWeight={'bold'} align='center' gutterBottom>

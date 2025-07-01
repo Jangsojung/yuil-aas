@@ -75,7 +75,10 @@ export const apiHelpers = {
         }
 
         const error = new Error(errorMessage);
-        (error as any).response = { status: response.status, data: errorMessage };
+        (error as any).response = {
+          status: response.status,
+          data: errorMessage,
+        };
         throw error;
       }
 

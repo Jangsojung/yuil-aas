@@ -64,7 +64,16 @@ export default function FacilityGroupSelect({
     return (
       <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#637381' }}>공장</label>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '5px',
+              fontSize: '14px',
+              color: '#637381',
+            }}
+          >
+            공장
+          </label>
           <FactorySelect
             value={selectedFactory}
             onChange={onFactoryChange || (() => {})}
@@ -73,7 +82,16 @@ export default function FacilityGroupSelect({
           />
         </div>
         <div style={{ flex: 1 }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#637381' }}>설비 그룹</label>
+          <label
+            style={{
+              display: 'block',
+              marginBottom: '5px',
+              fontSize: '14px',
+              color: '#637381',
+            }}
+          >
+            설비 그룹
+          </label>
           <FormControl fullWidth size='small'>
             <Select
               value={value}

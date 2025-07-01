@@ -27,7 +27,9 @@ export default function ConvertPage() {
   const [selectedConvert, setSelectedConvert] = useState<number | null>();
   const [bases, setBases] = useState<Base[]>([]);
   const [filteredBases, setFilteredBases] = useState<Base[]>([]);
-  const [baseDates, setBaseDates] = useState<{ [key: number]: { startDate: Dayjs | null; endDate: Dayjs | null } }>({});
+  const [baseDates, setBaseDates] = useState<{
+    [key: number]: { startDate: Dayjs | null; endDate: Dayjs | null };
+  }>({});
   const userIdx = useRecoilValue(userState)?.user_idx;
   const navigationReset = useRecoilValue(navigationResetState);
 

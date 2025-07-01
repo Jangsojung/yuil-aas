@@ -140,7 +140,12 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       const group = groupList.find((g) => g.fg_name === value);
       if (group) {
         const facilities = await getFacilitiesAPI(group.fg_idx);
-        setFacilityList(facilities.map((f: any) => ({ fa_idx: f.fa_idx, fa_name: f.fa_name })));
+        setFacilityList(
+          facilities.map((f: any) => ({
+            fa_idx: f.fa_idx,
+            fa_name: f.fa_name,
+          }))
+        );
       }
     } else {
       setFacilityList([]);
@@ -245,7 +250,12 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         // 설비 목록을 직접 다시 조회
         try {
           const facilities = await getFacilitiesAPI(currentFgIdx);
-          setFacilityList([...facilities.map((f: any) => ({ fa_idx: f.fa_idx, fa_name: f.fa_name }))]);
+          setFacilityList([
+            ...facilities.map((f: any) => ({
+              fa_idx: f.fa_idx,
+              fa_name: f.fa_name,
+            })),
+          ]);
 
           // 새로 추가된 설비를 선택
           setFacilityValue(facilityInput);
@@ -320,7 +330,15 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
 
   return (
     <BootstrapDialog open={open} onClose={handleClose}>
-      <DialogTitle sx={{ m: 0, p: 2, borderBottom: '1px solid #e0e0e0', fontWeight: 700, fontSize: '1.1rem' }}>
+      <DialogTitle
+        sx={{
+          m: 0,
+          p: 2,
+          borderBottom: '1px solid #e0e0e0',
+          fontWeight: 700,
+          fontSize: '1.1rem',
+        }}
+      >
         설비 등록 팝업
         <IconButton
           aria-label='close'
@@ -404,7 +422,10 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         fullWidth
                         placeholder='공장명 입력'
                         disabled={!isNewFactory}
-                        sx={{ background: isNewFactory ? '#fff' : '#f0f0f0', borderRadius: 1 }}
+                        sx={{
+                          background: isNewFactory ? '#fff' : '#f0f0f0',
+                          borderRadius: 1,
+                        }}
                       />
                     </Grid>
                   </Grid>

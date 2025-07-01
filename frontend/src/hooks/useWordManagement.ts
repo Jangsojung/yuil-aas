@@ -151,7 +151,10 @@ export const useWordManagement = () => {
     });
 
     if (invalidEntries.length > 0) {
-      return { success: false, message: '식별 ID는 영어, 숫자, _만 사용 가능합니다.' };
+      return {
+        success: false,
+        message: '식별 ID는 영어, 숫자, _만 사용 가능합니다.',
+      };
     }
 
     try {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
@@ -10,6 +10,7 @@ import { SearchBox, FilterBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { useWordManagement } from '../../hooks/useWordManagement';
 import { useAlertModal } from '../../hooks/useAlertModal';
+import { usePagination } from '../../hooks/usePagination';
 
 interface Word {
   as_kr: string;
@@ -18,18 +19,11 @@ interface Word {
 
 export default function DataManagerPage() {
   const navigationReset = useRecoilValue(navigationResetState);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
 
   // 커스텀 훅 사용
   const { alertModal, showAlert, closeAlert } = useAlertModal();
   const {
-    words,
     filteredWords,
-    selectedItems,
-    modifiedData,
-    editingValues,
     showUnmatchedOnly,
     searchKeyword,
     getWords,
@@ -46,23 +40,11 @@ export default function DataManagerPage() {
     handleSearch,
   } = useWordManagement();
 
-  const handlePageChange = (event: unknown, newPage: number) => {
-    setCurrentPage(newPage);
-  };
+  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+    filteredWords?.length || 0
+  );
 
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(0);
-  };
-
-  const pagedData = filteredWords?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-  const calculatedTotalPages = Math.ceil((filteredWords?.length || 0) / rowsPerPage);
-
-  useEffect(() => {
-    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
-      setCurrentPage(0);
-    }
-  }, [currentPage, calculatedTotalPages]);
+  const pagedData = paginatedData(filteredWords || []);
 
   useEffect(() => {
     getWords();
@@ -70,11 +52,7 @@ export default function DataManagerPage() {
 
   const handleSaveClick = async () => {
     const result = await handleSave();
-    if (result.success) {
-      showAlert('알림', result.message);
-    } else {
-      showAlert('알림', result.message);
-    }
+    showAlert('알림', result.message);
   };
 
   const handleUnmatchedOnlyChange = (checked: boolean) => {
@@ -85,13 +63,7 @@ export default function DataManagerPage() {
     handleSelectAllCurrentPage(pagedData, !isAllCurrentPageSelected(pagedData));
   };
 
-  const checkAllCurrentPageSelected = () => {
-    return isAllCurrentPageSelected(pagedData);
-  };
-
-  const checkSomeCurrentPageSelected = () => {
-    return isSomeCurrentPageSelected(pagedData);
-  };
+  const checkAllCurrentPageSelected = () => isAllCurrentPageSelected(pagedData);
 
   return (
     <div className='table-outer'>
@@ -183,7 +155,7 @@ export default function DataManagerPage() {
           count={filteredWords?.length || 0}
           page={currentPage}
           rowsPerPage={rowsPerPage}
-          onPageChange={handlePageChange}
+          onPageChange={(event, page) => goToPage(page)}
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </div>

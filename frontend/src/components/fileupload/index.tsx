@@ -84,7 +84,11 @@ export const FileUpload: FC<FileUploadProps> = ({
   return (
     <div
       className={`file-upload-container ${isDragOver ? 'drag-over' : ''}`}
-      style={{ width, height, backgroundColor: isDragOver ? '#e0e0e0' : backgroundColor }}
+      style={{
+        width,
+        height,
+        backgroundColor: isDragOver ? '#e0e0e0' : backgroundColor,
+      }}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}

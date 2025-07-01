@@ -215,7 +215,10 @@ export default function Edge_Gateway() {
                 pagedData.map((eg, idx) => (
                   <TableRow
                     key={eg.eg_idx}
-                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, cursor: 'pointer' }}
+                    sx={{
+                      '&:last-child td, &:last-child th': { border: 0 },
+                      cursor: 'pointer',
+                    }}
                     onClick={() => handleRowClick(eg)}
                   >
                     <TableCell onClick={(e) => e.stopPropagation()}>

@@ -44,7 +44,10 @@ export const useBasicAdd = () => {
       return { success: true, message: '기초코드가 등록되었습니다.' };
     } catch (error) {
       console.error('Error inserting base:', error);
-      return { success: false, message: '기초코드 등록 중 오류가 발생했습니다.' };
+      return {
+        success: false,
+        message: '기초코드 등록 중 오류가 발생했습니다.',
+      };
     }
   }, [selectedSensors, basicName, basicDesc, userIdx, setSelectedSensors]);
 

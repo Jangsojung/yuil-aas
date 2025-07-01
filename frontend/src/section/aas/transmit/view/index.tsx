@@ -11,7 +11,14 @@ export default function TransmitView() {
 
   return (
     <Container maxWidth='lg' className='tree-wrap'>
-      <Box sx={{ backgroundColor: '#ececec', padding: '10px', marginBottom: '10px' }} className='second-title'>
+      <Box
+        sx={{
+          backgroundColor: '#ececec',
+          padding: '10px',
+          marginBottom: '10px',
+        }}
+        className='second-title'
+      >
         선택한 aasx 파일 검증
       </Box>
       <Grid container spacing={2}>
