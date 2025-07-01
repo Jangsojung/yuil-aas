@@ -10,12 +10,9 @@ import AlertModal from '../../components/modal/alert';
 import { AASXFile } from '../../types/api';
 import { transformAASXData } from '../../utils/aasxTransform';
 import { useAlertModal } from '../../hooks/useAlertModal';
-import { usePagination } from '../../hooks/usePagination';
-import { PAGINATION } from '../../constants';
 
 export default function TransmitPage() {
   const currentFile = useRecoilValue(currentFileState);
-  const aasxData = useRecoilValue(aasxDataState);
   const [, setAasxData] = useRecoilState(aasxDataState);
   const [, setIsVerified] = useRecoilState(isVerifiedState);
   const [, setCurrentFile] = useRecoilState(currentFileState);

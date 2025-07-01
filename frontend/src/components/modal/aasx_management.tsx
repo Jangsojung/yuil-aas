@@ -1,4 +1,4 @@
-import React, { ChangeEvent, DragEvent, Fragment, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import Button, { ButtonProps } from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
@@ -12,7 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { grey } from '@mui/material/colors';
 import AlertModal from './alert';
 
-import { FileUpload, FileUploadProps } from '../../components/fileupload';
+import { FileUpload } from '../../components/fileupload';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import LoadingOverlay from '../loading/LodingOverlay';
@@ -49,7 +49,11 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-export default function CustomizedDialogs({ handleInsert }) {
+interface Props {
+  handleInsert: (file: any) => void;
+}
+
+export default function CustomizedDialogs({ handleInsert }: Props) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<globalThis.File | null>(null);
@@ -68,21 +72,6 @@ export default function CustomizedDialogs({ handleInsert }) {
   const handleClose = () => {
     setOpen(false);
     setSelectedFile(null);
-  };
-
-  const fileUploadProp: FileUploadProps = {
-    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-      if (event.target.files !== null && event.target?.files?.length > 0) {
-        const file = event.target.files[0];
-        setSelectedFile(file);
-      }
-    },
-    onDrop: (event: DragEvent<HTMLElement>) => {
-      const file = event.dataTransfer.files[0];
-      setSelectedFile(file);
-    },
-    selectedFileName: selectedFile?.name || '',
-    accept: '.json',
   };
 
   const handleAdd = async () => {
@@ -134,7 +123,7 @@ export default function CustomizedDialogs({ handleInsert }) {
       setAlertModal({
         open: true,
         title: '오류',
-        content: '업로드 중 오류 발생: ' + err.message,
+        content: '업로드 중 오류 발생: ' + (err instanceof Error ? err.message : '알 수 없는 오류'),
         type: 'alert',
         onConfirm: undefined,
       });

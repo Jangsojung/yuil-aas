@@ -85,7 +85,7 @@ export const apiHelpers = {
       return response.json();
     } catch (error) {
       clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
+      if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('요청 시간이 초과되었습니다.');
       }
       throw error;

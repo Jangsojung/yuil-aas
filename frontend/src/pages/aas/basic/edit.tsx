@@ -120,8 +120,8 @@ export default function BasiccodeEditPage() {
 
       const relevantFacilityGroups = new Set<number>();
       treeData.forEach((fg) => {
-        fg.facilities.forEach((fa) => {
-          fa.sensors.forEach((sensor) => {
+        fg.facilities.forEach((fa: any) => {
+          fa.sensors.forEach((sensor: any) => {
             if (selectedSensorIds.includes(sensor.sn_idx)) {
               relevantFacilityGroups.add(fg.fg_idx);
             }

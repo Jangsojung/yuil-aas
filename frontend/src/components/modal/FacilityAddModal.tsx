@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
@@ -71,7 +70,7 @@ interface FacilityAddModalProps {
 export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityAddModalProps) {
   const user = useRecoilValue(userState);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   // 공장 관련 상태
   const [factories, setFactories] = useState<Array<{ fc_idx: number; fc_name: string }>>([]);
@@ -96,6 +95,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       console.error('공장 목록 조회 실패:', error);
       setError('공장 목록을 불러오는데 실패했습니다.');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.cm_idx]);
 
   const fetchFacilityGroups = useCallback(

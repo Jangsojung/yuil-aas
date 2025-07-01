@@ -8,6 +8,45 @@ import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { useRecoilValue } from 'recoil';
 import { aasxDataState, isVerifiedState } from '../../recoil/atoms';
 
+// 타입 정의
+interface AASData {
+  name?: string;
+  url?: string;
+  AssetInformation?: Record<string, any>;
+  submodelRefs?: any[];
+  [key: string]: any;
+}
+
+interface SMData {
+  name?: string;
+  url?: string;
+  SMC?: SMCData[];
+  Prop?: PropData[] | Record<string, any>;
+  parentAAS?: any;
+  [key: string]: any;
+}
+
+interface SMCData {
+  name?: string;
+  elements?: number;
+  items?: ItemData[];
+}
+
+interface ItemData {
+  name?: string;
+  Prop?: PropData[];
+}
+
+interface PropData {
+  name?: string;
+  value?: any;
+}
+
+interface TreeData {
+  AAS?: AASData | AASData[];
+  SM?: SMData | SMData[];
+}
+
 const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
   [`& .${treeItemClasses.content}`]: {
     padding: theme.spacing(0.5, 1),
@@ -39,8 +78,8 @@ function EndIcon(props: PropsWithoutRef<typeof DisabledByDefaultRoundedIcon>) {
   return <DisabledByDefaultRoundedIcon {...props} sx={{ opacity: 0.3 }} />;
 }
 
-const createTreeItems = (data: any) => {
-  if (!data) return null;
+const createTreeItems = (data: TreeData): JSX.Element[] => {
+  if (!data) return [];
 
   const result: JSX.Element[] = [];
 
@@ -51,19 +90,14 @@ const createTreeItems = (data: any) => {
       const aasId = `AAS-${index}`;
       const aasLabel = `AAS "${aas.AssetInformation?.Unit1 || aas.name}" [${aas.url || 'url 없음'}]`;
 
-      const aasChildren = [];
+      const aasChildren: JSX.Element[] = [];
 
       if (aas.AssetInformation) {
         const assetInfoId = `${aasId}-AssetInfo`;
-        const assetInfoItems = [];
+        const assetInfoItems: JSX.Element[] = [];
 
+        // AAS의 AssetInformation 속성들 처리
         for (const key in aas.AssetInformation) {
-          for (const key in aas) {
-            if (key !== 'name' && key !== 'url' && key !== 'submodelRefs' && key !== 'AssetInformation') {
-              const propId = `${aasId}-${key}`;
-              assetInfoItems.push(<CustomTreeItem key={propId} itemId={propId} label={`kind: ${aas[key]}`} />);
-            }
-          }
           const assetPropId = `${assetInfoId}-${key}`;
           assetInfoItems.push(
             <CustomTreeItem
@@ -72,6 +106,14 @@ const createTreeItems = (data: any) => {
               label={`globalAssetId: ${aas.AssetInformation[key]}`}
             />
           );
+        }
+
+        // AAS의 다른 속성들 처리
+        for (const key in aas) {
+          if (key !== 'name' && key !== 'url' && key !== 'submodelRefs' && key !== 'AssetInformation') {
+            const propId = `${aasId}-${key}`;
+            assetInfoItems.push(<CustomTreeItem key={propId} itemId={propId} label={`kind: ${aas[key]}`} />);
+          }
         }
 
         aasChildren.push(
@@ -91,12 +133,12 @@ const createTreeItems = (data: any) => {
 
   if (data.SM) {
     const smItems = Array.isArray(data.SM) ? data.SM : [data.SM];
-    const smChildren = [];
+    const smChildren: JSX.Element[] = [];
 
     smItems.forEach((sm, index) => {
       const smId = `SM-${index}`;
       const smLabel = `${sm.name} [${sm.url || 'url 없음'}]`;
-      const smSubItems = [];
+      const smSubItems: JSX.Element[] = [];
 
       for (const key in sm) {
         if (key !== 'name' && key !== 'url' && key !== 'SMC' && key !== 'Prop' && key !== 'parentAAS') {
@@ -111,13 +153,13 @@ const createTreeItems = (data: any) => {
         smcItems.forEach((smc, smcIndex) => {
           const smcId = `${smId}-SMC-${smcIndex}`;
           const smcLabel = `SMC "${smc.name}" (${smc.elements || 0} elements)`;
-          const smcSubItems = [];
+          const smcSubItems: JSX.Element[] = [];
 
           if (smc.items && Array.isArray(smc.items)) {
             smc.items.forEach((item, itemIndex) => {
               const itemId = `${smcId}-item-${itemIndex}`;
               const itemLabel = item.name;
-              const itemSubItems = [];
+              const itemSubItems: JSX.Element[] = [];
 
               if (item.Prop && Array.isArray(item.Prop)) {
                 item.Prop.forEach((prop, propIndex) => {
@@ -147,7 +189,7 @@ const createTreeItems = (data: any) => {
       if (sm.Prop) {
         const propItems = Array.isArray(sm.Prop) ? sm.Prop : [sm.Prop];
         const propId = `${smId}-props`;
-        const propSubItems = [];
+        const propSubItems: JSX.Element[] = [];
 
         if (Array.isArray(propItems)) {
           propItems.forEach((prop, propIndex) => {

@@ -47,18 +47,11 @@ export default function AasxManagerPage() {
     onConfirm: undefined as (() => void) | undefined,
   });
 
-  const { currentPage, rowsPerPage, totalPages, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
     files?.length || 0
   );
 
   const pagedData = paginatedData(files || []);
-
-  const handleInsert = async (file: File) => {
-    setFiles((prevFiles) => {
-      const filesArray = Array.isArray(prevFiles) ? prevFiles : [];
-      return [file, ...filesArray];
-    });
-  };
 
   const handleInsertFile = (file: AASXFile) => {
     const newFile: File = {

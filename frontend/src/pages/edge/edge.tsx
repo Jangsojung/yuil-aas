@@ -40,7 +40,7 @@ export default function Edge_Gateway() {
     onConfirm: undefined as (() => void) | undefined,
   });
 
-  const { currentPage, rowsPerPage, totalPages, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
     edgeGateways?.length || 0
   );
 

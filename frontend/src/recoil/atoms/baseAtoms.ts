@@ -27,6 +27,7 @@ export const selectedBaseState = atom<Base>({
   default: {
     ab_idx: -1,
     ab_name: '',
+    ab_note: '',
     sn_length: -1,
   },
 });

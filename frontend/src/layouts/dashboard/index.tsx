@@ -32,7 +32,11 @@ function CustomAppTitle() {
   );
 }
 
-function ToolbarActionsAdmin({ user }) {
+interface ToolbarActionsAdminProps {
+  user: string;
+}
+
+function ToolbarActionsAdmin({ user }: ToolbarActionsAdminProps) {
   const navigate = useNavigate();
   const [, setUser] = useRecoilState(userState);
 

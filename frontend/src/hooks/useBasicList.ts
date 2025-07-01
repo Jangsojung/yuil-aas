@@ -80,7 +80,7 @@ export const useBasicList = () => {
       setSelectedBases((prevSelected) => {
         const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
         return checked
-          ? [...new Set([...prevArray, ...currentPageIds])]
+          ? [...Array.from(new Set([...prevArray, ...currentPageIds]))]
           : prevArray.filter((id) => !currentPageIds.includes(id));
       });
     },

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -16,8 +15,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
@@ -150,7 +147,7 @@ export default function CustomizedDialogs({
     }
   }, [edgeGatewayData, open]);
 
-  const handleNetworkStatusChange = (event) => {
+  const handleNetworkStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNetworkStatus(event.target.checked);
   };
 

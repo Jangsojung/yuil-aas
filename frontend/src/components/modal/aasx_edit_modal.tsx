@@ -149,7 +149,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       setAlertModal({
         open: true,
         title: '오류',
-        content: '업로드 중 오류 발생: ' + err.message,
+        content: '업로드 중 오류 발생: ' + (err instanceof Error ? err.message : '알 수 없는 오류'),
         type: 'alert',
         onConfirm: undefined,
       });

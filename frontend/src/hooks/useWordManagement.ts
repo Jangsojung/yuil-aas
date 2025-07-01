@@ -30,6 +30,7 @@ export const useWordManagement = () => {
       setWords([]);
       setFilteredWords([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const applyFilters = useCallback(

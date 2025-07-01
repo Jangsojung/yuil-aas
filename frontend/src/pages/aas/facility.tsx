@@ -4,7 +4,6 @@ import { navigationResetState } from '../../recoil/atoms';
 import { useFacilityManagement } from '../../hooks/useFacilityManagement';
 import { FacilityView } from '../../components/basic/FacilityView';
 import AlertModal from '../../components/modal/alert';
-import { deleteSensors } from '../../apis/api/facility';
 
 export default function FacilityManagementPage() {
   const navigationReset = useRecoilValue(navigationResetState);
@@ -29,7 +28,6 @@ export default function FacilityManagementPage() {
     handleFacilityAddSuccess,
     alertModal,
     showAlert,
-    showConfirm,
     closeAlert,
   } = useFacilityManagement();
 

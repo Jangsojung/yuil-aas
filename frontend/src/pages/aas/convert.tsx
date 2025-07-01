@@ -22,6 +22,8 @@ interface Base {
   createdAt?: string;
 }
 
+const cells = ['기초코드명', '센서 개수', '생성 일자', '시작 날짜', '종료 날짜'];
+
 export default function ConvertPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedConvert, setSelectedConvert] = useState<number | null>();
@@ -42,7 +44,7 @@ export default function ConvertPage() {
   const [alertContent, setAlertContent] = useState('');
   const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
 
-  const { currentPage, rowsPerPage, totalPages, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
     filteredBases?.length || 0
   );
 
@@ -179,7 +181,7 @@ export default function ConvertPage() {
     } catch (error) {
       console.error('변환 오류:', error);
 
-      const errorMessage = error.message || '파일 생성 중 오류가 발생했습니다.';
+      const errorMessage = error instanceof Error ? error.message : '파일 생성 중 오류가 발생했습니다.';
 
       setAlertTitle('오류');
       setAlertContent(errorMessage);
@@ -281,11 +283,9 @@ export default function ConvertPage() {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ width: '50px' }}></TableCell>
-                  <TableCell sx={{ width: '200px' }}>기초코드명</TableCell>
-                  <TableCell sx={{ width: '100px' }}>센서 개수</TableCell>
-                  <TableCell sx={{ width: '150px' }}>생성 일자</TableCell>
-                  <TableCell sx={{ width: '160px' }}>시작 날짜</TableCell>
-                  <TableCell sx={{ width: '160px' }}>종료 날짜</TableCell>
+                  {cells.map((cell, idx) => (
+                    <TableCell key={idx}>{cell}</TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -306,7 +306,7 @@ export default function ConvertPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} align='center'>
+                    <TableCell colSpan={cells.length + 1} align='center'>
                       데이터가 없습니다.
                     </TableCell>
                   </TableRow>
@@ -334,5 +334,3 @@ export default function ConvertPage() {
     </div>
   );
 }
-
-const cells = ['기초코드명', '센서 개수', '생성 일자', '시작 날짜', '종료 날짜'];

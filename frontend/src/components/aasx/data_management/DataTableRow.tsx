@@ -43,8 +43,8 @@ export default function DataTableRow({
     return validPattern.test(value);
   };
 
-  const currentValue = editingValue || data.as_en;
-  const isInvalid = currentValue && !isValidEnglish(currentValue);
+  const currentValue = editingValue ?? data.as_en ?? '';
+  const isInvalid = !!currentValue && !isValidEnglish(currentValue);
 
   return (
     <TableRow key={data.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
