@@ -54,10 +54,13 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 interface FacilityAddModalProps {
   open: boolean;
   handleClose: () => void;
-  handleAdd: () => void;
+  handleAdd: (
+    selectedGroup?: { fg_idx: number; fg_name: string },
+    selectedFacility?: { fa_idx: number; fa_name: string }
+  ) => void;
   handleReset: () => void;
-  groupList: string[];
-  facilityList: string[];
+  groupList: { fg_idx: number; fg_name: string }[];
+  facilityList: { fa_idx: number; fa_name: string }[];
   groupValue: string;
   setGroupValue: (v: string) => void;
   groupInput: string;
@@ -152,8 +155,8 @@ export default function FacilityAddModal({
                         >
                           <MenuItem value='신규등록'>신규등록</MenuItem>
                           {groupList.map((g) => (
-                            <MenuItem key={g} value={g}>
-                              {g}
+                            <MenuItem key={g.fg_name} value={g.fg_name}>
+                              {g.fg_name}
                             </MenuItem>
                           ))}
                         </Select>
@@ -213,8 +216,8 @@ export default function FacilityAddModal({
                         >
                           <MenuItem value='신규등록'>신규등록</MenuItem>
                           {facilityList.map((f) => (
-                            <MenuItem key={f} value={f}>
-                              {f}
+                            <MenuItem key={f.fa_name} value={f.fa_name}>
+                              {f.fa_name}
                             </MenuItem>
                           ))}
                         </Select>
@@ -286,7 +289,17 @@ export default function FacilityAddModal({
         </TableContainer>
       </DialogContent>
       <DialogActions sx={{ borderTop: '1px solid #e0e0e0' }}>
-        <Button variant='contained' color='primary' onClick={handleAdd} disabled={isAddDisabled}>
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={() => {
+            const selectedGroup =
+              groupValue === '신규등록' ? undefined : groupList.find((g) => g.fg_name === groupValue);
+            const selectedFacility =
+              facilityValue === '신규등록' ? undefined : facilityList.find((f) => f.fa_name === facilityValue);
+            handleAdd(selectedGroup, selectedFacility);
+          }}
+        >
           등록
         </Button>
         <GreyButton variant='outlined' onClick={handleReset}>

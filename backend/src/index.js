@@ -9,6 +9,7 @@ import EdgeGatewayRouter from './router/edge_gateway/EdgeGatewayRouter.js';
 import ConvertRouter from './router/convert/ConvertRouter.js';
 import FileRouter from './router/file/FileRouter.js';
 import SignInRouter from './router/signin/SignInRouter.js';
+import FacilityRouter from './router/facility/FacilityRouter.js';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/edge_gateway', EdgeGatewayRouter());
 app.use('/api/convert', ConvertRouter());
 app.use('/api/file', FileRouter());
 app.use('/api/signin', SignInRouter());
+app.use('/api/facility', FacilityRouter());
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
