@@ -1,15 +1,15 @@
 import express from 'express';
 import multer from 'multer';
 import {
-  getAASXFiles,
   insertAASXFile,
   updateAASXFile,
   uploadAASXFile,
-  deleteAASXFiles,
   getVerify,
   getWords,
   getSearch,
   updateWords,
+  getFiles,
+  deleteFiles,
 } from '../../controller/file/FileController.js';
 
 const router = express.Router();
@@ -39,13 +39,22 @@ export default () => {
 
   router.delete('/aasx', (req, res) => {
     const { ids } = req.body;
+    deleteFiles(ids, res);
+  });
 
-    deleteAASXFiles(ids, res);
+  router.delete('/files', (req, res) => {
+    const { ids } = req.body;
+    deleteFiles(ids, res);
   });
 
   router.post('/aasxFiles', (req, res) => {
     const { af_kind, fc_idx, startDate, endDate } = req.body;
-    getAASXFiles(af_kind, fc_idx, startDate, endDate, res);
+    getFiles(af_kind, fc_idx, startDate, endDate, res);
+  });
+
+  router.post('/jsonFiles', (req, res) => {
+    const { af_kind, fc_idx, startDate, endDate } = req.body;
+    getFiles(af_kind, fc_idx, startDate, endDate, res);
   });
 
   router.post('/verify', (req, res) => {

@@ -169,7 +169,7 @@ export default function AasxManagerPage() {
     const startDateStr = start ? dayjs(start).format('YYYY-MM-DD') : '';
     const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
 
-    const data: File[] = await getFilesAPI(startDateStr, endDateStr);
+    const data: File[] = await getFilesAPI(startDateStr, endDateStr, 3);
     setFiles(Array.isArray(data) ? data : []);
   };
 

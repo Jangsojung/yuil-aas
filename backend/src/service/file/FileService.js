@@ -6,40 +6,84 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const getAASXFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, endDate = null) => {
+export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, endDate = null) => {
   return new Promise((resolve, reject) => {
-    let query = 'select af_idx, af_name, createdAt from tb_aasx_file where af_kind = ? and fc_idx = ?';
+    let query = '';
+    const queryParams = [];
 
-    const queryParams = [af_kind, fc_idx];
+    // 공통 조건 쿼리
+    const baseWhereClause = `f.af_kind = ? AND f.fc_idx = ?`;
+    queryParams.push(af_kind, fc_idx);
 
+    // 날짜 조건이 있다면 추가
+    let dateClause = '';
     if (startDate && endDate) {
+      dateClause = ` AND f.createdAt BETWEEN ? AND ?`;
       const startDateTime = `${startDate} 00:00:00`;
       const endDateTime = `${endDate} 23:59:59`;
-      query += ' and createdAt between ? and ?';
       queryParams.push(startDateTime, endDateTime);
     }
 
-    query += ' order by af_idx desc';
+    if (af_kind === 1) {
+      // JSON 파일용 쿼리 (기초코드 정보 포함)
+      query = `
+        SELECT 
+          f.af_idx, 
+          f.af_name, 
+          f.createdAt,
+          b.ab_name AS base_name,
+          COUNT(bs.sn_idx) AS sn_length
+        FROM tb_aasx_file f
+        LEFT JOIN tb_aasx_base b 
+          ON b.ab_idx = CAST(SUBSTRING_INDEX(f.af_name, '-', 1) AS UNSIGNED)
+        LEFT JOIN tb_aasx_base_sensor bs 
+          ON bs.ab_idx = b.ab_idx
+        WHERE ${baseWhereClause}
+        ${dateClause}
+        GROUP BY f.af_idx, f.af_name, f.createdAt, b.ab_name
+        ORDER BY f.af_idx DESC
+      `;
+    } else {
+      // 일반 AASX 파일용 쿼리
+      query = `
+        SELECT f.af_idx, f.af_name, f.createdAt
+        FROM tb_aasx_file f
+        WHERE ${baseWhereClause}
+        ${dateClause}
+        ORDER BY f.af_idx DESC
+      `;
+    }
 
     pool.query(query, queryParams, (err, results) => {
       if (err) {
         reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+        return;
+      }
 
-        const files = results.map((file) => {
+      if (results.length === 0) {
+        resolve(null);
+        return;
+      }
+
+      const files = results.map((file) => {
+        if (af_kind === 1) {
+          return {
+            af_idx: file.af_idx,
+            af_name: file.af_name,
+            createdAt: file.createdAt,
+            base_name: file.base_name || '기초코드 없음',
+            sn_length: Number(file.sn_length) || 0,
+          };
+        } else {
           return {
             af_idx: file.af_idx,
             af_name: file.af_name,
             createdAt: file.createdAt,
           };
-        });
+        }
+      });
 
-        resolve(files);
-      }
+      resolve(files);
     });
   });
 };
@@ -207,64 +251,85 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
   }
 };
 
-export const deleteAASXFilesFromDB = async (ids) => {
+export const deleteFilesFromDB = async (ids) => {
   try {
-    const query = `select af_name from tb_aasx_file where af_idx in (?) and af_kind = 3`;
+    // 먼저 삭제할 파일들의 정보를 조회
+    const query = `select af_idx, af_name, af_kind from tb_aasx_file where af_idx in (?)`;
     const [results] = await pool.promise().query(query, [ids]);
 
     if (results.length === 0) {
-      console.log('삭제할 AASX 파일이 없습니다.');
+      console.log('삭제할 파일이 없습니다.');
       return {
         success: true,
-        message: '삭제할 AASX 파일이 없습니다.',
+        message: '삭제할 파일이 없습니다.',
         deletedCount: 0,
       };
     }
 
-    const aasxFileNames = results.map((row) => row.af_name);
-    const aasFileNames = aasxFileNames.map((fileName) => fileName.replace(/\.aasx$/i, '.json'));
-
-    const deleteAasxQuery = `delete from tb_aasx_file where af_idx in (?)`;
-    await pool.promise().query(deleteAasxQuery, [ids]);
-
-    const deleteAasQuery = `delete from tb_aasx_file where af_name in (?) and af_kind = 2`;
-    await pool.promise().query(deleteAasQuery, [aasFileNames]);
-
-    console.log('DB에서 AASX 및 AAS 파일 정보 삭제 완료');
+    // af_kind별로 파일 분류
+    const aasxFiles = results.filter((file) => file.af_kind === 3);
+    const jsonFiles = results.filter((file) => file.af_kind === 1);
 
     const deletePaths = [];
 
-    aasxFileNames.forEach((fileName) => {
-      deletePaths.push(`../files/aasx/${fileName}`);
+    // AASX 파일 삭제 (af_kind = 3)
+    if (aasxFiles.length > 0) {
+      const aasxFileNames = aasxFiles.map((row) => row.af_name);
+      const aasFileNames = aasxFileNames.map((fileName) => fileName.replace(/\.aasx$/i, '.json'));
 
-      const aasFileName = fileName.replace(/\.aasx$/i, '.json');
-      deletePaths.push(`../files/aas/${aasFileName}`);
-    });
+      // AASX 파일 경로 추가
+      aasxFileNames.forEach((fileName) => {
+        deletePaths.push(`../files/aasx/${fileName}`);
+        const aasFileName = fileName.replace(/\.aasx$/i, '.json');
+        deletePaths.push(`../files/aas/${aasFileName}`);
+      });
 
-    const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        paths: deletePaths,
-      }),
-    });
-
-    if (!pythonResponse.ok) {
-      console.log('Python 서버에서 파일 삭제 중 오류 발생');
+      // 관련 AAS 파일도 DB에서 삭제
+      const deleteAasQuery = `delete from tb_aasx_file where af_name in (?) and af_kind = 2`;
+      await pool.promise().query(deleteAasQuery, [aasFileNames]);
     }
 
-    console.log('AAS 및 AASX 파일 삭제 완료 (front 폴더 파일은 보존)');
+    // JSON 파일 삭제 (af_kind = 1)
+    if (jsonFiles.length > 0) {
+      const jsonFileNames = jsonFiles.map((row) => row.af_name);
+      jsonFileNames.forEach((fileName) => {
+        deletePaths.push(`../files/front/${fileName}`);
+      });
+    }
+
+    // DB에서 파일 정보 삭제
+    const deleteQuery = `delete from tb_aasx_file where af_idx in (?)`;
+    await pool.promise().query(deleteQuery, [ids]);
+
+    console.log('DB에서 파일 정보 삭제 완료');
+
+    // 실제 파일 삭제 (Python 서버 호출)
+    if (deletePaths.length > 0) {
+      const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paths: deletePaths,
+        }),
+      });
+
+      if (!pythonResponse.ok) {
+        console.log('Python 서버에서 파일 삭제 중 오류 발생');
+      }
+    }
+
+    console.log('파일 삭제 완료');
 
     return {
       success: true,
-      message: '파일이 성공적으로 삭제되었습니다. (front 폴더 파일은 보존됨)',
+      message: '파일이 성공적으로 삭제되었습니다.',
       deletedCount: results.length,
-      deletedFiles: aasxFileNames,
+      deletedFiles: results.map((file) => file.af_name),
     };
   } catch (err) {
-    console.log('Failed to delete AASX Files: ', err);
+    console.log('Failed to delete Files: ', err);
     throw err;
   }
 };

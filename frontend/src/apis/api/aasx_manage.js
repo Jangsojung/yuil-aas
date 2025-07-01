@@ -1,39 +1,27 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
 
-export const deleteAASXAPI = async (selectedFiles) => {
+// 파일 삭제
+export const deleteAASXAPI = async (ids) => {
   try {
-    const result = await apiHelpers.delete(API_ENDPOINTS.FILE.AASX, { ids: selectedFiles });
+    const result = await apiHelpers.delete('/api/file/files', { ids });
     return result;
   } catch (error) {
-    console.error('Error deleting AASX files:', error);
+    console.error('Error deleting files:', error);
     throw error;
   }
 };
 
-export const getFilesAPI = async (start, end) => {
+export const getFilesAPI = async (startDate, endDate, af_kind = 3) => {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/file/aasxFiles`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        af_kind: 3,
-        fc_idx: 3,
-        startDate: start,
-        endDate: end,
-      }),
+    const result = await apiHelpers.post('/api/file/aasxFiles', {
+      af_kind,
+      fc_idx: 3,
+      startDate,
+      endDate,
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch files');
-    }
-
-    const data = await response.json();
-
-    return data;
+    return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error(error.message);
+    console.error('Error fetching files:', error);
     return [];
   }
 };

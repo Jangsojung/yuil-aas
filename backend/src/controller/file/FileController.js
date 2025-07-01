@@ -1,12 +1,12 @@
 import {
-  getAASXFilesFromDB,
   insertAASXFileToDB,
   updateAASXFileToDB,
-  deleteAASXFilesFromDB,
+  deleteFilesFromDB,
   getVerifyFromDB,
   getWordsFromDB,
   getSearchFromDB,
   updateWordsToDB,
+  getFilesFromDB,
 } from '../../service/file/FileService.js';
 import fs from 'fs';
 import path from 'path';
@@ -15,9 +15,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const getAASXFiles = async (af_kind, fc_idx, startDate, endDate, res) => {
+export const getFiles = async (af_kind, fc_idx, startDate, endDate, res) => {
   try {
-    const result = await getAASXFilesFromDB(af_kind, fc_idx, startDate, endDate);
+    const result = await getFilesFromDB(af_kind, fc_idx, startDate, endDate);
 
     res.status(200).json(result);
   } catch (err) {
@@ -76,9 +76,9 @@ export const updateAASXFile = async (af_idx, fileName, user_idx, res) => {
   }
 };
 
-export const deleteAASXFiles = async (ids, res) => {
+export const deleteFiles = async (ids, res) => {
   try {
-    const result = await deleteAASXFilesFromDB(ids);
+    const result = await deleteFilesFromDB(ids);
 
     res.status(200).json(result);
   } catch (err) {
