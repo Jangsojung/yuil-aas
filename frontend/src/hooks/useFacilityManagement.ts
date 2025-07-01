@@ -7,7 +7,7 @@ import { FacilityGroupTree } from '../types/api';
 
 export const useFacilityManagement = () => {
   const userIdx = useRecoilValue(userState)?.user_idx;
-  const { alertModal, closeAlert } = useAlertModal();
+  const { alertModal, showAlert, showConfirm, closeAlert } = useAlertModal();
 
   // 상태 관리
   const [treeData, setTreeData] = useState<FacilityGroupTree[]>([]);
@@ -61,6 +61,8 @@ export const useFacilityManagement = () => {
 
     // 알림
     alertModal,
+    showAlert,
+    showConfirm,
     closeAlert,
   };
 };

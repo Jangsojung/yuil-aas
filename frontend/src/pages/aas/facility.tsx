@@ -6,7 +6,7 @@ import { FacilityView } from '../../components/basic/FacilityView';
 import AlertModal from '../../components/modal/alert';
 import FacilityAddModal from '../../components/modal/FacilityAddModal';
 import { getFacilityGroupsAPI, getFacilitiesAPI } from '../../apis/api/basic';
-import { postFacilityGroup, postFacility, postSensor } from '../../apis/api/facility';
+import { postFacilityGroup, postFacility, postSensor, deleteSensors } from '../../apis/api/facility';
 
 export default function FacilityManagementPage() {
   const navigationReset = useRecoilValue(navigationResetState);
@@ -21,6 +21,9 @@ export default function FacilityManagementPage() {
   const [facilityInput, setFacilityInput] = useState('');
   const [sensorName, setSensorName] = useState('');
 
+  // 체크박스 상태
+  const [selectedSensors, setSelectedSensors] = useState<number[]>([]);
+
   // 커스텀 훅 사용
   const {
     treeData,
@@ -34,6 +37,8 @@ export default function FacilityManagementPage() {
     handleTreeSearch,
     handleReset,
     alertModal,
+    showAlert,
+    showConfirm,
     closeAlert,
   } = useFacilityManagement();
 
@@ -58,7 +63,40 @@ export default function FacilityManagementPage() {
     setAddModalOpen(true);
   };
 
-  const handleDeleteFacility = async () => {};
+  // 알림 모달 상태
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // 설비 삭제 처리
+  const handleDeleteFacility = () => {
+    if (selectedSensors.length === 0) {
+      // 선택된 센서가 없으면 알림
+      showAlert('알림', '삭제할 센서를 선택해주세요.');
+      return;
+    }
+
+    // 삭제 확인 모달 열기
+    setDeleteModalOpen(true);
+  };
+
+  // 삭제 확인 처리
+  const handleConfirmDelete = async () => {
+    try {
+      const result = await deleteSensors(selectedSensors);
+      console.log('센서 삭제 결과:', result);
+
+      // 삭제 후 선택 상태 초기화
+      setSelectedSensors([]);
+      // 트리 데이터 새로고침
+      await handleTreeSearch();
+      setDeleteModalOpen(false);
+
+      // 성공 메시지 표시
+      showAlert('성공', `${result.deletedCount}개의 센서가 삭제되었습니다.`);
+    } catch (error) {
+      console.error('센서 삭제 실패:', error);
+      showAlert('오류', '센서 삭제 중 오류가 발생했습니다.');
+    }
+  };
 
   // 설비그룹 선택 시 설비명 목록 fetch
   const handleGroupValueChange = async (value: string) => {
@@ -185,6 +223,8 @@ export default function FacilityManagementPage() {
         setFacilityName={setFacilityName}
         sensorName={searchSensorName}
         setSensorName={setSearchSensorName}
+        selectedSensors={selectedSensors}
+        setSelectedSensors={setSelectedSensors}
         onTreeSearch={handleTreeSearch}
         onAddFacility={handleOpenAddModal}
         onDeleteFacility={handleDeleteFacility}
@@ -217,6 +257,15 @@ export default function FacilityManagementPage() {
         content={alertModal.content}
         type={alertModal.type}
         onConfirm={alertModal.onConfirm}
+      />
+
+      <AlertModal
+        open={deleteModalOpen}
+        handleClose={() => setDeleteModalOpen(false)}
+        title='삭제 확인'
+        content={`${selectedSensors.length}개의 센서를 삭제하시겠습니까?`}
+        type='confirm'
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

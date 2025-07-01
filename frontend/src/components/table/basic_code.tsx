@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Dispatch, SetStateAction } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -32,14 +32,18 @@ export default function BasicTable({
   fa_idx,
   sensors: propSensors,
   showCheckboxes = true,
+  selectedSensors: externalSelectedSensors,
+  setSelectedSensors: externalSetSelectedSensors,
 }: {
   sm_idx: string;
   fa_idx: number;
   sensors?: Sensor[];
   showCheckboxes?: boolean;
+  selectedSensors?: number[];
+  setSelectedSensors?: Dispatch<SetStateAction<number[]>>;
 }) {
   const [sensors, setSensors] = useState<Sensor[]>([]);
-  const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
+  const [internalSelectedSensors, setInternalSelectedSensors] = useRecoilState(selectedSensorsState);
   const baseEditMode = useRecoilValue(baseEditModeState);
   const selectedBase = useRecoilValue(selectedBaseState);
 
@@ -53,7 +57,7 @@ export default function BasicTable({
   const getSelectedSensors = async (selectedBase: Base) => {
     try {
       const data = await getBaseSensorsForTableAPI(selectedBase.ab_idx);
-      setSelectedSensors(data);
+      setInternalSelectedSensors(data);
     } catch (error) {
       console.error('Error fetching selected sensors:', error);
     }
@@ -100,6 +104,10 @@ export default function BasicTable({
       getSensors(fa_idx);
     }
   }, [fa_idx, propSensors]);
+
+  // 외부에서 관리하는 경우 외부 상태 사용, 그렇지 않으면 내부 상태 사용
+  const selectedSensors = externalSelectedSensors || internalSelectedSensors;
+  const setSelectedSensors = externalSetSelectedSensors || setInternalSelectedSensors;
 
   return (
     <TableContainer component={Paper}>

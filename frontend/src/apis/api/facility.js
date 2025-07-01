@@ -14,3 +14,8 @@ export const postSensor = async (data) => {
   const res = await apiHelpers.post('/api/facility/aasx/sensor', data);
   return res.sn_idx;
 };
+
+export const deleteSensors = async (sensorIds) => {
+  const res = await apiHelpers.delete('/api/facility/aasx/sensors', { sensorIds });
+  return res;
+};

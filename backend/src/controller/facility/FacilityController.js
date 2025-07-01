@@ -1,4 +1,9 @@
-import { insertFacilityGroup, insertFacility, insertSensor } from '../../service/facility/FacilityService.js';
+import {
+  insertFacilityGroup,
+  insertFacility,
+  insertSensor,
+  deleteSensors,
+} from '../../service/facility/FacilityService.js';
 
 export const addFacilityGroup = async (name, res) => {
   try {
@@ -24,5 +29,14 @@ export const addSensor = async (fa_idx, name, res) => {
     res.status(200).json({ sn_idx });
   } catch (err) {
     res.status(500).json({ error: '센서 등록 실패' });
+  }
+};
+
+export const deleteSensor = async (sensorIds, res) => {
+  try {
+    const result = await deleteSensors(sensorIds);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: '센서 삭제 실패' });
   }
 };

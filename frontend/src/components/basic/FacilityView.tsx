@@ -21,6 +21,8 @@ interface FacilityViewProps {
   setFacilityName: (name: string) => void;
   sensorName: string;
   setSensorName: (name: string) => void;
+  selectedSensors: number[];
+  setSelectedSensors: Dispatch<SetStateAction<number[]>>;
 
   // 핸들러
   onTreeSearch: () => Promise<{ success: boolean; message?: string }>;
@@ -37,6 +39,8 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   setFacilityName,
   sensorName,
   setSensorName,
+  selectedSensors,
+  setSelectedSensors,
   onTreeSearch,
   onAddFacility,
   onDeleteFacility,
@@ -167,7 +171,9 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
                         sm_idx={`${fgIdx + 1}.${faIdx + 1}`}
                         fa_idx={fa.fa_idx}
                         sensors={fa.sensors}
-                        showCheckboxes={false} // 체크박스 숨김
+                        showCheckboxes={true} // 체크박스 표시
+                        selectedSensors={selectedSensors}
+                        setSelectedSensors={setSelectedSensors}
                       />
                     </div>
                   </TreeItem>

@@ -44,3 +44,36 @@ export const insertSensor = async (fa_idx, name) => {
     throw err;
   }
 };
+
+export const deleteSensors = async (sensorIds) => {
+  try {
+    // 삭제할 센서들의 정보를 먼저 조회
+    const query = 'SELECT sn_idx, sn_name, fa_idx FROM tb_aasx_data_prop WHERE sn_idx IN (?)';
+    const [results] = await pool.promise().query(query, [sensorIds]);
+
+    if (results.length === 0) {
+      console.log('삭제할 센서가 없습니다.');
+      return {
+        success: true,
+        message: '삭제할 센서가 없습니다.',
+        deletedCount: 0,
+      };
+    }
+
+    // DB에서 센서 정보 삭제
+    const deleteQuery = 'DELETE FROM tb_aasx_data_prop WHERE sn_idx IN (?)';
+    await pool.promise().query(deleteQuery, [sensorIds]);
+
+    console.log('센서 삭제 완료');
+
+    return {
+      success: true,
+      message: '센서가 성공적으로 삭제되었습니다.',
+      deletedCount: results.length,
+      deletedSensors: results.map((sensor) => sensor.sn_name),
+    };
+  } catch (err) {
+    console.log('Failed to delete Sensors: ', err);
+    throw err;
+  }
+};
