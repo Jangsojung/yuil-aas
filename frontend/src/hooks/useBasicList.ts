@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { navigationResetState, selectedBasesState, selectedBaseState } from '../recoil/atoms';
 import { getBasesAPI, deleteBasesAPI } from '../apis/api/basic';
 import { Dayjs } from 'dayjs';
-import { PAGINATION, MODAL_TYPE, SEARCH } from '../constants';
+import { PAGINATION, MODAL_TYPE } from '../constants';
 
 interface Base {
   ab_idx: number;

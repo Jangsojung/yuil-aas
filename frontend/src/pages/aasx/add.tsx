@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
 
 interface AASXFile {
