@@ -90,32 +90,25 @@ export const ListView: React.FC<ListViewProps> = ({
             },
           ]}
         >
-          <Grid container spacing={2}>
+          <Grid container spacing={2} alignItems='center'>
             <Grid item xs={3}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div className='sort-title'>기초코드명</div>
-                </Grid>
-                <Grid item xs={9}>
-                  <TextField
-                    size='small'
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    placeholder='기초코드명을 입력하세요'
-                  />
-                </Grid>
-              </Grid>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className='sort-title'>기초코드명</div>
+                <TextField
+                  size='small'
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  placeholder='기초코드명을 입력하세요'
+                  sx={{ flex: 1 }}
+                />
+              </div>
             </Grid>
 
             <Grid item xs={6}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div className='sort-title'>날짜</div>
-                </Grid>
-                <Grid item xs={9}>
-                  <BasicDatePicker onDateChange={onDateChange} startDate={startDate} endDate={endDate} />
-                </Grid>
-              </Grid>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className='sort-title'>날짜</div>
+                <BasicDatePicker onDateChange={onDateChange} startDate={startDate} endDate={endDate} />
+              </div>
             </Grid>
           </Grid>
         </SearchBox>
