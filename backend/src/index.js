@@ -38,20 +38,14 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws) => {
-  console.log('Backend: 웹 소켓 연결');
-
   ws.on('message', (message) => {
     console.log('Back Received:', message.toString());
   });
 
-  ws.on('close', () => {
-    console.log('Backend: 웹 소켓 연결 해제');
-  });
+  ws.on('close', () => {});
 });
 
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+server.listen(port, () => {});
 
 const closeServer = () => {
   wss.clients.forEach((client) => {
@@ -60,17 +54,13 @@ const closeServer = () => {
 
   wss.close(() => {
     server.close(() => {
-      console.log('포트 5001 해제');
       process.exit(0);
     });
   });
 };
 
 process.on('SIGINT', () => {
-  console.log('서버 종료');
   closeServer();
 });
 
-process.on('exit', () => {
-  console.log('서버 종료');
-});
+process.on('exit', () => {});

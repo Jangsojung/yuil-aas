@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback } from 'react';
-import { PaginationState } from '../types/api';
 
 export const usePagination = (totalItems: number, defaultRowsPerPage: number = 10) => {
   const [currentPage, setCurrentPage] = useState(0);

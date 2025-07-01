@@ -1,6 +1,5 @@
 import { createTheme } from '@mui/material/styles';
 
-
 // A custom theme for this app
 const theme = createTheme({
   cssVariables: true,
@@ -14,7 +13,6 @@ const theme = createTheme({
     secondary: {
       main: '#19857b',
     },
-     
     error: {
       main: '#FF5630',
     },

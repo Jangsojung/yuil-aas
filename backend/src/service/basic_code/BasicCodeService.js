@@ -48,7 +48,7 @@ export const insertBasesToDB = async (name, note, ids, user_idx) => {
       ab_note: note,
     };
   } catch (err) {
-    console.log('Failed to insert new Bases: ', err);
+    console.error('Failed to insert new Bases: ', err);
     throw err;
   }
 };
@@ -78,7 +78,7 @@ export const updateBaseToDB = async (ab_idx, name, note, ids, user_idx) => {
     };
   } catch (err) {
     await connection.rollback();
-    console.log('Failed to update Bases:', err);
+    console.error('Failed to update Bases:', err);
     throw err;
   } finally {
     connection.release();
@@ -93,10 +93,9 @@ export const deleteBasesFromDB = async (ids) => {
     const deleteBasesQuery = `delete from tb_aasx_base where ab_idx in (?)`;
     await pool.promise().query(deleteBasesQuery, [ids]);
 
-    console.log('Bases deleted successfully');
     return { success: true, message: 'Bases deleted successfully' };
   } catch (err) {
-    console.log('Failed to delete Bases: ', err);
+    console.error('Failed to delete Bases: ', err);
     throw err;
   }
 };

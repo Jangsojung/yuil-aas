@@ -110,8 +110,6 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
     const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
     await pool.promise().query(aasQuery, [fc_idx, aasFileName, user_idx, user_idx]);
 
-    console.log('AAS JSON 파일 생성 및 DB 저장 완료');
-
     const aasFilePath = `../files/aas/${fileName}`;
     const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
       method: 'POST',
@@ -131,8 +129,6 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
     const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, '/files/aasx', ?, ?)`;
     const [result] = await pool.promise().query(aasxQuery, [fc_idx, aasxFileName, user_idx, user_idx]);
 
-    console.log('AASX 파일 생성 및 DB 저장 완료');
-
     return {
       success: true,
       fileName: aasxFileName,
@@ -141,7 +137,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       message: '변환 완료: AAS JSON, AASX 파일이 모두 생성되었습니다.',
     };
   } catch (err) {
-    console.log('Failed to insert AASX File: ', err);
+    console.error('Failed to insert AASX File: ', err);
     throw err;
   }
 };
@@ -161,12 +157,8 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
     const newAasFileName = fileName;
     const newAasxFileName = fileName.replace(/\.json$/i, '.aasx');
 
-    console.log('기존 파일명:', oldAasxFileName, '새 파일명:', newAasxFileName);
-
     const oldAasPath = `../files/aas/${oldAasFileName}`;
     const oldAasxPath = `../files/aasx/${oldAasxFileName}`;
-
-    console.log('삭제할 파일 경로:', oldAasPath, oldAasxPath);
 
     const deleteResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
       method: 'DELETE',
@@ -178,14 +170,9 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       }),
     });
 
-    console.log('삭제 응답 상태:', deleteResponse.status, deleteResponse.statusText);
-
     if (!deleteResponse.ok) {
       const errorText = await deleteResponse.text();
-      console.log('기존 파일 삭제 중 오류 발생:', errorText);
-    } else {
-      const responseText = await deleteResponse.text();
-      console.log('기존 파일 삭제 완료:', responseText);
+      console.error('기존 파일 삭제 중 오류 발생:', errorText);
     }
 
     const [existingAasRows] = await pool
@@ -195,11 +182,9 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
     if (existingAasRows.length > 0) {
       const updateAasQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_name = ? AND af_kind = 2`;
       await pool.promise().query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName]);
-      console.log('기존 AAS 파일 DB 레코드 업데이트 완료');
     } else {
       const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
       await pool.promise().query(insertAasQuery, [3, newAasFileName, user_idx, user_idx]);
-      console.log('새 AAS 파일 DB 레코드 생성 완료');
     }
 
     const frontFilePath = `../files/front/${fileName}`;
@@ -235,9 +220,6 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
 
     const updateAasxQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_idx = ?`;
     await pool.promise().query(updateAasxQuery, [newAasxFileName, user_idx, af_idx]);
-    console.log('AASX 파일명 DB 업데이트 완료');
-
-    console.log('AASX 파일 업데이트 및 DB 수정 완료');
 
     return {
       success: true,
@@ -246,7 +228,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       message: '변환 완료: AAS JSON, AASX 파일이 모두 업데이트되었습니다.',
     };
   } catch (err) {
-    console.log('Failed to update AASX File: ', err);
+    console.error('Failed to update AASX File: ', err);
     throw err;
   }
 };
@@ -258,7 +240,6 @@ export const deleteFilesFromDB = async (ids) => {
     const [results] = await pool.promise().query(query, [ids]);
 
     if (results.length === 0) {
-      console.log('삭제할 파일이 없습니다.');
       return {
         success: true,
         message: '삭제할 파일이 없습니다.',
@@ -301,8 +282,6 @@ export const deleteFilesFromDB = async (ids) => {
     const deleteQuery = `delete from tb_aasx_file where af_idx in (?)`;
     await pool.promise().query(deleteQuery, [ids]);
 
-    console.log('DB에서 파일 정보 삭제 완료');
-
     // 실제 파일 삭제 (Python 서버 호출)
     if (deletePaths.length > 0) {
       const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
@@ -316,11 +295,9 @@ export const deleteFilesFromDB = async (ids) => {
       });
 
       if (!pythonResponse.ok) {
-        console.log('Python 서버에서 파일 삭제 중 오류 발생');
+        console.error('Python 서버에서 파일 삭제 중 오류 발생');
       }
     }
-
-    console.log('파일 삭제 완료');
 
     return {
       success: true,
@@ -329,7 +306,7 @@ export const deleteFilesFromDB = async (ids) => {
       deletedFiles: results.map((file) => file.af_name),
     };
   } catch (err) {
-    console.log('Failed to delete Files: ', err);
+    console.error('Failed to delete Files: ', err);
     throw err;
   }
 };

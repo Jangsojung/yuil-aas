@@ -79,11 +79,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
   const [newFactoryName, setNewFactoryName] = useState('');
   const [isNewFactory, setIsNewFactory] = useState(false);
 
-  // factories 상태 변경 감지
-  useEffect(() => {
-    console.log('factories 상태 변경:', factories);
-  }, [factories]);
-
   // 설비그룹 관련 상태
   const [groupList, setGroupList] = useState<{ fg_idx: number; fg_name: string }[]>([]);
   const [facilityList, setFacilityList] = useState<{ fa_idx: number; fa_name: string }[]>([]);
@@ -96,7 +91,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
   const fetchFactories = useCallback(async () => {
     try {
       const data = await getFactoriesByCmIdxAPI(user!.cm_idx);
-      console.log('공장 목록 갱신:', data);
       setFactories(data);
     } catch (error) {
       console.error('공장 목록 조회 실패:', error);
@@ -111,7 +105,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
 
       try {
         const data = await getFacilityGroupsAPI(targetFcIdx as number);
-        console.log('설비그룹 목록 갱신:', data);
         setGroupList(data.map((g: any) => ({ fg_idx: g.fg_idx, fg_name: g.fg_name })));
       } catch (error) {
         console.error('설비그룹 목록 조회 실패:', error);
@@ -124,10 +117,9 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
   // 공장 목록 조회
   useEffect(() => {
     if (open && user?.cm_idx) {
-      console.log('모달 열림, 공장 목록 조회 시작:', user.cm_idx);
       fetchFactories();
     }
-  }, [open, user?.cm_idx]);
+  }, [open, user?.cm_idx, fetchFactories]);
 
   // 설비그룹 목록 조회
   useEffect(() => {
@@ -136,7 +128,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
     } else {
       setGroupList([]);
     }
-  }, [selectedFactory, isNewFactory]);
+  }, [selectedFactory, isNewFactory, fetchFacilityGroups]);
 
   // 설비그룹 선택 시 설비명 목록 fetch
   const handleGroupValueChange = async (value: string) => {
@@ -205,22 +197,15 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         const factoryResult = await insertFactoryAPI(user!.cm_idx, newFactoryName);
         currentFcIdx = factoryResult.fc_idx;
 
-        console.log('공장 추가 성공:', factoryResult);
-
         // 공장 목록을 직접 다시 조회하고 강제로 상태 업데이트
         try {
           const updatedFactories = await getFactoriesByCmIdxAPI(user!.cm_idx);
-          console.log('업데이트된 공장 목록:', updatedFactories);
-
-          // 강제로 상태 업데이트
           setFactories([...updatedFactories]);
 
           // 새로 추가된 공장을 선택하고 신규등록 모드 해제
           setIsNewFactory(false);
           setNewFactoryName(''); // 입력 필드 초기화
           setSelectedFactory(currentFcIdx);
-
-          console.log('공장 추가 후 상태 업데이트:', { currentFcIdx, isNewFactory: false });
 
           // 추가 대기 시간으로 상태 업데이트 완료 보장
           await new Promise((resolve) => setTimeout(resolve, 200));
@@ -234,8 +219,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         const facilityGroupResult = await insertFacilityGroupAPI(currentFcIdx, groupInput);
         currentFgIdx = facilityGroupResult.fg_idx;
 
-        console.log('설비그룹 추가 성공:', facilityGroupResult);
-
         // 설비그룹 목록을 직접 다시 조회
         try {
           await fetchFacilityGroups(currentFcIdx);
@@ -243,8 +226,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
           // 새로 추가된 설비그룹을 선택
           setGroupValue(groupInput);
           setGroupInput('');
-
-          console.log('설비그룹 추가 후 상태 업데이트:', { currentFgIdx, groupName: groupInput });
 
           // 추가 대기 시간으로 상태 업데이트 완료 보장
           await new Promise((resolve) => setTimeout(resolve, 200));
@@ -261,21 +242,14 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         const facilityResult = await insertFacilityAPI(currentFgIdx, facilityInput);
         currentFaIdx = facilityResult.fa_idx;
 
-        console.log('설비 추가 성공:', facilityResult);
-
         // 설비 목록을 직접 다시 조회
         try {
           const facilities = await getFacilitiesAPI(currentFgIdx);
-          console.log('업데이트된 설비 목록:', facilities);
-
-          // 강제로 상태 업데이트
           setFacilityList([...facilities.map((f: any) => ({ fa_idx: f.fa_idx, fa_name: f.fa_name }))]);
 
           // 새로 추가된 설비를 선택
           setFacilityValue(facilityInput);
           setFacilityInput('');
-
-          console.log('설비 추가 후 상태 업데이트:', { currentFaIdx, facilityName: facilityInput });
 
           // 추가 대기 시간으로 상태 업데이트 완료 보장
           await new Promise((resolve) => setTimeout(resolve, 200));
@@ -289,8 +263,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
 
       // 4. 센서 추가
       await insertSensorAPI(currentFaIdx, sensorName);
-
-      console.log('센서 추가 완료');
 
       // 성공 메시지 표시
       setError(null);

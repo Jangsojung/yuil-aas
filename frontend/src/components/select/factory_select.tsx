@@ -25,9 +25,6 @@ export default function FactorySelect({
 
   useEffect(() => {
     const fetchFactories = async () => {
-      console.log('FactorySelect - user:', user);
-      console.log('FactorySelect - cm_idx:', user?.cm_idx);
-
       if (!user?.cm_idx) {
         setError('사용자 정보에서 회사 정보를 찾을 수 없습니다.');
         return;
@@ -37,9 +34,7 @@ export default function FactorySelect({
       setError(null);
 
       try {
-        console.log('FactorySelect - API 호출 시작');
         const data = await getFactoriesByCmIdxAPI(user.cm_idx);
-        console.log('FactorySelect - API 응답:', data);
         setFactories(data || []);
       } catch (err) {
         console.error('공장 정보 조회 실패:', err);

@@ -111,9 +111,3 @@ export interface ApiResponse<T = any> {
   error?: string;
   message?: string;
 }
-
-export interface PaginatedResponse<T = any> extends ApiResponse<T> {
-  total?: number;
-  page?: number;
-  limit?: number;
-}

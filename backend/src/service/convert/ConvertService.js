@@ -51,8 +51,8 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       [snIdxList]
     );
 
+    // 별칭 검증
     const missingAliases = [];
-
     for (const item of aliasesCheck) {
       const [aliasCheck] = await pool.promise().query(
         `SELECT 
@@ -64,7 +64,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       );
 
       const { fg_alias, fa_alias, sn_alias } = aliasCheck[0];
-
       if (!fg_alias || !fa_alias || !sn_alias) {
         const missingItems = [];
         if (!fg_alias) missingItems.push(`설비그룹: ${item.fg_name}`);
@@ -84,7 +83,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       const missingDetails = missingAliases
         .map((item) => `${item.fg_name} > ${item.fa_name} > ${item.sn_name} (${item.missing.join(', ')})`)
         .join('\n');
-
       throw new Error(
         `식별 ID가 지정되어있지 않은 항목이 있습니다. 식별 ID 관리 탭에서 지정해주세요.\n\n설정되지 않은 식별 ID:\n${missingDetails}`
       );
@@ -125,12 +123,7 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
 
       const snData = sensorData.map((record) => {
         const t = new Date(record.sd_createdAt);
-        const timestamp = `${t.getFullYear()}${String(t.getMonth() + 1).padStart(2, '0')}${String(t.getDate()).padStart(
-          2,
-          '0'
-        )}_${String(t.getHours()).padStart(2, '0')}${String(t.getMinutes()).padStart(2, '0')}${String(
-          t.getSeconds()
-        ).padStart(2, '0')}`;
+        const timestamp = t.toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '_');
         return { Value: parseFloat(record.sn_compute_data), Timestamp: timestamp };
       });
 
@@ -162,8 +155,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
 
     const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 1, ?, '/files/front', ?, ?)`;
     await pool.promise().query(query, [fc_idx, file_name, user_idx, user_idx]);
-
-    console.log('JSON 파일 생성 및 DB 저장 완료');
 
     return { success: true, fileName: file_name, filePath: '/files/front' };
   } catch (err) {

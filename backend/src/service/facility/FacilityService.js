@@ -10,7 +10,7 @@ export const insertFacilityGroup = async (name) => {
     const [result] = await pool.promise().query(query, [nextFgIdx, name, 3]);
     return nextFgIdx;
   } catch (err) {
-    console.log('Failed to insert Facility Group: ', err);
+    console.error('Failed to insert Facility Group: ', err);
     throw err;
   }
 };
@@ -25,7 +25,7 @@ export const insertFacility = async (fg_idx, name) => {
     const [result] = await pool.promise().query(query, [nextFaIdx, fg_idx, name]);
     return nextFaIdx;
   } catch (err) {
-    console.log('Failed to insert Facility: ', err);
+    console.error('Failed to insert Facility: ', err);
     throw err;
   }
 };
@@ -40,7 +40,7 @@ export const insertSensor = async (fa_idx, name) => {
     const [result] = await pool.promise().query(query, [nextSnIdx, fa_idx, name]);
     return nextSnIdx;
   } catch (err) {
-    console.log('Failed to insert Sensor: ', err);
+    console.error('Failed to insert Sensor: ', err);
     throw err;
   }
 };
@@ -52,7 +52,6 @@ export const deleteSensors = async (sensorIds) => {
     const [results] = await pool.promise().query(query, [sensorIds]);
 
     if (results.length === 0) {
-      console.log('삭제할 센서가 없습니다.');
       return {
         success: true,
         message: '삭제할 센서가 없습니다.',
@@ -64,8 +63,6 @@ export const deleteSensors = async (sensorIds) => {
     const deleteQuery = 'DELETE FROM tb_aasx_data_prop WHERE sn_idx IN (?)';
     await pool.promise().query(deleteQuery, [sensorIds]);
 
-    console.log('센서 삭제 완료');
-
     return {
       success: true,
       message: '센서가 성공적으로 삭제되었습니다.',
@@ -73,7 +70,7 @@ export const deleteSensors = async (sensorIds) => {
       deletedSensors: results.map((sensor) => sensor.sn_name),
     };
   } catch (err) {
-    console.log('Failed to delete Sensors: ', err);
+    console.error('Failed to delete Sensors: ', err);
     throw err;
   }
 };

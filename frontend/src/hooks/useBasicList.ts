@@ -66,29 +66,15 @@ export const useBasicList = () => {
       const checked = event.target.checked;
       setSelectAll(checked);
 
-      if (checked) {
-        if (pagedData && pagedData.length > 0) {
-          setSelectedBases((prevSelected) => {
-            const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
-            const currentPageIds = pagedData.map((base) => base.ab_idx);
-            const newSelected = [...prevArray];
-            currentPageIds.forEach((id) => {
-              if (!newSelected.includes(id)) {
-                newSelected.push(id);
-              }
-            });
-            return newSelected;
-          });
-        }
-      } else {
-        if (pagedData && pagedData.length > 0) {
-          const currentPageIds = pagedData.map((base) => base.ab_idx);
-          setSelectedBases((prevSelected) => {
-            const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
-            return prevArray.filter((id) => !currentPageIds.includes(id));
-          });
-        }
-      }
+      if (!pagedData?.length) return;
+
+      const currentPageIds = pagedData.map((base) => base.ab_idx);
+      setSelectedBases((prevSelected) => {
+        const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
+        return checked
+          ? [...new Set([...prevArray, ...currentPageIds])]
+          : prevArray.filter((id) => !currentPageIds.includes(id));
+      });
     },
     [pagedData, setSelectedBases]
   );
@@ -98,11 +84,7 @@ export const useBasicList = () => {
     (baseIdx: number) => {
       setSelectedBases((prevSelected) => {
         const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
-        if (prevArray.includes(baseIdx)) {
-          return prevArray.filter((idx) => idx !== baseIdx);
-        } else {
-          return [...prevArray, baseIdx];
-        }
+        return prevArray.includes(baseIdx) ? prevArray.filter((idx) => idx !== baseIdx) : [...prevArray, baseIdx];
       });
     },
     [setSelectedBases]
@@ -136,7 +118,7 @@ export const useBasicList = () => {
       setAlertOpen(true);
       handleReset();
     } catch (err: any) {
-      console.log(err.message);
+      console.error('삭제 중 오류:', err.message);
       setAlertTitle('오류');
       setAlertContent('삭제 중 오류가 발생했습니다.');
       setAlertType('alert');
@@ -208,12 +190,16 @@ export const useBasicList = () => {
   const formatDate = useCallback((dateString: string | undefined) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
+    return date
+      .toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+      .replace(/\. /g, '.')
+      .replace(',', '');
   }, []);
 
   // Effects
