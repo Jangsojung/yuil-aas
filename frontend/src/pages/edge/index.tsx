@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import EdgeList from './list';
 import EdgeAdd from './add';
 import EdgeEdit from './edit';
@@ -20,13 +20,20 @@ export default function EdgeGatewayPage() {
   const [openModal, setOpenModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedEdgeGateway, setSelectedEdgeGateway] = useState<EdgeGateway | null>(null);
+  const listRef = useRef<any>(null);
 
   const handleInsert = async () => {
-    // 목록 새로고침 로직은 EdgeList에서 처리
+    // 등록 후 목록 새로고침
+    if (listRef.current && listRef.current.refresh) {
+      listRef.current.refresh();
+    }
   };
 
   const handleUpdate = async () => {
-    // 목록 새로고침 로직은 EdgeList에서 처리
+    // 수정 후 목록 새로고침
+    if (listRef.current && listRef.current.refresh) {
+      listRef.current.refresh();
+    }
   };
 
   const handleEditClick = (edgeGateway: EdgeGateway) => {
@@ -49,7 +56,7 @@ export default function EdgeGatewayPage() {
 
   return (
     <>
-      <EdgeList onAddClick={handleAddClick} onEditClick={handleEditClick} />
+      <EdgeList ref={listRef} onAddClick={handleAddClick} onEditClick={handleEditClick} />
       {isEditMode ? (
         <EdgeEdit
           open={openModal}

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { deleteEdgeAPI, getEdgeAPI } from '../../apis/api/edge';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
@@ -28,7 +28,7 @@ interface EdgeListProps {
   onEditClick: (edgeGateway: EdgeGateway) => void;
 }
 
-export default function EdgeList({ onAddClick, onEditClick }: EdgeListProps) {
+const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeListProps, ref) {
   const [edgeGateways, setEdgeGateways] = useState<EdgeGateway[]>([]);
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useState<number[]>([]);
   const navigationReset = useRecoilValue(navigationResetState);
@@ -156,6 +156,11 @@ export default function EdgeList({ onAddClick, onEditClick }: EdgeListProps) {
     }
   }, [selectedEdgeGateways, edgeGateways]);
 
+  // getEdge를 ref로 노출
+  useImperativeHandle(ref, () => ({
+    refresh: getEdge,
+  }));
+
   return (
     <div className='table-outer'>
       <ActionBox
@@ -231,6 +236,8 @@ export default function EdgeList({ onAddClick, onEditClick }: EdgeListProps) {
       />
     </div>
   );
-}
+});
+
+export default EdgeList;
 
 const cells = ['서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT', '생성 일자'];
