@@ -40,6 +40,7 @@ export default function BasiccodeEditPage() {
   const [selectedBaseForDetail, setSelectedBaseForDetail] = useState<Base | null>(null);
   const [detailTreeData, setDetailTreeData] = useState<FacilityGroupTree[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
 
   const handleModeChange = () => {
     if (id) {
@@ -246,6 +247,8 @@ export default function BasiccodeEditPage() {
         basicDesc={basicDesc}
         setBasicDesc={setBasicDesc}
         selectedSensors={selectedSensors}
+        selectedFactory={selectedFactory}
+        setSelectedFactory={setSelectedFactory}
         onTreeSearch={handleTreeSearch}
         onGroupSelectAll={handleGroupSelectAllWrapper}
         onFacilitySelectAll={handleFacilitySelectAllWrapper}

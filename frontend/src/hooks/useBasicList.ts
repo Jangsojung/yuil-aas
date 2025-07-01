@@ -139,7 +139,7 @@ export const useBasicList = () => {
   const handleSearch = useCallback(() => {
     let filtered = bases;
 
-    if (searchKeyword.trim().length >= SEARCH.MIN_LENGTH) {
+    if (searchKeyword.trim().length > 0) {
       filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
     }
 

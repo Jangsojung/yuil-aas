@@ -10,6 +10,7 @@ import { FacilityTreeView } from '../treeview/FacilityTreeView';
 import BasicModal from '../modal/basicmodal';
 import AlertModal from '../modal/alert';
 import { useAlertModal } from '../../hooks/useAlertModal';
+import FactorySelect from '../select/factory_select';
 
 interface EditViewProps {
   treeData: FacilityGroupTree[];
@@ -27,6 +28,8 @@ interface EditViewProps {
   basicDesc: string;
   setBasicDesc: (desc: string) => void;
   selectedSensors: number[];
+  selectedFactory: number | '';
+  setSelectedFactory: (fc: number | '') => void;
   onTreeSearch: () => void;
   onGroupSelectAll: (fgIdx: number, checked: boolean) => void;
   onFacilitySelectAll: (fgIdx: number, faIdx: number, checked: boolean) => void;
@@ -53,6 +56,8 @@ export const EditView: React.FC<EditViewProps> = ({
   basicDesc,
   setBasicDesc,
   selectedSensors,
+  selectedFactory,
+  setSelectedFactory,
   onTreeSearch,
   onGroupSelectAll,
   onFacilitySelectAll,
@@ -88,12 +93,23 @@ export const EditView: React.FC<EditViewProps> = ({
             <Grid item xs={3}>
               <Grid container spacing={1}>
                 <Grid item>
+                  <div className='sort-title'>공장</div>
+                </Grid>
+                <Grid item xs={9}>
+                  <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={3}>
+              <Grid container spacing={1}>
+                <Grid item>
                   <div className='sort-title'>설비그룹</div>
                 </Grid>
                 <Grid item xs={9}>
                   <FacilityGroupSelect
                     selectedFacilityGroups={selectedFacilityGroups}
                     setSelectedFacilityGroups={setSelectedFacilityGroups}
+                    selectedFactory={selectedFactory}
                   />
                 </Grid>
               </Grid>

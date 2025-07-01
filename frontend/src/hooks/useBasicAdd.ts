@@ -19,6 +19,7 @@ export const useBasicAdd = () => {
   const [selectedFacilityGroups, setSelectedFacilityGroups] = useState<number[]>([]);
   const [facilityName, setFacilityName] = useState('');
   const [sensorName, setSensorName] = useState('');
+  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
 
   // 기초코드 추가
   const handleAdd = useCallback(async () => {
@@ -53,13 +54,20 @@ export const useBasicAdd = () => {
 
   // 트리 검색
   const handleTreeSearch = useCallback(async () => {
+    if (!selectedFactory) {
+      return { success: false, message: '공장을 선택해주세요.' };
+    }
     if (!facilityName.trim() && !sensorName.trim() && selectedFacilityGroups.length === 0) {
       return { success: false, message: '검색 조건을 입력해주세요.' };
     }
-
     setTreeLoading(true);
     try {
-      const finalFilteredData = await buildTreeDataAPI(selectedFacilityGroups, facilityName, sensorName);
+      const finalFilteredData = await buildTreeDataAPI(
+        selectedFacilityGroups,
+        facilityName,
+        sensorName,
+        selectedFactory as number
+      );
       setTreeData(finalFilteredData);
       return { success: true };
     } catch (err) {
@@ -69,7 +77,7 @@ export const useBasicAdd = () => {
     } finally {
       setTreeLoading(false);
     }
-  }, [selectedFacilityGroups, facilityName, sensorName]);
+  }, [selectedFactory, selectedFacilityGroups, facilityName, sensorName]);
 
   // 모달 핸들러
   const handleBasicModalAdd = useCallback(async () => {
@@ -97,6 +105,7 @@ export const useBasicAdd = () => {
     setSelectedFacilityGroups([]);
     setFacilityName('');
     setSensorName('');
+    setSelectedFactory('');
   }, [setSelectedSensors]);
 
   return {
@@ -116,6 +125,8 @@ export const useBasicAdd = () => {
     sensorName,
     setSensorName,
     selectedSensors,
+    selectedFactory,
+    setSelectedFactory,
 
     // 핸들러
     handleAdd,
