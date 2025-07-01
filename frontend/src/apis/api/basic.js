@@ -1,6 +1,7 @@
 '// Basic API functions';
 
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+import { DEFAULTS } from '../../constants';
 
 // 기초코드 목록 조회
 export const getBasesAPI = async () => {
@@ -58,7 +59,7 @@ export const getBaseSensorsAPI = async (ab_idx) => {
 };
 
 // 설비그룹 조회
-export const getFacilityGroupsAPI = async (fc_idx = 3) => {
+export const getFacilityGroupsAPI = async (fc_idx = DEFAULTS.FACILITY_GROUP_ID) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.FACILITY_GROUPS, { fc_idx });
     return Array.isArray(result) ? result : [];
@@ -91,7 +92,12 @@ export const getSensorsAPI = async (fa_idx) => {
 };
 
 // 트리 데이터 구축을 위한 통합 API
-export const buildTreeDataAPI = async (selectedFacilityGroups = [], facilityName = '', sensorName = '', fc_idx = 3) => {
+export const buildTreeDataAPI = async (
+  selectedFacilityGroups = [],
+  facilityName = '',
+  sensorName = '',
+  fc_idx = DEFAULTS.FACILITY_GROUP_ID
+) => {
   try {
     // 1. 모든 설비그룹 조회
     const allFacilityGroups = await getFacilityGroupsAPI(fc_idx);
@@ -154,7 +160,7 @@ export const buildTreeDataAPI = async (selectedFacilityGroups = [], facilityName
 };
 
 // 센서 ID로부터 트리 데이터 구축
-export const buildTreeFromSensorIdsAPI = async (sensorIds, fc_idx = 3) => {
+export const buildTreeFromSensorIdsAPI = async (sensorIds, fc_idx = DEFAULTS.FACILITY_GROUP_ID) => {
   try {
     // 1. 모든 설비그룹 조회
     const allFacilityGroups = await getFacilityGroupsAPI(fc_idx);

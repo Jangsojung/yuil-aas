@@ -32,4 +32,4 @@ export const MODAL_TYPE = {
 export const DEFAULTS = {
   FACILITY_GROUP_ID: 3,
   AASX_KIND: 3,
-} as const;
+};

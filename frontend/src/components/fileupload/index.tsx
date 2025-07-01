@@ -1,4 +1,5 @@
 import React, { ChangeEvent, DragEvent, FC, useState } from 'react';
+import { FILE } from '../../constants';
 
 export type FileUploadProps = {
   imageButton?: boolean;
@@ -57,10 +58,26 @@ export const FileUpload: FC<FileUploadProps> = ({
     stopDefaults(e);
     setIsDragOver(false);
     setLabelText(hoverLabel);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.size > FILE.MAX_SIZE) {
+        alert(`파일 크기는 ${FILE.MAX_SIZE / (1024 * 1024)}MB 이하여야 합니다.`);
+        return;
+      }
+    }
+
     onDrop(e);
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.size > FILE.MAX_SIZE) {
+      alert(`파일 크기는 ${FILE.MAX_SIZE / (1024 * 1024)}MB 이하여야 합니다.`);
+      event.target.value = '';
+      return;
+    }
     onChange(event);
   };
 

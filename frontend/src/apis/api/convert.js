@@ -1,4 +1,5 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+import { DEFAULTS } from '../../constants';
 
 export const getBasesAPI = async () => {
   try {
@@ -13,7 +14,7 @@ export const getBasesAPI = async () => {
 export const insertBaseAPI = async (formattedStartDate, formattedEndDate, selectedConvert, userIdx) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.CONVERT, {
-      fc_idx: 3,
+      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
       user_idx: userIdx,
       startDate: formattedStartDate,
       endDate: formattedEndDate,

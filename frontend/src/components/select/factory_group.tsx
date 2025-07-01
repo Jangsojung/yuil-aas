@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { getFacilityGroupsAPI } from '../../apis/api/basic';
+import { DEFAULTS } from '../../constants';
 import { FacilityGroup } from '../../types/api';
 import FactorySelect from './factory_select';
 
@@ -40,7 +41,7 @@ export default function FacilityGroupSelect({
 
       try {
         // 공장이 선택된 경우 해당 공장의 설비 그룹을 가져옴
-        const fc_idx = showFactorySelect ? (selectedFactory as number) : 3; // 기본값
+        const fc_idx = showFactorySelect ? (selectedFactory as number) : DEFAULTS.FACILITY_GROUP_ID; // 기본값
         const data = await getFacilityGroupsAPI(fc_idx);
         setFacilityGroups(data || []);
       } catch (err) {

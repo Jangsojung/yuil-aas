@@ -1,4 +1,5 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+import { DEFAULTS } from '../../constants';
 
 export const handleVerifyAPI = async (selectedFile) => {
   try {
@@ -15,7 +16,9 @@ export const handleVerifyAPI = async (selectedFile) => {
 // 설비그룹 조회 (transmit용)
 export const getFacilityGroupsForTransmitAPI = async () => {
   try {
-    const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.FACILITY_GROUPS, { fc_idx: 3 });
+    const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.FACILITY_GROUPS, {
+      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+    });
     return Array.isArray(result) ? result : [];
   } catch (error) {
     console.error('Error fetching facility groups for transmit:', error);

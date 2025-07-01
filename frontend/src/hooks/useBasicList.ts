@@ -3,6 +3,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { navigationResetState, selectedBasesState, selectedBaseState } from '../recoil/atoms';
 import { getBasesAPI, deleteBasesAPI } from '../apis/api/basic';
 import { Dayjs } from 'dayjs';
+import { PAGINATION, MODAL_TYPE, SEARCH } from '../constants';
 
 interface Base {
   ab_idx: number;
@@ -28,9 +29,9 @@ export const useBasicList = () => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
   const [alertContent, setAlertContent] = useState('');
-  const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
+  const [alertType, setAlertType] = useState<'alert' | 'confirm'>(MODAL_TYPE.ALERT);
 
-  const rowsPerPage = 10;
+  const rowsPerPage = PAGINATION.DEFAULT_ROWS_PER_PAGE;
 
   // 페이지네이션 데이터 계산
   const pagedData = filteredBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
@@ -95,14 +96,14 @@ export const useBasicList = () => {
     if (selectedBases.length === 0) {
       setAlertTitle('알림');
       setAlertContent('삭제할 항목을 선택해주세요.');
-      setAlertType('alert');
+      setAlertType(MODAL_TYPE.ALERT);
       setAlertOpen(true);
       return;
     }
 
     setAlertTitle('확인');
     setAlertContent(`선택한 ${selectedBases.length}개 항목을 삭제하시겠습니까?`);
-    setAlertType('confirm');
+    setAlertType(MODAL_TYPE.CONFIRM);
     setAlertOpen(true);
   }, [selectedBases.length]);
 
@@ -114,14 +115,14 @@ export const useBasicList = () => {
       setSelectedBases([]);
       setAlertTitle('알림');
       setAlertContent('선택한 항목이 삭제되었습니다.');
-      setAlertType('alert');
+      setAlertType(MODAL_TYPE.ALERT);
       setAlertOpen(true);
       handleReset();
     } catch (err: any) {
       console.error('삭제 중 오류:', err.message);
       setAlertTitle('오류');
       setAlertContent('삭제 중 오류가 발생했습니다.');
-      setAlertType('alert');
+      setAlertType(MODAL_TYPE.ALERT);
       setAlertOpen(true);
     }
   }, [selectedBases, bases, setSelectedBases, handleReset]);
@@ -130,7 +131,7 @@ export const useBasicList = () => {
   const handleSearch = useCallback(() => {
     let filtered = bases;
 
-    if (searchKeyword.trim()) {
+    if (searchKeyword.trim().length >= SEARCH.MIN_LENGTH) {
       filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
     }
 

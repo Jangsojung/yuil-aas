@@ -1,3 +1,5 @@
+import { API as API_CONSTANTS } from '../constants';
+
 // API 설정
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
 export const WS_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:5001';
@@ -49,26 +51,42 @@ export const apiHelpers = {
       },
     };
 
-    const response = await fetch(url, { ...defaultOptions, ...options });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_CONSTANTS.TIMEOUT);
 
-    if (!response.ok) {
-      // 에러 응답의 본문을 읽어서 에러 메시지 포함
-      let errorMessage = `HTTP error! status: ${response.status}`;
-      try {
-        const errorData = await response.json();
-        if (errorData.message) {
-          errorMessage = errorData.message;
+    try {
+      const response = await fetch(url, {
+        ...defaultOptions,
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        // 에러 응답의 본문을 읽어서 에러 메시지 포함
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch (e) {
+          // JSON 파싱 실패 시 기본 메시지 사용
         }
-      } catch (e) {
-        // JSON 파싱 실패 시 기본 메시지 사용
+
+        const error = new Error(errorMessage);
+        (error as any).response = { status: response.status, data: errorMessage };
+        throw error;
       }
 
-      const error = new Error(errorMessage);
-      (error as any).response = { status: response.status, data: errorMessage };
+      return response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('요청 시간이 초과되었습니다.');
+      }
       throw error;
     }
-
-    return response.json();
   },
 
   // POST 요청

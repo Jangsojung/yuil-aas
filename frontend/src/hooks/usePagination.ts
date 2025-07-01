@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
+import { PAGINATION } from '../constants';
 
-export const usePagination = (totalItems: number, defaultRowsPerPage: number = 10) => {
+export const usePagination = (totalItems: number, defaultRowsPerPage: number = PAGINATION.DEFAULT_ROWS_PER_PAGE) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage] = useState(defaultRowsPerPage);
 
