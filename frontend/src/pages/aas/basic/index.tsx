@@ -17,6 +17,9 @@ export default function BasiccodePage() {
     alertTitle,
     alertContent,
     alertType,
+    currentPage,
+    rowsPerPage,
+    calculatedTotalPages,
 
     // 핸들러
     handleSearch,
@@ -25,6 +28,7 @@ export default function BasiccodePage() {
     handleAdd,
     handleDelete,
     handlePageChange,
+    handleRowsPerPageChange,
     handleSelectAllChange,
     handleCheckboxChange,
     handleClick,
@@ -49,12 +53,14 @@ export default function BasiccodePage() {
         onAdd={handleAdd}
         onDelete={handleDelete}
         onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
         onSelectAllChange={handleSelectAllChange}
         onCheckboxChange={handleCheckboxChange}
         onClick={handleClick}
         formatDate={formatDate}
-        currentPage={0}
-        calculatedTotalPages={0}
+        currentPage={currentPage}
+        rowsPerPage={rowsPerPage}
+        calculatedTotalPages={calculatedTotalPages}
       />
 
       <AlertModal

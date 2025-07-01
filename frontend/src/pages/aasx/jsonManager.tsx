@@ -5,6 +5,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../components/datepicker';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../components/pagination';
+import { usePagination } from '../../hooks/usePagination';
 import { deleteJSONAPI, getJSONFilesAPI } from '../../apis/api/json_manage';
 import JSONTableRow from '../../components/aasx/json_management/JSONTableRow';
 import { useRecoilValue } from 'recoil';
@@ -29,8 +30,6 @@ export default function JsonManagerPage() {
   const [selectAll, setSelectAll] = useState(false);
   const navigationReset = useRecoilValue(navigationResetState);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -39,21 +38,11 @@ export default function JsonManagerPage() {
     onConfirm: undefined as (() => void) | undefined,
   });
 
-  const rowsPerPage = 10;
+  const { currentPage, rowsPerPage, totalPages, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+    files?.length || 0
+  );
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const pagedData = files?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-
-  const calculatedTotalPages = Math.ceil((files?.length || 0) / rowsPerPage);
-
-  useEffect(() => {
-    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
-      setCurrentPage(0);
-    }
-  }, [currentPage, calculatedTotalPages]);
+  const pagedData = paginatedData(files || []);
 
   const handleDelete = async () => {
     if (selectedFiles.length === 0) {
@@ -254,7 +243,13 @@ export default function JsonManagerPage() {
           </Table>
         </TableContainer>
 
-        <Pagination count={files ? files.length : 0} page={currentPage} onPageChange={handlePageChange} />
+        <Pagination
+          count={files ? files.length : 0}
+          page={currentPage}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(event, page) => goToPage(page)}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
       </div>
 
       <AlertModal

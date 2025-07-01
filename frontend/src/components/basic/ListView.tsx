@@ -39,6 +39,7 @@ interface ListViewProps {
   onAdd: () => void;
   onDelete: () => void;
   onPageChange: (event: unknown, page: number) => void;
+  onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectAllChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onCheckboxChange: (baseIdx: number) => void;
   onClick: (base: Base) => void;
@@ -46,6 +47,7 @@ interface ListViewProps {
 
   // 페이지네이션
   currentPage: number;
+  rowsPerPage: number;
   calculatedTotalPages: number;
 }
 
@@ -65,11 +67,13 @@ export const ListView: React.FC<ListViewProps> = ({
   onAdd,
   onDelete,
   onPageChange,
+  onRowsPerPageChange,
   onSelectAllChange,
   onCheckboxChange,
   onClick,
   formatDate,
   currentPage,
+  rowsPerPage,
   calculatedTotalPages,
 }) => {
   return (
@@ -173,7 +177,13 @@ export const ListView: React.FC<ListViewProps> = ({
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination count={pagedData ? pagedData.length : 0} page={currentPage} onPageChange={onPageChange} />
+        <Pagination
+          count={pagedData ? pagedData.length : 0}
+          page={currentPage}
+          rowsPerPage={rowsPerPage}
+          onPageChange={onPageChange}
+          onRowsPerPageChange={onRowsPerPageChange}
+        />
       </div>
     </>
   );

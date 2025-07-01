@@ -6,6 +6,7 @@ import BasicDatePicker from '../../components/datepicker';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../components/pagination';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
+import { usePagination } from '../../hooks/usePagination';
 import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
 import AASXTableRow from '../../components/aasx/aasx_management/AASXTableRow';
 import { useRecoilValue } from 'recoil';
@@ -38,8 +39,6 @@ export default function AasxManagerPage() {
   const [openInsertModal, setOpenInsertModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<AASXFile | null>(null);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -48,21 +47,11 @@ export default function AasxManagerPage() {
     onConfirm: undefined as (() => void) | undefined,
   });
 
-  const rowsPerPage = 10;
+  const { currentPage, rowsPerPage, totalPages, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+    files?.length || 0
+  );
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const pagedData = files?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-
-  const calculatedTotalPages = Math.ceil((files?.length || 0) / rowsPerPage);
-
-  useEffect(() => {
-    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
-      setCurrentPage(0);
-    }
-  }, [currentPage, calculatedTotalPages]);
+  const pagedData = paginatedData(files || []);
 
   const handleInsert = async (file: File) => {
     setFiles((prevFiles) => {
@@ -227,7 +216,7 @@ export default function AasxManagerPage() {
   useEffect(() => {
     setSelectedFiles([]);
     setSelectAll(false);
-    setCurrentPage(0);
+    goToPage(0);
     setOpenUpdateModal(false);
     setOpenInsertModal(false);
     setSelectedFile(null);
@@ -331,7 +320,13 @@ export default function AasxManagerPage() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination count={files ? files.length : 0} page={currentPage} onPageChange={handlePageChange} />
+        <Pagination
+          count={files ? files.length : 0}
+          page={currentPage}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(event, page) => goToPage(page)}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
       </div>
       <CustomizedDialogs
         open={openUpdateModal}

@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextF
 import Grid from '@mui/material/Grid';
 import BasicDatePicker from '../../components/datepicker';
 import Pagination from '../../components/pagination';
+import { usePagination } from '../../hooks/usePagination';
 import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/aas/convert/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
@@ -33,27 +34,17 @@ export default function ConvertPage() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const rowsPerPage = 10;
 
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
   const [alertContent, setAlertContent] = useState('');
   const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  const { currentPage, rowsPerPage, totalPages, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+    filteredBases?.length || 0
+  );
 
-  const pagedData = filteredBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-
-  const calculatedTotalPages = Math.ceil((filteredBases?.length || 0) / rowsPerPage);
-
-  useEffect(() => {
-    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
-      setCurrentPage(0);
-    }
-  }, [currentPage, calculatedTotalPages]);
+  const pagedData = paginatedData(filteredBases || []);
 
   const startLoading = () => {
     setIsLoading(true);
@@ -105,7 +96,7 @@ export default function ConvertPage() {
     }
 
     setFilteredBases(filtered);
-    setCurrentPage(0);
+    goToPage(0);
   };
 
   const handleReset = () => {
@@ -113,7 +104,7 @@ export default function ConvertPage() {
     setStartDate(null);
     setEndDate(null);
     setFilteredBases(bases);
-    setCurrentPage(0);
+    goToPage(0);
   };
 
   const handleStartDateChange = (baseId: number, date: Dayjs | null) => {
@@ -219,7 +210,7 @@ export default function ConvertPage() {
     setSelectedConvert(null);
     setStartDate(null);
     setEndDate(null);
-    setCurrentPage(0);
+    goToPage(0);
     setSearchKeyword('');
     setBaseDates({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -324,7 +315,9 @@ export default function ConvertPage() {
           <Pagination
             count={filteredBases ? filteredBases.length : 0}
             page={currentPage}
-            onPageChange={handlePageChange}
+            rowsPerPage={rowsPerPage}
+            onPageChange={(event, page) => goToPage(page)}
+            onRowsPerPageChange={handleRowsPerPageChange}
           />
         </div>
       </div>

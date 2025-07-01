@@ -31,7 +31,7 @@ export const useBasicList = () => {
   const [alertContent, setAlertContent] = useState('');
   const [alertType, setAlertType] = useState<'alert' | 'confirm'>(MODAL_TYPE.ALERT);
 
-  const rowsPerPage = PAGINATION.DEFAULT_ROWS_PER_PAGE;
+  const [rowsPerPage, setRowsPerPage] = useState<number>(PAGINATION.DEFAULT_ROWS_PER_PAGE);
 
   // 페이지네이션 데이터 계산
   const pagedData = filteredBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
@@ -40,6 +40,13 @@ export const useBasicList = () => {
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((event: unknown, page: number) => {
     setCurrentPage(page);
+  }, []);
+
+  // 페이지 크기 변경 핸들러
+  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const newPageSize = parseInt(event.target.value, 10);
+    setRowsPerPage(newPageSize);
+    setCurrentPage(0);
   }, []);
 
   // 초기화 핸들러
@@ -250,6 +257,7 @@ export const useBasicList = () => {
     searchKeyword,
     setSearchKeyword,
     currentPage,
+    rowsPerPage,
     pagedData,
     calculatedTotalPages,
     alertOpen,
@@ -260,6 +268,7 @@ export const useBasicList = () => {
 
     // 핸들러
     handlePageChange,
+    handleRowsPerPageChange,
     handleReset,
     handleSelectAllChange,
     handleCheckboxChange,

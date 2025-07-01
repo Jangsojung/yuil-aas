@@ -2,6 +2,7 @@
 export const PAGINATION = {
   DEFAULT_ROWS_PER_PAGE: 10,
   MAX_ROWS_PER_PAGE: 100,
+  ROWS_PER_PAGE_OPTIONS: [5, 10, 25, 50, 100],
 } as const;
 
 // API 관련 상수

@@ -3,7 +3,7 @@ import { PAGINATION } from '../constants';
 
 export const usePagination = (totalItems: number, defaultRowsPerPage: number = PAGINATION.DEFAULT_ROWS_PER_PAGE) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage] = useState(defaultRowsPerPage);
+  const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
 
   const totalPages = useMemo(() => Math.ceil(totalItems / rowsPerPage), [totalItems, rowsPerPage]);
 
@@ -41,6 +41,12 @@ export const usePagination = (totalItems: number, defaultRowsPerPage: number = P
     setCurrentPage(0);
   }, []);
 
+  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const newPageSize = parseInt(event.target.value, 10);
+    setRowsPerPage(newPageSize);
+    setCurrentPage(0);
+  }, []);
+
   return {
     currentPage,
     totalPages,
@@ -50,5 +56,6 @@ export const usePagination = (totalItems: number, defaultRowsPerPage: number = P
     goToNextPage,
     goToPrevPage,
     resetPagination,
+    handleRowsPerPageChange,
   };
 };

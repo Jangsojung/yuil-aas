@@ -8,6 +8,7 @@ import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 import { ActionBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
+import { usePagination } from '../../hooks/usePagination';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -31,8 +32,6 @@ export default function Edge_Gateway() {
   const [openModal, setOpenModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -40,21 +39,12 @@ export default function Edge_Gateway() {
     type: 'alert' as 'alert' | 'confirm',
     onConfirm: undefined as (() => void) | undefined,
   });
-  const rowsPerPage = 10;
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  const { currentPage, rowsPerPage, totalPages, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+    edgeGateways?.length || 0
+  );
 
-  const pagedData = edgeGateways?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-
-  const calculatedTotalPages = Math.ceil((edgeGateways?.length || 0) / rowsPerPage);
-
-  useEffect(() => {
-    if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
-      setCurrentPage(0);
-    }
-  }, [currentPage, calculatedTotalPages]);
+  const pagedData = paginatedData(edgeGateways || []);
 
   const handleInsert = async () => {
     await getEdge();
@@ -169,7 +159,7 @@ export default function Edge_Gateway() {
   useEffect(() => {
     setSelectedEdgeGateways([]);
     setSelectAll(false);
-    setCurrentPage(0);
+    goToPage(0);
     setOpenModal(false);
     setIsEditMode(false);
     setSelectedEdgeGateway(null);
@@ -251,7 +241,13 @@ export default function Edge_Gateway() {
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination page={currentPage} count={edgeGateways ? edgeGateways.length : 0} onPageChange={handlePageChange} />
+        <Pagination
+          page={currentPage}
+          count={edgeGateways ? edgeGateways.length : 0}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(event, page) => goToPage(page)}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
       </div>
 
       <CustomizedDialogs
