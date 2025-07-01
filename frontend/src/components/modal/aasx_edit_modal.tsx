@@ -168,7 +168,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
-  useEffect(() => {
+  const handleFileDataChange = () => {
     if (fileData && fileData.af_idx) {
       setSelectedFile(fileData);
       setAf_Idx(fileData.af_idx);
@@ -178,6 +178,11 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     } else {
       handleReset();
     }
+  };
+
+  useEffect(() => {
+    handleFileDataChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileData, open]);
 
   return (

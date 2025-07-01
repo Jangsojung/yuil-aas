@@ -15,7 +15,7 @@ interface Base {
 
 export const useBasicList = () => {
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
-  const [selectedBase, setSelectedBase] = useRecoilState(selectedBaseState);
+  const [, setSelectedBase] = useRecoilState(selectedBaseState);
   const navigationReset = useRecoilValue(navigationResetState);
 
   // 상태 관리
@@ -55,6 +55,7 @@ export const useBasicList = () => {
     setStartDate(null);
     setEndDate(null);
     getBases();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 기초코드 목록 조회

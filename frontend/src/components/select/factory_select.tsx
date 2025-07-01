@@ -23,28 +23,27 @@ export default function FactorySelect({
   const [error, setError] = useState<string | null>(null);
   const user = useRecoilValue(userState);
 
+  const handleFetchFactories = async () => {
+    if (!user?.cm_idx) {
+      setError('사용자 정보에서 회사 정보를 찾을 수 없습니다.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getFactoriesByCmIdxAPI(user.cm_idx);
+      setFactories(data || []);
+    } catch (err) {
+      console.error('공장 정보 조회 실패:', err);
+      setError('공장 정보를 불러오는 데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchFactories = async () => {
-      if (!user?.cm_idx) {
-        setError('사용자 정보에서 회사 정보를 찾을 수 없습니다.');
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await getFactoriesByCmIdxAPI(user.cm_idx);
-        setFactories(data || []);
-      } catch (err) {
-        console.error('공장 정보 조회 실패:', err);
-        setError('공장 정보를 불러오는데 실패했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFactories();
+    handleFetchFactories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.cm_idx]);
 
   const handleChange = (event: SelectChangeEvent<number>) => {

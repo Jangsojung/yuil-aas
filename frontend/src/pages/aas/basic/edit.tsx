@@ -25,7 +25,7 @@ export default function BasiccodeEditPage() {
   const userIdx = useRecoilValue(userState)?.user_idx;
 
   // 커스텀 훅 사용
-  const { alertModal, showAlert, closeAlert } = useAlertModal();
+  const { showAlert } = useAlertModal();
   const { handleGroupSelectAll, handleFacilitySelectAll, isAllSensorsSelectedInGroup, isAllSensorsSelectedInFacility } =
     useSensorSelection();
 
@@ -41,8 +41,7 @@ export default function BasiccodeEditPage() {
   const [detailTreeData, setDetailTreeData] = useState<FacilityGroupTree[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // 모드 설정
-  useEffect(() => {
+  const handleModeChange = () => {
     if (id) {
       const baseId = parseInt(id);
       if (mode === 'view') {
@@ -55,6 +54,11 @@ export default function BasiccodeEditPage() {
         loadBaseForEdit(baseId);
       }
     }
+  };
+
+  useEffect(() => {
+    handleModeChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, mode]);
 
   // 데이터 로딩 함수들

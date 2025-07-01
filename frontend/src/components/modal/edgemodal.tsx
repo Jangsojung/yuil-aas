@@ -131,20 +131,23 @@ export default function CustomizedDialogs({
   });
   const userIdx = useRecoilValue(userState)?.user_idx;
 
-  useEffect(() => {
+  const handleEdgeGatewayDataChange = () => {
     if (edgeGatewayData) {
       setServerTemp(edgeGatewayData.eg_server_temp.toString());
       setNetworkStatus(edgeGatewayData.eg_network === 1);
       setPcTemp(edgeGatewayData.eg_pc_temp.toString());
-
       const [ip, port] = edgeGatewayData.eg_ip_port.split(':');
       setPcIp(ip || '');
       setPcPort(port || '');
-
       setEdgeGatewayId(edgeGatewayData.eg_idx);
     } else {
       handleReset();
     }
+  };
+
+  useEffect(() => {
+    handleEdgeGatewayDataChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [edgeGatewayData, open]);
 
   const handleNetworkStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {

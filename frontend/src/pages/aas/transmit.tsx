@@ -46,12 +46,16 @@ export default function TransmitPage() {
     }
   };
 
-  // 네비게이션 리셋 시 상태 초기화
-  useEffect(() => {
+  const handleResetStates = () => {
     setSelectedFile(undefined);
     setAasxData(null);
     setIsVerified(false);
     setCurrentFile(null);
+  };
+
+  useEffect(() => {
+    handleResetStates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset, setAasxData, setIsVerified, setCurrentFile]);
 
   // 현재 파일 변경 시 검증 상태 리셋

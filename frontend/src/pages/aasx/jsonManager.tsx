@@ -38,7 +38,7 @@ export default function JsonManagerPage() {
     onConfirm: undefined as (() => void) | undefined,
   });
 
-  const { currentPage, rowsPerPage, totalPages, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
     files?.length || 0
   );
 
@@ -147,10 +147,15 @@ export default function JsonManagerPage() {
     setAlertModal({ ...alertModal, open: false });
   };
 
+  const handleNavigationReset = () => {
+    handleReset();
+  };
+
   useEffect(() => {
     if (navigationReset) {
-      handleReset();
+      handleNavigationReset();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
   useEffect(() => {
@@ -159,6 +164,7 @@ export default function JsonManagerPage() {
     setStartDate(defaultStart);
     setEndDate(defaultEnd);
     getFiles(defaultStart, defaultEnd);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

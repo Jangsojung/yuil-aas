@@ -28,31 +28,27 @@ export default function FacilityGroupSelect({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleFetchFacilityGroups = async () => {
+    if (showFactorySelect && !selectedFactory) {
+      setFacilityGroups([]);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const fc_idx = showFactorySelect ? (selectedFactory as number) : DEFAULTS.FACILITY_GROUP_ID;
+      const data = await getFacilityGroupsAPI(fc_idx);
+      setFacilityGroups(data || []);
+    } catch (err) {
+      console.error('설비 그룹 조회 실패:', err);
+      setError('설비 그룹을 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchFacilityGroups = async () => {
-      // 공장이 선택되지 않았으면 설비 그룹을 로드하지 않음
-      if (showFactorySelect && !selectedFactory) {
-        setFacilityGroups([]);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        // 공장이 선택된 경우 해당 공장의 설비 그룹을 가져옴
-        const fc_idx = showFactorySelect ? (selectedFactory as number) : DEFAULTS.FACILITY_GROUP_ID; // 기본값
-        const data = await getFacilityGroupsAPI(fc_idx);
-        setFacilityGroups(data || []);
-      } catch (err) {
-        console.error('설비 그룹 조회 실패:', err);
-        setError('설비 그룹을 불러오는데 실패했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFacilityGroups();
+    handleFetchFacilityGroups();
   }, [selectedFactory, showFactorySelect]);
 
   const handleChange = (event: SelectChangeEvent<number>) => {

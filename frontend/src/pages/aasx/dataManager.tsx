@@ -4,22 +4,13 @@ import Paper from '@mui/material/Paper';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
 import Pagination from '../../components/pagination';
 import DataTableRow from '../../components/aasx/data_management/DataTableRow';
-import { useRecoilValue } from 'recoil';
-import { navigationResetState } from '../../recoil/atoms';
 import { SearchBox, FilterBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { useWordManagement } from '../../hooks/useWordManagement';
 import { useAlertModal } from '../../hooks/useAlertModal';
 import { usePagination } from '../../hooks/usePagination';
 
-interface Word {
-  as_kr: string;
-  as_en: string;
-}
-
 export default function DataManagerPage() {
-  const navigationReset = useRecoilValue(navigationResetState);
-
   // 커스텀 훅 사용
   const { alertModal, showAlert, closeAlert } = useAlertModal();
   const {
@@ -35,7 +26,6 @@ export default function DataManagerPage() {
     getEditingValue,
     isItemSelected,
     isAllCurrentPageSelected,
-    isSomeCurrentPageSelected,
     handleSearchKeywordChange,
     handleSearch,
   } = useWordManagement();

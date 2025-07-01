@@ -201,12 +201,7 @@ export default function AasxManagerPage() {
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
-  useEffect(() => {
-    handleReset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
+  const handleNavigationReset = () => {
     setSelectedFiles([]);
     setSelectAll(false);
     goToPage(0);
@@ -214,6 +209,10 @@ export default function AasxManagerPage() {
     setOpenInsertModal(false);
     setSelectedFile(null);
     handleReset();
+  };
+
+  useEffect(() => {
+    handleNavigationReset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 

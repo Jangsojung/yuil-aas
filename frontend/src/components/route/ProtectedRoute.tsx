@@ -7,14 +7,18 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const [, setUser] = useRecoilState(userState);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const handleUserLoad = () => {
     const storedUser = localStorage.getItem('user');
-
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     } else {
       navigate('/signIn/sign');
     }
+  };
+
+  useEffect(() => {
+    handleUserLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setUser, navigate]);
 
   return <>{children}</>;

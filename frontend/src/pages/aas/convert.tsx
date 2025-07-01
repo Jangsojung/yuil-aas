@@ -205,20 +205,24 @@ export default function ConvertPage() {
     setSelectedConvert((prev) => (prev === convertsIdx ? null : convertsIdx));
   };
 
-  useEffect(() => {
-    getBases();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
+  const handleNavigationReset = () => {
     setSelectedConvert(null);
     setStartDate(null);
     setEndDate(null);
     goToPage(0);
     setSearchKeyword('');
     setBaseDates({});
+  };
+
+  useEffect(() => {
+    handleNavigationReset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
+
+  useEffect(() => {
+    getBases();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setFilteredBases(bases);

@@ -152,17 +152,21 @@ export default function Edge_Gateway() {
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
-  useEffect(() => {
-    getEdge();
-  }, []);
-
-  useEffect(() => {
+  const handleNavigationReset = () => {
     setSelectedEdgeGateways([]);
     setSelectAll(false);
     goToPage(0);
     setOpenModal(false);
     setIsEditMode(false);
     setSelectedEdgeGateway(null);
+  };
+
+  useEffect(() => {
+    getEdge();
+  }, []);
+
+  useEffect(() => {
+    handleNavigationReset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
