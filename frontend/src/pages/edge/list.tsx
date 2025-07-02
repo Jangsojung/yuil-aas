@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { deleteEdgeAPI, getEdgeAPI } from '../../apis/api/edge';
+import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI } from '../../apis/api/edge';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
@@ -89,6 +89,17 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
     }
   };
 
+  const getEdgeWithStatus = async () => {
+    try {
+      const data: EdgeGateway[] = await getEdgeWithStatusAPI();
+      setEdgeGateways(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Failed to get edge gateways with status:', error);
+      // 실시간 상태 가져오기 실패 시 기본 데이터로 폴백
+      await getEdge();
+    }
+  };
+
   const handleSelectAll = (e: ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     setSelectAll(checked);
@@ -139,7 +150,20 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
   };
 
   useEffect(() => {
-    getEdge();
+    // 페이지 접속 시 실시간 상태로 초기 로드
+    getEdgeWithStatus();
+  }, []);
+
+  useEffect(() => {
+    // 10분마다 실시간 상태 업데이트
+    const interval = setInterval(
+      () => {
+        getEdgeWithStatus();
+      },
+      10 * 60 * 1000
+    ); // 10분
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -159,7 +183,7 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
 
   // getEdge를 ref로 노출
   useImperativeHandle(ref, () => ({
-    refresh: getEdge,
+    refresh: getEdgeWithStatus,
   }));
 
   return (
@@ -218,14 +242,15 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
             </TableBody>
           </Table>
         </TableContainer>
-        <Pagination
-          page={currentPage}
-          count={edgeGateways ? edgeGateways.length : 0}
-          rowsPerPage={rowsPerPage}
-          onPageChange={(event, page) => goToPage(page)}
-          onRowsPerPageChange={handleRowsPerPageChange}
-        />
       </div>
+
+      <Pagination
+        page={currentPage}
+        count={edgeGateways?.length || 0}
+        rowsPerPage={rowsPerPage}
+        onPageChange={(event, page) => goToPage(page)}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
 
       <AlertModal
         open={alertModal.open}
@@ -239,6 +264,6 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
   );
 });
 
-export default EdgeList;
-
 const cells = ['PC 이름', 'PC IP:PORT', '서버 온도', '네트워크 상태', '생성 일자'];
+
+export default EdgeList;

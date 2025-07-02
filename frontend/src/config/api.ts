@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
   // Edge Gateway 관리
   EDGE_GATEWAY: {
     LIST: `${API_BASE_URL}/api/edge_gateway`,
+    STATUS: `${API_BASE_URL}/api/edge_gateway/status`,
     INSERT: `${API_BASE_URL}/api/edge_gateway/insert`,
   },
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getEdgeGateways,
+  getEdgeGatewaysWithStatus,
   insertEdgeGateways,
   updateEdgeGateway,
   deleteEdgeGateways,
@@ -11,6 +12,10 @@ const router = express.Router();
 export default () => {
   router.post('/', (req, res) => {
     getEdgeGateways(res);
+  });
+
+  router.post('/status', (req, res) => {
+    getEdgeGatewaysWithStatus(res);
   });
 
   router.post('/insert', (req, res) => {
