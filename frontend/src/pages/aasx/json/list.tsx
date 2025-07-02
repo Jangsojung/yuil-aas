@@ -12,6 +12,7 @@ import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../../recoil/atoms';
 import { SearchBox, ActionBox } from '../../../components/common';
 import AlertModal from '../../../components/modal/alert';
+import { useNavigate } from 'react-router-dom';
 
 interface File {
   af_idx: number;
@@ -29,6 +30,7 @@ export default function JSONList() {
   const [files, setFiles] = useState<File[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const navigationReset = useRecoilValue(navigationResetState);
+  const navigate = useNavigate();
 
   const [alertModal, setAlertModal] = useState({
     open: false,
@@ -175,6 +177,10 @@ export default function JSONList() {
     }
   }, [selectedFiles, files]);
 
+  const handleRowClick = (af_idx: number) => {
+    navigate(`/aasx/json/detail/${af_idx}`);
+  };
+
   return (
     <div className='table-outer'>
       <SearchBox
@@ -235,6 +241,7 @@ export default function JSONList() {
                     onCheckboxChange={handleCheckboxChange}
                     checked={selectedFiles.includes(file.af_idx)}
                     totalCount={files.length}
+                    onRowClick={handleRowClick}
                   />
                 ))
               ) : (

@@ -27,3 +27,14 @@ export const deleteJSONAPI = async (fileIds) => {
     throw error;
   }
 };
+
+// 단일 JSON 파일 상세 조회
+export const getJSONFileDetailAPI = async (af_idx) => {
+  try {
+    const result = await apiHelpers.post('/api/file/verify', { file: { af_idx } });
+    return result;
+  } catch (error) {
+    console.error('Error fetching JSON file detail:', error);
+    return null;
+  }
+};

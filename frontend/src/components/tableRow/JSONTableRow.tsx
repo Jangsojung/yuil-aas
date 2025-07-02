@@ -13,9 +13,10 @@ interface JSONTableRowProps {
   onCheckboxChange: (id: number) => void;
   checked: boolean;
   totalCount?: number;
+  onRowClick?: (af_idx: number) => void;
 }
 
-export default function JSONTableRow({ file, onCheckboxChange, checked, totalCount }: JSONTableRowProps) {
+export default function JSONTableRow({ file, onCheckboxChange, checked, totalCount, onRowClick }: JSONTableRowProps) {
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -28,8 +29,12 @@ export default function JSONTableRow({ file, onCheckboxChange, checked, totalCou
   };
 
   return (
-    <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell>
+    <TableRow
+      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+      onClick={() => onRowClick && onRowClick(file.af_idx)}
+      style={{ cursor: onRowClick ? 'pointer' : 'default' }}
+    >
+      <TableCell onClick={(e) => e.stopPropagation()}>
         <Checkbox checked={checked} onChange={() => onCheckboxChange(file.af_idx)} />
       </TableCell>
       <TableCell>{file.af_name}</TableCell>

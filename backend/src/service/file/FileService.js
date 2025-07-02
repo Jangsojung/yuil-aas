@@ -331,17 +331,29 @@ export const deleteFilesFromDB = async (ids) => {
 };
 
 export const getVerifyFromDB = async (file) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      const filePath = path.join(__dirname, '../../../../files/aas', file.af_name.replace(/\.aasx$/i, '.json'));
-
-      fs.readFile(filePath, 'utf8', (err, fileData) => {
-        if (err) {
-          console.error('AASX 파일 읽기 오류:', err);
-          reject(new Error('AASX 파일 읽기 실패'));
+      let af_path = file.af_path;
+      let af_name = file.af_name;
+      // af_path, af_name이 없으면 DB에서 조회
+      if (!af_path || !af_name) {
+        const [rows] = await pool
+          .promise()
+          .query('SELECT af_path, af_name FROM tb_aasx_file WHERE af_idx = ?', [file.af_idx]);
+        if (!rows || rows.length === 0) {
+          reject(new Error('DB에서 파일 정보를 찾을 수 없습니다.'));
           return;
         }
-
+        af_path = rows[0].af_path;
+        af_name = rows[0].af_name;
+      }
+      const filePath = path.join(__dirname, '../../../../', af_path, af_name);
+      fs.readFile(filePath, 'utf8', (err, fileData) => {
+        if (err) {
+          console.error('JSON 파일 읽기 오류:', err);
+          reject(new Error('JSON 파일 읽기 실패'));
+          return;
+        }
         try {
           const jsonData = JSON.parse(fileData);
           resolve(jsonData);
@@ -351,8 +363,8 @@ export const getVerifyFromDB = async (file) => {
         }
       });
     } catch (error) {
-      console.error('AASX 파일 처리 오류:', error);
-      reject(new Error('AASX 파일 처리 실패'));
+      console.error('JSON 파일 처리 오류:', error);
+      reject(new Error('JSON 파일 처리 실패'));
     }
   });
 };
