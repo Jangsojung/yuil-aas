@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI } from '../../apis/api/edge';
+import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI, downloadDeployFilesAPI } from '../../apis/api/edge';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
@@ -9,6 +9,7 @@ import { ActionBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { usePagination } from '../../hooks/usePagination';
 import EdgeTableRow from '../../components/tableRow/EdgeTableRow';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -190,6 +191,11 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
     <div className='table-outer'>
       <ActionBox
         buttons={[
+          {
+            text: '배포파일 다운로드',
+            onClick: downloadDeployFilesAPI,
+            color: 'info',
+          },
           {
             text: '등록',
             onClick: onAddClick,

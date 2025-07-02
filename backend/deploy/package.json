@@ -1,0 +1,25 @@
+{
+  "name": "temperature-server",
+  "version": "1.0.0",
+  "description": "Edge Gateway 온도 측정 서버",
+  "main": "temperature-server.js",
+  "scripts": {
+    "start": "node temperature-server.js",
+    "dev": "nodemon temperature-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "systeminformation": "^5.21.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "temperature",
+    "monitoring",
+    "edge-gateway"
+  ],
+  "author": "YUIL AAS",
+  "license": "MIT"
+}

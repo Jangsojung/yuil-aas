@@ -5,6 +5,7 @@ import {
   insertEdgeGateways,
   updateEdgeGateway,
   deleteEdgeGateways,
+  downloadDeployFiles,
 } from '../../controller/edge_gateway/EdgeGatewayController.js';
 
 const router = express.Router();
@@ -34,6 +35,10 @@ export default () => {
   router.delete('/', (req, res) => {
     const { ids } = req.body;
     deleteEdgeGateways(ids, res);
+  });
+
+  router.get('/download-deploy', (req, res) => {
+    downloadDeployFiles(res);
   });
 
   return router;

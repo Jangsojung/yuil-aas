@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+import { API_ENDPOINTS, apiHelpers, API_BASE_URL } from '../../config/api';
 
 export const deleteEdgeAPI = async (data) => {
   try {
@@ -46,6 +46,19 @@ export const updateEdgeAPI = async (data) => {
     return result;
   } catch (error) {
     console.error('Error updating edge gateway:', error);
+    throw error;
+  }
+};
+
+export const downloadDeployFilesAPI = async () => {
+  try {
+    // 새 창에서 다운로드 URL 열기
+    const downloadUrl = `${API_BASE_URL}/api/edge_gateway/download-deploy`;
+    window.open(downloadUrl, '_blank');
+
+    return true;
+  } catch (error) {
+    console.error('Error downloading deploy files:', error);
     throw error;
   }
 };
