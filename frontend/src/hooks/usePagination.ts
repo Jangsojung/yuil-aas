@@ -5,10 +5,14 @@ export const usePagination = (totalItems: number, defaultRowsPerPage: number = P
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
 
-  const totalPages = useMemo(() => Math.ceil(totalItems / rowsPerPage), [totalItems, rowsPerPage]);
+  const totalPages = useMemo(
+    () => (rowsPerPage === -1 ? 1 : Math.ceil(totalItems / rowsPerPage)),
+    [totalItems, rowsPerPage]
+  );
 
   const paginatedData = useCallback(
     <T>(data: T[]): T[] => {
+      if (rowsPerPage === -1) return data;
       const startIndex = currentPage * rowsPerPage;
       const endIndex = startIndex + rowsPerPage;
       return data.slice(startIndex, endIndex);
@@ -42,7 +46,8 @@ export const usePagination = (totalItems: number, defaultRowsPerPage: number = P
   }, []);
 
   const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newPageSize = parseInt(event.target.value, 10);
+    const value = event.target.value;
+    const newPageSize = value === '-1' ? -1 : parseInt(value, 10);
     setRowsPerPage(newPageSize);
     setCurrentPage(0);
   }, []);

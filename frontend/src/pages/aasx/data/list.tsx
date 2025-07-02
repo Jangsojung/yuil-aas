@@ -31,7 +31,8 @@ export default function DataList() {
   } = useWordManagement();
 
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    filteredWords?.length || 0
+    filteredWords?.length || 0,
+    -1 // 기본값: 전체
   );
 
   const pagedData = paginatedData(filteredWords || []);
