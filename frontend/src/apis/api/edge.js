@@ -62,3 +62,14 @@ export const downloadDeployFilesAPI = async () => {
     throw error;
   }
 };
+
+export const checkEdgePingAPI = async (ip, port) => {
+  const url = `${API_BASE_URL}/api/edge_gateway/ping`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ip, port }),
+  });
+  if (!response.ok) throw new Error('Ping check failed');
+  return response.json();
+};

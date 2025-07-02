@@ -4,6 +4,7 @@ import {
   insertEdgeGatewaysToDB,
   updateEdgeGatewayToDB,
   deleteEdgeGatewaysFromDB,
+  checkNetworkStatus,
 } from '../../service/edge_gateway/EdgeGatewayService.js';
 import fs from 'fs';
 import path from 'path';
@@ -107,5 +108,14 @@ export const downloadDeployFiles = async (res) => {
   } catch (err) {
     console.error('배포 파일 다운로드 오류:', err);
     res.status(500).json({ error: '배포 파일 생성 실패' });
+  }
+};
+
+export const checkEdgeGatewayPing = async (ip, port, res) => {
+  try {
+    const isConnected = await checkNetworkStatus(ip);
+    res.status(200).json({ connected: isConnected });
+  } catch (err) {
+    res.status(500).json({ error: 'Ping check failed' });
   }
 };

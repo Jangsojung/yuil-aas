@@ -1,5 +1,7 @@
 import React from 'react';
-import { TableCell, TableRow, Checkbox } from '@mui/material';
+import { TableCell, TableRow, Checkbox, Button } from '@mui/material';
+import { useState } from 'react';
+import { checkEdgePingAPI } from '../../apis/api/edge';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -26,6 +28,23 @@ export default function EdgeTableRow({
   onRowClick,
   formatDate,
 }: EdgeTableRowProps) {
+  const [networkStatus, setNetworkStatus] = useState(edgeGateway.eg_network);
+  const [checking, setChecking] = useState(false);
+
+  const handleCheckStatus = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setChecking(true);
+    try {
+      const [ip, port] = edgeGateway.eg_ip_port.split(':');
+      const result = await checkEdgePingAPI(ip, port);
+      setNetworkStatus(result.connected ? 1 : 0);
+    } catch (err) {
+      setNetworkStatus(0);
+    } finally {
+      setChecking(false);
+    }
+  };
+
   return (
     <TableRow
       key={edgeGateway.eg_idx}
@@ -38,7 +57,19 @@ export default function EdgeTableRow({
       <TableCell>{edgeGateway.eg_pc_name || '-'}</TableCell>
       <TableCell>{edgeGateway.eg_ip_port}</TableCell>
       <TableCell>{edgeGateway.eg_server_temp ? `${edgeGateway.eg_server_temp} °C` : '-'}</TableCell>
-      <TableCell>{edgeGateway.eg_network === 1 ? '연결 됨' : '연결 안 됨'}</TableCell>
+      <TableCell>
+        {networkStatus === 1 ? '연결 됨' : '연결 안 됨'}
+        <Button
+          variant='contained'
+          color='info'
+          size='small'
+          style={{ marginLeft: 8 }}
+          onClick={handleCheckStatus}
+          disabled={checking}
+        >
+          상태 체크
+        </Button>
+      </TableCell>
       <TableCell>{edgeGateway.createdAt ? formatDate(edgeGateway.createdAt) : ''}</TableCell>
     </TableRow>
   );
