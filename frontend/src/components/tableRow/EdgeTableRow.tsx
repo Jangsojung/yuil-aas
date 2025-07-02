@@ -11,6 +11,7 @@ interface EdgeGateway {
   eg_network?: number;
   eg_pc_temp?: number;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 interface EdgeTableRowProps {
@@ -71,6 +72,7 @@ export default function EdgeTableRow({
         </Button>
       </TableCell>
       <TableCell>{edgeGateway.createdAt ? formatDate(edgeGateway.createdAt) : ''}</TableCell>
+      <TableCell>{edgeGateway.updatedAt ? formatDate(edgeGateway.updatedAt) : ''}</TableCell>
     </TableRow>
   );
 }

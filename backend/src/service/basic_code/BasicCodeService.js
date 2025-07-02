@@ -3,7 +3,7 @@ import { pool } from '../../index.js';
 export const getBasesFromDB = async () => {
   return new Promise((resolve, reject) => {
     const query =
-      'select b.ab_idx, b.ab_name, b.ab_note, COUNT(bs.sn_idx) as sn_length, b.createdAt from tb_aasx_base b, tb_aasx_base_sensor bs where b.ab_idx = bs.ab_idx group by b.ab_idx, b.ab_name, b.ab_note, b.createdAt order by b.ab_idx desc';
+      'select b.ab_idx, b.ab_name, b.ab_note, COUNT(bs.sn_idx) as sn_length, b.createdAt, b.updatedAt from tb_aasx_base b, tb_aasx_base_sensor bs where b.ab_idx = bs.ab_idx group by b.ab_idx, b.ab_name, b.ab_note, b.createdAt, b.updatedAt order by b.ab_idx desc';
 
     pool.query(query, async (err, results) => {
       if (err) {
@@ -43,6 +43,7 @@ export const getBasesFromDB = async () => {
               fc_idx: fc_idx,
               sn_length: base.sn_length,
               createdAt: base.createdAt,
+              updatedAt: base.updatedAt,
             };
           })
         );

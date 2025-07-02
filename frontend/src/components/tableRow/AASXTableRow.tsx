@@ -10,6 +10,7 @@ interface AASXTableRowProps {
     af_name: string;
     af_size: number;
     createdAt: string;
+    updatedAt?: string;
   };
   onCheckboxChange: (id: number) => void;
   checked: boolean;
@@ -18,7 +19,7 @@ interface AASXTableRowProps {
 }
 
 export default function AASXTableRow({ file, onCheckboxChange, checked, onEditClick, totalCount }: AASXTableRowProps) {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
     if (!dateString) return '';
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -36,6 +37,7 @@ export default function AASXTableRow({ file, onCheckboxChange, checked, onEditCl
       </TableCell>
       <TableCell>{file.af_name}</TableCell>
       <TableCell>{formatDate(file.createdAt)}</TableCell>
+      <TableCell>{formatDate(file.updatedAt)}</TableCell>
       <TableCell>
         <Button variant='contained' color='success' onClick={() => onEditClick(file)}>
           수정

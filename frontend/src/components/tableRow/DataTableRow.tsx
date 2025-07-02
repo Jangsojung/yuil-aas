@@ -9,6 +9,8 @@ interface DataTableRowProps {
     as_kr: string;
     as_en: string;
     af_idx?: number;
+    createdAt?: string;
+    updatedAt?: string;
   };
   totalCount?: number;
   checked?: boolean;
@@ -83,6 +85,8 @@ export default function DataTableRow({
           data.as_en
         )}
       </TableCell>
+      <TableCell>{data.createdAt ? new Date(data.createdAt).toLocaleString() : ''}</TableCell>
+      <TableCell>{data.updatedAt ? new Date(data.updatedAt).toLocaleString() : ''}</TableCell>
     </TableRow>
   );
 }

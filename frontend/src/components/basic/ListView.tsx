@@ -20,6 +20,7 @@ interface Base {
   ab_note: string;
   sn_length: number;
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 interface ListViewProps {
@@ -51,7 +52,7 @@ interface ListViewProps {
   calculatedTotalPages: number;
 }
 
-const cells = ['기초코드명', '센서 개수', '생성 일자', '비고'];
+const cells = ['기초코드명', '센서 개수', '생성 일자', '수정 일자', '비고'];
 
 export const ListView: React.FC<ListViewProps> = ({
   startDate,
@@ -95,7 +96,6 @@ export const ListView: React.FC<ListViewProps> = ({
           ]}
         >
           <Grid container spacing={4}>
-            
             {/* 기초코드명 */}
             <Grid container spacing={2}>
               <Grid className='sort-title'>
@@ -103,12 +103,12 @@ export const ListView: React.FC<ListViewProps> = ({
               </Grid>
               <Grid>
                 <TextField
-                    size='small'
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    placeholder='기초코드명을 입력하세요'
-                    sx={{ flex: 1 }}
-                  />
+                  size='small'
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  placeholder='기초코드명을 입력하세요'
+                  sx={{ flex: 1 }}
+                />
               </Grid>
             </Grid>
             {/* 기초코드명 */}
@@ -123,7 +123,6 @@ export const ListView: React.FC<ListViewProps> = ({
               </Grid>
             </Grid>
             {/* 날짜 */}
-
           </Grid>
         </SearchBox>
 
@@ -174,6 +173,7 @@ export const ListView: React.FC<ListViewProps> = ({
                     <TableCell>{base.ab_name}</TableCell>
                     <TableCell>{base.sn_length || 0}</TableCell>
                     <TableCell>{formatDate(base.createdAt?.toString())}</TableCell>
+                    <TableCell>{formatDate(base.updatedAt?.toString())}</TableCell>
                     <TableCell>{base.ab_note}</TableCell>
                   </TableRow>
                 ))

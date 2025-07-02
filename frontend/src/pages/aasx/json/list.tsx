@@ -276,4 +276,4 @@ export default function JSONList() {
   );
 }
 
-const cells = ['파일명', '기초코드명', '센서 개수', '생성 일자'];
+const cells = ['파일명', '기초코드명', '센서 개수', '생성 일자', '수정 일자'];

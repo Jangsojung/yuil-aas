@@ -300,4 +300,4 @@ const AASXList = forwardRef(function AASXList({ onEditClick, onAddClick }: AASXL
 
 export default AASXList;
 
-const cells = ['파일명', '생성 일자'];
+const cells = ['파일명', '생성 일자', '수정 일자'];

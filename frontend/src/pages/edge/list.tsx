@@ -280,6 +280,6 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
   );
 });
 
-const cells = ['PC 이름', 'PC IP:PORT', '서버 온도', '네트워크 상태', '생성 일자'];
+const cells = ['PC 이름', 'PC IP:PORT', '서버 온도', '네트워크 상태', '생성 일자', '수정 일자'];
 
 export default EdgeList;

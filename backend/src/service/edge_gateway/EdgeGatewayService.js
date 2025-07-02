@@ -7,7 +7,8 @@ const execAsync = promisify(exec);
 
 export const getEdgeGatewaysFromDB = async () => {
   return new Promise((resolve, reject) => {
-    const query = 'select eg_idx, eg_pc_name, eg_ip_port, createdAt from tb_aasx_edge_gateway order by eg_idx desc';
+    const query =
+      'select eg_idx, eg_pc_name, eg_ip_port, createdAt, updatedAt from tb_aasx_edge_gateway order by eg_idx desc';
 
     pool.query(query, (err, results) => {
       if (err) {
@@ -23,7 +24,11 @@ export const getEdgeGatewaysFromDB = async () => {
             eg_idx: eg.eg_idx,
             eg_pc_name: eg.eg_pc_name,
             eg_ip_port: eg.eg_ip_port,
+            eg_server_temp: eg.eg_server_temp,
+            eg_network: eg.eg_network,
+            eg_pc_temp: eg.eg_pc_temp,
             createdAt: eg.createdAt,
+            updatedAt: eg.updatedAt,
           };
         });
 

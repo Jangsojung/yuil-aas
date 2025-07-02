@@ -7,6 +7,7 @@ interface JSONTableRowProps {
     af_name: string;
     af_size: number;
     createdAt: string;
+    updatedAt?: string;
     base_name?: string;
     sn_length?: number;
   };
@@ -17,7 +18,7 @@ interface JSONTableRowProps {
 }
 
 export default function JSONTableRow({ file, onCheckboxChange, checked, totalCount, onRowClick }: JSONTableRowProps) {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
     if (!dateString) return '';
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -41,6 +42,7 @@ export default function JSONTableRow({ file, onCheckboxChange, checked, totalCou
       <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
       <TableCell>{file.sn_length || 0}</TableCell>
       <TableCell>{formatDate(file.createdAt)}</TableCell>
+      <TableCell>{formatDate(file.updatedAt)}</TableCell>
     </TableRow>
   );
 }

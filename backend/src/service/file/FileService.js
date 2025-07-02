@@ -31,6 +31,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
           f.af_idx, 
           f.af_name, 
           f.createdAt,
+          f.updatedAt,
           b.ab_name AS base_name,
            COUNT(DISTINCT bs.sn_idx) AS sn_length
         FROM tb_aasx_file f
@@ -40,13 +41,13 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
           ON bs.ab_idx = b.ab_idx
         WHERE ${baseWhereClause}
         ${dateClause}
-        GROUP BY f.af_idx, f.af_name, f.createdAt, b.ab_name
+        GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, b.ab_name
         ORDER BY f.af_idx DESC
       `;
     } else {
       // 일반 AASX 파일용 쿼리
       query = `
-        SELECT f.af_idx, f.af_name, f.createdAt
+        SELECT f.af_idx, f.af_name, f.createdAt, f.updatedAt
         FROM tb_aasx_file f
         WHERE ${baseWhereClause}
         ${dateClause}
@@ -71,6 +72,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
             af_idx: file.af_idx,
             af_name: file.af_name,
             createdAt: file.createdAt,
+            updatedAt: file.updatedAt,
             base_name: file.base_name || '삭제된 기초코드',
             sn_length: Number(file.sn_length) || 0,
           };
@@ -79,6 +81,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
             af_idx: file.af_idx,
             af_name: file.af_name,
             createdAt: file.createdAt,
+            updatedAt: file.updatedAt,
           };
         }
       });
