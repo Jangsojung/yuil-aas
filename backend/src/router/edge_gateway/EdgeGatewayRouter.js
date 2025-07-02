@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getEdgeGateways,
+  getEdgeGatewaysWithStatus,
   insertEdgeGateways,
   updateEdgeGateway,
   deleteEdgeGateways,
@@ -13,17 +14,21 @@ export default () => {
     getEdgeGateways(res);
   });
 
+  router.post('/status', (req, res) => {
+    getEdgeGatewaysWithStatus(res);
+  });
+
   router.post('/insert', (req, res) => {
     const { user_idx } = req.body;
-    const { serverTemp, networkStatus, pcTemp, pcIp, pcPort } = req.body;
-    insertEdgeGateways(serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res);
+    const { pcName, pcIp, pcPort } = req.body;
+    insertEdgeGateways(pcName, pcIp, pcPort, user_idx, res);
   });
 
   router.put('/', (req, res) => {
     const { eg_idx, user_idx } = req.body;
-    const { serverTemp, networkStatus, pcTemp, pcIp, pcPort } = req.body;
+    const { pcName, pcIp, pcPort } = req.body;
 
-    updateEdgeGateway(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res);
+    updateEdgeGateway(eg_idx, pcName, pcIp, pcPort, user_idx, res);
   });
 
   router.delete('/', (req, res) => {

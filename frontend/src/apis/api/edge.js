@@ -20,6 +20,16 @@ export const getEdgeAPI = async () => {
   }
 };
 
+export const getEdgeWithStatusAPI = async () => {
+  try {
+    const data = await apiHelpers.post(API_ENDPOINTS.EDGE_GATEWAY.STATUS);
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Error fetching edge gateways with status:', error);
+    return [];
+  }
+};
+
 export const insertEdgeAPI = async (data) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.EDGE_GATEWAY.INSERT, data);

@@ -7,7 +7,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "temp-server": "node temperature-server.js",
+    "temp-server-dev": "nodemon temperature-server.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.2",
     "mysql2": "^3.14.0",
+    "node-fetch": "^3.3.2",
     "ws": "^8.18.1"
   },
   "devDependencies": {

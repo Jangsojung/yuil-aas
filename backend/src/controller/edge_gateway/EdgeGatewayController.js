@@ -1,5 +1,6 @@
 import {
   getEdgeGatewaysFromDB,
+  getEdgeGatewaysWithRealTimeStatus,
   insertEdgeGatewaysToDB,
   updateEdgeGatewayToDB,
   deleteEdgeGatewaysFromDB,
@@ -16,15 +17,24 @@ export const getEdgeGateways = async (res) => {
   }
 };
 
-export const insertEdgeGateways = async (serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res) => {
+export const getEdgeGatewaysWithStatus = async (res) => {
   try {
-    const eg_idx = await insertEdgeGatewaysToDB(serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx);
+    const result = await getEdgeGatewaysWithRealTimeStatus();
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const insertEdgeGateways = async (pcName, pcIp, pcPort, user_idx, res) => {
+  try {
+    const eg_idx = await insertEdgeGatewaysToDB(pcName, pcIp, pcPort, user_idx);
 
     const newEdgeGateway = {
       eg_idx,
-      eg_server_temp: serverTemp,
-      eg_network: networkStatus ? 1 : 0,
-      eg_pc_temp: pcTemp,
+      eg_pc_name: pcName,
       eg_ip_port: `${pcIp}:${pcPort}`,
     };
 
@@ -35,9 +45,9 @@ export const insertEdgeGateways = async (serverTemp, networkStatus, pcTemp, pcIp
   }
 };
 
-export const updateEdgeGateway = async (eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx, res) => {
+export const updateEdgeGateway = async (eg_idx, pcName, pcIp, pcPort, user_idx, res) => {
   try {
-    await updateEdgeGatewayToDB(eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx);
+    await updateEdgeGatewayToDB(eg_idx, pcName, pcIp, pcPort, user_idx);
 
     res.status(200).json({ success: true });
   } catch (err) {
