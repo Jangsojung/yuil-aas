@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getBasesAPI, insertBaseAPI } from '../../apis/api/convert';
 import { Dayjs } from 'dayjs';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import BasicDatePicker from '../../components/datepicker';
 import Pagination from '../../components/pagination';
 import { usePagination } from '../../hooks/usePagination';
@@ -248,26 +248,35 @@ export default function ConvertPage() {
             },
           ]}
         >
-          <Grid container spacing={2} alignItems='center'>
-            <Grid item xs={3}>
-              <div className='flex-center-gap'>
-                <div className='sort-title'>기초코드명</div>
-                <TextField
-                  size='small'
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  placeholder='기초코드명을 입력하세요'
-                  sx={{ flex: 1 }}
-                />
-              </div>
-            </Grid>
+          <Grid container spacing={4}>
 
-            <Grid item xs={6}>
-              <div className='flex-center-gap'>
-                <div className='sort-title'>생성 날짜</div>
+            {/* 기초코드명 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div >기초코드명</div>
+              </Grid>
+              <Grid>
+                <TextField
+                    size='small'
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    placeholder='기초코드명을 입력하세요'
+                    sx={{ flex: 1 }}
+                  />
+              </Grid>
+            </Grid> 
+            {/* 기초코드명 */}
+
+            {/* 생성 날짜 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>생성 날짜</div>
+              </Grid>
+              <Grid>
                 <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
-              </div>
+              </Grid>
             </Grid>
+            {/* 생성 날짜 */}
           </Grid>
         </SearchBox>
 

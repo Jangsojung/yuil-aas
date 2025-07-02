@@ -25,7 +25,7 @@ export default function FactorySelect({
 
   const handleFetchFactories = async () => {
     if (!user?.cm_idx) {
-      setError('사용자 정보에서 회사 정보를 찾을 수 없습니다.');
+      setError('정보 없음'); //사용자정보에서 회사정보가 없음 
       return;
     }
     setLoading(true);

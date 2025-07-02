@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
 import { FacilityGroupTree } from '../../types/api';
@@ -80,6 +80,7 @@ export const EditView: React.FC<EditViewProps> = ({
   return (
     <div className='table-outer'>
       <div>
+        
         <SearchBox
           buttons={[
             {
@@ -89,69 +90,78 @@ export const EditView: React.FC<EditViewProps> = ({
             },
           ]}
         >
-          <Grid container spacing={2}>
-            <Grid item xs={3}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div className='sort-title'>공장</div>
-                </Grid>
-                <Grid item xs={9}>
-                  <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
-                </Grid>
+          
+          <Grid container spacing={4}>
+            
+            {/* 공장 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>공장</div>
+              </Grid>
+              <Grid>
+                <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
               </Grid>
             </Grid>
-            <Grid item xs={3}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div className='sort-title'>설비그룹</div>
-                </Grid>
-                <Grid item xs={9}>
-                  <FacilityGroupSelect
-                    selectedFacilityGroups={selectedFacilityGroups}
-                    setSelectedFacilityGroups={setSelectedFacilityGroups}
-                    selectedFactory={selectedFactory}
+            {/* 공장 */}
+
+            {/* 설비그룹 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>설비그룹</div>
+              </Grid>
+              <Grid>
+                <FacilityGroupSelect
+                  selectedFacilityGroups={selectedFacilityGroups}
+                  setSelectedFacilityGroups={setSelectedFacilityGroups}
+                  selectedFactory={selectedFactory}
+                />
+              </Grid>
+            </Grid>
+            {/* 설비그룹 */}
+
+            {/* 설비명 */}
+            <Grid container size={3}>
+              <Grid className='sort-title'>
+                <div>설비명</div>
+              </Grid>
+              <Grid>
+                <FormControl sx={{ width: '100%' }} size='small'>
+                  <TextField
+                    size='small'
+                    value={facilityName}
+                    onChange={(e) => setFacilityName(e.target.value)}
+                    placeholder='설비명을 입력하세요'
                   />
-                </Grid>
+                </FormControl>
               </Grid>
             </Grid>
+            {/* 설비명 */}
 
-            <Grid item xs={3}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div className='sort-title'>설비명</div>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl sx={{ width: '100%' }} size='small'>
-                    <TextField
-                      size='small'
-                      value={facilityName}
-                      onChange={(e) => setFacilityName(e.target.value)}
-                      placeholder='설비명을 입력하세요'
-                    />
-                  </FormControl>
-                </Grid>
+            {/* 센서명 */}
+            <Grid container size={3}>
+              <Grid className='sort-title'>
+                <div>센서명</div>
+              </Grid>
+              <Grid>
+                <FormControl sx={{ width: '100%' }} size='small'>
+                  <TextField
+                    size='small'
+                    value={sensorName}
+                    onChange={(e) => setSensorName(e.target.value)}
+                    placeholder='센서명을 입력하세요'
+                  />
+                </FormControl>
               </Grid>
             </Grid>
+            {/* 센서명 */}
 
-            <Grid item xs={3}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <div className='sort-title'>센서명</div>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl sx={{ width: '100%' }} size='small'>
-                    <TextField
-                      size='small'
-                      value={sensorName}
-                      onChange={(e) => setSensorName(e.target.value)}
-                      placeholder='센서명을 입력하세요'
-                    />
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
           </Grid>
+
+          
+
         </SearchBox>
+          
+
 
         <ActionBox
           buttons={[

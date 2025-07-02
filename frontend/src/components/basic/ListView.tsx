@@ -1,5 +1,5 @@
 import React from 'react';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
@@ -94,26 +94,36 @@ export const ListView: React.FC<ListViewProps> = ({
             },
           ]}
         >
-          <Grid container spacing={2} alignItems='center'>
-            <Grid item xs={3}>
-              <div className='flex-center-gap'>
-                <div className='sort-title'>기초코드명</div>
+          <Grid container spacing={4}>
+            
+            {/* 기초코드명 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>기초코드명</div>
+              </Grid>
+              <Grid>
                 <TextField
-                  size='small'
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  placeholder='기초코드명을 입력하세요'
-                  sx={{ flex: 1 }}
-                />
-              </div>
+                    size='small'
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    placeholder='기초코드명을 입력하세요'
+                    sx={{ flex: 1 }}
+                  />
+              </Grid>
             </Grid>
+            {/* 기초코드명 */}
 
-            <Grid item xs={6}>
-              <div className='flex-center-gap'>
-                <div className='sort-title'>날짜</div>
+            {/* 날짜 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>날짜</div>
+              </Grid>
+              <Grid>
                 <BasicDatePicker onDateChange={onDateChange} startDate={startDate} endDate={endDate} />
-              </div>
+              </Grid>
             </Grid>
+            {/* 날짜 */}
+
           </Grid>
         </SearchBox>
 

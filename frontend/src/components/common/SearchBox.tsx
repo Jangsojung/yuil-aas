@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import Box from '@mui/system/Box';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
@@ -30,29 +30,27 @@ export default function SearchBox({ children, buttons = [], buttonAlign = 'right
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }} className='sort-box'>
-      <Grid container spacing={1}>
-        <Grid item xs={buttons.length > 0 ? 10 : 12}>
-          {children}
-        </Grid>
-        {buttons.length > 0 && (
-          <Grid item xs={2}>
-            <Stack spacing={1} direction='row' sx={{ justifyContent: getAlignment() }}>
-              {buttons.map((button, index) => (
-                <Button
-                  key={index}
-                  variant={button.variant || 'contained'}
-                  color={button.color || 'success'}
-                  onClick={button.onClick}
-                  disabled={button.disabled}
-                >
-                  {button.text}
-                </Button>
-              ))}
-            </Stack>
-          </Grid>
-        )}
+    <Grid container className='sort-box'>
+      <Grid size={buttons.length > 0 ? 10 : 12}>
+        {children}
       </Grid>
-    </Box>
+      {buttons.length > 0 && (
+        <Grid size={2}>
+          <Stack direction='row' style={{ gap:5,justifyContent: getAlignment() }}>
+            {buttons.map((button, index) => (
+              <Button
+                key={index}
+                variant={button.variant || 'contained'}
+                color={button.color || 'success'}
+                onClick={button.onClick}
+                disabled={button.disabled}
+              >
+                {button.text}
+              </Button>
+            ))}
+          </Stack>
+        </Grid>
+      )}
+    </Grid>
   );
 }

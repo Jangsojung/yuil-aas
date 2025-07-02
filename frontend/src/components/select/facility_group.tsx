@@ -77,7 +77,7 @@ export default function FacilityGroupSelect({
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <FormControl sx={{ flex: 1 }} size='small'>
+      <FormControl fullWidth size='small'>
         <Select
           multiple
           value={selectedFacilityGroups}
