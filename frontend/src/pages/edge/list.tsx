@@ -10,6 +10,7 @@ import AlertModal from '../../components/modal/alert';
 import { usePagination } from '../../hooks/usePagination';
 import EdgeTableRow from '../../components/tableRow/EdgeTableRow';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import LoadingOverlay from '../../components/loading/LodingOverlay';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -50,6 +51,8 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
 
   const pagedData = paginatedData(edgeGateways || []);
 
+  const [loading, setLoading] = useState(true);
+
   const handleDelete = async () => {
     if (selectedEdgeGateways.length === 0) {
       setAlertModal({
@@ -83,21 +86,27 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
 
   const getEdge = async () => {
     try {
+      setLoading(true);
       const data: EdgeGateway[] = await getEdgeAPI();
       setEdgeGateways(Array.isArray(data) ? data : []);
     } catch (error) {
       setEdgeGateways([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const getEdgeWithStatus = async () => {
     try {
+      setLoading(true);
       const data: EdgeGateway[] = await getEdgeWithStatusAPI();
       setEdgeGateways(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to get edge gateways with status:', error);
       // 실시간 상태 가져오기 실패 시 기본 데이터로 폴백
       await getEdge();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -189,6 +198,7 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
 
   return (
     <div className='table-outer'>
+      {loading && <LoadingOverlay />}
       <ActionBox
         buttons={[
           {
