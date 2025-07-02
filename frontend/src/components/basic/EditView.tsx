@@ -38,6 +38,7 @@ interface EditViewProps {
   onBasicModalAdd: () => void;
   onBasicModalReset: () => void;
   onBackToList: () => void;
+  hideFactorySelect?: boolean;
 }
 
 export const EditView: React.FC<EditViewProps> = ({
@@ -66,6 +67,7 @@ export const EditView: React.FC<EditViewProps> = ({
   onBasicModalAdd,
   onBasicModalReset,
   onBackToList,
+  hideFactorySelect = false,
 }) => {
   const { alertModal, showAlert, closeAlert } = useAlertModal();
 
@@ -80,7 +82,6 @@ export const EditView: React.FC<EditViewProps> = ({
   return (
     <div className='table-outer'>
       <div>
-        
         <SearchBox
           buttons={[
             {
@@ -90,18 +91,18 @@ export const EditView: React.FC<EditViewProps> = ({
             },
           ]}
         >
-          
           <Grid container spacing={4}>
-            
             {/* 공장 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>공장</div>
+            {!hideFactorySelect && (
+              <Grid container spacing={2}>
+                <Grid className='sort-title'>
+                  <div>공장</div>
+                </Grid>
+                <Grid>
+                  <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
+                </Grid>
               </Grid>
-              <Grid>
-                <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
-              </Grid>
-            </Grid>
+            )}
             {/* 공장 */}
 
             {/* 설비그룹 */}
@@ -154,14 +155,8 @@ export const EditView: React.FC<EditViewProps> = ({
               </Grid>
             </Grid>
             {/* 센서명 */}
-
           </Grid>
-
-          
-
         </SearchBox>
-          
-
 
         <ActionBox
           buttons={[

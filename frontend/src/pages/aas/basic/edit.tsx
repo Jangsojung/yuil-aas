@@ -104,6 +104,7 @@ export default function BasiccodeEditPage() {
       setEditingBase(targetBase);
       setBasicName(targetBase.ab_name);
       setBasicDesc(targetBase.ab_note || '');
+      setSelectedFactory(targetBase.fc_idx);
 
       const sensorIds = await getBaseSensorsAPI(baseId);
       const sensorIdList = Array.isArray(sensorIds)
@@ -257,6 +258,7 @@ export default function BasiccodeEditPage() {
         onBasicModalAdd={handleBasicModalAdd}
         onBasicModalReset={handleBasicModalReset}
         onBackToList={handleBackToList}
+        hideFactorySelect={true}
       />
     );
   }
