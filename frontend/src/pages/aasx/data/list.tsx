@@ -115,8 +115,10 @@ export default function DataList() {
                 <TableCell sx={{ minWidth: '150px', width: '150px' }}>
                   <Checkbox checked={pagedData ? checkAllCurrentPageSelected() : false} onChange={handleSelectAll} />
                 </TableCell>
-                <TableCell sx={{ width: '50%' }}>한글명</TableCell>
-                <TableCell sx={{ width: '50%' }}>식별 ID</TableCell>
+                <TableCell>한글명</TableCell>
+                <TableCell>식별 ID</TableCell>
+                <TableCell>생성 일자</TableCell>
+                <TableCell>수정 일자</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

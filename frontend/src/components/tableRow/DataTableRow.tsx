@@ -45,6 +45,17 @@ export default function DataTableRow({
     return validPattern.test(value);
   };
 
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
+  };
+
   const currentValue = editingValue ?? data.as_en ?? '';
   const isInvalid = !!currentValue && !isValidEnglish(currentValue);
 
@@ -85,8 +96,8 @@ export default function DataTableRow({
           data.as_en
         )}
       </TableCell>
-      <TableCell>{data.createdAt ? new Date(data.createdAt).toLocaleString() : ''}</TableCell>
-      <TableCell>{data.updatedAt ? new Date(data.updatedAt).toLocaleString() : ''}</TableCell>
+      <TableCell>{formatDate(data.createdAt)}</TableCell>
+      <TableCell>{formatDate(data.updatedAt)}</TableCell>
     </TableRow>
   );
 }

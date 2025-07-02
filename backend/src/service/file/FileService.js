@@ -374,7 +374,7 @@ export const getVerifyFromDB = async (file) => {
 
 export const getWordsFromDB = async (fc_idx) => {
   return new Promise((resolve, reject) => {
-    const query = 'select as_kr, as_en from tb_aasx_alias order by as_idx desc';
+    const query = 'select as_kr, as_en, createdAt, updatedAt from tb_aasx_alias order by as_idx desc';
 
     pool.query(query, (err, results) => {
       if (err) {
@@ -389,6 +389,8 @@ export const getWordsFromDB = async (fc_idx) => {
           return {
             as_kr: word.as_kr,
             as_en: word.as_en,
+            createdAt: word.createdAt,
+            updatedAt: word.updatedAt,
           };
         });
 
