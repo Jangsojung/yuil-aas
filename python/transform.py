@@ -73,7 +73,9 @@ def transform_aas(path, data):
         obj_store.add(aas)
         aas_ids.append(id_)
 
-    basyx_json.write_aas_json_file(f'../files/aas/{basename}', obj_store, indent=2)
+    output_path = f'../files/aas/{basename}'
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    basyx_json.write_aas_json_file(output_path, obj_store, indent=2)
 
 
 def transform_aasx(path):
@@ -81,13 +83,15 @@ def transform_aasx(path):
     obj_store = basyx_json.read_aas_json_file(path)
 
     filename = os.path.splitext(os.path.basename(path))[0]
+    output_path = f'../files/aasx/{filename}.aasx'
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     aas_ids = [
         aas.id for aas in obj_store
         if isinstance(aas, model.AssetAdministrationShell)
     ]
 
-    with aasx.AASXWriter(f'../files/aasx/{filename}.aasx') as writer:
+    with aasx.AASXWriter(output_path) as writer:
         writer.write_aas(
             aas_ids=aas_ids,
             object_store=obj_store,
