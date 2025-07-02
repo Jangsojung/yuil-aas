@@ -3,10 +3,11 @@ import CustomizedDialogs from '../../components/modal/edgemodal';
 
 interface EdgeGateway {
   eg_idx: number;
-  eg_server_temp: number;
-  eg_network: number;
-  eg_pc_temp: number;
+  eg_pc_name?: string;
   eg_ip_port: string;
+  eg_server_temp?: number;
+  eg_network?: number;
+  eg_pc_temp?: number;
   createdAt?: string;
   created_at?: string;
   createDate?: string;

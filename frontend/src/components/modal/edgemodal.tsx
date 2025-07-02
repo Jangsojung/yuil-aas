@@ -15,7 +15,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Switch from '@mui/material/Switch';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import AlertModal from './alert';
@@ -52,50 +51,13 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const IOSSwitch = styled((props) => <Switch focusVisibleClassName='.Mui-focusVisible' disableRipple {...props} />)(
-  ({ theme }) => ({
-    width: 42,
-    height: 26,
-    padding: 0,
-    '& .MuiSwitch-switchBase': {
-      padding: 0,
-      margin: 2,
-      transitionDuration: 300,
-      '&.Mui-checked': {
-        transform: 'translateX(16px)',
-        color: '#fff',
-        '& + .MuiSwitch-track': {
-          backgroundColor: theme.palette.mode === 'dark' ? '#2ECA45' : '#65C466',
-          opacity: 1,
-          border: 0,
-        },
-        '&.Mui-disabled + .MuiSwitch-track': {
-          opacity: 0.5,
-        },
-      },
-    },
-    '& .MuiSwitch-thumb': {
-      boxSizing: 'border-box',
-      width: 22,
-      height: 22,
-    },
-    '& .MuiSwitch-track': {
-      borderRadius: 26 / 2,
-      backgroundColor: theme.palette.mode === 'dark' ? '#39393D' : '#E9E9EA',
-      opacity: 1,
-      transition: theme.transitions.create(['background-color'], {
-        duration: 500,
-      }),
-    },
-  })
-);
-
 interface EdgeGateway {
   eg_idx: number;
-  eg_server_temp: number;
-  eg_network: number;
-  eg_pc_temp: number;
+  eg_pc_name?: string;
   eg_ip_port: string;
+  eg_server_temp?: number;
+  eg_network?: number;
+  eg_pc_temp?: number;
   createdAt?: string;
 }
 
@@ -116,9 +78,7 @@ export default function CustomizedDialogs({
   handleInsert,
   handleUpdate,
 }: CustomizedDialogsProps) {
-  const [serverTemp, setServerTemp] = useState('');
-  const [networkStatus, setNetworkStatus] = useState(false);
-  const [pcTemp, setPcTemp] = useState('');
+  const [pcName, setPcName] = useState('');
   const [pcIp, setPcIp] = useState('');
   const [pcPort, setPcPort] = useState('');
   const [edgeGatewayId, setEdgeGatewayId] = useState<number | null>(null);
@@ -133,9 +93,7 @@ export default function CustomizedDialogs({
 
   const handleEdgeGatewayDataChange = () => {
     if (edgeGatewayData) {
-      setServerTemp(edgeGatewayData.eg_server_temp.toString());
-      setNetworkStatus(edgeGatewayData.eg_network === 1);
-      setPcTemp(edgeGatewayData.eg_pc_temp.toString());
+      setPcName(edgeGatewayData.eg_pc_name || '');
       const [ip, port] = edgeGatewayData.eg_ip_port.split(':');
       setPcIp(ip || '');
       setPcPort(port || '');
@@ -150,17 +108,13 @@ export default function CustomizedDialogs({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [edgeGatewayData, open]);
 
-  const handleNetworkStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNetworkStatus(event.target.checked);
-  };
-
   const validateIp = (ip: string) => {
     const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     return ipRegex.test(ip);
   };
 
   const handleAction = async () => {
-    if (!serverTemp || !pcTemp || !pcIp || !pcPort) {
+    if (!pcName || !pcIp || !pcPort) {
       setAlertModal({
         open: true,
         title: '알림',
@@ -184,9 +138,7 @@ export default function CustomizedDialogs({
     try {
       if (modalType === 'insert' && handleInsert) {
         await insertEdgeAPI({
-          serverTemp: parseInt(serverTemp),
-          networkStatus: networkStatus ? 1 : 0,
-          pcTemp: parseInt(pcTemp),
+          pcName,
           pcIp,
           pcPort,
           user_idx: userIdx,
@@ -195,9 +147,7 @@ export default function CustomizedDialogs({
       } else if (modalType === 'update' && handleUpdate) {
         await updateEdgeAPI({
           eg_idx: edgeGatewayId,
-          serverTemp: parseInt(serverTemp),
-          networkStatus: networkStatus ? 1 : 0,
-          pcTemp: parseInt(pcTemp),
+          pcName,
           pcIp,
           pcPort,
           user_idx: userIdx,
@@ -217,9 +167,7 @@ export default function CustomizedDialogs({
   };
 
   const handleReset = () => {
-    setServerTemp('');
-    setNetworkStatus(false);
-    setPcTemp('');
+    setPcName('');
     setPcIp('');
     setPcPort('');
     setEdgeGatewayId(null);
@@ -264,45 +212,17 @@ export default function CustomizedDialogs({
             <Table aria-label='simple table'>
               <TableBody>
                 <TableRow>
-                  <TableCell>서버온도</TableCell>
+                  <TableCell>PC 이름</TableCell>
                   <TableCell>
-                    <div className='d-flex gap-5 flex-start'>
+                    <div className='d-flex gap-5 flex-center'>
                       <TextField
                         hiddenLabel
-                        type='number'
                         id='outlined-size-small'
                         size='small'
-                        value={serverTemp}
-                        onChange={(e) => setServerTemp(e.target.value)}
-                        className='width-50'
+                        value={pcName}
+                        onChange={(e) => setPcName(e.target.value)}
+                        className='width-120'
                       />
-                      <span>℃</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>네트워크상태</TableCell>
-                  <TableCell>
-                    <div className='d-flex gap-5 flex-start'>
-                      <IOSSwitch checked={networkStatus} onChange={handleNetworkStatusChange} {...({} as any)} />
-                      <span>{networkStatus ? '연결 됨' : '연결 안 됨'}</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell>PC 온도</TableCell>
-                  <TableCell>
-                    <div className='d-flex gap-5 flex-start'>
-                      <TextField
-                        hiddenLabel
-                        type='number'
-                        id='outlined-size-small'
-                        size='small'
-                        value={pcTemp}
-                        onChange={(e) => setPcTemp(e.target.value)}
-                        className='width-50'
-                      />
-                      <span>℃</span>
                     </div>
                   </TableCell>
                 </TableRow>

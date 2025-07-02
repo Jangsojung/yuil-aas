@@ -2,8 +2,7 @@ import { pool } from '../../index.js';
 
 export const getEdgeGatewaysFromDB = async () => {
   return new Promise((resolve, reject) => {
-    const query =
-      'select eg_idx, eg_server_temp, eg_network, eg_pc_temp, eg_ip_port, createdAt from tb_aasx_edge_gateway order by eg_idx desc';
+    const query = 'select eg_idx, eg_pc_name, eg_ip_port, createdAt from tb_aasx_edge_gateway order by eg_idx desc';
 
     pool.query(query, (err, results) => {
       if (err) {
@@ -17,9 +16,7 @@ export const getEdgeGatewaysFromDB = async () => {
         const edgeGateways = results.map((eg) => {
           return {
             eg_idx: eg.eg_idx,
-            eg_server_temp: eg.eg_server_temp,
-            eg_network: eg.eg_network,
-            eg_pc_temp: eg.eg_pc_temp,
+            eg_pc_name: eg.eg_pc_name,
             eg_ip_port: eg.eg_ip_port,
             createdAt: eg.createdAt,
           };
@@ -31,12 +28,12 @@ export const getEdgeGatewaysFromDB = async () => {
   });
 };
 
-export const insertEdgeGatewaysToDB = async (serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx) => {
+export const insertEdgeGatewaysToDB = async (pcName, pcIp, pcPort, user_idx) => {
   try {
     const ipPort = `${pcIp}:${pcPort}`;
 
-    const query = `insert into tb_aasx_edge_gateway (eg_server_temp, eg_network, eg_pc_temp, eg_ip_port, creator, updater) values (?, ?, ?, ?, ?, ?)`;
-    const [result] = await pool.promise().query(query, [serverTemp, networkStatus, pcTemp, ipPort, user_idx, user_idx]);
+    const query = `insert into tb_aasx_edge_gateway (eg_pc_name, eg_ip_port, creator, updater) values (?, ?, ?, ?)`;
+    const [result] = await pool.promise().query(query, [pcName, ipPort, user_idx, user_idx]);
 
     return result.insertId;
   } catch (err) {
@@ -45,12 +42,12 @@ export const insertEdgeGatewaysToDB = async (serverTemp, networkStatus, pcTemp, 
   }
 };
 
-export const updateEdgeGatewayToDB = async (eg_idx, serverTemp, networkStatus, pcTemp, pcIp, pcPort, user_idx) => {
+export const updateEdgeGatewayToDB = async (eg_idx, pcName, pcIp, pcPort, user_idx) => {
   try {
     const ipPort = `${pcIp}:${pcPort}`;
 
-    const query = `update tb_aasx_edge_gateway set eg_server_temp = ?, eg_network = ?, eg_pc_temp = ?, eg_ip_port = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where eg_idx = ?`;
-    await pool.promise().query(query, [serverTemp, networkStatus, pcTemp, ipPort, user_idx, eg_idx]);
+    const query = `update tb_aasx_edge_gateway set eg_pc_name = ?, eg_ip_port = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where eg_idx = ?`;
+    await pool.promise().query(query, [pcName, ipPort, user_idx, eg_idx]);
   } catch (err) {
     console.error('Failed to update Edge Gateway: ', err);
     throw err;

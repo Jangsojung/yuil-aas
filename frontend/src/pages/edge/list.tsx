@@ -12,10 +12,11 @@ import EdgeTableRow from '../../components/tableRow/EdgeTableRow';
 
 interface EdgeGateway {
   eg_idx: number;
-  eg_server_temp: number;
-  eg_network: number;
-  eg_pc_temp: number;
+  eg_pc_name?: string;
   eg_ip_port: string;
+  eg_server_temp?: number;
+  eg_network?: number;
+  eg_pc_temp?: number;
   createdAt?: string;
   created_at?: string;
   createDate?: string;
@@ -240,4 +241,4 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
 
 export default EdgeList;
 
-const cells = ['서버 온도', '네트워크 상태', 'PC 온도', 'PC IP:PORT', '생성 일자'];
+const cells = ['PC 이름', 'PC IP:PORT', '서버 온도', '네트워크 상태', '생성 일자'];
