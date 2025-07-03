@@ -78,7 +78,6 @@ export default function DataList() {
                   size='small'
                   value={searchKeyword}
                   onChange={(e) => handleSearchKeywordChange(e.target.value)}
-                  placeholder='검색어 입력'
                 />
               </Grid>
             </Grid>

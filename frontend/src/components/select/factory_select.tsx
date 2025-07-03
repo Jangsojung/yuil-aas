@@ -12,12 +12,7 @@ interface FactorySelectProps {
   placeholder?: string;
 }
 
-export default function FactorySelect({
-  value,
-  onChange,
-  disabled = false,
-  placeholder = '공장을 선택해주세요',
-}: FactorySelectProps) {
+export default function FactorySelect({ value, onChange, disabled = false, placeholder = '공장' }: FactorySelectProps) {
   const [factories, setFactories] = useState<Factory[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +20,7 @@ export default function FactorySelect({
 
   const handleFetchFactories = async () => {
     if (!user?.cm_idx) {
-      setError('정보 없음'); //사용자정보에서 회사정보가 없음 
+      setError('정보 없음'); //사용자정보에서 회사정보가 없음
       return;
     }
     setLoading(true);

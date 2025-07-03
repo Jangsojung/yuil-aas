@@ -103,12 +103,11 @@ export const ListView: React.FC<ListViewProps> = ({
                 <div>기초코드명</div>
               </Grid>
               <Grid>
-                <FormControl sx={{ minWidth:'200px',width: '100%' }} size='small'>
+                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
                   <TextField
                     size='small'
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
-                    placeholder='기초코드명을 입력하세요'
                     sx={{ flex: 1 }}
                   />
                 </FormControl>

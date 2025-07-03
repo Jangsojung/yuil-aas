@@ -103,7 +103,7 @@ export default function BasicModal({
                 onChange={(e) => setName(e.target.value)}
                 size='small'
                 fullWidth
-                placeholder='기초코드명을 입력하세요'
+                placeholder='기초코드명'
               />
             </Grid>
             <Grid item xs={3} className='form-label'>
@@ -120,7 +120,7 @@ export default function BasicModal({
                 maxRows={5}
                 inputProps={{ maxLength: 500 }}
                 helperText={`${desc.length}/500`}
-                placeholder='비고를 입력하세요'
+                placeholder='비고'
               />
             </Grid>
           </Grid>

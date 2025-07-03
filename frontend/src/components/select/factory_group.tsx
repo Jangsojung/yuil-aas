@@ -19,7 +19,7 @@ export default function FacilityGroupSelect({
   value,
   onChange,
   disabled = false,
-  placeholder = '설비 그룹을 선택해주세요',
+  placeholder = '설비 그룹',
   showFactorySelect = false,
   selectedFactory = '',
   onFactoryChange,
@@ -74,7 +74,7 @@ export default function FacilityGroupSelect({
             value={selectedFactory}
             onChange={onFactoryChange || (() => {})}
             disabled={disabled}
-            placeholder='공장을 선택해주세요'
+            placeholder='공장'
           />
         </div>
         <div style={{ flex: 1 }}>

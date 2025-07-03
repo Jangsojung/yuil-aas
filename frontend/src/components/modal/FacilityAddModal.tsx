@@ -420,7 +420,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         onChange={(e) => setNewFactoryName(e.target.value)}
                         size='small'
                         fullWidth
-                        placeholder='공장명 입력'
+                        placeholder='공장명'
                         disabled={!isNewFactory}
                         sx={{
                           background: isNewFactory ? '#fff' : '#f0f0f0',
@@ -486,7 +486,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         onChange={(e) => setGroupInput(e.target.value)}
                         size='small'
                         fullWidth
-                        placeholder='설비그룹명 입력'
+                        placeholder='설비그룹명'
                         disabled={groupValue !== '신규등록' || (!selectedFactory && !isNewFactory)}
                         sx={{
                           background:
@@ -553,7 +553,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         onChange={(e) => setFacilityInput(e.target.value)}
                         size='small'
                         fullWidth
-                        placeholder='설비명 입력'
+                        placeholder='설비명'
                         disabled={facilityValue !== '신규등록' || !groupValue || groupValue === ''}
                         sx={{
                           background:
@@ -596,7 +596,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                     onChange={(e) => setSensorName(e.target.value)}
                     size='small'
                     fullWidth
-                    placeholder='센서명을 입력하세요'
+                    placeholder='센서명'
                     disabled={!groupValue || !facilityValue || groupValue === '' || facilityValue === ''}
                     sx={{
                       background: '#fff',

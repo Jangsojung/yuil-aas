@@ -127,12 +127,7 @@ export const EditView: React.FC<EditViewProps> = ({
               </Grid>
               <Grid>
                 <FormControl sx={{ width: '100%' }} size='small'>
-                  <TextField
-                    size='small'
-                    value={facilityName}
-                    onChange={(e) => setFacilityName(e.target.value)}
-                    placeholder='설비명을 입력하세요'
-                  />
+                  <TextField size='small' value={facilityName} onChange={(e) => setFacilityName(e.target.value)} />
                 </FormControl>
               </Grid>
             </Grid>
@@ -145,12 +140,7 @@ export const EditView: React.FC<EditViewProps> = ({
               </Grid>
               <Grid>
                 <FormControl sx={{ width: '100%' }} size='small'>
-                  <TextField
-                    size='small'
-                    value={sensorName}
-                    onChange={(e) => setSensorName(e.target.value)}
-                    placeholder='센서명을 입력하세요'
-                  />
+                  <TextField size='small' value={sensorName} onChange={(e) => setSensorName(e.target.value)} />
                 </FormControl>
               </Grid>
             </Grid>

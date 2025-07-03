@@ -62,11 +62,11 @@ export default function FacilityGroupSelect({
 
   const getDisplayText = () => {
     if (selectedFacilityGroups.length === 0) {
-      return '선택 없음';
+      return '선택';
     }
     if (selectedFacilityGroups.length === 1) {
       const selected = facilityGroups.find((fg) => fg.fg_idx === selectedFacilityGroups[0]);
-      return selected ? selected.fg_name : '선택 없음';
+      return selected ? selected.fg_name : '선택';
     }
     return `${selectedFacilityGroups.length}개 선택됨`;
   };

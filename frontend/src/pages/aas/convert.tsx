@@ -278,7 +278,6 @@ export default function ConvertPage() {
                   size='small'
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
-                  placeholder='기초코드명을 입력하세요'
                   sx={{ flex: 1 }}
                 />
               </Grid>
