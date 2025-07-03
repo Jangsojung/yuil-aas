@@ -65,18 +65,21 @@ export interface FacilityGroup {
 export interface FacilityGroupTree {
   fg_idx: number;
   fg_name: string;
+  origin_check?: number;
   facilities: Facility[];
 }
 
 export interface Facility {
   fa_idx: number;
   fa_name: string;
+  origin_check?: number;
   sensors: Sensor[];
 }
 
 export interface Sensor {
   sn_idx: number;
   sn_name: string;
+  origin_check?: number;
 }
 
 // API 응답 타입들
@@ -112,6 +115,7 @@ export interface PaginationState {
 export interface Factory {
   fc_idx: number;
   fc_name: string;
+  origin_check?: number;
 }
 
 export interface User {

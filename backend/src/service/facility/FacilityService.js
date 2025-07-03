@@ -6,8 +6,8 @@ export const insertFacilityGroup = async (name) => {
     const [maxResult] = await pool.promise().query('SELECT MAX(fg_idx) as max_idx FROM tb_aasx_data_aas');
     const nextFgIdx = (maxResult[0].max_idx || 0) + 1;
 
-    const query = 'INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx) VALUES (?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextFgIdx, name, 3]);
+    const query = 'INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx, origin_check) VALUES (?, ?, ?, ?)';
+    const [result] = await pool.promise().query(query, [nextFgIdx, name, 3, 0]);
     return nextFgIdx;
   } catch (err) {
     console.error('Failed to insert Facility Group: ', err);
@@ -21,8 +21,8 @@ export const insertFacility = async (fg_idx, name) => {
     const [maxResult] = await pool.promise().query('SELECT MAX(fa_idx) as max_idx FROM tb_aasx_data_sm');
     const nextFaIdx = (maxResult[0].max_idx || 0) + 1;
 
-    const query = 'INSERT INTO tb_aasx_data_sm (fa_idx, fg_idx, fa_name) VALUES (?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextFaIdx, fg_idx, name]);
+    const query = 'INSERT INTO tb_aasx_data_sm (fa_idx, fg_idx, fa_name, origin_check) VALUES (?, ?, ?, ?)';
+    const [result] = await pool.promise().query(query, [nextFaIdx, fg_idx, name, 0]);
     return nextFaIdx;
   } catch (err) {
     console.error('Failed to insert Facility: ', err);
@@ -36,8 +36,8 @@ export const insertSensor = async (fa_idx, name) => {
     const [maxResult] = await pool.promise().query('SELECT MAX(sn_idx) as max_idx FROM tb_aasx_data_prop');
     const nextSnIdx = (maxResult[0].max_idx || 0) + 1;
 
-    const query = 'INSERT INTO tb_aasx_data_prop (sn_idx, fa_idx, sn_name) VALUES (?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextSnIdx, fa_idx, name]);
+    const query = 'INSERT INTO tb_aasx_data_prop (sn_idx, fa_idx, sn_name, origin_check) VALUES (?, ?, ?, ?)';
+    const [result] = await pool.promise().query(query, [nextSnIdx, fa_idx, name, 0]);
     return nextSnIdx;
   } catch (err) {
     console.error('Failed to insert Sensor: ', err);

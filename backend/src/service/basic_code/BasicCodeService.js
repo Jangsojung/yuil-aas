@@ -153,7 +153,7 @@ export const getFacilityGroupsFromDB = async (fc_idx = 3, order = 'asc') => {
   return new Promise((resolve, reject) => {
     const validOrder = order;
 
-    const query = `select fg_idx, fg_name from tb_aasx_data_aas where fc_idx = ? order by fg_idx ${validOrder}`;
+    const query = `select fg_idx, fg_name, origin_check from tb_aasx_data_aas where fc_idx = ? order by fg_idx ${validOrder}`;
 
     pool.query(query, [fc_idx], (err, results) => {
       if (err) {
@@ -169,6 +169,7 @@ export const getFacilityGroupsFromDB = async (fc_idx = 3, order = 'asc') => {
           return {
             fg_idx: facilityGroup.fg_idx,
             fg_name: facilityGroup.fg_name,
+            origin_check: facilityGroup.origin_check || -1,
           };
         });
 
@@ -180,7 +181,7 @@ export const getFacilityGroupsFromDB = async (fc_idx = 3, order = 'asc') => {
 
 export const getSensorsFromDB = async (fa_idx) => {
   return new Promise((resolve, reject) => {
-    const query = 'select sn_idx, sn_name from tb_aasx_data_prop where fa_idx = ?';
+    const query = 'select sn_idx, sn_name, origin_check from tb_aasx_data_prop where fa_idx = ?';
 
     pool.query(query, [fa_idx], (err, results) => {
       if (err) {
@@ -196,6 +197,7 @@ export const getSensorsFromDB = async (fa_idx) => {
           return {
             sn_idx: sensor.sn_idx,
             sn_name: sensor.sn_name,
+            origin_check: sensor.origin_check || -1,
           };
         });
 
@@ -207,7 +209,7 @@ export const getSensorsFromDB = async (fa_idx) => {
 
 export const getBaseCodeFromDB = async (fg_idx) => {
   return new Promise((resolve, reject) => {
-    const query = `SELECT fa_idx, fa_name from tb_aasx_data_sm where fg_idx =  ?;`;
+    const query = `SELECT fa_idx, fa_name, origin_check from tb_aasx_data_sm where fg_idx =  ?;`;
 
     pool.query(query, [fg_idx], (err, results) => {
       if (err) {
@@ -223,6 +225,7 @@ export const getBaseCodeFromDB = async (fg_idx) => {
           return {
             fa_idx: basic.fa_idx,
             fa_name: basic.fa_name,
+            origin_check: basic.origin_check || -1,
           };
         });
 
@@ -235,7 +238,7 @@ export const getBaseCodeFromDB = async (fg_idx) => {
 export const getAllSensorsInGroupFromDB = async (fg_idx) => {
   return new Promise((resolve, reject) => {
     const query = `
-      SELECT p.sn_idx, p.sn_name 
+      SELECT p.sn_idx, p.sn_name, p.origin_check 
       FROM tb_aasx_data_prop p
       JOIN tb_aasx_data_sm s ON p.fa_idx = s.fa_idx
       WHERE s.fg_idx = ?
@@ -254,6 +257,7 @@ export const getAllSensorsInGroupFromDB = async (fg_idx) => {
           return {
             sn_idx: sensor.sn_idx,
             sn_name: sensor.sn_name,
+            origin_check: sensor.origin_check || -1,
           };
         });
 
@@ -267,7 +271,7 @@ export const getFactoriesByCmIdxFromDB = async (cm_idx) => {
   return new Promise((resolve, reject) => {
     // tb_aasx_data에서 공장 목록 조회 (외래키 제약 조건을 만족하기 위해)
     const query = `
-      SELECT DISTINCT a.fc_idx, a.fc_name 
+      SELECT DISTINCT a.fc_idx, a.fc_name, a.origin_check
       FROM tb_aasx_data a
       INNER JOIN tb_factory_info f ON a.fc_idx = f.fc_idx
       WHERE f.cm_idx = ? 
@@ -288,6 +292,7 @@ export const getFactoriesByCmIdxFromDB = async (cm_idx) => {
           return {
             fc_idx: factory.fc_idx,
             fc_name: factory.fc_name,
+            origin_check: factory.origin_check || -1,
           };
         });
 
@@ -354,8 +359,8 @@ export const insertFacilityGroupToDB = async (fc_idx, fg_name) => {
       const nextFgIdx = (maxResult[0].max_fg_idx || 0) + 1;
 
       // 설비그룹 추가
-      const insertQuery = 'INSERT INTO tb_aasx_data_aas (fc_idx, fg_idx, fg_name) VALUES (?, ?, ?)';
-      await connection.query(insertQuery, [fc_idx, nextFgIdx, fg_name]);
+      const insertQuery = 'INSERT INTO tb_aasx_data_aas (fc_idx, fg_idx, fg_name, origin_check) VALUES (?, ?, ?, ?)';
+      await connection.query(insertQuery, [fc_idx, nextFgIdx, fg_name, 0]);
 
       await connection.commit();
 
@@ -388,8 +393,8 @@ export const insertFacilityToDB = async (fg_idx, fa_name) => {
       const nextFaIdx = (maxResult[0].max_fa_idx || 0) + 1;
 
       // 설비 추가
-      const insertQuery = 'INSERT INTO tb_aasx_data_sm (fg_idx, fa_idx, fa_name) VALUES (?, ?, ?)';
-      await connection.query(insertQuery, [fg_idx, nextFaIdx, fa_name]);
+      const insertQuery = 'INSERT INTO tb_aasx_data_sm (fg_idx, fa_idx, fa_name, origin_check) VALUES (?, ?, ?, ?)';
+      await connection.query(insertQuery, [fg_idx, nextFaIdx, fa_name, 0]);
 
       await connection.commit();
 
@@ -422,8 +427,8 @@ export const insertSensorToDB = async (fa_idx, sn_name) => {
       const nextSnIdx = (maxResult[0].max_sn_idx || 0) + 1;
 
       // 센서 추가
-      const insertQuery = 'INSERT INTO tb_aasx_data_prop (fa_idx, sn_idx, sn_name) VALUES (?, ?, ?)';
-      await connection.query(insertQuery, [fa_idx, nextSnIdx, sn_name]);
+      const insertQuery = 'INSERT INTO tb_aasx_data_prop (fa_idx, sn_idx, sn_name, origin_check) VALUES (?, ?, ?, ?)';
+      await connection.query(insertQuery, [fa_idx, nextSnIdx, sn_name, 0]);
 
       await connection.commit();
 

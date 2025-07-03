@@ -62,7 +62,12 @@ export const getBaseSensorsAPI = async (ab_idx) => {
 export const getFacilityGroupsAPI = async (fc_idx = DEFAULTS.FACILITY_GROUP_ID) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.FACILITY_GROUPS, { fc_idx });
-    return Array.isArray(result) ? result : [];
+    return Array.isArray(result)
+      ? result.map((fg) => ({
+          ...fg,
+          origin_check: fg.origin_check || -1,
+        }))
+      : [];
   } catch (error) {
     console.error('Error fetching facility groups:', error);
     return [];
@@ -73,7 +78,12 @@ export const getFacilityGroupsAPI = async (fc_idx = DEFAULTS.FACILITY_GROUP_ID) 
 export const getFacilitiesAPI = async (fg_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASE_CODE, { fg_idx });
-    return Array.isArray(result) ? result : [];
+    return Array.isArray(result)
+      ? result.map((fa) => ({
+          ...fa,
+          origin_check: fa.origin_check || -1,
+        }))
+      : [];
   } catch (error) {
     console.error('Error fetching facilities:', error);
     return [];
@@ -84,7 +94,12 @@ export const getFacilitiesAPI = async (fg_idx) => {
 export const getSensorsAPI = async (fa_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.SENSORS, { fa_idx });
-    return Array.isArray(result) ? result : [];
+    return Array.isArray(result)
+      ? result.map((sensor) => ({
+          ...sensor,
+          origin_check: sensor.origin_check || -1,
+        }))
+      : [];
   } catch (error) {
     console.error('Error fetching sensors:', error);
     return [];
