@@ -131,10 +131,6 @@ export default function BasicTable({
                             <ListItem>
                               <ListItemText secondary={sensor.sn_name} />
                             </ListItem>
-                            <Divider variant='middle' component='li' />
-                            <ListItem>
-                              <ListItemText secondary={'Prop 1.' + sm_idx + '.' + (idx + 1)} />
-                            </ListItem>
                           </div>
                         </List>
                       </Grid>

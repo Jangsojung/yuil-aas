@@ -93,19 +93,6 @@ export const DetailView: React.FC<DetailViewProps> = ({
                                               <ListItem>
                                                 <ListItemText secondary={sensor.sn_name} />
                                               </ListItem>
-                                              <Divider variant='middle' component='li' />
-                                              <ListItem>
-                                                <ListItemText
-                                                  secondary={
-                                                    'Prop 1.' +
-                                                    (fgIdx + 1) +
-                                                    '.' +
-                                                    (faIdx + 1) +
-                                                    '.' +
-                                                    (rowIndex * 6 + idx + 1)
-                                                  }
-                                                />
-                                              </ListItem>
                                             </div>
                                           </List>
                                         </Grid>
