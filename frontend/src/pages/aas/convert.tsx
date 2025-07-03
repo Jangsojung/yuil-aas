@@ -13,6 +13,7 @@ import { userState, navigationResetState } from '../../recoil/atoms';
 import LoadingOverlay from '../../components/loading/LodingOverlay';
 import { SearchBox, ActionBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
+import ProgressOverlay from '../../components/loading/ProgressOverlay';
 
 interface Base {
   ab_idx: number;
@@ -49,6 +50,9 @@ export default function ConvertPage() {
   );
 
   const pagedData = paginatedData(filteredBases || []);
+
+  const [progress, setProgress] = useState(0);
+  const [progressOpen, setProgressOpen] = useState(false);
 
   const startLoading = () => {
     setIsLoading(true);
@@ -152,7 +156,6 @@ export default function ConvertPage() {
       setAlertOpen(true);
       return;
     }
-
     const selectedBaseDates = baseDates[selectedConvert];
     if (!selectedBaseDates || !selectedBaseDates.startDate || !selectedBaseDates.endDate) {
       setAlertTitle('알림');
@@ -161,28 +164,29 @@ export default function ConvertPage() {
       setAlertOpen(true);
       return;
     }
-
-    startLoading();
+    setProgressOpen(true);
+    setProgress(10);
     try {
+      setProgress(30);
       const formattedStartDate = selectedBaseDates.startDate.format('YYMMDD');
       const formattedEndDate = selectedBaseDates.endDate.format('YYMMDD');
-
+      setProgress(60);
       const data = await insertBaseAPI(formattedStartDate, formattedEndDate, selectedConvert, userIdx);
-
+      setProgress(90);
       if (data) {
         setAlertTitle('알림');
         setAlertContent('성공적으로 json파일을 생성하였습니다.\n파일 위치: /files/front');
         setAlertType('alert');
         setAlertOpen(true);
-
         setSelectedConvert(null);
         setBaseDates({});
       }
+      setProgress(100);
+      setTimeout(() => setProgressOpen(false), 300);
     } catch (error) {
+      setProgressOpen(false);
       console.error('변환 오류:', error);
-
       let errorMessage = '파일 생성 중 오류가 발생했습니다.';
-
       if (error instanceof Error) {
         errorMessage = error.message;
       } else if (typeof error === 'object' && error !== null) {
@@ -201,13 +205,10 @@ export default function ConvertPage() {
           }
         }
       }
-
-      setAlertTitle('오류');
+      setAlertTitle('에러');
       setAlertContent(errorMessage);
       setAlertType('alert');
       setAlertOpen(true);
-    } finally {
-      endLoading();
     }
   };
 
@@ -248,119 +249,120 @@ export default function ConvertPage() {
   }, [bases]);
 
   return (
-    <div className='position-relative height-100'>
-      {isLoading && <LoadingOverlay />}
+    <>
+      <ProgressOverlay open={progressOpen} progress={progress} label='변환 중...' />
+      <div className='position-relative height-100'>
+        <div className={`table-outer ${isLoading ? 'pointer-events-none' : 'pointer-events-auto'}`}>
+          <SearchBox
+            buttons={[
+              {
+                text: '검색',
+                onClick: handleSearch,
+                color: 'success',
+              },
+              {
+                text: '초기화',
+                onClick: handleReset,
+                color: 'inherit',
+                variant: 'outlined',
+              },
+            ]}
+          >
+            <Grid container spacing={4}>
+              {/* 기초코드명 */}
+              <Grid container spacing={2}>
+                <Grid className='sort-title'>
+                  <div>기초코드명</div>
+                </Grid>
+                <Grid>
+                  <TextField
+                    size='small'
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    sx={{ flex: 1 }}
+                  />
+                </Grid>
+              </Grid>
+              {/* 기초코드명 */}
 
-      <div className={`table-outer ${isLoading ? 'pointer-events-none' : 'pointer-events-auto'}`}>
-        <SearchBox
-          buttons={[
-            {
-              text: '검색',
-              onClick: handleSearch,
-              color: 'success',
-            },
-            {
-              text: '초기화',
-              onClick: handleReset,
-              color: 'inherit',
-              variant: 'outlined',
-            },
-          ]}
-        >
-          <Grid container spacing={4}>
-            {/* 기초코드명 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>기초코드명</div>
+              {/* 생성 날짜 */}
+              <Grid container spacing={2}>
+                <Grid className='sort-title'>
+                  <div>생성 날짜</div>
+                </Grid>
+                <Grid>
+                  <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
+                </Grid>
               </Grid>
-              <Grid>
-                <TextField
-                  size='small'
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  sx={{ flex: 1 }}
-                />
-              </Grid>
+              {/* 생성 날짜 */}
             </Grid>
-            {/* 기초코드명 */}
+          </SearchBox>
 
-            {/* 생성 날짜 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>생성 날짜</div>
-              </Grid>
-              <Grid>
-                <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
-              </Grid>
-            </Grid>
-            {/* 생성 날짜 */}
-          </Grid>
-        </SearchBox>
-
-        <ActionBox
-          buttons={[
-            {
-              text: '변환',
-              onClick: handleConvert,
-              color: 'success',
-            },
-          ]}
-        />
-
-        <div className='table-wrap'>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ width: '50px' }}></TableCell>
-                  {cells.map((cell, idx) => (
-                    <TableCell key={idx}>{cell}</TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {pagedData && pagedData.length > 0 ? (
-                  pagedData.map((base, idx) => (
-                    <ConvertTableRow
-                      base={base}
-                      key={idx}
-                      checked={selectedConvert === base.ab_idx}
-                      onCheckboxChange={handleCheckboxChange}
-                      onStartDateChange={handleStartDateChange}
-                      onEndDateChange={handleEndDateChange}
-                      totalCount={filteredBases.length}
-                      startDate={baseDates[base.ab_idx]?.startDate || null}
-                      endDate={baseDates[base.ab_idx]?.endDate || null}
-                      onDatePickerOpen={handleDatePickerOpen}
-                    />
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={cells.length + 1} align='center'>
-                      데이터가 없습니다.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Pagination
-            count={filteredBases ? filteredBases.length : 0}
-            page={currentPage}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(event, page) => goToPage(page)}
-            onRowsPerPageChange={handleRowsPerPageChange}
+          <ActionBox
+            buttons={[
+              {
+                text: '변환',
+                onClick: handleConvert,
+                color: 'success',
+              },
+            ]}
           />
-        </div>
-      </div>
 
-      <AlertModal
-        open={alertOpen}
-        handleClose={() => setAlertOpen(false)}
-        title={alertTitle}
-        content={alertContent}
-        type={alertType}
-      />
-    </div>
+          <div className='table-wrap'>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ width: '50px' }}></TableCell>
+                    {cells.map((cell, idx) => (
+                      <TableCell key={idx}>{cell}</TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {pagedData && pagedData.length > 0 ? (
+                    pagedData.map((base, idx) => (
+                      <ConvertTableRow
+                        base={base}
+                        key={idx}
+                        checked={selectedConvert === base.ab_idx}
+                        onCheckboxChange={handleCheckboxChange}
+                        onStartDateChange={handleStartDateChange}
+                        onEndDateChange={handleEndDateChange}
+                        totalCount={filteredBases.length}
+                        startDate={baseDates[base.ab_idx]?.startDate || null}
+                        endDate={baseDates[base.ab_idx]?.endDate || null}
+                        onDatePickerOpen={handleDatePickerOpen}
+                      />
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={cells.length + 1} align='center'>
+                        데이터가 없습니다.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Pagination
+              count={filteredBases ? filteredBases.length : 0}
+              page={currentPage}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(event, page) => goToPage(page)}
+              onRowsPerPageChange={handleRowsPerPageChange}
+            />
+          </div>
+        </div>
+
+        <AlertModal
+          open={alertOpen}
+          handleClose={() => setAlertOpen(false)}
+          title={alertTitle}
+          content={alertContent}
+          type={alertType}
+        />
+      </div>
+    </>
   );
 }

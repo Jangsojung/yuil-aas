@@ -11,6 +11,7 @@ import {
   synchronizeFacility,
 } from '../apis/api/facility';
 import { FactoryTree } from '../types/api';
+import ProgressOverlay from '../components/loading/ProgressOverlay';
 
 export const useFacilityManagement = () => {
   const userIdx = useRecoilValue(userState)?.user_idx;
@@ -31,28 +32,37 @@ export const useFacilityManagement = () => {
   const [syncLoading, setSyncLoading] = useState(false);
   const [factoryRefreshKey, setFactoryRefreshKey] = useState(0);
   const [facilityGroupRefreshKey, setFacilityGroupRefreshKey] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [progressOpen, setProgressOpen] = useState(false);
 
   // 트리 검색
   const handleTreeSearch = useCallback(async () => {
+    setProgressOpen(true);
+    setProgress(10); // 시작
     if (!selectedFactory) {
+      setProgressOpen(false);
       return { success: false, message: '공장을 선택해주세요.' };
     }
-
     if (!facilityName.trim() && !sensorName.trim() && selectedFacilityGroups.length === 0) {
+      setProgressOpen(false);
       return { success: false, message: '검색 조건을 입력해주세요.' };
     }
-
     setTreeLoading(true);
     try {
+      setProgress(20);
       const finalFilteredData = await buildTreeDataAPI(
         selectedFacilityGroups,
         facilityName,
         sensorName,
         selectedFactory as number
       );
+      setProgress(80);
       setTreeData(finalFilteredData);
+      setProgress(100);
+      setTimeout(() => setProgressOpen(false), 300); // 0.3초 후 overlay 닫기
       return { success: true };
     } catch (err) {
+      setProgressOpen(false);
       console.error('검색 에러:', err);
       setTreeData([]);
       return { success: false, message: '검색 중 오류가 발생했습니다.' };
@@ -231,6 +241,8 @@ export const useFacilityManagement = () => {
     syncLoading,
     factoryRefreshKey,
     facilityGroupRefreshKey,
+    progress,
+    progressOpen,
     handleTreeSearch,
     handleReset,
     handlePartialReset,
@@ -254,5 +266,7 @@ export const useFacilityManagement = () => {
     showAlert,
     showConfirm,
     closeAlert,
+    setProgress,
+    setProgressOpen,
   };
 };

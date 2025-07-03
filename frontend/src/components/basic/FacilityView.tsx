@@ -53,7 +53,7 @@ interface FacilityViewProps {
   closeAlert: () => void;
 }
 
-export const FacilityView: React.FC<FacilityViewProps> = ({
+export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean }> = ({
   treeData,
   treeLoading,
   selectedFacilityGroups,
@@ -87,6 +87,7 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   showAlert,
   showConfirm,
   closeAlert,
+  progressOpen = false,
 }) => {
   // treeData는 이미 4단계 구조로 반환됨
   const convertedTreeData: FactoryTree[] = treeData as FactoryTree[];
@@ -298,7 +299,7 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
       </div>
 
       <div className='table-wrap'>
-        {treeLoading ? (
+        {treeLoading && !progressOpen ? (
           <LoadingOverlay />
         ) : treeData.length === 0 ? (
           <div className='text-center text-muted padding-lg'>조회 결과 없음</div>

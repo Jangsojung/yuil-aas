@@ -5,6 +5,7 @@ import { useFacilityManagement } from '../../hooks/useFacilityManagement';
 import { FacilityView } from '../../components/basic/FacilityView';
 import AlertModal from '../../components/modal/alert';
 import LoadingOverlay from '../../components/loading/LodingOverlay';
+import ProgressOverlay from '../../components/loading/ProgressOverlay';
 
 export default function FacilityManagementPage() {
   const navigationReset = useRecoilValue(navigationResetState);
@@ -44,6 +45,8 @@ export default function FacilityManagementPage() {
     showAlert,
     showConfirm,
     closeAlert,
+    progress,
+    progressOpen,
   } = useFacilityManagement();
 
   // 네비게이션 리셋 처리
@@ -55,6 +58,7 @@ export default function FacilityManagementPage() {
 
   return (
     <>
+      <ProgressOverlay open={progressOpen} progress={progress} label='트리 데이터 불러오는 중...' />
       <FacilityView
         treeData={treeData}
         treeLoading={treeLoading}
@@ -89,6 +93,7 @@ export default function FacilityManagementPage() {
         showAlert={showAlert}
         showConfirm={showConfirm}
         closeAlert={closeAlert}
+        progressOpen={progressOpen}
       />
 
       <AlertModal

@@ -16,6 +16,7 @@ import { userState } from '../../recoil/atoms';
 import LoadingOverlay from '../loading/LodingOverlay';
 import AlertModal from './alert';
 import { updateAASXFileAPI, uploadAASXFileAPI } from '../../apis/api/aasx_manage';
+import ProgressOverlay from '../loading/ProgressOverlay';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -74,6 +75,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     onConfirm: undefined as (() => void) | undefined,
   });
   const userIdx = useRecoilValue(userState)?.user_idx;
+  const [progress, setProgress] = useState(100);
 
   const title = fileData ? (selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정') : '파일 등록';
 
@@ -199,7 +201,9 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   return (
     <>
       <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
-        {isLoading && <LoadingOverlay />}
+        {isLoading && (
+          <ProgressOverlay open={isLoading} progress={progress} label={fileData ? '수정 중...' : '등록 중...'} />
+        )}
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
           {title}
         </DialogTitle>
