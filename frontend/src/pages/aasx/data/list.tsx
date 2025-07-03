@@ -116,10 +116,9 @@ export default function DataList() {
                 <TableCell sx={{ minWidth: '150px', width: '150px' }}>
                   <Checkbox checked={pagedData ? checkAllCurrentPageSelected() : false} onChange={handleSelectAll} />
                 </TableCell>
-                <TableCell>한글명</TableCell>
-                <TableCell>식별 ID</TableCell>
-                <TableCell>생성 일자</TableCell>
-                <TableCell>수정 일자</TableCell>
+                {cells.map((cell, idx) => (
+                  <TableCell key={idx}>{cell}</TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -164,3 +163,5 @@ export default function DataList() {
     </div>
   );
 }
+
+const cells = ['한글명', '식별 ID', '생성 일자', '수정 일자'];

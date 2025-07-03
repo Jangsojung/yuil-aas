@@ -5,7 +5,7 @@ import { getJSONFileDetailAPI } from '../../../apis/api/json_manage';
 import ActionBox from '../../../components/common/ActionBox';
 import LoadingOverlay from '../../../components/loading/LodingOverlay';
 
-const JsonDetail = () => {
+export default function JsonDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [jsonData, setJsonData] = useState(null);
@@ -51,6 +51,4 @@ const JsonDetail = () => {
       </div>
     </div>
   );
-};
-
-export default JsonDetail;
+}

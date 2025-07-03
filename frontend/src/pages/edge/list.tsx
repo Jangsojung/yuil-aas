@@ -31,7 +31,7 @@ interface EdgeListProps {
   onEditClick: (edgeGateway: EdgeGateway) => void;
 }
 
-const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeListProps, ref) {
+export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeListProps, ref) {
   const [edgeGateways, setEdgeGateways] = useState<EdgeGateway[]>([]);
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useState<number[]>([]);
   const navigationReset = useRecoilValue(navigationResetState);
@@ -281,5 +281,3 @@ const EdgeList = forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeL
 });
 
 const cells = ['PC 이름', 'PC IP:PORT', '서버 온도', '네트워크 상태', '생성 일자', '수정 일자'];
-
-export default EdgeList;

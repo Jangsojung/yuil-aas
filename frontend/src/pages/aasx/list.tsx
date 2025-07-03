@@ -31,7 +31,7 @@ interface AASXListProps {
   onAddClick: () => void;
 }
 
-const AASXList = forwardRef(function AASXList({ onEditClick, onAddClick }: AASXListProps, ref) {
+export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXListProps, ref) {
   const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -297,7 +297,5 @@ const AASXList = forwardRef(function AASXList({ onEditClick, onAddClick }: AASXL
     </div>
   );
 });
-
-export default AASXList;
 
 const cells = ['파일명', '생성 일자', '수정 일자'];
