@@ -68,14 +68,10 @@ export const apiHelpers = {
         let errorMessage = `HTTP error! status: ${response.status}`;
         try {
           const errorData = await response.json();
-          console.log('Error response data:', errorData);
-          console.log('Error response status:', response.status);
           if (errorData.message) {
             errorMessage = errorData.message;
-            console.log('Using errorData.message:', errorMessage);
           } else if (errorData.error) {
             errorMessage = errorData.error;
-            console.log('Using errorData.error:', errorMessage);
           }
         } catch (e) {
           console.error('Error parsing error response:', e);
@@ -87,7 +83,6 @@ export const apiHelpers = {
           status: response.status,
           data: errorMessage,
         };
-        console.log('Throwing error with message:', errorMessage);
         throw error;
       }
 

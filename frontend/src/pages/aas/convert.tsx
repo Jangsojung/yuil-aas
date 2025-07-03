@@ -180,20 +180,15 @@ export default function ConvertPage() {
       }
     } catch (error) {
       console.error('변환 오류:', error);
-      console.error('Error type:', typeof error);
-      console.error('Error instanceof Error:', error instanceof Error);
-      console.error('Error object keys:', error ? Object.keys(error) : 'null');
 
       let errorMessage = '파일 생성 중 오류가 발생했습니다.';
 
       if (error instanceof Error) {
         errorMessage = error.message;
-        console.log('Using Error.message:', errorMessage);
       } else if (typeof error === 'object' && error !== null) {
         const errorObj = error as Record<string, any>;
         if ('message' in errorObj) {
           errorMessage = String(errorObj.message);
-          console.log('Using error.message:', errorMessage);
         } else if (
           'response' in errorObj &&
           errorObj.response &&
@@ -203,7 +198,6 @@ export default function ConvertPage() {
           const response = errorObj.response as Record<string, any>;
           if ('data' in response) {
             errorMessage = String(response.data);
-            console.log('Using error.response.data:', errorMessage);
           }
         }
       }
