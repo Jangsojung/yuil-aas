@@ -136,17 +136,9 @@ export const buildTreeDataAPI = async (
         const facilities = await getFacilitiesAPI(fg.fg_idx);
         const facilitiesArray = Array.isArray(facilities) ? facilities : [];
 
-        // 설비명 필터링
-        let filteredFacilities = facilitiesArray;
-        if (facilityName.trim()) {
-          filteredFacilities = facilitiesArray.filter(
-            (fa) => fa.fa_name && fa.fa_name.toLowerCase().includes(facilityName.trim().toLowerCase())
-          );
-        }
-
         // 각 설비별로 센서 정보 조회
         const facilitiesWithSensors = await Promise.all(
-          filteredFacilities.map(async (fa) => {
+          facilitiesArray.map(async (fa) => {
             const sensors = await getSensorsAPI(fa.fa_idx);
             const sensorsArray = Array.isArray(sensors) ? sensors : [];
 
@@ -162,18 +154,21 @@ export const buildTreeDataAPI = async (
           })
         );
 
-        // 센서가 있는 설비만 필터링
-        const facilitiesWithSensorsFiltered = facilitiesWithSensors.filter(
-          (fa) => fa.sensors && Array.isArray(fa.sensors) && fa.sensors.length > 0
-        );
-        return { ...fg, facilities: facilitiesWithSensorsFiltered };
+        // 설비명 필터링
+        let filteredFacilities = facilitiesWithSensors;
+        if (facilityName.trim()) {
+          filteredFacilities = facilitiesWithSensors.filter(
+            (fa) => fa.fa_name && fa.fa_name.toLowerCase().includes(facilityName.trim().toLowerCase())
+          );
+        }
+
+        // 설비가 없어도 설비그룹은 항상 포함
+        return { ...fg, facilities: filteredFacilities };
       })
     );
 
-    // 5. 설비가 있는 그룹만 필터링
-    const finalFilteredGroups = facilitiesAll.filter(
-      (fg) => fg.facilities && Array.isArray(fg.facilities) && fg.facilities.length > 0
-    );
+    // 설비그룹은 항상 포함
+    const finalFilteredGroups = facilitiesAll;
 
     // 6. 4단계 구조로 반환
     return [
