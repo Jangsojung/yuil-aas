@@ -321,8 +321,8 @@ export const insertFactoryToDB = async (cm_idx, fc_name) => {
       const nextFcIdx = Math.max(maxFactoryIdx, maxAasxIdx) + 1;
 
       // tb_aasx_data에 먼저 공장 정보 추가 (외래키 제약 조건을 위해)
-      const insertAasxQuery = 'INSERT INTO tb_aasx_data (fc_idx, fc_name) VALUES (?, ?)';
-      await connection.query(insertAasxQuery, [nextFcIdx, fc_name]);
+      const insertAasxQuery = 'INSERT INTO tb_aasx_data (fc_idx, fc_name, origin_check) VALUES (?, ?, ?)';
+      await connection.query(insertAasxQuery, [nextFcIdx, fc_name, 0]);
 
       // tb_factory_info에 공장 추가
       const insertQuery = 'INSERT INTO tb_factory_info (cm_idx, fc_idx, fc_name) VALUES (?, ?, ?)';

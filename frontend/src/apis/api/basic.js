@@ -114,16 +114,23 @@ export const buildTreeDataAPI = async (
   fc_idx = DEFAULTS.FACILITY_GROUP_ID
 ) => {
   try {
-    // 1. 모든 설비그룹 조회
+    // 1. 공장 정보 조회 - 선택된 공장의 정보를 가져옴
+    const factoryInfo = await getFactoriesByCmIdxAPI(1);
+    const selectedFactory =
+      factoryInfo && factoryInfo.length > 0
+        ? factoryInfo.find((f) => f.fc_idx === fc_idx) || factoryInfo[0]
+        : { fc_idx, fc_name: '공장' };
+
+    // 2. 모든 설비그룹 조회
     const allFacilityGroups = await getFacilityGroupsAPI(fc_idx);
 
-    // 2. 필터링된 설비그룹
+    // 3. 필터링된 설비그룹
     let filteredFacilityGroups = allFacilityGroups;
     if (selectedFacilityGroups.length > 0) {
       filteredFacilityGroups = allFacilityGroups.filter((fg) => selectedFacilityGroups.includes(fg.fg_idx));
     }
 
-    // 3. 각 설비그룹별로 설비와 센서 정보 조회
+    // 4. 각 설비그룹별로 설비와 센서 정보 조회
     const facilitiesAll = await Promise.all(
       filteredFacilityGroups.map(async (fg) => {
         const facilities = await getFacilitiesAPI(fg.fg_idx);
@@ -163,11 +170,20 @@ export const buildTreeDataAPI = async (
       })
     );
 
-    // 4. 설비가 있는 그룹만 반환
-    const finalFilteredData = facilitiesAll.filter(
+    // 5. 설비가 있는 그룹만 필터링
+    const finalFilteredGroups = facilitiesAll.filter(
       (fg) => fg.facilities && Array.isArray(fg.facilities) && fg.facilities.length > 0
     );
-    return finalFilteredData;
+
+    // 6. 4단계 구조로 반환
+    return [
+      {
+        fc_idx: selectedFactory.fc_idx,
+        fc_name: selectedFactory.fc_name,
+        origin_check: selectedFactory.origin_check || 0,
+        facilityGroups: finalFilteredGroups,
+      },
+    ];
   } catch (error) {
     console.error('Error building tree data:', error);
     throw error;
@@ -299,6 +315,74 @@ export const insertSensorAPI = async (fa_idx, sn_name) => {
     return result;
   } catch (error) {
     console.error('Error inserting sensor:', error);
+    throw error;
+  }
+};
+
+// 기초코드 관리를 위한 3단계 트리 데이터 구축 API
+export const buildTreeDataForBasicAPI = async (
+  selectedFacilityGroups = [],
+  facilityName = '',
+  sensorName = '',
+  fc_idx = DEFAULTS.FACILITY_GROUP_ID
+) => {
+  try {
+    // 1. 모든 설비그룹 조회
+    const allFacilityGroups = await getFacilityGroupsAPI(fc_idx);
+
+    // 2. 필터링된 설비그룹
+    let filteredFacilityGroups = allFacilityGroups;
+    if (selectedFacilityGroups.length > 0) {
+      filteredFacilityGroups = allFacilityGroups.filter((fg) => selectedFacilityGroups.includes(fg.fg_idx));
+    }
+
+    // 3. 각 설비그룹별로 설비와 센서 정보 조회
+    const facilitiesAll = await Promise.all(
+      filteredFacilityGroups.map(async (fg) => {
+        const facilities = await getFacilitiesAPI(fg.fg_idx);
+        const facilitiesArray = Array.isArray(facilities) ? facilities : [];
+
+        // 설비명 필터링
+        let filteredFacilities = facilitiesArray;
+        if (facilityName.trim()) {
+          filteredFacilities = facilitiesArray.filter(
+            (fa) => fa.fa_name && fa.fa_name.toLowerCase().includes(facilityName.trim().toLowerCase())
+          );
+        }
+
+        // 각 설비별로 센서 정보 조회
+        const facilitiesWithSensors = await Promise.all(
+          filteredFacilities.map(async (fa) => {
+            const sensors = await getSensorsAPI(fa.fa_idx);
+            const sensorsArray = Array.isArray(sensors) ? sensors : [];
+
+            // 센서명 필터링
+            let filteredSensors = sensorsArray;
+            if (sensorName.trim()) {
+              filteredSensors = sensorsArray.filter(
+                (sensor) => sensor.sn_name && sensor.sn_name.toLowerCase().includes(sensorName.trim().toLowerCase())
+              );
+            }
+
+            return { ...fa, sensors: filteredSensors };
+          })
+        );
+
+        // 센서가 있는 설비만 필터링
+        const facilitiesWithSensorsFiltered = facilitiesWithSensors.filter(
+          (fa) => fa.sensors && Array.isArray(fa.sensors) && fa.sensors.length > 0
+        );
+        return { ...fg, facilities: facilitiesWithSensorsFiltered };
+      })
+    );
+
+    // 4. 설비가 있는 그룹만 반환
+    const finalFilteredData = facilitiesAll.filter(
+      (fg) => fg.facilities && Array.isArray(fg.facilities) && fg.facilities.length > 0
+    );
+    return finalFilteredData;
+  } catch (error) {
+    console.error('Error building tree data for basic:', error);
     throw error;
   }
 };

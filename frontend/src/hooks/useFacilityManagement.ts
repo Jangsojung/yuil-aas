@@ -4,14 +4,14 @@ import { userState } from '../recoil/atoms';
 import { useAlertModal } from './useAlertModal';
 import { buildTreeDataAPI } from '../apis/api/basic';
 import { deleteSensors, synchronizeFacility } from '../apis/api/facility';
-import { FacilityGroupTree } from '../types/api';
+import { FactoryTree } from '../types/api';
 
 export const useFacilityManagement = () => {
   const userIdx = useRecoilValue(userState)?.user_idx;
   const { alertModal, showAlert, showConfirm, closeAlert } = useAlertModal();
 
   // 상태 관리
-  const [treeData, setTreeData] = useState<FacilityGroupTree[]>([]);
+  const [treeData, setTreeData] = useState<FactoryTree[]>([]);
   const [treeLoading, setTreeLoading] = useState(false);
   const [selectedFacilityGroups, setSelectedFacilityGroups] = useState<number[]>([]);
   const [facilityName, setFacilityName] = useState('');

@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedSensorsState, userState } from '../recoil/atoms';
 import { useAlertModal } from './useAlertModal';
-import { insertBaseAPI, buildTreeDataAPI } from '../apis/api/basic';
+import { insertBaseAPI, buildTreeDataForBasicAPI } from '../apis/api/basic';
 import { FacilityGroupTree } from '../types/api';
 
 export const useBasicAdd = () => {
@@ -75,7 +75,7 @@ export const useBasicAdd = () => {
     }
     setTreeLoading(true);
     try {
-      const finalFilteredData = await buildTreeDataAPI(
+      const finalFilteredData = await buildTreeDataForBasicAPI(
         selectedFacilityGroups,
         facilityName,
         sensorName,

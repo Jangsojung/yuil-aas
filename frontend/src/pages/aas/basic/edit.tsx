@@ -12,7 +12,7 @@ import {
   getBaseSensorsAPI,
   getBasesAPI,
   buildTreeFromSensorIdsAPI,
-  buildTreeDataAPI,
+  buildTreeDataForBasicAPI,
 } from '../../../apis/api/basic';
 
 export default function BasiccodeEditPage() {
@@ -179,7 +179,7 @@ export default function BasiccodeEditPage() {
 
     setTreeLoading(true);
     try {
-      const finalFilteredData = await buildTreeDataAPI(selectedFacilityGroups, facilityName, sensorName);
+      const finalFilteredData = await buildTreeDataForBasicAPI(selectedFacilityGroups, facilityName, sensorName);
       setTreeData(finalFilteredData);
     } catch (err) {
       console.error('검색 에러:', err);

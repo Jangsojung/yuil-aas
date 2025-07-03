@@ -124,3 +124,10 @@ export interface User {
   user_name: string;
   cm_idx?: number;
 }
+
+export interface FactoryTree {
+  fc_idx: number;
+  fc_name: string;
+  origin_check?: number;
+  facilityGroups: FacilityGroupTree[];
+}
