@@ -129,7 +129,7 @@ export const useWordManagement = () => {
   );
 
   const handleEnglishChange = useCallback((originalData: Word, newEnglish: string) => {
-    const key = `${originalData.as_kr}|${originalData.as_en}`;
+    const key = `${originalData.as_kr}|${originalData.as_en || ''}`;
     setEditingValues((prev) => ({
       ...prev,
       [key]: newEnglish,
@@ -166,7 +166,7 @@ export const useWordManagement = () => {
 
         return {
           as_kr: as_kr,
-          original_as_en: original_as_en,
+          original_as_en: original_as_en === '' ? null : original_as_en,
           new_as_en: new_as_en,
         };
       });
@@ -186,7 +186,7 @@ export const useWordManagement = () => {
 
   const getEditingValue = useCallback(
     (item: Word) => {
-      const key = `${item.as_kr}|${item.as_en}`;
+      const key = `${item.as_kr}|${item.as_en || ''}`;
       return editingValues[key] !== undefined ? editingValues[key] : item.as_en;
     },
     [editingValues]

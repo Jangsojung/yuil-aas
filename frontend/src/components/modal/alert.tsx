@@ -76,7 +76,7 @@ export default function AlertModal({ open, handleClose, title, content, type, on
         <CloseIcon />
       </IconButton>
       <DialogContent dividers>
-        <Box sx={{ typography: 'body1' }}>{content}</Box>
+        <Box sx={{ typography: 'body1', whiteSpace: 'pre-line' }}>{content}</Box>
       </DialogContent>
       <DialogActions>
         {type === 'alert' ? (

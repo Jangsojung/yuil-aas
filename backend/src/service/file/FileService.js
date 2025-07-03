@@ -443,14 +443,21 @@ export const updateWordsToDB = async (updates) => {
       return new Promise((resolveUpdate, rejectUpdate) => {
         const { as_kr, original_as_en, new_as_en } = update;
 
-        if (!as_kr || !original_as_en || !new_as_en) {
+        if (!as_kr) {
           rejectUpdate(new Error('필수 필드가 누락되었습니다.'));
           return;
         }
 
-        const query = `UPDATE tb_aasx_alias SET as_en = ? WHERE as_kr = ? AND as_en = ?`;
+        let query, params;
+        if (original_as_en === null) {
+          query = `UPDATE tb_aasx_alias SET as_en = ? WHERE as_kr = ? AND as_en IS NULL`;
+          params = [new_as_en || null, as_kr];
+        } else {
+          query = `UPDATE tb_aasx_alias SET as_en = ? WHERE as_kr = ? AND as_en = ?`;
+          params = [new_as_en || null, as_kr, original_as_en];
+        }
 
-        pool.query(query, [new_as_en, as_kr, original_as_en], (err, result) => {
+        pool.query(query, params, (err, result) => {
           if (err) {
             rejectUpdate(err);
           } else {

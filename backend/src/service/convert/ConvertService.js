@@ -84,7 +84,7 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
         .map((item) => `${item.fg_name} > ${item.fa_name} > ${item.sn_name} (${item.missing.join(', ')})`)
         .join('\n');
       throw new Error(
-        `식별 ID가 지정되어있지 않은 항목이 있습니다. 식별 ID 관리 탭에서 지정해주세요.\n\n설정되지 않은 식별 ID:\n${missingDetails}`
+        `식별 ID가 지정되어있지 않은 항목이 있습니다.\n데이터 관리 > 식별 ID 관리 탭에서 지정해주세요.\n\n설정되지 않은 식별 ID:\n${missingDetails}`
       );
     }
 

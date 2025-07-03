@@ -21,11 +21,14 @@ export default function FacilityManagementPage() {
     selectedFactory,
     setSelectedFactory,
     facilityAddModalOpen,
+    selectedSensors,
+    setSelectedSensors,
     handleTreeSearch,
     handleReset,
     handleAddFacility,
     handleCloseFacilityAddModal,
     handleFacilityAddSuccess,
+    handleDeleteSensors,
     alertModal,
     showAlert,
     closeAlert,
@@ -40,8 +43,7 @@ export default function FacilityManagementPage() {
 
   // 설비 삭제 처리
   const handleDeleteFacility = () => {
-    // 선택된 센서가 없으면 알림
-    showAlert('알림', '삭제할 센서를 선택해주세요.');
+    handleDeleteSensors();
   };
 
   return (
@@ -55,8 +57,8 @@ export default function FacilityManagementPage() {
         setFacilityName={setFacilityName}
         sensorName={sensorName}
         setSensorName={setSensorName}
-        selectedSensors={[]}
-        setSelectedSensors={() => {}}
+        selectedSensors={selectedSensors}
+        setSelectedSensors={setSelectedSensors}
         selectedFactory={selectedFactory}
         setSelectedFactory={setSelectedFactory}
         facilityAddModalOpen={facilityAddModalOpen}

@@ -180,8 +180,33 @@ export default function ConvertPage() {
       }
     } catch (error) {
       console.error('변환 오류:', error);
+      console.error('Error type:', typeof error);
+      console.error('Error instanceof Error:', error instanceof Error);
+      console.error('Error object keys:', error ? Object.keys(error) : 'null');
 
-      const errorMessage = error instanceof Error ? error.message : '파일 생성 중 오류가 발생했습니다.';
+      let errorMessage = '파일 생성 중 오류가 발생했습니다.';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        console.log('Using Error.message:', errorMessage);
+      } else if (typeof error === 'object' && error !== null) {
+        const errorObj = error as Record<string, any>;
+        if ('message' in errorObj) {
+          errorMessage = String(errorObj.message);
+          console.log('Using error.message:', errorMessage);
+        } else if (
+          'response' in errorObj &&
+          errorObj.response &&
+          typeof errorObj.response === 'object' &&
+          errorObj.response !== null
+        ) {
+          const response = errorObj.response as Record<string, any>;
+          if ('data' in response) {
+            errorMessage = String(response.data);
+            console.log('Using error.response.data:', errorMessage);
+          }
+        }
+      }
 
       setAlertTitle('오류');
       setAlertContent(errorMessage);
@@ -249,22 +274,21 @@ export default function ConvertPage() {
           ]}
         >
           <Grid container spacing={4}>
-
             {/* 기초코드명 */}
             <Grid container spacing={2}>
               <Grid className='sort-title'>
-                <div >기초코드명</div>
+                <div>기초코드명</div>
               </Grid>
               <Grid>
                 <TextField
-                    size='small'
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    placeholder='기초코드명을 입력하세요'
-                    sx={{ flex: 1 }}
-                  />
+                  size='small'
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  placeholder='기초코드명을 입력하세요'
+                  sx={{ flex: 1 }}
+                />
               </Grid>
-            </Grid> 
+            </Grid>
             {/* 기초코드명 */}
 
             {/* 생성 날짜 */}

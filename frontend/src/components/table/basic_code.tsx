@@ -72,12 +72,12 @@ export default function BasicTable({
     }
   };
 
-  const handleCheckboxChange = (fileIdx: number) => {
+  const handleCheckboxChange = (sensorIdx: number) => {
     setSelectedSensors((prevSelected) => {
-      if (prevSelected.includes(fileIdx)) {
-        return prevSelected.filter((idx) => idx !== fileIdx);
+      if (prevSelected.includes(sensorIdx)) {
+        return prevSelected.filter((idx) => idx !== sensorIdx);
       } else {
-        return [...prevSelected, fileIdx];
+        return [...prevSelected, sensorIdx];
       }
     });
   };

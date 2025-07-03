@@ -3,6 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/atoms';
 import { useAlertModal } from './useAlertModal';
 import { buildTreeDataAPI } from '../apis/api/basic';
+import { deleteSensors } from '../apis/api/facility';
 import { FacilityGroupTree } from '../types/api';
 
 export const useFacilityManagement = () => {
@@ -17,6 +18,7 @@ export const useFacilityManagement = () => {
   const [sensorName, setSensorName] = useState('');
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
   const [facilityAddModalOpen, setFacilityAddModalOpen] = useState(false);
+  const [selectedSensors, setSelectedSensors] = useState<number[]>([]);
 
   // 트리 검색
   const handleTreeSearch = useCallback(async () => {
@@ -71,6 +73,35 @@ export const useFacilityManagement = () => {
     handleTreeSearch();
   }, [handleTreeSearch]);
 
+  // 센서 삭제
+  const handleDeleteSensors = useCallback(async () => {
+    if (selectedSensors.length === 0) {
+      showAlert('알림', '삭제할 센서를 선택해주세요.');
+      return;
+    }
+
+    const confirmed = await new Promise<boolean>((resolve) => {
+      showConfirm('센서 삭제', `선택한 ${selectedSensors.length}개의 센서를 삭제하시겠습니까?`, () => resolve(true));
+    });
+
+    if (!confirmed) return;
+
+    try {
+      const result = await deleteSensors(selectedSensors);
+      if (result.success) {
+        showAlert('알림', result.message);
+        setSelectedSensors([]);
+        // 삭제 후 트리 데이터 새로고침
+        handleTreeSearch();
+      } else {
+        showAlert('오류', result.message || '센서 삭제 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('센서 삭제 실패:', error);
+      showAlert('오류', '센서 삭제 중 오류가 발생했습니다.');
+    }
+  }, [selectedSensors, showAlert, showConfirm, handleTreeSearch]);
+
   return {
     // 상태
     treeData,
@@ -84,6 +115,8 @@ export const useFacilityManagement = () => {
     selectedFactory,
     setSelectedFactory,
     facilityAddModalOpen,
+    selectedSensors,
+    setSelectedSensors,
 
     // 핸들러
     handleTreeSearch,
@@ -91,6 +124,7 @@ export const useFacilityManagement = () => {
     handleAddFacility,
     handleCloseFacilityAddModal,
     handleFacilityAddSuccess,
+    handleDeleteSensors,
 
     // 알림
     alertModal,
