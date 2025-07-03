@@ -97,13 +97,37 @@ export const synchronizeFacilityData = async () => {
           .query('SELECT fc_idx FROM tb_aasx_data WHERE fc_idx = ? AND fc_name = ?', [factory.fc_idx, factory.fc_name]);
 
         if (existingWithName.length === 0) {
-          // fc_name이 다르면 새로운 fc_idx로 추가
+          // fc_name이 다르면 기존 fc_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxFcIdx] = await pool.promise().query('SELECT MAX(fc_idx) as max_idx FROM tb_aasx_data');
           const newFcIdx = (maxFcIdx[0].max_idx || 0) + 1;
 
-          await pool
-            .promise()
-            .query('INSERT INTO tb_aasx_data (fc_idx, fc_name) VALUES (?, ?)', [newFcIdx, factory.fc_name]);
+          // 외래키 제약조건을 일시적으로 비활성화
+          await pool.promise().query('SET FOREIGN_KEY_CHECKS = 0');
+
+          try {
+            // 1. 기존 fc_idx를 새로운 값으로 변경
+            await pool
+              .promise()
+              .query('UPDATE tb_aasx_data SET fc_idx = ? WHERE fc_idx = ?', [newFcIdx, factory.fc_idx]);
+
+            // 2. tb_aasx_data_aas의 fc_idx 참조 업데이트
+            await pool
+              .promise()
+              .query('UPDATE tb_aasx_data_aas SET fc_idx = ? WHERE fc_idx = ?', [newFcIdx, factory.fc_idx]);
+
+            // 3. tb_facility_group_info의 fc_idx 참조 업데이트
+            await pool
+              .promise()
+              .query('UPDATE tb_facility_group_info SET fc_idx = ? WHERE fc_idx = ?', [newFcIdx, factory.fc_idx]);
+
+            // 4. 새로운 (fc_idx, fc_name) 조합으로 저장
+            await pool
+              .promise()
+              .query('INSERT INTO tb_aasx_data (fc_idx, fc_name) VALUES (?, ?)', [factory.fc_idx, factory.fc_name]);
+          } finally {
+            // 외래키 제약조건을 다시 활성화
+            await pool.promise().query('SET FOREIGN_KEY_CHECKS = 1');
+          }
         }
       }
     }
@@ -134,17 +158,41 @@ export const synchronizeFacilityData = async () => {
           .query('SELECT fg_idx FROM tb_aasx_data_aas WHERE fg_idx = ? AND fg_name = ?', [group.fg_idx, group.fg_name]);
 
         if (existingWithName.length === 0) {
-          // fg_name이 다르면 새로운 fg_idx로 추가
+          // fg_name이 다르면 기존 fg_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxFgIdx] = await pool.promise().query('SELECT MAX(fg_idx) as max_idx FROM tb_aasx_data_aas');
           const newFgIdx = (maxFgIdx[0].max_idx || 0) + 1;
 
-          await pool
-            .promise()
-            .query('INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx) VALUES (?, ?, ?)', [
-              newFgIdx,
-              group.fg_name,
-              group.fc_idx,
-            ]);
+          // 외래키 제약조건을 일시적으로 비활성화
+          await pool.promise().query('SET FOREIGN_KEY_CHECKS = 0');
+
+          try {
+            // 1. 기존 fg_idx를 새로운 값으로 변경
+            await pool
+              .promise()
+              .query('UPDATE tb_aasx_data_aas SET fg_idx = ? WHERE fg_idx = ?', [newFgIdx, group.fg_idx]);
+
+            // 2. tb_facility_info의 fg_idx 참조 업데이트
+            await pool
+              .promise()
+              .query('UPDATE tb_facility_info SET fg_idx = ? WHERE fg_idx = ?', [newFgIdx, group.fg_idx]);
+
+            // 3. tb_aasx_data_sm의 fg_idx 참조 업데이트
+            await pool
+              .promise()
+              .query('UPDATE tb_aasx_data_sm SET fg_idx = ? WHERE fg_idx = ?', [newFgIdx, group.fg_idx]);
+
+            // 4. 새로운 (fg_idx, fg_name) 조합으로 저장
+            await pool
+              .promise()
+              .query('INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx) VALUES (?, ?, ?)', [
+                group.fg_idx,
+                group.fg_name,
+                group.fc_idx,
+              ]);
+          } finally {
+            // 외래키 제약조건을 다시 활성화
+            await pool.promise().query('SET FOREIGN_KEY_CHECKS = 1');
+          }
         }
       }
     }
@@ -176,17 +224,41 @@ export const synchronizeFacilityData = async () => {
           ]);
 
         if (existingWithName.length === 0) {
-          // fa_name이 다르면 새로운 fa_idx로 추가
+          // fa_name이 다르면 기존 fa_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxFaIdx] = await pool.promise().query('SELECT MAX(fa_idx) as max_idx FROM tb_aasx_data_sm');
           const newFaIdx = (maxFaIdx[0].max_idx || 0) + 1;
 
-          await pool
-            .promise()
-            .query('INSERT INTO tb_aasx_data_sm (fa_idx, fa_name, fg_idx) VALUES (?, ?, ?)', [
-              newFaIdx,
-              facility.fa_name,
-              facility.fg_idx,
-            ]);
+          // 외래키 제약조건을 일시적으로 비활성화
+          await pool.promise().query('SET FOREIGN_KEY_CHECKS = 0');
+
+          try {
+            // 1. 기존 fa_idx를 새로운 값으로 변경
+            await pool
+              .promise()
+              .query('UPDATE tb_aasx_data_sm SET fa_idx = ? WHERE fa_idx = ?', [newFaIdx, facility.fa_idx]);
+
+            // 2. tb_sensor_info의 fa_idx 참조 업데이트
+            await pool
+              .promise()
+              .query('UPDATE tb_sensor_info SET fa_idx = ? WHERE fa_idx = ?', [newFaIdx, facility.fa_idx]);
+
+            // 3. tb_aasx_data_prop의 fa_idx 참조 업데이트
+            await pool
+              .promise()
+              .query('UPDATE tb_aasx_data_prop SET fa_idx = ? WHERE fa_idx = ?', [newFaIdx, facility.fa_idx]);
+
+            // 4. 새로운 (fa_idx, fa_name) 조합으로 저장
+            await pool
+              .promise()
+              .query('INSERT INTO tb_aasx_data_sm (fa_idx, fa_name, fg_idx) VALUES (?, ?, ?)', [
+                facility.fa_idx,
+                facility.fa_name,
+                facility.fg_idx,
+              ]);
+          } finally {
+            // 외래키 제약조건을 다시 활성화
+            await pool.promise().query('SET FOREIGN_KEY_CHECKS = 1');
+          }
         }
       }
     }
@@ -218,17 +290,36 @@ export const synchronizeFacilityData = async () => {
           ]);
 
         if (existingWithName.length === 0) {
-          // sn_name이 다르면 새로운 sn_idx로 추가
+          // sn_name이 다르면 기존 sn_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxSnIdx] = await pool.promise().query('SELECT MAX(sn_idx) as max_idx FROM tb_aasx_data_prop');
           const newSnIdx = (maxSnIdx[0].max_idx || 0) + 1;
 
-          await pool
-            .promise()
-            .query('INSERT INTO tb_aasx_data_prop (sn_idx, sn_name, fa_idx) VALUES (?, ?, ?)', [
-              newSnIdx,
-              sensor.sn_name,
-              sensor.fa_idx,
-            ]);
+          // 외래키 제약조건을 일시적으로 비활성화
+          await pool.promise().query('SET FOREIGN_KEY_CHECKS = 0');
+
+          try {
+            // 1. 기존 sn_idx를 새로운 값으로 변경
+            await pool
+              .promise()
+              .query('UPDATE tb_aasx_data_prop SET sn_idx = ? WHERE sn_idx = ?', [newSnIdx, sensor.sn_idx]);
+
+            // 2. tb_aasx_base_sensor의 sn_idx 참조 업데이트
+            await pool
+              .promise()
+              .query('UPDATE tb_aasx_base_sensor SET sn_idx = ? WHERE sn_idx = ?', [newSnIdx, sensor.sn_idx]);
+
+            // 4. 새로운 (sn_idx, sn_name) 조합으로 저장
+            await pool
+              .promise()
+              .query('INSERT INTO tb_aasx_data_prop (sn_idx, sn_name, fa_idx) VALUES (?, ?, ?)', [
+                sensor.sn_idx,
+                sensor.sn_name,
+                sensor.fa_idx,
+              ]);
+          } finally {
+            // 외래키 제약조건을 다시 활성화
+            await pool.promise().query('SET FOREIGN_KEY_CHECKS = 1');
+          }
         }
       }
     }
