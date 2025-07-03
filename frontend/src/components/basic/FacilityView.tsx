@@ -26,6 +26,12 @@ interface FacilityViewProps {
   setSensorName: (name: string) => void;
   selectedSensors: number[];
   setSelectedSensors: Dispatch<SetStateAction<number[]>>;
+  selectedFacilities: number[];
+  setSelectedFacilities: Dispatch<SetStateAction<number[]>>;
+  selectedFacilityGroupsForDelete: number[];
+  setSelectedFacilityGroupsForDelete: Dispatch<SetStateAction<number[]>>;
+  selectedFactoriesForDelete: number[];
+  setSelectedFactoriesForDelete: Dispatch<SetStateAction<number[]>>;
   selectedFactory?: number | '';
   setSelectedFactory?: (factory: number | '') => void;
   facilityAddModalOpen?: boolean;
@@ -50,6 +56,12 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   setSensorName,
   selectedSensors,
   setSelectedSensors,
+  selectedFacilities,
+  setSelectedFacilities,
+  selectedFacilityGroupsForDelete,
+  setSelectedFacilityGroupsForDelete,
+  selectedFactoriesForDelete,
+  setSelectedFactoriesForDelete,
   selectedFactory = '',
   setSelectedFactory,
   facilityAddModalOpen = false,
@@ -74,71 +86,101 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   const handleFactoryChange = (factory: number) => {
     if (setSelectedFactory) {
       setSelectedFactory(factory);
-      // 공장이 변경되면 설비그룹 선택 초기화
       setSelectedFacilityGroups([]);
+      setSelectedFacilities([]);
+      setSelectedSensors([]);
+      setSelectedFacilityGroupsForDelete([]);
+      setSelectedFactoriesForDelete([]);
     }
   };
 
   const handleFacilityCheckboxChange = (facility: any) => {
-    const facilitySensorIds = facility.sensors.map((sensor: any) => sensor.sn_idx);
-    const isAllSelected = facilitySensorIds.every((id: number) => selectedSensors.includes(id));
+    console.log('설비 체크박스 클릭:', facility.fa_idx, facility.fa_name);
 
-    if (isAllSelected) {
-      // 모든 센서가 선택되어 있으면 해제
+    // 설비 선택 상태 업데이트
+    const isFacilitySelected = selectedFacilities.includes(facility.fa_idx);
+    if (isFacilitySelected) {
+      setSelectedFacilities((prev) => prev.filter((id) => id !== facility.fa_idx));
+    } else {
+      setSelectedFacilities((prev) => Array.from(new Set([...prev, facility.fa_idx])));
+    }
+
+    // 해당 설비의 모든 센서 선택 상태도 업데이트
+    const facilitySensorIds = facility.sensors.map((sensor: any) => sensor.sn_idx);
+    if (isFacilitySelected) {
+      // 설비가 해제되면 해당 센서들도 해제
       setSelectedSensors((prev) => prev.filter((id) => !facilitySensorIds.includes(id)));
     } else {
-      // 일부만 선택되어 있으면 모두 선택
+      // 설비가 선택되면 해당 센서들도 선택
       setSelectedSensors((prev) => Array.from(new Set([...prev, ...facilitySensorIds])));
     }
   };
 
   const isFacilityAllSelected = (facility: any) => {
-    const facilitySensorIds = facility.sensors.map((sensor: any) => sensor.sn_idx);
-    return facilitySensorIds.length > 0 && facilitySensorIds.every((id: number) => selectedSensors.includes(id));
+    return selectedFacilities.includes(facility.fa_idx);
   };
 
   const handleFacilityGroupCheckboxChange = (facilityGroup: any) => {
+    // 설비그룹 선택 상태 업데이트
+    const isGroupSelected = selectedFacilityGroupsForDelete.includes(facilityGroup.fg_idx);
+    if (isGroupSelected) {
+      setSelectedFacilityGroupsForDelete((prev) => prev.filter((id) => id !== facilityGroup.fg_idx));
+    } else {
+      setSelectedFacilityGroupsForDelete((prev) => Array.from(new Set([...prev, facilityGroup.fg_idx])));
+    }
+
+    // 해당 설비그룹의 모든 설비와 센서 선택 상태도 업데이트
+    const groupFacilityIds = facilityGroup.facilities.map((fa: any) => fa.fa_idx);
     const groupSensorIds = facilityGroup.facilities.flatMap((fa: any) =>
       fa.sensors.map((sensor: any) => sensor.sn_idx)
     );
-    const isAllSelected = groupSensorIds.every((id: number) => selectedSensors.includes(id));
 
-    if (isAllSelected) {
-      // 모든 센서가 선택되어 있으면 해제
+    if (isGroupSelected) {
+      // 설비그룹이 해제되면 해당 설비들과 센서들도 해제
+      setSelectedFacilities((prev) => prev.filter((id) => !groupFacilityIds.includes(id)));
       setSelectedSensors((prev) => prev.filter((id) => !groupSensorIds.includes(id)));
     } else {
-      // 일부만 선택되어 있으면 모두 선택
+      // 설비그룹이 선택되면 해당 설비들과 센서들도 선택
+      setSelectedFacilities((prev) => Array.from(new Set([...prev, ...groupFacilityIds])));
       setSelectedSensors((prev) => Array.from(new Set([...prev, ...groupSensorIds])));
     }
   };
 
   const isFacilityGroupAllSelected = (facilityGroup: any) => {
-    const groupSensorIds = facilityGroup.facilities.flatMap((fa: any) =>
-      fa.sensors.map((sensor: any) => sensor.sn_idx)
-    );
-    return groupSensorIds.length > 0 && groupSensorIds.every((id: number) => selectedSensors.includes(id));
+    return selectedFacilityGroupsForDelete.includes(facilityGroup.fg_idx);
   };
 
   const handleFactoryCheckboxChange = (factory: any) => {
+    // 공장 선택 상태 업데이트
+    const isFactorySelected = selectedFactoriesForDelete.includes(factory.fc_idx);
+    if (isFactorySelected) {
+      setSelectedFactoriesForDelete((prev) => prev.filter((id) => id !== factory.fc_idx));
+    } else {
+      setSelectedFactoriesForDelete((prev) => Array.from(new Set([...prev, factory.fc_idx])));
+    }
+
+    // 해당 공장의 모든 설비그룹, 설비, 센서 선택 상태도 업데이트
+    const factoryGroupIds = factory.facilityGroups.map((fg: any) => fg.fg_idx);
+    const factoryFacilityIds = factory.facilityGroups.flatMap((fg: any) => fg.facilities.map((fa: any) => fa.fa_idx));
     const factorySensorIds = factory.facilityGroups.flatMap((fg: any) =>
       fg.facilities.flatMap((fa: any) => fa.sensors.map((sensor: any) => sensor.sn_idx))
     );
-    const isAllSelected = factorySensorIds.every((id: number) => selectedSensors.includes(id));
 
-    if (isAllSelected) {
-      // 모든 센서가 선택되어 있으면 해제
+    if (isFactorySelected) {
+      // 공장이 해제되면 해당 설비그룹들, 설비들, 센서들도 해제
+      setSelectedFacilityGroupsForDelete((prev) => prev.filter((id) => !factoryGroupIds.includes(id)));
+      setSelectedFacilities((prev) => prev.filter((id) => !factoryFacilityIds.includes(id)));
       setSelectedSensors((prev) => prev.filter((id) => !factorySensorIds.includes(id)));
     } else {
-      // 일부만 선택되어 있으면 모두 선택
+      // 공장이 선택되면 해당 설비그룹들, 설비들, 센서들도 선택
+      setSelectedFacilityGroupsForDelete((prev) => Array.from(new Set([...prev, ...factoryGroupIds])));
+      setSelectedFacilities((prev) => Array.from(new Set([...prev, ...factoryFacilityIds])));
       setSelectedSensors((prev) => Array.from(new Set([...prev, ...factorySensorIds])));
     }
   };
 
   const isFactoryAllSelected = (factory: any) => {
-    const factorySensorIds = factory.facilityGroups.flatMap((fg: any) =>
-      fg.facilities.flatMap((fa: any) => fa.sensors.map((sensor: any) => sensor.sn_idx))
-    );
-    return factorySensorIds.length > 0 && factorySensorIds.every((id: number) => selectedSensors.includes(id));
+    return selectedFactoriesForDelete.includes(factory.fc_idx);
   };
 
   return (

@@ -21,13 +21,21 @@ export default function FacilityList() {
     selectedFactory,
     setSelectedFactory,
     facilityAddModalOpen,
+    selectedSensors,
+    setSelectedSensors,
+    selectedFacilities,
+    setSelectedFacilities,
+    selectedFacilityGroupsForDelete,
+    setSelectedFacilityGroupsForDelete,
+    selectedFactoriesForDelete,
+    setSelectedFactoriesForDelete,
     handleTreeSearch,
     handleReset,
     handleAddFacility,
     handleCloseFacilityAddModal,
     handleFacilityAddSuccess,
+    handleDeleteFacility,
     alertModal,
-    showAlert,
     closeAlert,
   } = useFacilityManagement();
 
@@ -38,13 +46,8 @@ export default function FacilityList() {
     }
   }, [navigationReset, handleReset]);
 
-  // 설비 삭제 처리
-  const handleDeleteFacility = () => {
-    showAlert('알림', '삭제할 센서를 선택해주세요.');
-  };
-
   return (
-    <div className='table-outer'>
+    <>
       <FacilityView
         treeData={treeData}
         treeLoading={treeLoading}
@@ -54,8 +57,14 @@ export default function FacilityList() {
         setFacilityName={setFacilityName}
         sensorName={sensorName}
         setSensorName={setSensorName}
-        selectedSensors={[]}
-        setSelectedSensors={() => {}}
+        selectedSensors={selectedSensors}
+        setSelectedSensors={setSelectedSensors}
+        selectedFacilities={selectedFacilities}
+        setSelectedFacilities={setSelectedFacilities}
+        selectedFacilityGroupsForDelete={selectedFacilityGroupsForDelete}
+        setSelectedFacilityGroupsForDelete={setSelectedFacilityGroupsForDelete}
+        selectedFactoriesForDelete={selectedFactoriesForDelete}
+        setSelectedFactoriesForDelete={setSelectedFactoriesForDelete}
         selectedFactory={selectedFactory}
         setSelectedFactory={setSelectedFactory}
         facilityAddModalOpen={facilityAddModalOpen}
@@ -68,12 +77,11 @@ export default function FacilityList() {
 
       <AlertModal
         open={alertModal.open}
-        handleClose={closeAlert}
         title={alertModal.title}
         content={alertModal.content}
-        type={alertModal.type}
-        onConfirm={alertModal.onConfirm}
+        type='alert'
+        handleClose={closeAlert}
       />
-    </div>
+    </>
   );
 }

@@ -24,13 +24,19 @@ export default function FacilityManagementPage() {
     facilityAddModalOpen,
     selectedSensors,
     setSelectedSensors,
+    selectedFacilities,
+    setSelectedFacilities,
+    selectedFacilityGroupsForDelete,
+    setSelectedFacilityGroupsForDelete,
+    selectedFactoriesForDelete,
+    setSelectedFactoriesForDelete,
     syncLoading,
     handleTreeSearch,
     handleReset,
     handleAddFacility,
     handleCloseFacilityAddModal,
     handleFacilityAddSuccess,
-    handleDeleteSensors,
+    handleDeleteFacility,
     handleSynchronize,
     alertModal,
     closeAlert,
@@ -43,14 +49,8 @@ export default function FacilityManagementPage() {
     }
   }, [navigationReset, handleReset]);
 
-  // 설비 삭제 처리
-  const handleDeleteFacility = () => {
-    handleDeleteSensors();
-  };
-
   return (
-    <div className='table-outer'>
-      {syncLoading && <LoadingOverlay />}
+    <>
       <FacilityView
         treeData={treeData}
         treeLoading={treeLoading}
@@ -62,15 +62,21 @@ export default function FacilityManagementPage() {
         setSensorName={setSensorName}
         selectedSensors={selectedSensors}
         setSelectedSensors={setSelectedSensors}
+        selectedFacilities={selectedFacilities}
+        setSelectedFacilities={setSelectedFacilities}
+        selectedFacilityGroupsForDelete={selectedFacilityGroupsForDelete}
+        setSelectedFacilityGroupsForDelete={setSelectedFacilityGroupsForDelete}
+        selectedFactoriesForDelete={selectedFactoriesForDelete}
+        setSelectedFactoriesForDelete={setSelectedFactoriesForDelete}
         selectedFactory={selectedFactory}
         setSelectedFactory={setSelectedFactory}
         facilityAddModalOpen={facilityAddModalOpen}
         onTreeSearch={handleTreeSearch}
         onAddFacility={handleAddFacility}
         onDeleteFacility={handleDeleteFacility}
+        onSynchronize={handleSynchronize}
         onCloseFacilityAddModal={handleCloseFacilityAddModal}
         onFacilityAddSuccess={handleFacilityAddSuccess}
-        onSynchronize={handleSynchronize}
       />
 
       <AlertModal
@@ -81,6 +87,8 @@ export default function FacilityManagementPage() {
         type={alertModal.type}
         onConfirm={alertModal.onConfirm}
       />
-    </div>
+
+      {syncLoading && <LoadingOverlay />}
+    </>
   );
 }

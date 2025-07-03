@@ -4,6 +4,9 @@ import {
   addFacility,
   addSensor,
   deleteSensor,
+  deleteFacility,
+  deleteFacilityGroup,
+  deleteFactory,
   synchronizeFacility,
 } from '../../controller/facility/FacilityController.js';
 
@@ -25,9 +28,24 @@ export default () => {
     addSensor(fa_idx, name, res);
   });
 
-  router.delete('/aasx/sensors', (req, res) => {
+  router.post('/aasx/sensors', (req, res) => {
     const { sensorIds } = req.body;
     deleteSensor(sensorIds, res);
+  });
+
+  router.post('/aasx/facilities', (req, res) => {
+    const { facilityIds } = req.body;
+    deleteFacility(facilityIds, res);
+  });
+
+  router.post('/aasx/facility-groups', (req, res) => {
+    const { facilityGroupIds } = req.body;
+    deleteFacilityGroup(facilityGroupIds, res);
+  });
+
+  router.post('/aasx/factories', (req, res) => {
+    const { factoryIds } = req.body;
+    deleteFactory(factoryIds, res);
   });
 
   router.post('/aasx/synchronize', (req, res) => {

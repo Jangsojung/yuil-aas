@@ -3,6 +3,9 @@ import {
   insertFacility,
   insertSensor,
   deleteSensors,
+  deleteFacilities,
+  deleteFacilityGroups,
+  deleteFactories,
   synchronizeFacilityData,
 } from '../../service/facility/FacilityService.js';
 
@@ -39,6 +42,33 @@ export const deleteSensor = async (sensorIds, res) => {
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ error: '센서 삭제 실패' });
+  }
+};
+
+export const deleteFacility = async (facilityIds, res) => {
+  try {
+    const result = await deleteFacilities(facilityIds);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: '설비 삭제 실패' });
+  }
+};
+
+export const deleteFacilityGroup = async (facilityGroupIds, res) => {
+  try {
+    const result = await deleteFacilityGroups(facilityGroupIds);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: '설비그룹 삭제 실패' });
+  }
+};
+
+export const deleteFactory = async (factoryIds, res) => {
+  try {
+    const result = await deleteFactories(factoryIds);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: '공장 삭제 실패' });
   }
 };
 
