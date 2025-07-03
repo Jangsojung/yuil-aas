@@ -74,6 +74,19 @@ export const useFacilityManagement = () => {
     setSelectedFactoriesForDelete([]);
   }, []);
 
+  // 부분 초기화 (공장 선택 유지)
+  const handlePartialReset = useCallback(() => {
+    setTreeData([]);
+    setSelectedFacilityGroups([]);
+    setFacilityName('');
+    setSensorName('');
+    setSelectedSensors([]);
+    setSelectedFacilities([]);
+    setSelectedFacilityGroupsForDelete([]);
+    setSelectedFactoriesForDelete([]);
+    // setSelectedFactory(''); // 공장 선택은 유지
+  }, []);
+
   // 공장 추가 모달
   const handleAddFactory = useCallback(() => {
     setFacilityAddModalOpen(true);
@@ -146,90 +159,38 @@ export const useFacilityManagement = () => {
       confirmMessage = `선택한 ${deleteCount}개의 센서를 삭제하시겠습니까?`;
     }
 
-    const confirmed = await new Promise<boolean>((resolve) => {
-      showConfirm(`${deleteType} 삭제`, confirmMessage, () => resolve(true));
-    });
-
-    if (!confirmed) return;
-
-    try {
-      let result;
-      let deleted = false;
-      let deletedType = '';
-      // 센서 → 설비 → 설비그룹 → 공장 순서로 모두 삭제 시도
-      if (hasSelectedSensors) {
-        console.log('센서 삭제 API 호출:', selectedSensors);
-        result = await deleteSensors(selectedSensors);
-        console.log('센서 삭제 결과:', result);
-        if (result.success) {
-          setSelectedSensors([]);
-          deleted = true;
-          deletedType = 'sensor';
-        }
-      }
-      if (hasSelectedFacilities) {
-        console.log('설비 삭제 API 호출:', selectedFacilities);
-        result = await deleteFacilities(selectedFacilities);
-        console.log('설비 삭제 결과:', result);
-        if (result.success) {
-          setSelectedFacilities([]);
-          deleted = true;
-          deletedType = 'facility';
-        }
-      }
-      if (hasSelectedFacilityGroups) {
-        console.log('설비그룹 삭제 API 호출:', selectedFacilityGroupsForDelete);
-        result = await deleteFacilityGroups(selectedFacilityGroupsForDelete);
-        console.log('설비그룹 삭제 결과:', result);
-        if (result.success) {
+    showConfirm('삭제 확인', confirmMessage, async () => {
+      try {
+        if (hasSelectedFactories) {
+          await deleteFactories(selectedFactoriesForDelete);
+          showAlert('알림', `${deleteType} 삭제 완료`);
+          handleReset();
+        } else if (hasSelectedFacilityGroups) {
+          await deleteFacilityGroups(selectedFacilityGroupsForDelete);
+          showAlert('알림', `${deleteType} 삭제 완료`);
+          // 삭제된 설비그룹만 선택 목록에서 제거
+          setSelectedFacilityGroups((prev) => prev.filter((id) => !selectedFacilityGroupsForDelete.includes(id)));
           setSelectedFacilityGroupsForDelete([]);
-          deleted = true;
-          deletedType = 'facilityGroup';
-        }
-      }
-      if (hasSelectedFactories) {
-        console.log('공장 삭제 API 호출:', selectedFactoriesForDelete);
-        result = await deleteFactories(selectedFactoriesForDelete);
-        console.log('공장 삭제 결과:', result);
-        if (result.success) {
-          setSelectedFactoriesForDelete([]);
-          deleted = true;
-          deletedType = 'factory';
-        }
-      }
-
-      if (deleted && result && result.success) {
-        showAlert('알림', result.message);
-        await handleTreeSearch();
-        // 설비그룹 삭제 시: 공장 선택은 유지, 설비그룹 관련 검색조건만 초기화
-        if (deletedType === 'facilityGroup') {
-          setSelectedFacilityGroups([]);
+          setSelectedFacilities([]);
+          setSelectedSensors([]);
           setFacilityName('');
           setSensorName('');
-          setSelectedSensors([]);
-          setSelectedFacilities([]);
-          setSelectedFacilityGroupsForDelete([]);
+          setTreeData([]);
           setFacilityGroupRefreshKey((prev) => prev + 1);
+        } else if (hasSelectedFacilities) {
+          await deleteFacilities(selectedFacilities);
+          showAlert('알림', `${deleteType} 삭제 완료`);
+          // 설비 삭제 시 검색조건 유지(필요시 별도 처리)
+        } else if (hasSelectedSensors) {
+          await deleteSensors(selectedSensors);
+          showAlert('알림', `${deleteType} 삭제 완료`);
+          // 센서 삭제 시 검색조건 유지(필요시 별도 처리)
         }
-        // 공장 삭제 시: 모든 검색조건 초기화 및 전체 새로고침
-        if (deletedType === 'factory') {
-          setSelectedFactory('');
-          setSelectedFacilityGroups([]);
-          setFacilityName('');
-          setSensorName('');
-          setSelectedSensors([]);
-          setSelectedFacilities([]);
-          setSelectedFacilityGroupsForDelete([]);
-          setSelectedFactoriesForDelete([]);
-          window.location.reload(); // 전체 새로고침으로 완전 초기화
-        }
-      } else if (result) {
-        showAlert('오류', result.message || `${deleteType} 삭제 중 오류가 발생했습니다.`);
+      } catch (err) {
+        console.error(`${deleteType} 삭제 중 오류 발생:`, err);
+        showAlert('에러', `${deleteType} 삭제 중 오류가 발생했습니다.`);
       }
-    } catch (error) {
-      console.error(`${deleteType} 삭제 실패:`, error);
-      showAlert('오류', `${deleteType} 삭제 중 오류가 발생했습니다.`);
-    }
+    });
   }, [
     selectedSensors,
     selectedFacilities,
@@ -237,66 +198,58 @@ export const useFacilityManagement = () => {
     selectedFactoriesForDelete,
     showAlert,
     showConfirm,
-    handleTreeSearch,
+    handleReset,
+    handlePartialReset,
   ]);
 
-  // 설비 동기화
   const handleSynchronize = useCallback(async () => {
     setSyncLoading(true);
     try {
-      const result = await synchronizeFacility();
-      if (result.success) {
-        showAlert('알림', result.message);
-        // 알림 모달이 표시된 후 페이지 새로고침
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } else {
-        showAlert('오류', result.message || '설비 동기화 중 오류가 발생했습니다.');
-      }
-    } catch (error) {
-      console.error('설비 동기화 실패:', error);
-      showAlert('오류', '설비 동기화 중 오류가 발생했습니다.');
+      await synchronizeFacility();
+      showAlert('알림', '동기화 완료');
+      handleReset();
+    } catch (err) {
+      console.error('동기화 중 오류 발생:', err);
+      showAlert('에러', '동기화 중 오류가 발생했습니다.');
     } finally {
       setSyncLoading(false);
     }
-  }, [showAlert]);
+  }, [showAlert, handleReset]);
 
   return {
-    // 상태
     treeData,
     treeLoading,
     selectedFacilityGroups,
-    setSelectedFacilityGroups,
     facilityName,
-    setFacilityName,
     sensorName,
-    setSensorName,
     selectedFactory,
-    setSelectedFactory,
     facilityAddModalOpen,
     selectedSensors,
-    setSelectedSensors,
     selectedFacilities,
-    setSelectedFacilities,
     selectedFacilityGroupsForDelete,
-    setSelectedFacilityGroupsForDelete,
     selectedFactoriesForDelete,
-    setSelectedFactoriesForDelete,
     syncLoading,
     factoryRefreshKey,
     facilityGroupRefreshKey,
-
-    // 핸들러
     handleTreeSearch,
     handleReset,
+    handlePartialReset,
     handleAddFactory,
     handleCloseFactoryAddModal,
     handleFactoryAddSuccess,
+    handleAddFacilityGroup,
+    handleCloseFacilityGroupAddModal,
+    handleFacilityGroupAddSuccess,
     handleDeleteFacility,
     handleSynchronize,
-
-    // 모달
+    setSelectedFacilityGroups,
+    setFacilityName,
+    setSensorName,
+    setSelectedFactory,
+    setSelectedSensors,
+    setSelectedFacilities,
+    setSelectedFacilityGroupsForDelete,
+    setSelectedFactoriesForDelete,
     alertModal,
     showAlert,
     showConfirm,
