@@ -3,6 +3,7 @@ import {
   insertFacility,
   insertSensor,
   deleteSensors,
+  synchronizeFacilityData,
 } from '../../service/facility/FacilityService.js';
 
 export const addFacilityGroup = async (name, res) => {
@@ -38,5 +39,19 @@ export const deleteSensor = async (sensorIds, res) => {
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ error: '센서 삭제 실패' });
+  }
+};
+
+export const synchronizeFacility = async (res) => {
+  try {
+    const result = await synchronizeFacilityData();
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('설비 동기화 오류:', err);
+    res.status(500).json({
+      success: false,
+      error: true,
+      message: err.message || '설비 동기화 실패',
+    });
   }
 };

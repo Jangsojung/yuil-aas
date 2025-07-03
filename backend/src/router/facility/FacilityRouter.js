@@ -4,6 +4,7 @@ import {
   addFacility,
   addSensor,
   deleteSensor,
+  synchronizeFacility,
 } from '../../controller/facility/FacilityController.js';
 
 const router = express.Router();
@@ -27,6 +28,10 @@ export default () => {
   router.delete('/aasx/sensors', (req, res) => {
     const { sensorIds } = req.body;
     deleteSensor(sensorIds, res);
+  });
+
+  router.post('/aasx/synchronize', (req, res) => {
+    synchronizeFacility(res);
   });
 
   return router;

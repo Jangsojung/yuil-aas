@@ -33,6 +33,7 @@ interface FacilityViewProps {
   onTreeSearch: () => Promise<{ success: boolean; message?: string }>;
   onAddFacility: () => void;
   onDeleteFacility: () => void;
+  onSynchronize?: () => void;
   onCloseFacilityAddModal?: () => void;
   onFacilityAddSuccess?: () => void;
 }
@@ -54,6 +55,7 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   onTreeSearch,
   onAddFacility,
   onDeleteFacility,
+  onSynchronize,
   onCloseFacilityAddModal,
   onFacilityAddSuccess,
 }) => {
@@ -156,6 +158,11 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
 
         <ActionBox
           buttons={[
+            {
+              text: '동기화',
+              onClick: onSynchronize || (() => {}),
+              color: 'primary',
+            },
             {
               text: '설비 추가',
               onClick: onAddFacility,

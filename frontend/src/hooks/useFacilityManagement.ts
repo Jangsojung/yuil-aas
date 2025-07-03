@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/atoms';
 import { useAlertModal } from './useAlertModal';
 import { buildTreeDataAPI } from '../apis/api/basic';
-import { deleteSensors } from '../apis/api/facility';
+import { deleteSensors, synchronizeFacility } from '../apis/api/facility';
 import { FacilityGroupTree } from '../types/api';
 
 export const useFacilityManagement = () => {
@@ -19,6 +19,7 @@ export const useFacilityManagement = () => {
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
   const [facilityAddModalOpen, setFacilityAddModalOpen] = useState(false);
   const [selectedSensors, setSelectedSensors] = useState<number[]>([]);
+  const [syncLoading, setSyncLoading] = useState(false);
 
   // 트리 검색
   const handleTreeSearch = useCallback(async () => {
@@ -102,6 +103,28 @@ export const useFacilityManagement = () => {
     }
   }, [selectedSensors, showAlert, showConfirm, handleTreeSearch]);
 
+  // 설비 동기화
+  const handleSynchronize = useCallback(async () => {
+    setSyncLoading(true);
+    try {
+      const result = await synchronizeFacility();
+      if (result.success) {
+        showAlert('알림', result.message);
+        // 알림 모달이 표시된 후 페이지 새로고침
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        showAlert('오류', result.message || '설비 동기화 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('설비 동기화 실패:', error);
+      showAlert('오류', '설비 동기화 중 오류가 발생했습니다.');
+    } finally {
+      setSyncLoading(false);
+    }
+  }, [showAlert]);
+
   return {
     // 상태
     treeData,
@@ -117,6 +140,7 @@ export const useFacilityManagement = () => {
     facilityAddModalOpen,
     selectedSensors,
     setSelectedSensors,
+    syncLoading,
 
     // 핸들러
     handleTreeSearch,
@@ -125,6 +149,7 @@ export const useFacilityManagement = () => {
     handleCloseFacilityAddModal,
     handleFacilityAddSuccess,
     handleDeleteSensors,
+    handleSynchronize,
 
     // 알림
     alertModal,
