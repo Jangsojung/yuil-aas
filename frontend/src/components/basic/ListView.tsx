@@ -1,4 +1,5 @@
 import React from 'react';
+import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/system/Grid';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
@@ -102,27 +103,29 @@ export const ListView: React.FC<ListViewProps> = ({
                 <div>기초코드명</div>
               </Grid>
               <Grid>
-                <TextField
-                  size='small'
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  placeholder='기초코드명을 입력하세요'
-                  sx={{ flex: 1 }}
-                />
+                <FormControl sx={{ minWidth:'200px',width: '100%' }} size='small'>
+                  <TextField
+                    size='small'
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    placeholder='기초코드명을 입력하세요'
+                    sx={{ flex: 1 }}
+                  />
+                </FormControl>
               </Grid>
             </Grid>
             {/* 기초코드명 */}
 
-            {/* 날짜 */}
+            {/* 기간 */}
             <Grid container spacing={2}>
               <Grid className='sort-title'>
-                <div>날짜</div>
+                <div>기간</div>
               </Grid>
               <Grid>
                 <BasicDatePicker onDateChange={onDateChange} startDate={startDate} endDate={endDate} />
               </Grid>
             </Grid>
-            {/* 날짜 */}
+            {/* 기간 */}
           </Grid>
         </SearchBox>
 
