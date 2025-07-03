@@ -18,12 +18,14 @@ type Props = {
   selectedFacilityGroups: number[];
   setSelectedFacilityGroups: Dispatch<SetStateAction<number[]>>;
   selectedFactory?: number | '';
+  refreshKey?: number;
 };
 
 export default function FacilityGroupSelect({
   selectedFacilityGroups,
   setSelectedFacilityGroups,
   selectedFactory,
+  refreshKey = 0,
 }: Props) {
   const [facilityGroups, setFacilityGroups] = useState<FacilityGroup[]>([]);
   const [loading, setLoading] = useState(false);
@@ -73,7 +75,7 @@ export default function FacilityGroupSelect({
 
   useEffect(() => {
     getFacilityGroups(selectedFactory as number);
-  }, [selectedFactory]);
+  }, [selectedFactory, refreshKey]);
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

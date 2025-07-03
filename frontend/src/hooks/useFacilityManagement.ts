@@ -29,6 +29,8 @@ export const useFacilityManagement = () => {
   const [selectedFacilityGroupsForDelete, setSelectedFacilityGroupsForDelete] = useState<number[]>([]);
   const [selectedFactoriesForDelete, setSelectedFactoriesForDelete] = useState<number[]>([]);
   const [syncLoading, setSyncLoading] = useState(false);
+  const [factoryRefreshKey, setFactoryRefreshKey] = useState(0);
+  const [facilityGroupRefreshKey, setFacilityGroupRefreshKey] = useState(0);
 
   // 트리 검색
   const handleTreeSearch = useCallback(async () => {
@@ -72,19 +74,34 @@ export const useFacilityManagement = () => {
     setSelectedFactoriesForDelete([]);
   }, []);
 
-  // 설비 추가 모달
-  const handleAddFacility = useCallback(() => {
+  // 공장 추가 모달
+  const handleAddFactory = useCallback(() => {
     setFacilityAddModalOpen(true);
   }, []);
 
-  const handleCloseFacilityAddModal = useCallback(() => {
+  const handleCloseFactoryAddModal = useCallback(() => {
     setFacilityAddModalOpen(false);
   }, []);
 
-  const handleFacilityAddSuccess = useCallback(() => {
+  const handleFactoryAddSuccess = useCallback(() => {
     setFacilityAddModalOpen(false);
-    // 설비 추가 후 트리 데이터 새로고침
     handleTreeSearch();
+    setFactoryRefreshKey((prev) => prev + 1);
+  }, [handleTreeSearch]);
+
+  // 설비그룹 추가 모달
+  const handleAddFacilityGroup = useCallback(() => {
+    setFacilityAddModalOpen(true);
+  }, []);
+
+  const handleCloseFacilityGroupAddModal = useCallback(() => {
+    setFacilityAddModalOpen(false);
+  }, []);
+
+  const handleFacilityGroupAddSuccess = useCallback(() => {
+    setFacilityAddModalOpen(false);
+    handleTreeSearch();
+    setFacilityGroupRefreshKey((prev) => prev + 1);
   }, [handleTreeSearch]);
 
   // 통합 삭제 함수
@@ -138,6 +155,7 @@ export const useFacilityManagement = () => {
     try {
       let result;
       let deleted = false;
+      let deletedType = '';
       // 센서 → 설비 → 설비그룹 → 공장 순서로 모두 삭제 시도
       if (hasSelectedSensors) {
         console.log('센서 삭제 API 호출:', selectedSensors);
@@ -146,6 +164,7 @@ export const useFacilityManagement = () => {
         if (result.success) {
           setSelectedSensors([]);
           deleted = true;
+          deletedType = 'sensor';
         }
       }
       if (hasSelectedFacilities) {
@@ -155,6 +174,7 @@ export const useFacilityManagement = () => {
         if (result.success) {
           setSelectedFacilities([]);
           deleted = true;
+          deletedType = 'facility';
         }
       }
       if (hasSelectedFacilityGroups) {
@@ -164,6 +184,7 @@ export const useFacilityManagement = () => {
         if (result.success) {
           setSelectedFacilityGroupsForDelete([]);
           deleted = true;
+          deletedType = 'facilityGroup';
         }
       }
       if (hasSelectedFactories) {
@@ -173,13 +194,35 @@ export const useFacilityManagement = () => {
         if (result.success) {
           setSelectedFactoriesForDelete([]);
           deleted = true;
+          deletedType = 'factory';
         }
       }
 
       if (deleted && result && result.success) {
         showAlert('알림', result.message);
-        // 삭제 후 트리 데이터 새로고침
-        handleTreeSearch();
+        await handleTreeSearch();
+        // 설비그룹 삭제 시: 공장 선택은 유지, 설비그룹 관련 검색조건만 초기화
+        if (deletedType === 'facilityGroup') {
+          setSelectedFacilityGroups([]);
+          setFacilityName('');
+          setSensorName('');
+          setSelectedSensors([]);
+          setSelectedFacilities([]);
+          setSelectedFacilityGroupsForDelete([]);
+          setFacilityGroupRefreshKey((prev) => prev + 1);
+        }
+        // 공장 삭제 시: 모든 검색조건 초기화 및 전체 새로고침
+        if (deletedType === 'factory') {
+          setSelectedFactory('');
+          setSelectedFacilityGroups([]);
+          setFacilityName('');
+          setSensorName('');
+          setSelectedSensors([]);
+          setSelectedFacilities([]);
+          setSelectedFacilityGroupsForDelete([]);
+          setSelectedFactoriesForDelete([]);
+          window.location.reload(); // 전체 새로고침으로 완전 초기화
+        }
       } else if (result) {
         showAlert('오류', result.message || `${deleteType} 삭제 중 오류가 발생했습니다.`);
       }
@@ -241,13 +284,15 @@ export const useFacilityManagement = () => {
     selectedFactoriesForDelete,
     setSelectedFactoriesForDelete,
     syncLoading,
+    factoryRefreshKey,
+    facilityGroupRefreshKey,
 
     // 핸들러
     handleTreeSearch,
     handleReset,
-    handleAddFacility,
-    handleCloseFacilityAddModal,
-    handleFacilityAddSuccess,
+    handleAddFactory,
+    handleCloseFactoryAddModal,
+    handleFactoryAddSuccess,
     handleDeleteFacility,
     handleSynchronize,
 

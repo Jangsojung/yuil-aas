@@ -10,9 +10,16 @@ interface FactorySelectProps {
   onChange: (value: number) => void;
   disabled?: boolean;
   placeholder?: string;
+  refreshKey?: number;
 }
 
-export default function FactorySelect({ value, onChange, disabled = false, placeholder = '공장' }: FactorySelectProps) {
+export default function FactorySelect({
+  value,
+  onChange,
+  disabled = false,
+  placeholder = '공장',
+  refreshKey = 0,
+}: FactorySelectProps) {
   const [factories, setFactories] = useState<Factory[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +46,7 @@ export default function FactorySelect({ value, onChange, disabled = false, place
   useEffect(() => {
     handleFetchFactories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.cm_idx]);
+  }, [user?.cm_idx, refreshKey]);
 
   const handleChange = (event: SelectChangeEvent<number>) => {
     const selectedValue = event.target.value as number;

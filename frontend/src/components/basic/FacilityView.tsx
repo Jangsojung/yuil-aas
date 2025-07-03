@@ -35,14 +35,22 @@ interface FacilityViewProps {
   selectedFactory?: number | '';
   setSelectedFactory?: (factory: number | '') => void;
   facilityAddModalOpen?: boolean;
+  factoryRefreshKey: number;
+  facilityGroupRefreshKey: number;
+  syncLoading: boolean;
 
   // 핸들러
-  onTreeSearch: () => Promise<{ success: boolean; message?: string }>;
-  onAddFacility: () => void;
-  onDeleteFacility: () => void;
-  onSynchronize?: () => void;
-  onCloseFacilityAddModal?: () => void;
-  onFacilityAddSuccess?: () => void;
+  handleTreeSearch: () => Promise<{ success: boolean; message?: string }>;
+  handleReset: () => void;
+  handleAddFactory: () => void;
+  handleCloseFactoryAddModal: () => void;
+  handleFactoryAddSuccess: () => void;
+  handleDeleteFacility: () => void;
+  handleSynchronize: () => void;
+  alertModal: any;
+  showAlert: (title: string, content: string) => void;
+  showConfirm: (title: string, content: string, onConfirm: () => void) => void;
+  closeAlert: () => void;
 }
 
 export const FacilityView: React.FC<FacilityViewProps> = ({
@@ -65,18 +73,26 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   selectedFactory = '',
   setSelectedFactory,
   facilityAddModalOpen = false,
-  onTreeSearch,
-  onAddFacility,
-  onDeleteFacility,
-  onSynchronize,
-  onCloseFacilityAddModal,
-  onFacilityAddSuccess,
+  factoryRefreshKey,
+  facilityGroupRefreshKey,
+  syncLoading,
+  handleTreeSearch,
+  handleReset,
+  handleAddFactory,
+  handleCloseFactoryAddModal,
+  handleFactoryAddSuccess,
+  handleDeleteFacility,
+  handleSynchronize,
+  alertModal,
+  showAlert,
+  showConfirm,
+  closeAlert,
 }) => {
   // treeData는 이미 4단계 구조로 반환됨
   const convertedTreeData: FactoryTree[] = treeData as FactoryTree[];
 
   const handleSearch = async () => {
-    const result = await onTreeSearch();
+    const result = await handleTreeSearch();
     if (!result.success && result.message) {
       // 에러 메시지는 상위에서 처리
       console.error(result.message);
@@ -203,7 +219,12 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
               </Grid>
               <Grid sx={{ flexGrow: 1 }}>
                 <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                  <FactorySelect value={selectedFactory} onChange={handleFactoryChange} placeholder='선택' />
+                  <FactorySelect
+                    value={selectedFactory}
+                    onChange={handleFactoryChange}
+                    placeholder='선택'
+                    refreshKey={factoryRefreshKey}
+                  />
                 </FormControl>
               </Grid>
             </Grid>
@@ -220,6 +241,7 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
                     selectedFacilityGroups={selectedFacilityGroups}
                     setSelectedFacilityGroups={setSelectedFacilityGroups}
                     selectedFactory={selectedFactory}
+                    refreshKey={facilityGroupRefreshKey}
                   />
                 </FormControl>
               </Grid>
@@ -258,17 +280,17 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
           buttons={[
             {
               text: '동기화',
-              onClick: onSynchronize || (() => {}),
+              onClick: handleSynchronize || (() => {}),
               color: 'primary',
             },
             {
               text: '설비 추가',
-              onClick: onAddFacility,
+              onClick: handleAddFactory,
               color: 'success',
             },
             {
               text: '설비 삭제',
-              onClick: onDeleteFacility,
+              onClick: handleDeleteFacility,
               color: 'error',
             },
           ]}
@@ -370,8 +392,8 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
 
       <FacilityAddModal
         open={facilityAddModalOpen}
-        onClose={onCloseFacilityAddModal || (() => {})}
-        onSuccess={onFacilityAddSuccess || (() => {})}
+        onClose={handleCloseFactoryAddModal || (() => {})}
+        onSuccess={handleFactoryAddSuccess || (() => {})}
       />
     </>
   );

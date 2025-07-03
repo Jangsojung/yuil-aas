@@ -31,14 +31,18 @@ export default function FacilityManagementPage() {
     selectedFactoriesForDelete,
     setSelectedFactoriesForDelete,
     syncLoading,
+    factoryRefreshKey,
+    facilityGroupRefreshKey,
     handleTreeSearch,
     handleReset,
-    handleAddFacility,
-    handleCloseFacilityAddModal,
-    handleFacilityAddSuccess,
+    handleAddFactory,
+    handleCloseFactoryAddModal,
+    handleFactoryAddSuccess,
     handleDeleteFacility,
     handleSynchronize,
     alertModal,
+    showAlert,
+    showConfirm,
     closeAlert,
   } = useFacilityManagement();
 
@@ -60,6 +64,9 @@ export default function FacilityManagementPage() {
         setFacilityName={setFacilityName}
         sensorName={sensorName}
         setSensorName={setSensorName}
+        selectedFactory={selectedFactory}
+        setSelectedFactory={setSelectedFactory}
+        facilityAddModalOpen={facilityAddModalOpen}
         selectedSensors={selectedSensors}
         setSelectedSensors={setSelectedSensors}
         selectedFacilities={selectedFacilities}
@@ -68,15 +75,20 @@ export default function FacilityManagementPage() {
         setSelectedFacilityGroupsForDelete={setSelectedFacilityGroupsForDelete}
         selectedFactoriesForDelete={selectedFactoriesForDelete}
         setSelectedFactoriesForDelete={setSelectedFactoriesForDelete}
-        selectedFactory={selectedFactory}
-        setSelectedFactory={setSelectedFactory}
-        facilityAddModalOpen={facilityAddModalOpen}
-        onTreeSearch={handleTreeSearch}
-        onAddFacility={handleAddFacility}
-        onDeleteFacility={handleDeleteFacility}
-        onSynchronize={handleSynchronize}
-        onCloseFacilityAddModal={handleCloseFacilityAddModal}
-        onFacilityAddSuccess={handleFacilityAddSuccess}
+        syncLoading={syncLoading}
+        factoryRefreshKey={factoryRefreshKey}
+        facilityGroupRefreshKey={facilityGroupRefreshKey}
+        handleTreeSearch={handleTreeSearch}
+        handleReset={handleReset}
+        handleAddFactory={handleAddFactory}
+        handleCloseFactoryAddModal={handleCloseFactoryAddModal}
+        handleFactoryAddSuccess={handleFactoryAddSuccess}
+        handleDeleteFacility={handleDeleteFacility}
+        handleSynchronize={handleSynchronize}
+        alertModal={alertModal}
+        showAlert={showAlert}
+        showConfirm={showConfirm}
+        closeAlert={closeAlert}
       />
 
       <AlertModal
