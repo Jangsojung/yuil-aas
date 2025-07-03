@@ -4,6 +4,7 @@ import { navigationResetState } from '../../recoil/atoms';
 import { useFacilityManagement } from '../../hooks/useFacilityManagement';
 import { FacilityView } from '../../components/basic/FacilityView';
 import AlertModal from '../../components/modal/alert';
+import LoadingOverlay from '../../components/loading/LodingOverlay';
 
 export default function FacilityManagementPage() {
   const navigationReset = useRecoilValue(navigationResetState);
@@ -23,12 +24,14 @@ export default function FacilityManagementPage() {
     facilityAddModalOpen,
     selectedSensors,
     setSelectedSensors,
+    syncLoading,
     handleTreeSearch,
     handleReset,
     handleAddFacility,
     handleCloseFacilityAddModal,
     handleFacilityAddSuccess,
     handleDeleteSensors,
+    handleSynchronize,
     alertModal,
     closeAlert,
   } = useFacilityManagement();
@@ -47,6 +50,7 @@ export default function FacilityManagementPage() {
 
   return (
     <div className='table-outer'>
+      {syncLoading && <LoadingOverlay />}
       <FacilityView
         treeData={treeData}
         treeLoading={treeLoading}
@@ -66,6 +70,7 @@ export default function FacilityManagementPage() {
         onDeleteFacility={handleDeleteFacility}
         onCloseFacilityAddModal={handleCloseFacilityAddModal}
         onFacilityAddSuccess={handleFacilityAddSuccess}
+        onSynchronize={handleSynchronize}
       />
 
       <AlertModal

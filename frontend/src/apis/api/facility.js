@@ -19,3 +19,8 @@ export const deleteSensors = async (sensorIds) => {
   const res = await apiHelpers.delete('/api/facility/aasx/sensors', { sensorIds });
   return res;
 };
+
+export const synchronizeFacility = async () => {
+  const res = await apiHelpers.post('/api/facility/aasx/synchronize');
+  return res;
+};

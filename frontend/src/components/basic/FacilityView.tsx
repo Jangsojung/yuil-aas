@@ -4,6 +4,7 @@ import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import Checkbox from '@mui/material/Checkbox';
 import LoadingOverlay from '../loading/LodingOverlay';
 import FacilityGroupSelect from '../select/facility_group';
 import FactorySelect from '../select/factory_select';
@@ -33,6 +34,7 @@ interface FacilityViewProps {
   onTreeSearch: () => Promise<{ success: boolean; message?: string }>;
   onAddFacility: () => void;
   onDeleteFacility: () => void;
+  onSynchronize?: () => void;
   onCloseFacilityAddModal?: () => void;
   onFacilityAddSuccess?: () => void;
 }
@@ -54,6 +56,7 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
   onTreeSearch,
   onAddFacility,
   onDeleteFacility,
+  onSynchronize,
   onCloseFacilityAddModal,
   onFacilityAddSuccess,
 }) => {
@@ -71,6 +74,24 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
       // 공장이 변경되면 설비그룹 선택 초기화
       setSelectedFacilityGroups([]);
     }
+  };
+
+  const handleFacilityCheckboxChange = (facility: any) => {
+    const facilitySensorIds = facility.sensors.map((sensor: any) => sensor.sn_idx);
+    const isAllSelected = facilitySensorIds.every((id: number) => selectedSensors.includes(id));
+
+    if (isAllSelected) {
+      // 모든 센서가 선택되어 있으면 해제
+      setSelectedSensors((prev) => prev.filter((id) => !facilitySensorIds.includes(id)));
+    } else {
+      // 일부만 선택되어 있으면 모두 선택
+      setSelectedSensors((prev) => Array.from(new Set([...prev, ...facilitySensorIds])));
+    }
+  };
+
+  const isFacilityAllSelected = (facility: any) => {
+    const facilitySensorIds = facility.sensors.map((sensor: any) => sensor.sn_idx);
+    return facilitySensorIds.length > 0 && facilitySensorIds.every((id: number) => selectedSensors.includes(id));
   };
 
   return (
@@ -162,6 +183,11 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
         <ActionBox
           buttons={[
             {
+              text: '동기화',
+              onClick: onSynchronize || (() => {}),
+              color: 'primary',
+            },
+            {
               text: '설비 추가',
               onClick: onAddFacility,
               color: 'success',
@@ -203,6 +229,15 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
                     itemId={`subfacility-${fgIdx}-${faIdx}`}
                     label={
                       <div className='flex-center'>
+                        {fa.origin_check !== 1 && (
+                          <Checkbox
+                            checked={isFacilityAllSelected(fa)}
+                            onChange={() => handleFacilityCheckboxChange(fa)}
+                            onClick={(e) => e.stopPropagation()}
+                            size='small'
+                            sx={{ mr: 1 }}
+                          />
+                        )}
                         <span className='text-medium text-small'>{fa.fa_name}</span>
                       </div>
                     }
@@ -215,6 +250,7 @@ export const FacilityView: React.FC<FacilityViewProps> = ({
                         showCheckboxes={true} // 체크박스 표시
                         selectedSensors={selectedSensors}
                         setSelectedSensors={setSelectedSensors}
+                        useOriginCheck={true}
                       />
                     </div>
                   </TreeItem>

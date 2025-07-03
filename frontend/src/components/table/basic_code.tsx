@@ -17,6 +17,7 @@ import { getBaseSensorsForTableAPI, getSensorsForTableAPI } from '../../apis/api
 interface Sensor {
   sn_idx: number;
   sn_name: string;
+  origin_check?: number;
 }
 
 interface Base {
@@ -33,6 +34,7 @@ export default function BasicTable({
   showCheckboxes = true,
   selectedSensors: externalSelectedSensors,
   setSelectedSensors: externalSetSelectedSensors,
+  useOriginCheck = false,
 }: {
   sm_idx: string;
   fa_idx: number;
@@ -40,6 +42,7 @@ export default function BasicTable({
   showCheckboxes?: boolean;
   selectedSensors?: number[];
   setSelectedSensors?: Dispatch<SetStateAction<number[]>>;
+  useOriginCheck?: boolean;
 }) {
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [internalSelectedSensors, setInternalSelectedSensors] = useRecoilState(selectedSensorsState);
@@ -120,7 +123,7 @@ export default function BasicTable({
                     rowSensors.map((sensor, idx) => (
                       <Grid item xs={2} key={sensor.sn_idx}>
                         <List sx={style} className='basic-checkbox'>
-                          {showCheckboxes && (
+                          {showCheckboxes && (!useOriginCheck || sensor.origin_check !== 1) && (
                             <Checkbox
                               checked={selectedSensors.includes(sensor.sn_idx)}
                               onChange={() => handleCheckboxChange(sensor.sn_idx)}
