@@ -9,7 +9,6 @@ import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { baseEditModeState, selectedBaseState, selectedSensorsState } from '../../recoil/atoms';

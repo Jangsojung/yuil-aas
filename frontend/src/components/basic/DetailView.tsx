@@ -7,7 +7,6 @@ import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 import { FacilityGroupTree, Base } from '../../types/api';
 import { ActionBox } from '../common';
 import LoadingOverlay from '../loading/LodingOverlay';

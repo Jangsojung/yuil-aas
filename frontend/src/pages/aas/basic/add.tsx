@@ -28,11 +28,11 @@ export default function BasiccodeAddPage() {
     setSensorName,
     selectedSensors,
     selectedFactory,
-    setSelectedFactory,
     handleTreeSearch,
     handleBasicModalAdd,
     handleBasicModalReset,
     handleReset,
+    handleFactoryChange,
     alertModal,
     closeAlert,
   } = useBasicAdd();
@@ -87,7 +87,7 @@ export default function BasiccodeAddPage() {
         setBasicDesc={setBasicDesc}
         selectedSensors={selectedSensors}
         selectedFactory={selectedFactory}
-        setSelectedFactory={setSelectedFactory}
+        setSelectedFactory={handleFactoryChange}
         onTreeSearch={handleTreeSearch}
         onGroupSelectAll={handleGroupSelectAllWrapper}
         onFacilitySelectAll={handleFacilitySelectAllWrapper}

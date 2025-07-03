@@ -21,6 +21,19 @@ export const useBasicAdd = () => {
   const [sensorName, setSensorName] = useState('');
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
 
+  // 공장 변경 시 체크된 센서들 리셋
+  const handleFactoryChange = useCallback(
+    (factory: number | '') => {
+      setSelectedFactory(factory);
+      if (factory !== '') {
+        setSelectedSensors([]); // 체크된 센서들 리셋
+        setSelectedFacilityGroups([]); // 설비그룹 선택 리셋
+        setTreeData([]); // 트리 데이터도 리셋
+      }
+    },
+    [setSelectedSensors]
+  );
+
   // 기초코드 추가
   const handleAdd = useCallback(async () => {
     if (selectedSensors.length === 0) {
@@ -134,6 +147,7 @@ export const useBasicAdd = () => {
     handleBasicModalAdd,
     handleBasicModalReset,
     handleReset,
+    handleFactoryChange,
 
     // 알림
     alertModal,

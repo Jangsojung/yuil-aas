@@ -30,7 +30,6 @@ export default function FacilityManagementPage() {
     handleFacilityAddSuccess,
     handleDeleteSensors,
     alertModal,
-    showAlert,
     closeAlert,
   } = useFacilityManagement();
 

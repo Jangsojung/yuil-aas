@@ -165,4 +165,4 @@ export default function DataList() {
   );
 }
 
-const cells = ['한글명', '식별 ID', '생성 일자', '수정 일자'];
+// const cells = ['한글명', '식별 ID', '생성 일자', '수정 일자'];
