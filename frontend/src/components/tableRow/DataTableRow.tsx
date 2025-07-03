@@ -61,11 +61,11 @@ export default function DataTableRow({
 
   return (
     <TableRow key={data.af_idx} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-      <TableCell sx={{ minWidth: '150px', width: '150px' }}>
+      <TableCell sx={{ minWidth: '60px', width: '60px' }}>
         <Checkbox checked={checked} onChange={handleCheckboxChange} />
       </TableCell>
-      <TableCell sx={{ width: '50%' }}>{data.as_kr}</TableCell>
-      <TableCell sx={{ width: '50%' }}>
+      <TableCell sx={{ width: '35%' }}>{data.as_kr}</TableCell>
+      <TableCell sx={{ width: '35%' }}>
         {checked ? (
           <>
             <TextField

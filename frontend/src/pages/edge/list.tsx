@@ -9,7 +9,6 @@ import { ActionBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { usePagination } from '../../hooks/usePagination';
 import EdgeTableRow from '../../components/tableRow/EdgeTableRow';
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import LoadingOverlay from '../../components/loading/LodingOverlay';
 
 interface EdgeGateway {
@@ -162,6 +161,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
   useEffect(() => {
     // 페이지 접속 시 실시간 상태로 초기 로드
     getEdgeWithStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -174,6 +174,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     ); // 10분
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

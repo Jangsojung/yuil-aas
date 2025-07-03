@@ -113,12 +113,13 @@ export default function DataList() {
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ minWidth: '150px', width: '150px' }}>
+                <TableCell sx={{ minWidth: '60px', width: '60px' }}>
                   <Checkbox checked={pagedData ? checkAllCurrentPageSelected() : false} onChange={handleSelectAll} />
                 </TableCell>
-                {cells.map((cell, idx) => (
-                  <TableCell key={idx}>{cell}</TableCell>
-                ))}
+                <TableCell sx={{ width: '35%' }}>한글명</TableCell>
+                <TableCell sx={{ width: '35%' }}>식별 ID</TableCell>
+                <TableCell sx={{ minWidth: '140px', width: '140px' }}>생성 일자</TableCell>
+                <TableCell sx={{ minWidth: '140px', width: '140px' }}>수정 일자</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -135,7 +136,7 @@ export default function DataList() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={3} align='center'>
+                  <TableCell colSpan={5} align='center'>
                     데이터가 없습니다.
                   </TableCell>
                 </TableRow>
