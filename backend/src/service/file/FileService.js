@@ -698,6 +698,7 @@ export const getVerifyFromDB = async (file) => {
                 name: fileName,
                 path: '/files/front',
               },
+              fileSize: fileStats.size,
             });
           } else {
             // AASX 파일인 경우 AASX 파일도 읽기
@@ -727,6 +728,7 @@ export const getVerifyFromDB = async (file) => {
                   name: fileName,
                   path: '/files/aas',
                 },
+                fileSize: fileStats.size,
               });
             });
           }

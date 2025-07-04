@@ -82,11 +82,11 @@ export default function JsonDetail() {
             });
             return;
           } else {
-            setJsonData(data.aasData);
+            setJsonData({ ...data.aasData, _fileSize: data.fileSize });
             setEditedJsonText(JSON.stringify(data.aasData, null, 2));
           }
         } else {
-          setJsonData(data);
+          setJsonData({ ...data, _fileSize: data.fileSize });
           setEditedJsonText(JSON.stringify(data, null, 2));
         }
 
@@ -130,6 +130,19 @@ export default function JsonDetail() {
   }, [id]);
 
   const handleEditClick = () => {
+    // 파일 크기가 50MB 이상인 경우 수정 불가
+    const fileSizeMB = (jsonData as any)._fileSize ? (jsonData as any)._fileSize / (1024 * 1024) : 0;
+    if (fileSizeMB > 50) {
+      setAlertModal({
+        open: true,
+        title: '수정 불가',
+        content: `파일 크기: ${fileSizeMB.toFixed(1)}MB\n\n50MB 이상의 파일은 수정할 수 없습니다.`,
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
     setIsEditing(true);
     setJsonError('');
   };
