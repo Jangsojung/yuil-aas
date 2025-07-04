@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../../components/datepicker';
-import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../../components/pagination';
 import { usePagination } from '../../../hooks/usePagination';
 import { deleteJSONAPI, getJSONFilesAPI } from '../../../apis/api/json_manage';
@@ -306,5 +306,3 @@ export default function JSONList() {
     </div>
   );
 }
-
-const cells = ['파일명', '기초코드명', '센서 개수', '생성 일자'];

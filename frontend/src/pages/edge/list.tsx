@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI, downloadDeployFilesAPI } from '../../apis/api/edge';
-import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
 import { useRecoilValue } from 'recoil';
@@ -113,6 +113,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       const data: EdgeGateway[] = await getEdgeAPI();
       setEdgeGateways(Array.isArray(data) ? data : []);
     } catch (error) {
+      console.error('getEdge failed:', error);
       setEdgeGateways([]);
     } finally {
       setLoading(false);

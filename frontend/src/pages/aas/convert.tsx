@@ -10,7 +10,6 @@ import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/tableRow/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
 import { userState, navigationResetState } from '../../recoil/atoms';
-import LoadingOverlay from '../../components/loading/LodingOverlay';
 import { SearchBox, ActionBox, SortableTableHeader } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import ProgressOverlay from '../../components/loading/ProgressOverlay';
@@ -25,7 +24,7 @@ interface Base {
 }
 
 export default function ConvertPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [selectedConvert, setSelectedConvert] = useState<number | null>();
   const [bases, setBases] = useState<Base[]>([]);
   const [filteredBases, setFilteredBases] = useState<Base[]>([]);
@@ -67,14 +66,6 @@ export default function ConvertPage() {
 
   const [progress, setProgress] = useState(0);
   const [progressOpen, setProgressOpen] = useState(false);
-
-  const startLoading = () => {
-    setIsLoading(true);
-  };
-
-  const endLoading = () => {
-    setIsLoading(false);
-  };
 
   const handleDateChange = (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
     setStartDate(newStartDate);

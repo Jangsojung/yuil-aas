@@ -50,10 +50,7 @@ export const checkNetworkStatus = async (ip) => {
       command = `ping -c 1 -W 2 ${ip}`; // Linux/Mac: 2초 타임아웃 추가
     }
 
-    // console.log(`Executing ping command: ${command}`);
     const { stdout, stderr } = await execAsync(command);
-
-    // console.log(`Ping stderr for ${ip}:`, stderr);
 
     // ping 결과에서 응답 시간이나 특정 패턴을 확인
     let isConnected = false;
@@ -66,10 +63,9 @@ export const checkNetworkStatus = async (ip) => {
         stdout.includes('1 received') || stdout.includes('1 packets received') || stdout.includes('bytes from');
     }
 
-    // console.log(`Ping result for ${ip}: ${isConnected ? 'Connected' : 'Not connected'}`);
     return isConnected;
   } catch (error) {
-    // console.error(`Ping failed for ${ip}:`, error.message);
+    console.error(`Ping failed for ${ip}:`, error.message);
     // ping 실패 시 연결 안 됨으로 처리
     return false;
   }
@@ -84,16 +80,20 @@ export const getServerTemperature = async (ip, port) => {
     for (const endpoint of endpoints) {
       try {
         const url = `http://${ip}:${port}${endpoint}`;
-        // console.log(`Trying temperature API: ${url}`);
+
+        // AbortController를 사용한 타임아웃 설정
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2초 타임아웃
 
         const response = await fetch(url, {
           method: 'GET',
-          timeout: 3000, // 3초 타임아웃으로 단축
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           const data = await response.json();
-          // console.log(`Temperature API response for ${url}:`, data);
 
           // 다양한 응답 구조에서 온도 값 추출
           const temperature =
@@ -112,15 +112,13 @@ export const getServerTemperature = async (ip, port) => {
           }
         }
       } catch (endpointError) {
-        // console.log(`Endpoint ${endpoint} failed for ${ip}:${port}:`, endpointError.message);
         continue; // 다음 엔드포인트 시도
       }
     }
 
-    // console.log(`All temperature endpoints failed for ${ip}:${port}`);
     return null;
   } catch (error) {
-    // console.error(`Temperature API failed for ${ip}:${port}:`, error.message);
+    console.error(`Temperature API failed for ${ip}:${port}:`, error.message);
     return null;
   }
 };
@@ -128,33 +126,32 @@ export const getServerTemperature = async (ip, port) => {
 // 모든 Edge Gateway의 실시간 상태 가져오기
 export const getEdgeGatewaysWithRealTimeStatus = async () => {
   try {
-    // console.log('Starting real-time status check for Edge Gateways...');
     const edgeGateways = await getEdgeGatewaysFromDB();
 
     if (!edgeGateways) {
-      // console.log('No Edge Gateways found in database');
       return [];
     }
-
-    // console.log(`Found ${edgeGateways.length} Edge Gateways, checking status...`);
 
     // 각 Edge Gateway에 대해 실시간 상태 확인
     const edgeGatewaysWithStatus = await Promise.all(
       edgeGateways.map(async (eg) => {
         try {
           const [ip, port] = eg.eg_ip_port.split(':');
-          // console.log(`Checking status for ${eg.eg_pc_name} (${ip}:${port})`);
 
           // 네트워크 상태 확인
           const networkStatus = await checkNetworkStatus(ip);
 
-          // 서버 온도 확인 (네트워크가 연결된 경우에만)
+          // 서버 온도 확인 (네트워크가 연결된 경우에만, 빠른 검사)
           let serverTemp = null;
           if (networkStatus) {
-            // console.log(`Network is connected for ${ip}, checking temperature...`);
-            serverTemp = await getServerTemperature(ip, port);
-          } else {
-            // console.log(`Network is not connected for ${ip}, skipping temperature check`);
+            // 온도 검사를 별도로 처리하여 전체 응답 시간 단축
+            getServerTemperature(ip, port)
+              .then((temp) => {
+                // 온도 업데이트 로직 (필요시 추가)
+              })
+              .catch((err) => {
+                // 온도 검사 실패 처리 (필요시 추가)
+              });
           }
 
           const result = {
@@ -163,14 +160,9 @@ export const getEdgeGatewaysWithRealTimeStatus = async () => {
             eg_server_temp: serverTemp,
           };
 
-          // console.log(
-          //   `Status result for ${eg.eg_pc_name}: Network=${
-          //     networkStatus ? 'Connected' : 'Disconnected'
-          //   }, Temp=${serverTemp}`
-          // );
           return result;
         } catch (error) {
-          // console.error(`Error checking status for ${eg.eg_pc_name}:`, error.message);
+          console.error(`Error checking status for ${eg.eg_pc_name}:`, error.message);
           // 개별 Edge Gateway 에러 시 기본값으로 반환
           return {
             ...eg,
@@ -181,10 +173,9 @@ export const getEdgeGatewaysWithRealTimeStatus = async () => {
       })
     );
 
-    // console.log('Real-time status check completed');
     return edgeGatewaysWithStatus;
   } catch (error) {
-    // console.error('Failed to get Edge Gateways with real-time status:', error);
+    console.error('Failed to get Edge Gateways with real-time status:', error);
     throw error;
   }
 };

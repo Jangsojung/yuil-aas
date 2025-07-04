@@ -127,6 +127,7 @@ export default function JsonDetail() {
         setProgressLabel('오류 발생');
         setLoading(false);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleEditClick = () => {

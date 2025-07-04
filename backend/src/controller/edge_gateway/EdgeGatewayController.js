@@ -5,6 +5,7 @@ import {
   updateEdgeGatewayToDB,
   deleteEdgeGatewaysFromDB,
   checkNetworkStatus,
+  getServerTemperature,
 } from '../../service/edge_gateway/EdgeGatewayService.js';
 import fs from 'fs';
 import path from 'path';
@@ -25,10 +26,9 @@ export const getEdgeGateways = async (res) => {
 export const getEdgeGatewaysWithStatus = async (res) => {
   try {
     const result = await getEdgeGatewaysWithRealTimeStatus();
-
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
+    console.error('getEdgeGatewaysWithStatus error:', err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -117,5 +117,14 @@ export const checkEdgeGatewayPing = async (ip, port, res) => {
     res.status(200).json({ connected: isConnected });
   } catch (err) {
     res.status(500).json({ error: 'Ping check failed' });
+  }
+};
+
+export const checkEdgeGatewayTemperature = async (ip, port, res) => {
+  try {
+    const temperature = await getServerTemperature(ip, port);
+    res.status(200).json({ temperature: temperature });
+  } catch (err) {
+    res.status(500).json({ error: 'Temperature check failed' });
   }
 };

@@ -11,7 +11,6 @@ import {
   synchronizeFacility,
 } from '../apis/api/facility';
 import { FactoryTree } from '../types/api';
-import ProgressOverlay from '../components/loading/ProgressOverlay';
 
 export const useFacilityManagement = () => {
   const userIdx = useRecoilValue(userState)?.user_idx;
@@ -201,6 +200,7 @@ export const useFacilityManagement = () => {
         showAlert('에러', `${deleteType} 삭제 중 오류가 발생했습니다.`);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedSensors,
     selectedFacilities,
