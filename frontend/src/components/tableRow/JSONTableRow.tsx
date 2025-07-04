@@ -5,9 +5,7 @@ interface JSONTableRowProps {
   file: {
     af_idx: number;
     af_name: string;
-    af_size: number;
     createdAt: string;
-    updatedAt?: string;
     base_name?: string;
     sn_length?: number;
   };
@@ -42,7 +40,6 @@ export default function JSONTableRow({ file, onCheckboxChange, checked, totalCou
       <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
       <TableCell>{file.sn_length || 0}</TableCell>
       <TableCell>{formatDate(file.createdAt)}</TableCell>
-      <TableCell>{formatDate(file.updatedAt)}</TableCell>
     </TableRow>
   );
 }

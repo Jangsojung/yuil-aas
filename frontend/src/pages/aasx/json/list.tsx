@@ -18,7 +18,6 @@ import { useSortableData, SortableColumn } from '../../../hooks/useSortableData'
 interface File {
   af_idx: number;
   af_name: string;
-  af_size: number;
   createdAt: string;
   base_name?: string;
   sensor_count?: number;
@@ -52,7 +51,6 @@ export default function JSONList() {
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<File>[] = [
     { field: 'af_name', label: '파일명' },
-    { field: 'af_size', label: '파일 크기' },
     { field: 'base_name', label: '기초코드명' },
     { field: 'sensor_count', label: '센서 개수' },
     { field: 'createdAt', label: '생성 일자' },
@@ -293,4 +291,4 @@ export default function JSONList() {
   );
 }
 
-const cells = ['파일명', '기초코드명', '센서 개수', '생성 일자', '수정 일자'];
+const cells = ['파일명', '기초코드명', '센서 개수', '생성 일자'];

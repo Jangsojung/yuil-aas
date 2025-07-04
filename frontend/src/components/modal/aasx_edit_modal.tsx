@@ -96,39 +96,10 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     accept: '.json',
   };
 
-  const handleEdit = async () => {
-    const { name } = uploadFile;
-
-    if (!name.toLowerCase().endsWith('.json')) {
-      setAlertModal({
-        open: true,
-        title: '알림',
-        content: 'JSON 파일만 업로드 가능합니다.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
-      return;
-    }
-
-    if (fileData && !af_idx) {
-      setAlertModal({
-        open: true,
-        title: '오류',
-        content: '파일 정보가 올바르지 않습니다.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
-      return;
-    }
-
+  // 실제 수정/등록 실행 함수
+  const executeEdit = async () => {
     setIsLoading(true);
     setProgress(0);
-
-    // 파일 크기 경고 메시지 생성
-    const fileSizeMB = (uploadFile.size / (1024 * 1024)).toFixed(1);
-    const warning =
-      parseFloat(fileSizeMB) > 10 ? `\n\n⚠️ 파일 크기: ${fileSizeMB}MB\n처리 시간이 오래 걸릴 수 있습니다.` : '';
-    setSizeWarning(warning);
 
     try {
       let result;
@@ -145,7 +116,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         setProgressLabel('기존 파일 삭제 완료 ...'); // 기존 파일 삭제 완료
         setProgress(50);
         setProgressLabel('AAS 파일 생성 중 ...'); // AAS 파일 생성 시작
-        result = await updateAASXFileAPI(af_idx, name, userIdx);
+        result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx);
         setProgress(80);
         setProgressLabel('AASX 파일 생성 중 ...'); // AASX 파일 생성 시작
         setProgress(90);
@@ -202,19 +173,11 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
           type: 'alert',
           onConfirm: undefined,
         });
-      } else if (msg.includes('404') || msg.includes('Not Found')) {
-        setAlertModal({
-          open: true,
-          title: '오류',
-          content: '서버에서 요청한 리소스를 찾을 수 없습니다. 관리자에게 문의하세요.',
-          type: 'alert',
-          onConfirm: undefined,
-        });
       } else {
         setAlertModal({
           open: true,
           title: '오류',
-          content: '업로드 중 오류 발생: ' + msg,
+          content: '파일 처리 중 오류 발생: ' + msg,
           type: 'alert',
           onConfirm: undefined,
         });
@@ -225,6 +188,48 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       setProgressLabel('');
       setSizeWarning('');
     }
+  };
+
+  const handleEdit = async () => {
+    const { name } = uploadFile;
+
+    if (!name.toLowerCase().endsWith('.json')) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: 'JSON 파일만 업로드 가능합니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
+    if (fileData && !af_idx) {
+      setAlertModal({
+        open: true,
+        title: '오류',
+        content: '파일 정보가 올바르지 않습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
+    // 파일 크기 체크 (50MB)
+    const fileSizeMB = uploadFile.size / (1024 * 1024);
+    if (fileSizeMB > 50) {
+      setAlertModal({
+        open: true,
+        title: 'AASX 파일 변환',
+        content: '파일의 크기가 50MB를 초과할 경우 AASX 파일 변환에 다소 시간이 소요될 수 있습니다.\n변환하시겠습니까?',
+        type: 'confirm',
+        onConfirm: executeEdit,
+      });
+      return;
+    }
+
+    // 바로 수정/등록 실행
+    await executeEdit();
   };
 
   const handleReset = () => {
@@ -257,7 +262,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   return (
     <>
       <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
-        {isLoading && <ProgressOverlay open={isLoading} progress={progress} label={`${progressLabel}${sizeWarning}`} />}
+        {isLoading && <ProgressOverlay open={isLoading} progress={progress} label={progressLabel} />}
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
           {title}
         </DialogTitle>

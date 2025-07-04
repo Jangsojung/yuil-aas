@@ -92,6 +92,10 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
 };
 
 export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
+  let aasInsertId = null;
+  let aasxInsertId = null;
+  let createdFiles = [];
+
   try {
     // 파일명 중복 체크
     const [existing] = await pool
@@ -103,6 +107,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
     const frontFilePath = `../files/front/${fileName}`;
 
+    // AAS 파일 생성
     try {
       const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
         method: 'POST',
@@ -130,12 +135,16 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       }
     }
 
+    // AAS 파일 DB 저장
     const aasFileName = fileName;
     const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
-    await pool.promise().query(aasQuery, [fc_idx, aasFileName, user_idx, user_idx]);
+    const [aasResult] = await pool.promise().query(aasQuery, [fc_idx, aasFileName, user_idx, user_idx]);
+    aasInsertId = aasResult.insertId;
+    createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: aasInsertId });
 
     const aasFilePath = `../files/aas/${fileName}`;
 
+    // AASX 파일 생성
     try {
       const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
         method: 'POST',
@@ -164,24 +173,71 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       }
     }
 
+    // AASX 파일 DB 저장
     const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
     const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, '/files/aasx', ?, ?)`;
-    const [result] = await pool.promise().query(aasxQuery, [fc_idx, aasxFileName, user_idx, user_idx]);
+    const [aasxResult] = await pool.promise().query(aasxQuery, [fc_idx, aasxFileName, user_idx, user_idx]);
+    aasxInsertId = aasxResult.insertId;
+    createdFiles.push({ type: 'aasx', path: `../files/aasx/${aasxFileName}`, insertId: aasxInsertId });
 
     return {
       success: true,
       fileName: aasxFileName,
       filePath: '/files/aasx',
-      af_idx: result.insertId,
+      af_idx: aasxInsertId,
       message: '변환 완료: AAS JSON, AASX 파일이 모두 생성되었습니다.',
     };
   } catch (err) {
     console.error('Failed to insert AASX File: ', err);
+
+    // 실패 시 생성된 파일들 정리
+    await cleanupCreatedFiles(createdFiles);
+
     throw err;
   }
 };
 
+// 생성된 파일들을 정리하는 함수
+const cleanupCreatedFiles = async (createdFiles) => {
+  try {
+    if (createdFiles.length === 0) return;
+
+    // DB에서 삭제
+    const insertIds = createdFiles.map((file) => file.insertId);
+    if (insertIds.length > 0) {
+      await pool.promise().query('DELETE FROM tb_aasx_file WHERE af_idx IN (?)', [insertIds]);
+    }
+
+    // 실제 파일 삭제
+    const deletePaths = createdFiles.map((file) => file.path);
+    if (deletePaths.length > 0) {
+      const deleteResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paths: deletePaths,
+        }),
+      });
+
+      if (!deleteResponse.ok) {
+        console.error('생성된 파일 정리 중 오류 발생');
+      }
+    }
+
+    console.log('생성된 파일들이 정리되었습니다.');
+  } catch (cleanupError) {
+    console.error('파일 정리 중 오류 발생:', cleanupError);
+  }
+};
+
 export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
+  let newAasInsertId = null;
+  let newAasxInsertId = null;
+  let createdFiles = [];
+  let oldFileInfo = null;
+
   try {
     // 새 파일명으로 이미 존재하는 파일이 있는지 체크
     const newAasxFileName = fileName.replace(/\.json$/i, '.aasx');
@@ -195,6 +251,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       throw new Error('이미 생성되어있는 파일입니다.');
     }
 
+    // 기존 파일 정보 조회
     const [aasxRows] = await pool
       .promise()
       .query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ? AND af_kind = 3', [af_idx]);
@@ -207,36 +264,14 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
     const oldAasFileName = oldAasxFileName.replace(/\.aasx$/i, '.json');
     const newAasFileName = fileName;
 
-    const oldAasPath = `../files/aas/${oldAasFileName}`;
-    const oldAasxPath = `../files/aasx/${oldAasxFileName}`;
+    oldFileInfo = {
+      oldAasFileName,
+      oldAasxFileName,
+      oldAasPath: `../files/aas/${oldAasFileName}`,
+      oldAasxPath: `../files/aasx/${oldAasxFileName}`,
+    };
 
-    const deleteResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        paths: [oldAasPath, oldAasxPath],
-      }),
-    });
-
-    if (!deleteResponse.ok) {
-      const errorText = await deleteResponse.text();
-      console.error('기존 파일 삭제 중 오류 발생:', errorText);
-    }
-
-    const [existingAasRows] = await pool
-      .promise()
-      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 2', [oldAasFileName]);
-
-    if (existingAasRows.length > 0) {
-      const updateAasQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_name = ? AND af_kind = 2`;
-      await pool.promise().query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName]);
-    } else {
-      const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
-      await pool.promise().query(insertAasQuery, [3, newAasFileName, user_idx, user_idx]);
-    }
-
+    // 새 AAS 파일 생성
     const frontFilePath = `../files/front/${fileName}`;
 
     try {
@@ -258,8 +293,24 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
     }
 
+    // 새 AAS 파일 DB 저장
+    const [existingAasRows] = await pool
+      .promise()
+      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 2', [oldAasFileName]);
+
+    if (existingAasRows.length > 0) {
+      const updateAasQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_name = ? AND af_kind = 2`;
+      await pool.promise().query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName]);
+    } else {
+      const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
+      const [aasResult] = await pool.promise().query(insertAasQuery, [3, newAasFileName, user_idx, user_idx]);
+      newAasInsertId = aasResult.insertId;
+      createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: newAasInsertId });
+    }
+
     const aasFilePath = `../files/aas/${fileName}`;
 
+    // 새 AASX 파일 생성
     try {
       const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
         method: 'POST',
@@ -279,17 +330,45 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
     }
 
-    const updateAasxQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_idx = ?`;
-    await pool.promise().query(updateAasxQuery, [newAasxFileName, user_idx, af_idx]);
+    // 새 AASX 파일 DB 저장
+    const insertAasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, '/files/aasx', ?, ?)`;
+    const [aasxResult] = await pool.promise().query(insertAasxQuery, [3, newAasxFileName, user_idx, user_idx]);
+    newAasxInsertId = aasxResult.insertId;
+    createdFiles.push({ type: 'aasx', path: `../files/aasx/${newAasxFileName}`, insertId: newAasxInsertId });
+
+    // 기존 파일 삭제 (새 파일 생성이 성공한 후에만)
+    const deleteResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        paths: [oldFileInfo.oldAasPath, oldFileInfo.oldAasxPath],
+      }),
+    });
+
+    if (!deleteResponse.ok) {
+      const errorText = await deleteResponse.text();
+      console.error('기존 파일 삭제 중 오류 발생:', errorText);
+    }
+
+    // 기존 DB 레코드 삭제
+    await pool.promise().query('DELETE FROM tb_aasx_file WHERE af_name = ? AND af_kind = 2', [oldAasFileName]);
+    await pool.promise().query('DELETE FROM tb_aasx_file WHERE af_idx = ? AND af_kind = 3', [af_idx]);
 
     return {
       success: true,
       fileName: newAasxFileName,
       filePath: '/files/aasx',
+      af_idx: newAasxInsertId,
       message: '변환 완료: AAS JSON, AASX 파일이 모두 업데이트되었습니다.',
     };
   } catch (err) {
     console.error('Failed to update AASX File: ', err);
+
+    // 실패 시 새로 생성된 파일들 정리
+    await cleanupCreatedFiles(createdFiles);
+
     throw err;
   }
 };

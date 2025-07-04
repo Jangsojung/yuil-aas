@@ -17,7 +17,6 @@ import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 interface File {
   af_idx: number;
   af_name: string;
-  af_size: number;
   createdAt: string;
   updatedAt?: string;
 }
@@ -41,6 +40,13 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   const [selectAll, setSelectAll] = useState(false);
   const navigationReset = useRecoilValue(navigationResetState);
 
+  // refresh 메서드를 ref로 노출
+  useImperativeHandle(ref, () => ({
+    refresh: () => {
+      getFiles();
+    },
+  }));
+
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -60,7 +66,6 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<File>[] = [
     { field: 'af_name', label: '파일명' },
-    { field: 'af_size', label: '파일 크기' },
     { field: 'createdAt', label: '생성 일자' },
     { field: 'updatedAt', label: '수정 일자' },
   ];

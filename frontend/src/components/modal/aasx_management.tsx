@@ -78,37 +78,10 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
     setSelectedFile(null);
   };
 
-  const handleAdd = async () => {
-    if (!selectedFile) {
-      setAlertModal({
-        open: true,
-        title: '알림',
-        content: '파일을 선택해주세요.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
-      return;
-    }
-
-    if (!selectedFile.name.toLowerCase().endsWith('.json')) {
-      setAlertModal({
-        open: true,
-        title: '알림',
-        content: 'JSON 파일만 업로드 가능합니다.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
-      return;
-    }
-
+  // 실제 업로드 실행 함수
+  const executeUpload = async () => {
     setIsLoading(true);
     setProgress(0);
-
-    // 파일 크기 경고 메시지 생성
-    const fileSizeMB = (selectedFile.size / (1024 * 1024)).toFixed(1);
-    const warning =
-      parseFloat(fileSizeMB) > 10 ? `\n\n⚠️ 파일 크기: ${fileSizeMB}MB\n처리 시간이 오래 걸릴 수 있습니다.` : '';
-    setSizeWarning(warning);
 
     try {
       setProgress(10);
@@ -175,6 +148,46 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
     }
   };
 
+  const handleAdd = async () => {
+    if (!selectedFile) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '파일을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
+    if (!selectedFile.name.toLowerCase().endsWith('.json')) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: 'JSON 파일만 업로드 가능합니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
+    // 파일 크기 체크 (50MB)
+    const fileSizeMB = selectedFile.size / (1024 * 1024);
+    if (fileSizeMB > 50) {
+      setAlertModal({
+        open: true,
+        title: 'AASX 파일 변환',
+        content: '파일의 크기가 50MB를 초과할 경우 AASX 파일 변환에 다소 시간이 소요될 수 있습니다.\n변환하시겠습니까?',
+        type: 'confirm',
+        onConfirm: executeUpload,
+      });
+      return;
+    }
+
+    // 바로 업로드 실행
+    await executeUpload();
+  };
+
   const handleCloseAlert = () => {
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
@@ -186,7 +199,7 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
         파일등록
       </Button>
 
-      {isLoading && <ProgressOverlay open={isLoading} progress={progress} label={`${progressLabel}${sizeWarning}`} />}
+      {isLoading && <ProgressOverlay open={isLoading} progress={progress} label={progressLabel} />}
 
       <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
