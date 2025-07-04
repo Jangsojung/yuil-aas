@@ -302,7 +302,7 @@ export default function ConvertPage() {
               {/* 생성 날짜 */}
               <Grid container spacing={2}>
                 <Grid className='sort-title'>
-                  <div>생성 날짜</div>
+                  <div>생성일</div>
                 </Grid>
                 <Grid>
                   <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
@@ -334,6 +334,8 @@ export default function ConvertPage() {
                       sortDirection={sortDirection}
                       onSort={handleSort}
                     />
+                    <TableCell>시작일</TableCell>
+                    <TableCell>종료일</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

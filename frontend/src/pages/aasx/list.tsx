@@ -19,6 +19,7 @@ interface File {
   af_name: string;
   af_size: number;
   createdAt: string;
+  updatedAt?: string;
 }
 
 interface AASXFile {
@@ -61,6 +62,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     { field: 'af_name', label: '파일명' },
     { field: 'af_size', label: '파일 크기' },
     { field: 'createdAt', label: '생성 일자' },
+    { field: 'updatedAt', label: '수정 일자' },
   ];
 
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
@@ -228,7 +230,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
           <Grid item>
             <Grid container spacing={1}>
               <Grid item className='d-flex gap-5'>
-                <div className='sort-title'>날짜</div>
+                <div className='sort-title'>기간</div>
               </Grid>
               <Grid item>
                 <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />

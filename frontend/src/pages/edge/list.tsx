@@ -24,6 +24,10 @@ interface EdgeGateway {
   createDate?: string;
   create_date?: string;
   date?: string;
+  updatedAt?: string;
+  updated_at?: string;
+  updateDate?: string;
+  update_date?: string;
 }
 
 interface EdgeListProps {
@@ -61,6 +65,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     { field: 'eg_network', label: '네트워크' },
     { field: 'eg_pc_temp', label: 'PC 온도' },
     { field: 'createdAt', label: '생성 일자' },
+    { field: 'updatedAt', label: '수정 일자' },
   ];
 
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(

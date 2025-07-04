@@ -81,7 +81,7 @@ export default function ConvertTableRow({
         <SingleDatePicker
           onDateChange={handleStartDateChange}
           value={startDate || null}
-          label='시작 날짜'
+          label='시작일'
           onOpen={handleStartDateOpen}
         />
       </TableCell>
@@ -89,7 +89,7 @@ export default function ConvertTableRow({
         <SingleDatePicker
           onDateChange={handleEndDateChange}
           value={endDate || null}
-          label='종료 날짜'
+          label='종료일'
           minDate={startDate || undefined}
           onOpen={handleEndDateOpen}
         />

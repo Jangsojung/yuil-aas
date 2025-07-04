@@ -71,6 +71,7 @@ export default function EdgeTableRow({
           상태 체크
         </Button>
       </TableCell>
+      <TableCell>{edgeGateway.eg_pc_temp ? `${edgeGateway.eg_pc_temp} °C` : '-'}</TableCell>
       <TableCell>{edgeGateway.createdAt ? formatDate(edgeGateway.createdAt) : ''}</TableCell>
       <TableCell>{edgeGateway.updatedAt ? formatDate(edgeGateway.updatedAt) : ''}</TableCell>
     </TableRow>

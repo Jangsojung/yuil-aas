@@ -53,7 +53,7 @@ export default function BasicDatePicker({ onDateChange, startDate, endDate }: Pr
       <ThemeProvider theme={theme}>
         <div className='datepicker-wrap d-flex gap-5'>
           <DatePicker
-            label='시작 날짜'
+            label='시작일'
             value={startDate}
             format='YYYY-MM-DD'
             onChange={handleStartDateChange}
@@ -64,7 +64,7 @@ export default function BasicDatePicker({ onDateChange, startDate, endDate }: Pr
             <RemoveIcon />
           </span>
           <DatePicker
-            label='종료 날짜'
+            label='종료일'
             value={endDate}
             format='YYYY-MM-DD'
             onChange={handleEndDateChange}

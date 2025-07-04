@@ -30,12 +30,21 @@ export default function AASXTableRow({ file, onCheckboxChange, checked, onEditCl
     return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   return (
     <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
       <TableCell>
         <Checkbox checked={checked} onChange={() => onCheckboxChange(file.af_idx)} />
       </TableCell>
       <TableCell>{file.af_name}</TableCell>
+      <TableCell>{formatFileSize(file.af_size)}</TableCell>
       <TableCell>{formatDate(file.createdAt)}</TableCell>
       <TableCell>{formatDate(file.updatedAt)}</TableCell>
       <TableCell>
