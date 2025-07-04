@@ -500,66 +500,92 @@ export const checkFileSizeFromDB = async (file) => {
       console.log('파일 크기 확인 시작:', file);
       let af_path = file.af_path;
       let af_name = file.af_name;
+      let af_kind = file.af_kind;
 
-      if (!af_path || !af_name) {
+      if (!af_path || !af_name || !af_kind) {
         console.log('DB에서 파일 정보 조회 중...');
-        pool.query('SELECT af_path, af_name FROM tb_aasx_file WHERE af_idx = ?', [file.af_idx], (err, rows) => {
-          if (err || !rows || rows.length === 0) {
-            console.error('DB 조회 실패:', err);
-            reject(new Error('DB에서 파일 정보를 찾을 수 없습니다.'));
-            return;
+        pool.query(
+          'SELECT af_path, af_name, af_kind FROM tb_aasx_file WHERE af_idx = ?',
+          [file.af_idx],
+          (err, rows) => {
+            if (err || !rows || rows.length === 0) {
+              console.error('DB 조회 실패:', err);
+              reject(new Error('DB에서 파일 정보를 찾을 수 없습니다.'));
+              return;
+            }
+            af_path = rows[0].af_path;
+            af_name = rows[0].af_name;
+            af_kind = rows[0].af_kind;
+            console.log('DB에서 조회된 파일 정보:', { af_path, af_name, af_kind });
+
+            let filePath;
+            let fileName;
+
+            if (af_kind === 1) {
+              // JSON 파일 (front/ 폴더)
+              fileName = af_name;
+              filePath = path.join(__dirname, '../../../../files/front', fileName);
+              console.log('JSON 파일 경로:', filePath);
+            } else {
+              // AAS 파일 (aas/ 폴더)
+              fileName = af_name.replace(/\.aasx$/i, '.json');
+              filePath = path.join(__dirname, '../../../../files/aas', fileName);
+              console.log('AAS 파일 경로:', filePath);
+            }
+
+            // 파일 존재 여부 확인
+            if (!fs.existsSync(filePath)) {
+              console.error('파일이 존재하지 않음:', filePath);
+              reject(new Error('해당하는 파일이 존재하지 않습니다.'));
+              return;
+            }
+
+            // 파일 크기 확인
+            const fileStats = fs.statSync(filePath);
+            console.log(`파일 크기: ${fileStats.size} bytes`);
+
+            const result = {
+              size: fileStats.size,
+              fileName: fileName,
+              filePath: filePath,
+              isLargeFile: fileStats.size > 500 * 1024 * 1024,
+            };
+            console.log('파일 크기 확인 결과:', result);
+            resolve(result);
           }
-          af_path = rows[0].af_path;
-          af_name = rows[0].af_name;
-          console.log('DB에서 조회된 파일 정보:', { af_path, af_name });
-
-          // AAS 파일명 생성 (.aasx -> .json)
-          const aasFileName = af_name.replace(/\.aasx$/i, '.json');
-          const aasFilePath = path.join(__dirname, '../../../../files/aas', aasFileName);
-          console.log('AAS 파일 경로:', aasFilePath);
-
-          // AAS 파일 존재 여부 확인
-          if (!fs.existsSync(aasFilePath)) {
-            console.error('AAS 파일이 존재하지 않음:', aasFilePath);
-            reject(new Error('해당하는 AAS 파일이 존재하지 않습니다.'));
-            return;
-          }
-
-          // AAS 파일 크기 확인
-          const aasStats = fs.statSync(aasFilePath);
-          console.log(`AAS 파일 크기: ${aasStats.size} bytes`);
-
-          const result = {
-            size: aasStats.size,
-            fileName: aasFileName,
-            filePath: aasFilePath,
-            isLargeFile: aasStats.size > 500 * 1024 * 1024,
-          };
-          console.log('파일 크기 확인 결과:', result);
-          resolve(result);
-        });
+        );
       } else {
-        // AAS 파일명 생성 (.aasx -> .json)
-        const aasFileName = af_name.replace(/\.aasx$/i, '.json');
-        const aasFilePath = path.join(__dirname, '../../../../files/aas', aasFileName);
-        console.log('AAS 파일 경로:', aasFilePath);
+        let filePath;
+        let fileName;
 
-        // AAS 파일 존재 여부 확인
-        if (!fs.existsSync(aasFilePath)) {
-          console.error('AAS 파일이 존재하지 않음:', aasFilePath);
-          reject(new Error('해당하는 AAS 파일이 존재하지 않습니다.'));
+        if (af_kind === 1) {
+          // JSON 파일 (front/ 폴더)
+          fileName = af_name;
+          filePath = path.join(__dirname, '../../../../files/front', fileName);
+          console.log('JSON 파일 경로:', filePath);
+        } else {
+          // AAS 파일 (aas/ 폴더)
+          fileName = af_name.replace(/\.aasx$/i, '.json');
+          filePath = path.join(__dirname, '../../../../files/aas', fileName);
+          console.log('AAS 파일 경로:', filePath);
+        }
+
+        // 파일 존재 여부 확인
+        if (!fs.existsSync(filePath)) {
+          console.error('파일이 존재하지 않음:', filePath);
+          reject(new Error('해당하는 파일이 존재하지 않습니다.'));
           return;
         }
 
-        // AAS 파일 크기 확인
-        const aasStats = fs.statSync(aasFilePath);
-        console.log(`AAS 파일 크기: ${aasStats.size} bytes`);
+        // 파일 크기 확인
+        const fileStats = fs.statSync(filePath);
+        console.log(`파일 크기: ${fileStats.size} bytes`);
 
         const result = {
-          size: aasStats.size,
-          fileName: aasFileName,
-          filePath: aasFilePath,
-          isLargeFile: aasStats.size > 500 * 1024 * 1024,
+          size: fileStats.size,
+          fileName: fileName,
+          filePath: filePath,
+          isLargeFile: fileStats.size > 500 * 1024 * 1024,
         };
         console.log('파일 크기 확인 결과:', result);
         resolve(result);
@@ -576,64 +602,78 @@ export const getVerifyFromDB = async (file) => {
     try {
       let af_path = file.af_path;
       let af_name = file.af_name;
-      // af_path, af_name이 없으면 DB에서 조회
-      if (!af_path || !af_name) {
+      let af_kind = file.af_kind;
+
+      // af_path, af_name, af_kind이 없으면 DB에서 조회
+      if (!af_path || !af_name || !af_kind) {
         const [rows] = await pool
           .promise()
-          .query('SELECT af_path, af_name FROM tb_aasx_file WHERE af_idx = ?', [file.af_idx]);
+          .query('SELECT af_path, af_name, af_kind FROM tb_aasx_file WHERE af_idx = ?', [file.af_idx]);
         if (!rows || rows.length === 0) {
           reject(new Error('DB에서 파일 정보를 찾을 수 없습니다.'));
           return;
         }
         af_path = rows[0].af_path;
         af_name = rows[0].af_name;
+        af_kind = rows[0].af_kind;
       }
 
-      // AASX 파일 경로
-      const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
+      let filePath;
+      let fileName;
 
-      // AAS 파일명 생성 (.aasx -> .json)
-      const aasFileName = af_name.replace(/\.aasx$/i, '.json');
-      const aasFilePath = path.join(__dirname, '../../../../files/aas', aasFileName);
+      if (af_kind === 1) {
+        // JSON 파일 (front/ 폴더)
+        fileName = af_name;
+        filePath = path.join(__dirname, '../../../../files/front', fileName);
+        console.log('JSON 파일 경로:', filePath);
+      } else {
+        // AASX 파일 경로
+        const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
 
-      // AASX 파일 존재 여부 확인
-      if (!fs.existsSync(aasxFilePath)) {
-        reject(new Error('AASX 파일이 존재하지 않습니다.'));
+        // AAS 파일명 생성 (.aasx -> .json)
+        fileName = af_name.replace(/\.aasx$/i, '.json');
+        filePath = path.join(__dirname, '../../../../files/aas', fileName);
+        console.log('AAS 파일 경로:', filePath);
+
+        // AASX 파일 존재 여부 확인
+        if (!fs.existsSync(aasxFilePath)) {
+          reject(new Error('AASX 파일이 존재하지 않습니다.'));
+          return;
+        }
+      }
+
+      // 파일 존재 여부 확인
+      if (!fs.existsSync(filePath)) {
+        reject(new Error('해당하는 파일이 존재하지 않습니다.'));
         return;
       }
 
-      // AAS 파일 존재 여부 확인
-      if (!fs.existsSync(aasFilePath)) {
-        reject(new Error('해당하는 AAS 파일이 존재하지 않습니다.'));
-        return;
-      }
-
-      // AAS 파일 크기 확인
-      const aasStats = fs.statSync(aasFilePath);
-      console.log(`AAS 파일 크기: ${aasStats.size} bytes`);
+      // 파일 크기 확인
+      const fileStats = fs.statSync(filePath);
+      console.log(`파일 크기: ${fileStats.size} bytes`);
 
       // 파일이 너무 큰 경우 처리
-      if (aasStats.size > 500 * 1024 * 1024) {
+      if (fileStats.size > 500 * 1024 * 1024) {
         // 500MB 이상
-        reject(new Error('AAS_FILE_TOO_LARGE'));
+        reject(new Error('FILE_TOO_LARGE'));
         return;
       }
 
-      // AAS 파일 읽기 (JSON 데이터) - 스트리밍 방식
-      const readStream = fs.createReadStream(aasFilePath, { encoding: 'utf8' });
-      let aasFileData = '';
+      // 파일 읽기 (JSON 데이터) - 스트리밍 방식
+      const readStream = fs.createReadStream(filePath, { encoding: 'utf8' });
+      let fileData = '';
       let isJsonStart = false;
 
       readStream.on('data', (chunk) => {
-        aasFileData += chunk;
+        fileData += chunk;
 
         // 첫 번째 청크에서 JSON 시작 확인
-        if (!isJsonStart && aasFileData.length > 0) {
-          const trimmedStart = aasFileData.trim();
+        if (!isJsonStart && fileData.length > 0) {
+          const trimmedStart = fileData.trim();
           if (!trimmedStart.startsWith('{') && !trimmedStart.startsWith('[')) {
-            console.error('JSON이 아닌 AAS 파일 내용 (처음 100자):', trimmedStart.substring(0, 100));
+            console.error('JSON이 아닌 파일 내용 (처음 100자):', trimmedStart.substring(0, 100));
             readStream.destroy();
-            reject(new Error('유효하지 않은 AAS JSON 파일입니다.'));
+            reject(new Error('유효하지 않은 JSON 파일입니다.'));
             return;
           }
           isJsonStart = true;
@@ -641,53 +681,65 @@ export const getVerifyFromDB = async (file) => {
       });
 
       readStream.on('end', () => {
-        // AAS 파일 내용이 비어있는지 확인
-        if (!aasFileData || aasFileData.trim() === '') {
-          reject(new Error('AAS 파일이 비어있습니다.'));
+        // 파일 내용이 비어있는지 확인
+        if (!fileData || fileData.trim() === '') {
+          reject(new Error('파일이 비어있습니다.'));
           return;
         }
 
         try {
-          const aasJsonData = JSON.parse(aasFileData);
+          const jsonData = JSON.parse(fileData);
 
-          // AASX 파일도 읽기 (바이너리 데이터)
-          fs.readFile(aasxFilePath, (err, aasxFileData) => {
-            if (err) {
-              console.error('AASX 파일 읽기 오류:', err);
-              reject(new Error('AASX 파일 읽기 실패'));
-              return;
-            }
-
-            // AASX 파일이 비어있는지 확인
-            if (!aasxFileData || aasxFileData.length === 0) {
-              reject(new Error('AASX 파일이 비어있습니다.'));
-              return;
-            }
-
-            // AAS JSON 데이터와 AASX 파일 정보를 함께 반환
+          if (af_kind === 1) {
+            // JSON 파일인 경우
             resolve({
-              aasData: aasJsonData,
-              aasxFile: {
-                name: af_name,
-                size: aasxFileData.length,
-                path: af_path,
-              },
-              aasFile: {
-                name: aasFileName,
-                path: '/files/aas',
+              aasData: jsonData,
+              jsonFile: {
+                name: fileName,
+                path: '/files/front',
               },
             });
-          });
+          } else {
+            // AASX 파일인 경우 AASX 파일도 읽기
+            const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
+            fs.readFile(aasxFilePath, (err, aasxFileData) => {
+              if (err) {
+                console.error('AASX 파일 읽기 오류:', err);
+                reject(new Error('AASX 파일 읽기 실패'));
+                return;
+              }
+
+              // AASX 파일이 비어있는지 확인
+              if (!aasxFileData || aasxFileData.length === 0) {
+                reject(new Error('AASX 파일이 비어있습니다.'));
+                return;
+              }
+
+              // AAS JSON 데이터와 AASX 파일 정보를 함께 반환
+              resolve({
+                aasData: jsonData,
+                aasxFile: {
+                  name: af_name,
+                  size: aasxFileData.length,
+                  path: af_path,
+                },
+                aasFile: {
+                  name: fileName,
+                  path: '/files/aas',
+                },
+              });
+            });
+          }
         } catch (parseError) {
-          console.error('AAS JSON 파싱 오류:', parseError);
-          console.error('AAS 파일 내용 (처음 200자):', aasFileData.substring(0, 200));
-          reject(new Error('AAS JSON 파싱 실패'));
+          console.error('JSON 파싱 오류:', parseError);
+          console.error('파일 내용 (처음 200자):', fileData.substring(0, 200));
+          reject(new Error('JSON 파싱 실패'));
         }
       });
 
       readStream.on('error', (err) => {
-        console.error('AAS 파일 읽기 오류:', err);
-        reject(new Error('AAS 파일 읽기 실패'));
+        console.error('파일 읽기 오류:', err);
+        reject(new Error('파일 읽기 실패'));
       });
     } catch (error) {
       console.error('파일 처리 오류:', error);

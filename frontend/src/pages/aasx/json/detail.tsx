@@ -31,9 +31,9 @@ export default function JsonDetail() {
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90) return prev;
-        return prev + Math.random() * 10;
+        return prev + Math.random() * 15;
       });
-    }, 200);
+    }, 100);
 
     // 먼저 파일 크기 확인
     checkJSONFileSizeAPI(id)
@@ -96,9 +96,7 @@ export default function JsonDetail() {
         clearInterval(progressInterval);
         setProgress(100);
         setProgressLabel('완료');
-        setTimeout(() => {
-          setLoading(false);
-        }, 500);
+        setLoading(false);
       })
       .catch((error) => {
         console.error('JSON 파일 처리 오류:', error);
@@ -119,9 +117,7 @@ export default function JsonDetail() {
         clearInterval(progressInterval);
         setProgress(100);
         setProgressLabel('오류 발생');
-        setTimeout(() => {
-          setLoading(false);
-        }, 1000);
+        setLoading(false);
       });
   }, [id]);
 
@@ -130,28 +126,31 @@ export default function JsonDetail() {
   if (!jsonData) return <div>데이터가 없습니다.</div>;
 
   return (
-    <div className='table-outer'>
-      <ActionBox
-        buttons={[
-          {
-            text: '수정',
-            onClick: () => navigate(`/aasx/json/edit/${id}`),
-            color: 'success',
-          },
-          {
-            text: '목록',
-            onClick: () => navigate('/data/jsonManager'),
-            color: 'inherit',
-            variant: 'outlined',
-          },
-        ]}
-      />
-      <div style={{ marginTop: 16 }}>
+    <div className='table-outer' style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flexShrink: 0 }}>
+        <ActionBox
+          buttons={[
+            {
+              text: '수정',
+              onClick: () => navigate(`/aasx/json/edit/${id}`),
+              color: 'success',
+            },
+            {
+              text: '목록',
+              onClick: () => navigate('/data/jsonManager'),
+              color: 'inherit',
+              variant: 'outlined',
+            },
+          ]}
+        />
+      </div>
+      <div style={{ flex: 1, marginTop: 16, overflow: 'auto' }}>
         <JSONViewer
           value={jsonData}
-          collapsed={false}
+          collapsed={3}
           enableClipboard={true}
           displayDataTypes={false}
+          displayObjectSize={true}
           style={{ fontSize: 18 }}
         />
       </div>
