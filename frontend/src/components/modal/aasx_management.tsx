@@ -16,6 +16,7 @@ import { FileUpload } from '../../components/fileupload';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import LoadingOverlay from '../loading/LodingOverlay';
+import ProgressOverlay from '../loading/ProgressOverlay';
 import { uploadAASXFileAPI } from '../../apis/api/aasx_manage';
 
 const GreyButton = styled(Button)<ButtonProps>(() => ({
@@ -57,6 +58,9 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<globalThis.File | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState('');
+  const [sizeWarning, setSizeWarning] = useState('');
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -98,9 +102,34 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
     }
 
     setIsLoading(true);
+    setProgress(0);
+
+    // 파일 크기 경고 메시지 생성
+    const fileSizeMB = (selectedFile.size / (1024 * 1024)).toFixed(1);
+    const warning =
+      parseFloat(fileSizeMB) > 10 ? `\n\n⚠️ 파일 크기: ${fileSizeMB}MB\n처리 시간이 오래 걸릴 수 있습니다.` : '';
+    setSizeWarning(warning);
 
     try {
+      setProgress(10);
+      setProgressLabel('시작 ...'); // 시작
+      setProgress(20);
+      setProgressLabel('파일 검증 ...'); // 파일 검증
+      setProgress(30);
+      setProgressLabel('파일 업로드 시작 ...'); // 파일 업로드 시작
+      setProgress(40);
+      setProgressLabel('파일 업로드 완료 ...'); // 파일 업로드 완료
+      setProgress(50);
+      setProgressLabel('AAS 파일 생성 중 ...'); // AAS 파일 생성 시작
+
       const result = await uploadAASXFileAPI(selectedFile, userIdx);
+
+      setProgress(80);
+      setProgressLabel('AASX 파일 생성 중 ...'); // AASX 파일 생성 시작
+      setProgress(90);
+      setProgressLabel('DB 저장 ...'); // DB 저장
+      setProgress(100);
+      setProgressLabel('완료 ...'); // 완료
 
       const newFile = {
         af_idx: result.af_idx,
@@ -140,6 +169,9 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
       }
     } finally {
       setIsLoading(false);
+      setProgress(0);
+      setProgressLabel('');
+      setSizeWarning('');
     }
   };
 
@@ -154,7 +186,7 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
         파일등록
       </Button>
 
-      {isLoading && <LoadingOverlay />}
+      {isLoading && <ProgressOverlay open={isLoading} progress={progress} label={`${progressLabel}${sizeWarning}`} />}
 
       <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>

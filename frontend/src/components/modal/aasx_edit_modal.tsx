@@ -76,6 +76,8 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   });
   const userIdx = useRecoilValue(userState)?.user_idx;
   const [progress, setProgress] = useState(100);
+  const [progressLabel, setProgressLabel] = useState('');
+  const [sizeWarning, setSizeWarning] = useState('');
 
   const title = fileData ? (selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정') : '파일 등록';
 
@@ -122,17 +124,53 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     setIsLoading(true);
     setProgress(0);
 
+    // 파일 크기 경고 메시지 생성
+    const fileSizeMB = (uploadFile.size / (1024 * 1024)).toFixed(1);
+    const warning =
+      parseFloat(fileSizeMB) > 10 ? `\n\n⚠️ 파일 크기: ${fileSizeMB}MB\n처리 시간이 오래 걸릴 수 있습니다.` : '';
+    setSizeWarning(warning);
+
     try {
       let result;
 
       if (fileData) {
+        // 수정 과정
+        setProgress(10);
+        setProgressLabel('시작 ...'); // 시작
+        setProgress(20);
+        setProgressLabel('파일 검증 ...'); // 파일 검증
+        setProgress(30);
+        setProgressLabel('기존 파일 삭제 시작 ...'); // 기존 파일 삭제 시작
+        setProgress(40);
+        setProgressLabel('기존 파일 삭제 완료 ...'); // 기존 파일 삭제 완료
         setProgress(50);
+        setProgressLabel('AAS 파일 생성 중 ...'); // AAS 파일 생성 시작
         result = await updateAASXFileAPI(af_idx, name, userIdx);
+        setProgress(80);
+        setProgressLabel('AASX 파일 생성 중 ...'); // AASX 파일 생성 시작
+        setProgress(90);
+        setProgressLabel('DB 업데이트 ...'); // DB 업데이트
         setProgress(100);
+        setProgressLabel('완료 ...'); // 완료
       } else {
+        // 등록 과정
+        setProgress(10);
+        setProgressLabel('시작 ...'); // 시작
+        setProgress(20);
+        setProgressLabel('파일 검증 ...'); // 파일 검증
+        setProgress(30);
+        setProgressLabel('파일 업로드 시작 ...'); // 파일 업로드 시작
+        setProgress(40);
+        setProgressLabel('파일 업로드 완료 ...'); // 파일 업로드 완료
         setProgress(50);
+        setProgressLabel('AAS 파일 생성 중 ...'); // AAS 파일 생성 시작
         result = await uploadAASXFileAPI(uploadFile, userIdx);
+        setProgress(80);
+        setProgressLabel('AASX 파일 생성 중 ...'); // AASX 파일 생성 시작
+        setProgress(90);
+        setProgressLabel('DB 저장 ...'); // DB 저장
         setProgress(100);
+        setProgressLabel('완료 ...'); // 완료
       }
 
       const newFile = {
@@ -184,6 +222,8 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     } finally {
       setIsLoading(false);
       setProgress(0);
+      setProgressLabel('');
+      setSizeWarning('');
     }
   };
 
@@ -217,9 +257,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   return (
     <>
       <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
-        {isLoading && (
-          <ProgressOverlay open={isLoading} progress={progress} label={fileData ? '수정 중...' : '등록 중...'} />
-        )}
+        {isLoading && <ProgressOverlay open={isLoading} progress={progress} label={`${progressLabel}${sizeWarning}`} />}
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
           {title}
         </DialogTitle>

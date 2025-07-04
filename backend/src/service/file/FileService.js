@@ -103,18 +103,31 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
     const frontFilePath = `../files/front/${fileName}`;
 
-    const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        path: frontFilePath,
-      }),
-    });
+    try {
+      const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: frontFilePath,
+        }),
+      });
 
-    if (!aasResponse.ok) {
-      throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
+      if (!aasResponse.ok) {
+        throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('AAS 파일 생성 중 오류가 발생했습니다:', error.message);
+      // 파일이 실제로 생성되었는지 확인
+      const fs = await import('fs');
+      const aasFilePath = `../files/aas/${fileName}`;
+
+      if (fs.existsSync(aasFilePath)) {
+        console.log('AAS 파일이 생성되었습니다. 계속 진행합니다.');
+      } else {
+        throw new Error('AAS 파일 생성에 실패했습니다.');
+      }
     }
 
     const aasFileName = fileName;
@@ -122,18 +135,33 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
     await pool.promise().query(aasQuery, [fc_idx, aasFileName, user_idx, user_idx]);
 
     const aasFilePath = `../files/aas/${fileName}`;
-    const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        path: aasFilePath,
-      }),
-    });
 
-    if (!aasxResponse.ok) {
-      throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
+    try {
+      const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: aasFilePath,
+        }),
+      });
+
+      if (!aasxResponse.ok) {
+        throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('AASX 파일 생성 중 오류가 발생했습니다:', error.message);
+      // 파일이 실제로 생성되었는지 확인
+      const fs = await import('fs');
+      const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
+      const aasxFilePath = `../files/aasx/${aasxFileName}`;
+
+      if (fs.existsSync(aasxFilePath)) {
+        console.log('AASX 파일이 생성되었습니다. 계속 진행합니다.');
+      } else {
+        throw new Error('AASX 파일 생성에 실패했습니다.');
+      }
     }
 
     const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
@@ -211,32 +239,43 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
 
     const frontFilePath = `../files/front/${fileName}`;
 
-    const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        path: frontFilePath,
-      }),
-    });
+    try {
+      const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: frontFilePath,
+        }),
+      });
 
-    if (!aasResponse.ok) {
+      if (!aasResponse.ok) {
+        throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('AAS 파일 생성 중 오류가 발생했습니다:', error.message);
       throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
     }
 
     const aasFilePath = `../files/aas/${fileName}`;
-    const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        path: aasFilePath,
-      }),
-    });
 
-    if (!aasxResponse.ok) {
+    try {
+      const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          path: aasFilePath,
+        }),
+      });
+
+      if (!aasxResponse.ok) {
+        throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      console.error('AASX 파일 생성 중 오류가 발생했습니다:', error.message);
       throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
     }
 

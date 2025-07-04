@@ -7,7 +7,7 @@ export const PAGINATION = {
 
 // API 관련 상수
 export const API = {
-  TIMEOUT: 30000,
+  // TIMEOUT: 300000, // 타임아웃 제거 (큰 파일 처리용)
   RETRY_COUNT: 3,
 } as const;
 

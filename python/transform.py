@@ -19,8 +19,26 @@ def create_submodel(line_name, machine_name, machine_data):
         )
 
         for item in sensor_info['SN_Data']:
-            value_type_str = type(item['Value']).__name__.capitalize()
-            value_type = getattr(datatypes, value_type_str, None)
+            # 데이터 타입 추론 개선
+            value = item['Value']
+            if isinstance(value, (int, float)):
+                if isinstance(value, int):
+                    # 큰 정수는 String으로 처리
+                    if abs(value) > 2147483647:  # 32비트 정수 최대값
+                        value_type = datatypes.String
+                        value = str(value)
+                    else:
+                        value_type = datatypes.Int
+                else:
+                    # 큰 실수는 String으로 처리
+                    if abs(value) > 1e308:  # double 최대값
+                        value_type = datatypes.String
+                        value = str(value)
+                    else:
+                        value_type = datatypes.Float
+            else:
+                value_type = datatypes.String
+                value = str(value)
 
             time_series.value.add(
                 model.SubmodelElementCollection(
@@ -34,7 +52,7 @@ def create_submodel(line_name, machine_name, machine_data):
                         model.Property(
                             id_short='value',
                             value_type=value_type,
-                            value=item['Value']
+                            value=value
                         ),
                     ]
                 )
