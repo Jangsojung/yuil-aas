@@ -5,6 +5,7 @@ import {
   updateAASXFile,
   uploadAASXFile,
   getVerify,
+  checkFileSize,
   getWords,
   getSearch,
   updateWords,
@@ -60,6 +61,11 @@ export default () => {
   router.post('/jsonFiles', (req, res) => {
     const { af_kind, fc_idx, startDate, endDate } = req.body;
     getFiles(af_kind, fc_idx, startDate, endDate, res);
+  });
+
+  router.post('/checkFileSize', (req, res) => {
+    const { file } = req.body;
+    checkFileSize(file, res);
   });
 
   router.post('/verify', (req, res) => {

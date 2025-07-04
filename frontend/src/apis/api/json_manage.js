@@ -28,6 +28,17 @@ export const deleteJSONAPI = async (fileIds) => {
   }
 };
 
+// 파일 크기 확인
+export const checkJSONFileSizeAPI = async (af_idx) => {
+  try {
+    const result = await apiHelpers.post('/api/file/checkFileSize', { file: { af_idx } });
+    return result;
+  } catch (error) {
+    console.error('Error checking JSON file size:', error);
+    throw error;
+  }
+};
+
 // 단일 JSON 파일 상세 조회
 export const getJSONFileDetailAPI = async (af_idx) => {
   try {
@@ -35,6 +46,6 @@ export const getJSONFileDetailAPI = async (af_idx) => {
     return result;
   } catch (error) {
     console.error('Error fetching JSON file detail:', error);
-    return null;
+    throw error; // 에러를 다시 던져서 상위에서 처리할 수 있도록 함
   }
 };

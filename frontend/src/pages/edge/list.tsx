@@ -303,5 +303,3 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     </div>
   );
 });
-
-const cells = ['PC 이름', 'PC IP:PORT', '서버 온도', '네트워크 상태', '생성 일자', '수정 일자'];

@@ -493,6 +493,84 @@ export const deleteFilesFromDB = async (ids) => {
   }
 };
 
+// 파일 크기만 확인하는 함수
+export const checkFileSizeFromDB = async (file) => {
+  return new Promise((resolve, reject) => {
+    try {
+      console.log('파일 크기 확인 시작:', file);
+      let af_path = file.af_path;
+      let af_name = file.af_name;
+
+      if (!af_path || !af_name) {
+        console.log('DB에서 파일 정보 조회 중...');
+        pool.query('SELECT af_path, af_name FROM tb_aasx_file WHERE af_idx = ?', [file.af_idx], (err, rows) => {
+          if (err || !rows || rows.length === 0) {
+            console.error('DB 조회 실패:', err);
+            reject(new Error('DB에서 파일 정보를 찾을 수 없습니다.'));
+            return;
+          }
+          af_path = rows[0].af_path;
+          af_name = rows[0].af_name;
+          console.log('DB에서 조회된 파일 정보:', { af_path, af_name });
+
+          // AAS 파일명 생성 (.aasx -> .json)
+          const aasFileName = af_name.replace(/\.aasx$/i, '.json');
+          const aasFilePath = path.join(__dirname, '../../../../files/aas', aasFileName);
+          console.log('AAS 파일 경로:', aasFilePath);
+
+          // AAS 파일 존재 여부 확인
+          if (!fs.existsSync(aasFilePath)) {
+            console.error('AAS 파일이 존재하지 않음:', aasFilePath);
+            reject(new Error('해당하는 AAS 파일이 존재하지 않습니다.'));
+            return;
+          }
+
+          // AAS 파일 크기 확인
+          const aasStats = fs.statSync(aasFilePath);
+          console.log(`AAS 파일 크기: ${aasStats.size} bytes`);
+
+          const result = {
+            size: aasStats.size,
+            fileName: aasFileName,
+            filePath: aasFilePath,
+            isLargeFile: aasStats.size > 500 * 1024 * 1024,
+          };
+          console.log('파일 크기 확인 결과:', result);
+          resolve(result);
+        });
+      } else {
+        // AAS 파일명 생성 (.aasx -> .json)
+        const aasFileName = af_name.replace(/\.aasx$/i, '.json');
+        const aasFilePath = path.join(__dirname, '../../../../files/aas', aasFileName);
+        console.log('AAS 파일 경로:', aasFilePath);
+
+        // AAS 파일 존재 여부 확인
+        if (!fs.existsSync(aasFilePath)) {
+          console.error('AAS 파일이 존재하지 않음:', aasFilePath);
+          reject(new Error('해당하는 AAS 파일이 존재하지 않습니다.'));
+          return;
+        }
+
+        // AAS 파일 크기 확인
+        const aasStats = fs.statSync(aasFilePath);
+        console.log(`AAS 파일 크기: ${aasStats.size} bytes`);
+
+        const result = {
+          size: aasStats.size,
+          fileName: aasFileName,
+          filePath: aasFilePath,
+          isLargeFile: aasStats.size > 500 * 1024 * 1024,
+        };
+        console.log('파일 크기 확인 결과:', result);
+        resolve(result);
+      }
+    } catch (error) {
+      console.error('파일 크기 확인 오류:', error);
+      reject(new Error('파일 크기 확인 실패'));
+    }
+  });
+};
+
 export const getVerifyFromDB = async (file) => {
   return new Promise(async (resolve, reject) => {
     try {

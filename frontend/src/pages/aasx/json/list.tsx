@@ -12,7 +12,7 @@ import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../../recoil/atoms';
 import { SearchBox, ActionBox, SortableTableHeader } from '../../../components/common';
 import AlertModal from '../../../components/modal/alert';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
 
 interface File {
@@ -31,6 +31,7 @@ export default function JSONList() {
   const [selectAll, setSelectAll] = useState(false);
   const navigationReset = useRecoilValue(navigationResetState);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [alertModal, setAlertModal] = useState({
     open: false,
@@ -183,6 +184,21 @@ export default function JSONList() {
     getFiles(defaultStart, defaultEnd);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // location.state에서 alert 정보 확인
+  useEffect(() => {
+    if (location.state?.showAlert) {
+      setAlertModal({
+        open: true,
+        title: location.state.alertTitle || '알림',
+        content: location.state.alertContent || '',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      // state 초기화
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   useEffect(() => {
     if (files && files.length > 0) {

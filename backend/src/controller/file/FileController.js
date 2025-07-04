@@ -3,6 +3,7 @@ import {
   updateAASXFileToDB,
   deleteFilesFromDB,
   getVerifyFromDB,
+  checkFileSizeFromDB,
   getWordsFromDB,
   getSearchFromDB,
   updateWordsToDB,
@@ -86,6 +87,20 @@ export const deleteFiles = async (ids, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const checkFileSize = async (file, res) => {
+  try {
+    const result = await checkFileSizeFromDB(file);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    if (res) {
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      console.error('Internal Server Error (no res)');
+    }
   }
 };
 
