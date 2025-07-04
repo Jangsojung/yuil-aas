@@ -162,30 +162,30 @@ export default function ConvertPage() {
     setSelectedConvert(baseId);
   };
 
-  const handleConvert = async () => {
-    if (!selectedConvert) {
-      setAlertTitle('알림');
-      setAlertContent('변환할 기초코드를 선택해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
-      return;
-    }
-    const selectedBaseDates = baseDates[selectedConvert];
-    if (!selectedBaseDates || !selectedBaseDates.startDate || !selectedBaseDates.endDate) {
-      setAlertTitle('알림');
-      setAlertContent('시작날짜와 종료날짜를 모두 선택해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
-      return;
-    }
+  // 파일 크기 추정 함수 (센서 개수와 기간을 기반으로)
+  const estimateFileSize = (sensorCount: number, startDate: Dayjs, endDate: Dayjs) => {
+    const daysDiff = endDate.diff(startDate, 'day') + 1;
+    const hoursPerDay = 24;
+    const dataPointsPerHour = 60; // 1분마다 데이터
+    const bytesPerDataPoint = 100; // 예상 데이터 포인트 크기
+
+    const totalDataPoints = sensorCount * daysDiff * hoursPerDay * dataPointsPerHour;
+    const estimatedSizeBytes = totalDataPoints * bytesPerDataPoint;
+
+    return estimatedSizeBytes;
+  };
+
+  // 실제 변환 실행 함수
+  const executeConvert = async () => {
     setProgressOpen(true);
     setProgress(10);
     try {
       setProgress(30);
-      const formattedStartDate = selectedBaseDates.startDate.format('YYMMDD');
-      const formattedEndDate = selectedBaseDates.endDate.format('YYMMDD');
+      const selectedBaseDates = baseDates[selectedConvert!];
+      const formattedStartDate = selectedBaseDates.startDate!.format('YYMMDD');
+      const formattedEndDate = selectedBaseDates.endDate!.format('YYMMDD');
       setProgress(60);
-      const data = await insertBaseAPI(formattedStartDate, formattedEndDate, selectedConvert, userIdx);
+      const data = await insertBaseAPI(formattedStartDate, formattedEndDate, selectedConvert!, userIdx);
       setProgress(90);
       if (data) {
         setAlertTitle('알림');
@@ -224,6 +224,49 @@ export default function ConvertPage() {
       setAlertType('alert');
       setAlertOpen(true);
     }
+  };
+
+  const handleConvert = async () => {
+    if (!selectedConvert) {
+      setAlertTitle('알림');
+      setAlertContent('변환할 기초코드를 선택해주세요.');
+      setAlertType('alert');
+      setAlertOpen(true);
+      return;
+    }
+    const selectedBaseDates = baseDates[selectedConvert];
+    if (!selectedBaseDates || !selectedBaseDates.startDate || !selectedBaseDates.endDate) {
+      setAlertTitle('알림');
+      setAlertContent('시작날짜와 종료날짜를 모두 선택해주세요.');
+      setAlertType('alert');
+      setAlertOpen(true);
+      return;
+    }
+
+    // 파일 크기 추정
+    const selectedBase = bases.find((base) => base.ab_idx === selectedConvert);
+    if (selectedBase) {
+      const estimatedSizeBytes = estimateFileSize(
+        selectedBase.sn_length,
+        selectedBaseDates.startDate,
+        selectedBaseDates.endDate
+      );
+      const estimatedSizeMB = estimatedSizeBytes / (1024 * 1024);
+
+      // 50MB 초과 시 확인 알림
+      if (estimatedSizeMB > 50) {
+        setAlertTitle('AASX 파일 변환');
+        setAlertContent(
+          '생성되는 파일의 크기가 50MB를 초과할 경우, AASX 파일 변환에 다소 시간이 소요될 수 있습니다.\n변환하시겠습니까?'
+        );
+        setAlertType('confirm');
+        setAlertOpen(true);
+        return;
+      }
+    }
+
+    // 바로 변환 실행
+    await executeConvert();
   };
 
   const handleCheckboxChange = (convertsIdx: number) => {
@@ -380,6 +423,7 @@ export default function ConvertPage() {
           title={alertTitle}
           content={alertContent}
           type={alertType}
+          onConfirm={alertType === 'confirm' ? executeConvert : undefined}
         />
       </div>
     </>
