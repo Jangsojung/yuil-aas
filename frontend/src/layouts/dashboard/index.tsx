@@ -10,6 +10,12 @@ import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
 
 import { Link } from 'react-router-dom';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import IconButton from '@mui/material/IconButton';
+import HelpGuideModal from '../../components/modal/HelpGuideModal';
 
 const GreyButton = styled(Button)<ButtonProps>(() => ({
   color: '#637381',
@@ -39,14 +45,16 @@ interface ToolbarActionsAdminProps {
 function ToolbarActionsAdmin({ user }: ToolbarActionsAdminProps) {
   const navigate = useNavigate();
   const [, setUser] = useRecoilState(userState);
+  const [helpOpen, setHelpOpen] = React.useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-
     setUser(null);
-
     navigate('/signIn/sign');
   };
+
+  const handleHelpOpen = () => setHelpOpen(true);
+  const handleHelpClose = () => setHelpOpen(false);
 
   return (
     <div className='flex-center-gap'>
@@ -54,6 +62,10 @@ function ToolbarActionsAdmin({ user }: ToolbarActionsAdminProps) {
       <GreyButton variant='outlined' onClick={handleLogout}>
         로그아웃
       </GreyButton>
+      <IconButton onClick={handleHelpOpen} sx={{ ml: 1 }} aria-label='도움말'>
+        <HelpOutlineIcon />
+      </IconButton>
+      <HelpGuideModal open={helpOpen} onClose={handleHelpClose} />
     </div>
   );
 }

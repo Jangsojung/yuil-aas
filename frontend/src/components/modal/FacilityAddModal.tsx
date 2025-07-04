@@ -511,7 +511,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                   }}
                   align='left'
                 >
-                  설비명
+                  설비
                 </TableCell>
                 <TableCell
                   sx={{
@@ -582,7 +582,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                   }}
                   align='left'
                 >
-                  센서명
+                  센서
                 </TableCell>
                 <TableCell
                   sx={{

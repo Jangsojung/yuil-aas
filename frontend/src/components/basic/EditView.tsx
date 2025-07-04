@@ -123,7 +123,7 @@ export const EditView: React.FC<EditViewProps> = ({
             {/* 설비명 */}
             <Grid container size={3}>
               <Grid className='sort-title'>
-                <div>설비명</div>
+                <div>설비</div>
               </Grid>
               <Grid>
                 <FormControl sx={{ width: '100%' }} size='small'>
@@ -136,7 +136,7 @@ export const EditView: React.FC<EditViewProps> = ({
             {/* 센서명 */}
             <Grid container size={3}>
               <Grid className='sort-title'>
-                <div>센서명</div>
+                <div>센서</div>
               </Grid>
               <Grid>
                 <FormControl sx={{ width: '100%' }} size='small'>
