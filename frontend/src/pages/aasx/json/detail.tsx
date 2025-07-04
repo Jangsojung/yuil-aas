@@ -5,6 +5,7 @@ import { getJSONFileDetailAPI, checkJSONFileSizeAPI } from '../../../apis/api/js
 import ActionBox from '../../../components/common/ActionBox';
 import ProgressOverlay from '../../../components/loading/ProgressOverlay';
 import AlertModal from '../../../components/modal/alert';
+import { TextField, Button, Box } from '@mui/material';
 
 export default function JsonDetail() {
   const { id } = useParams();
@@ -20,6 +21,9 @@ export default function JsonDetail() {
     type: 'alert' as 'alert' | 'confirm',
     onConfirm: undefined as (() => void) | undefined,
   });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedJsonText, setEditedJsonText] = useState('');
+  const [jsonError, setJsonError] = useState('');
 
   useEffect(() => {
     if (!id) return;
@@ -77,9 +81,11 @@ export default function JsonDetail() {
             return;
           } else {
             setJsonData(data.aasData);
+            setEditedJsonText(JSON.stringify(data.aasData, null, 2));
           }
         } else {
           setJsonData(data);
+          setEditedJsonText(JSON.stringify(data, null, 2));
         }
 
         // 데이터가 없는 경우 처리
@@ -121,6 +127,41 @@ export default function JsonDetail() {
       });
   }, [id]);
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setJsonError('');
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setJsonError('');
+    setEditedJsonText(JSON.stringify(jsonData, null, 2));
+  };
+
+  const handleSaveEdit = () => {
+    try {
+      const parsedJson = JSON.parse(editedJsonText);
+      setJsonData(parsedJson);
+      setIsEditing(false);
+      setJsonError('');
+
+      setAlertModal({
+        open: true,
+        title: '저장 완료',
+        content: 'JSON 데이터가 성공적으로 수정되었습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+    } catch (error) {
+      setJsonError('유효하지 않은 JSON 형식입니다.');
+    }
+  };
+
+  const handleJsonTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedJsonText(event.target.value);
+    setJsonError('');
+  };
+
   if (loading) return <ProgressOverlay open={loading} progress={progress} label={progressLabel} />;
   if (!jsonData && !loading) return <div>데이터가 없습니다.</div>;
   if (!jsonData) return <div>데이터가 없습니다.</div>;
@@ -129,30 +170,71 @@ export default function JsonDetail() {
     <div className='table-outer' style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <div style={{ flexShrink: 0 }}>
         <ActionBox
-          buttons={[
-            {
-              text: '수정',
-              onClick: () => navigate(`/aasx/json/edit/${id}`),
-              color: 'success',
-            },
-            {
-              text: '목록',
-              onClick: () => navigate('/data/jsonManager'),
-              color: 'inherit',
-              variant: 'outlined',
-            },
-          ]}
+          buttons={
+            isEditing
+              ? [
+                  {
+                    text: '저장',
+                    onClick: handleSaveEdit,
+                    color: 'success',
+                  },
+                  {
+                    text: '취소',
+                    onClick: handleCancelEdit,
+                    color: 'inherit',
+                    variant: 'outlined',
+                  },
+                ]
+              : [
+                  {
+                    text: '수정',
+                    onClick: handleEditClick,
+                    color: 'success',
+                  },
+                  {
+                    text: '목록',
+                    onClick: () => navigate('/data/jsonManager'),
+                    color: 'inherit',
+                    variant: 'outlined',
+                  },
+                ]
+          }
         />
       </div>
       <div style={{ flex: 1, marginTop: 16, overflow: 'auto' }}>
-        <JSONViewer
-          value={jsonData}
-          collapsed={3}
-          enableClipboard={true}
-          displayDataTypes={false}
-          displayObjectSize={true}
-          style={{ fontSize: 18 }}
-        />
+        {isEditing ? (
+          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <TextField
+              multiline
+              fullWidth
+              value={editedJsonText}
+              onChange={handleJsonTextChange}
+              error={!!jsonError}
+              helperText={jsonError}
+              sx={{
+                flex: 1,
+                '& .MuiInputBase-root': {
+                  height: '100%',
+                  fontFamily: 'monospace',
+                  fontSize: '14px',
+                },
+                '& .MuiInputBase-input': {
+                  height: '100% !important',
+                  overflow: 'auto',
+                },
+              }}
+            />
+          </Box>
+        ) : (
+          <JSONViewer
+            value={jsonData}
+            collapsed={3}
+            enableClipboard={true}
+            displayDataTypes={false}
+            displayObjectSize={true}
+            style={{ fontSize: 18 }}
+          />
+        )}
       </div>
 
       <AlertModal
