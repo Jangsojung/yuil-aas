@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
   FILE: {
     ROOT: `${API_BASE_URL}/api/file`,
     AASX: `${API_BASE_URL}/api/file/aasx`,
+    AASX_UPDATE: `${API_BASE_URL}/api/file/aasx/update`,
     AASX_FILES: `${API_BASE_URL}/api/file/aasxFiles`,
     VERIFY: `${API_BASE_URL}/api/file/verify`,
     WORDS: `${API_BASE_URL}/api/file/words`,

@@ -22,18 +22,23 @@ const upload = multer({
 });
 
 export default () => {
+  // AASX 파일 업로드 (파일 포함)
   router.post('/aasx', upload.single('file'), (req, res) => {
     if (req.file) {
       uploadAASXFile(req, res);
     } else {
-      const { fc_idx } = req.body;
-      const { fileName } = req.body;
-      const { af_idx, user_idx } = req.query;
-      if (af_idx) {
-        updateAASXFile(af_idx, fileName, user_idx, res);
-      } else {
-        insertAASXFile(fc_idx, fileName, user_idx, res);
-      }
+      res.status(400).json({ error: '파일이 필요합니다.' });
+    }
+  });
+
+  // AASX 파일 수정 (파일 없음)
+  router.post('/aasx/update', (req, res) => {
+    const { fileName } = req.body;
+    const { af_idx, user_idx } = req.query;
+    if (af_idx) {
+      updateAASXFile(af_idx, fileName, user_idx, res);
+    } else {
+      res.status(400).json({ error: 'af_idx가 필요합니다.' });
     }
   });
 

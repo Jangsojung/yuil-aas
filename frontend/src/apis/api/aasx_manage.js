@@ -79,7 +79,7 @@ export const uploadAASXFileAPI = async (fileData, userIdx) => {
 // AASX 파일 수정
 export const updateAASXFileAPI = async (af_idx, fileName, userIdx) => {
   try {
-    const result = await apiHelpers.post(`${API_ENDPOINTS.FILE.AASX}?af_idx=${af_idx}&user_idx=${userIdx}`, {
+    const result = await apiHelpers.post(`${API_ENDPOINTS.FILE.AASX_UPDATE}?af_idx=${af_idx}&user_idx=${userIdx}`, {
       fileName,
     });
     return result;

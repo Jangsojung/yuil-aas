@@ -120,14 +120,19 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     }
 
     setIsLoading(true);
+    setProgress(0);
 
     try {
       let result;
 
       if (fileData) {
+        setProgress(50);
         result = await updateAASXFileAPI(af_idx, name, userIdx);
+        setProgress(100);
       } else {
+        setProgress(50);
         result = await uploadAASXFileAPI(uploadFile, userIdx);
+        setProgress(100);
       }
 
       const newFile = {
@@ -148,12 +153,22 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       handleUpdate(newFile);
       handleClose();
     } catch (err: any) {
+      console.error('AASX 파일 처리 중 오류:', err);
       const msg = err?.response?.data?.error || err?.message || (typeof err === 'string' ? err : '알 수 없는 오류');
+
       if (msg.includes('이미 생성되어있는 파일입니다.')) {
         setAlertModal({
           open: true,
           title: '알림',
           content: '이미 생성되어있는 파일입니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+      } else if (msg.includes('404') || msg.includes('Not Found')) {
+        setAlertModal({
+          open: true,
+          title: '오류',
+          content: '서버에서 요청한 리소스를 찾을 수 없습니다. 관리자에게 문의하세요.',
           type: 'alert',
           onConfirm: undefined,
         });
@@ -168,6 +183,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       }
     } finally {
       setIsLoading(false);
+      setProgress(0);
     }
   };
 
