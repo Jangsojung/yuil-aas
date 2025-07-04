@@ -1,11 +1,13 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import JSONViewer from '@uiw/react-json-view';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getJSONFileDetailAPI, checkJSONFileSizeAPI } from '../../../apis/api/json_manage';
 import ActionBox from '../../../components/common/ActionBox';
 import ProgressOverlay from '../../../components/loading/ProgressOverlay';
 import AlertModal from '../../../components/modal/alert';
-import { TextField, Button, Box } from '@mui/material';
+import { Box } from '@mui/material';
+import JSONInput from 'react-json-editor-ajrm';
+import locale from 'react-json-editor-ajrm/locale/en';
 
 export default function JsonDetail() {
   const { id } = useParams();
@@ -157,10 +159,31 @@ export default function JsonDetail() {
     }
   };
 
-  const handleJsonTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedJsonText(event.target.value);
-    setJsonError('');
-  };
+  const handleJSONChange = useCallback(
+    (data: any) => {
+      // 에러가 있는 경우에만 상태 업데이트
+      if (data.error) {
+        setJsonError(data.error.reason);
+      } else {
+        setJsonError('');
+        // JSON 문자열이 변경된 경우에만 업데이트
+        if (data.json !== editedJsonText) {
+          setEditedJsonText(data.json);
+        }
+      }
+    },
+    [editedJsonText]
+  );
+
+  const handleJSONBlur = useCallback((data: any) => {
+    // onBlur에서는 최종 상태만 업데이트
+    if (data.error) {
+      setJsonError(data.error.reason);
+    } else {
+      setJsonError('');
+      setEditedJsonText(data.json);
+    }
+  }, []);
 
   if (loading) return <ProgressOverlay open={loading} progress={progress} label={progressLabel} />;
   if (!jsonData && !loading) return <div>데이터가 없습니다.</div>;
@@ -204,26 +227,25 @@ export default function JsonDetail() {
       <div style={{ flex: 1, marginTop: 16, overflow: 'auto' }}>
         {isEditing ? (
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <TextField
-              multiline
-              fullWidth
-              value={editedJsonText}
-              onChange={handleJsonTextChange}
-              error={!!jsonError}
-              helperText={jsonError}
-              sx={{
-                flex: 1,
-                '& .MuiInputBase-root': {
-                  height: '100%',
-                  fontFamily: 'monospace',
-                  fontSize: '14px',
-                },
-                '& .MuiInputBase-input': {
-                  height: '100% !important',
-                  overflow: 'auto',
-                },
-              }}
+            <JSONInput
+              placeholder={jsonData}
+              locale={locale}
+              height='100%'
+              width='100%'
+              onChange={handleJSONChange}
+              onBlur={handleJSONBlur}
+              theme='light_vscode'
+              style={
+                {
+                  body: { fontSize: '14px' },
+                  outerBox: { height: '100%' },
+                  container: { height: '100%' },
+                } as any
+              }
             />
+            {jsonError && (
+              <Box sx={{ color: 'error.main', fontSize: '12px', mt: 1, p: 1, bgcolor: 'error.light' }}>{jsonError}</Box>
+            )}
           </Box>
         ) : (
           <JSONViewer
