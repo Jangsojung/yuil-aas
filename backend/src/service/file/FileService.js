@@ -120,17 +120,32 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       });
 
       if (!aasResponse.ok) {
-        throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
+        const errorText = await aasResponse.text();
+        console.error('AAS 파일 생성 응답 오류:', aasResponse.status, errorText);
+        throw new Error(`AAS 파일 생성 중 오류가 발생했습니다. (${aasResponse.status})`);
       }
+
+      // 응답 내용 확인
+      const responseText = await aasResponse.text();
+      console.log('AAS 파일 생성 응답:', responseText);
     } catch (error) {
       console.error('AAS 파일 생성 중 오류가 발생했습니다:', error.message);
+
       // 파일이 실제로 생성되었는지 확인
       const fs = await import('fs');
       const aasFilePath = `../files/aas/${fileName}`;
 
       if (fs.existsSync(aasFilePath)) {
-        console.log('AAS 파일이 생성되었습니다. 계속 진행합니다.');
+        // 파일 크기 확인
+        const stats = fs.statSync(aasFilePath);
+        if (stats.size > 0) {
+          console.log('AAS 파일이 생성되었습니다. 계속 진행합니다.');
+        } else {
+          console.error('AAS 파일이 생성되었지만 크기가 0입니다.');
+          throw new Error('AAS 파일 생성에 실패했습니다.');
+        }
       } else {
+        console.error('AAS 파일이 생성되지 않았습니다.');
         throw new Error('AAS 파일 생성에 실패했습니다.');
       }
     }
@@ -157,18 +172,33 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       });
 
       if (!aasxResponse.ok) {
-        throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
+        const errorText = await aasxResponse.text();
+        console.error('AASX 파일 생성 응답 오류:', aasxResponse.status, errorText);
+        throw new Error(`AASX 파일 생성 중 오류가 발생했습니다. (${aasxResponse.status})`);
       }
+
+      // 응답 내용 확인
+      const responseText = await aasxResponse.text();
+      console.log('AASX 파일 생성 응답:', responseText);
     } catch (error) {
       console.error('AASX 파일 생성 중 오류가 발생했습니다:', error.message);
+
       // 파일이 실제로 생성되었는지 확인
       const fs = await import('fs');
       const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
       const aasxFilePath = `../files/aasx/${aasxFileName}`;
 
       if (fs.existsSync(aasxFilePath)) {
-        console.log('AASX 파일이 생성되었습니다. 계속 진행합니다.');
+        // 파일 크기 확인
+        const stats = fs.statSync(aasxFilePath);
+        if (stats.size > 0) {
+          console.log('AASX 파일이 생성되었습니다. 계속 진행합니다.');
+        } else {
+          console.error('AASX 파일이 생성되었지만 크기가 0입니다.');
+          throw new Error('AASX 파일 생성에 실패했습니다.');
+        }
       } else {
+        console.error('AASX 파일이 생성되지 않았습니다.');
         throw new Error('AASX 파일 생성에 실패했습니다.');
       }
     }
@@ -286,8 +316,14 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       });
 
       if (!aasResponse.ok) {
-        throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
+        const errorText = await aasResponse.text();
+        console.error('AAS 파일 생성 응답 오류:', aasResponse.status, errorText);
+        throw new Error(`AAS 파일 생성 중 오류가 발생했습니다. (${aasResponse.status})`);
       }
+
+      // 응답 내용 확인
+      const responseText = await aasResponse.text();
+      console.log('AAS 파일 생성 응답:', responseText);
     } catch (error) {
       console.error('AAS 파일 생성 중 오류가 발생했습니다:', error.message);
       throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
@@ -323,8 +359,14 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       });
 
       if (!aasxResponse.ok) {
-        throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
+        const errorText = await aasxResponse.text();
+        console.error('AASX 파일 생성 응답 오류:', aasxResponse.status, errorText);
+        throw new Error(`AASX 파일 생성 중 오류가 발생했습니다. (${aasxResponse.status})`);
       }
+
+      // 응답 내용 확인
+      const responseText = await aasxResponse.text();
+      console.log('AASX 파일 생성 응답:', responseText);
     } catch (error) {
       console.error('AASX 파일 생성 중 오류가 발생했습니다:', error.message);
       throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
@@ -468,24 +510,110 @@ export const getVerifyFromDB = async (file) => {
         af_path = rows[0].af_path;
         af_name = rows[0].af_name;
       }
-      const filePath = path.join(__dirname, '../../../../', af_path, af_name);
-      fs.readFile(filePath, 'utf8', (err, fileData) => {
-        if (err) {
-          console.error('JSON 파일 읽기 오류:', err);
-          reject(new Error('JSON 파일 읽기 실패'));
-          return;
-        }
-        try {
-          const jsonData = JSON.parse(fileData);
-          resolve(jsonData);
-        } catch (parseError) {
-          console.error('JSON 파싱 오류:', parseError);
-          reject(new Error('JSON 파싱 실패'));
+
+      // AASX 파일 경로
+      const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
+
+      // AAS 파일명 생성 (.aasx -> .json)
+      const aasFileName = af_name.replace(/\.aasx$/i, '.json');
+      const aasFilePath = path.join(__dirname, '../../../../files/aas', aasFileName);
+
+      // AASX 파일 존재 여부 확인
+      if (!fs.existsSync(aasxFilePath)) {
+        reject(new Error('AASX 파일이 존재하지 않습니다.'));
+        return;
+      }
+
+      // AAS 파일 존재 여부 확인
+      if (!fs.existsSync(aasFilePath)) {
+        reject(new Error('해당하는 AAS 파일이 존재하지 않습니다.'));
+        return;
+      }
+
+      // AAS 파일 크기 확인
+      const aasStats = fs.statSync(aasFilePath);
+      console.log(`AAS 파일 크기: ${aasStats.size} bytes`);
+
+      // 파일이 너무 큰 경우 처리
+      if (aasStats.size > 500 * 1024 * 1024) {
+        // 500MB 이상
+        reject(new Error('AAS_FILE_TOO_LARGE'));
+        return;
+      }
+
+      // AAS 파일 읽기 (JSON 데이터) - 스트리밍 방식
+      const readStream = fs.createReadStream(aasFilePath, { encoding: 'utf8' });
+      let aasFileData = '';
+      let isJsonStart = false;
+
+      readStream.on('data', (chunk) => {
+        aasFileData += chunk;
+
+        // 첫 번째 청크에서 JSON 시작 확인
+        if (!isJsonStart && aasFileData.length > 0) {
+          const trimmedStart = aasFileData.trim();
+          if (!trimmedStart.startsWith('{') && !trimmedStart.startsWith('[')) {
+            console.error('JSON이 아닌 AAS 파일 내용 (처음 100자):', trimmedStart.substring(0, 100));
+            readStream.destroy();
+            reject(new Error('유효하지 않은 AAS JSON 파일입니다.'));
+            return;
+          }
+          isJsonStart = true;
         }
       });
+
+      readStream.on('end', () => {
+        // AAS 파일 내용이 비어있는지 확인
+        if (!aasFileData || aasFileData.trim() === '') {
+          reject(new Error('AAS 파일이 비어있습니다.'));
+          return;
+        }
+
+        try {
+          const aasJsonData = JSON.parse(aasFileData);
+
+          // AASX 파일도 읽기 (바이너리 데이터)
+          fs.readFile(aasxFilePath, (err, aasxFileData) => {
+            if (err) {
+              console.error('AASX 파일 읽기 오류:', err);
+              reject(new Error('AASX 파일 읽기 실패'));
+              return;
+            }
+
+            // AASX 파일이 비어있는지 확인
+            if (!aasxFileData || aasxFileData.length === 0) {
+              reject(new Error('AASX 파일이 비어있습니다.'));
+              return;
+            }
+
+            // AAS JSON 데이터와 AASX 파일 정보를 함께 반환
+            resolve({
+              aasData: aasJsonData,
+              aasxFile: {
+                name: af_name,
+                size: aasxFileData.length,
+                path: af_path,
+              },
+              aasFile: {
+                name: aasFileName,
+                path: '/files/aas',
+              },
+            });
+          });
+        } catch (parseError) {
+          console.error('AAS JSON 파싱 오류:', parseError);
+          console.error('AAS 파일 내용 (처음 200자):', aasFileData.substring(0, 200));
+          reject(new Error('AAS JSON 파싱 실패'));
+        }
+      });
+
+      readStream.on('error', (err) => {
+        console.error('AAS 파일 읽기 오류:', err);
+        reject(new Error('AAS 파일 읽기 실패'));
+      });
     } catch (error) {
-      console.error('JSON 파일 처리 오류:', error);
-      reject(new Error('JSON 파일 처리 실패'));
+      console.error('파일 처리 오류:', error);
+      reject(new Error('파일 처리 실패'));
     }
   });
 };

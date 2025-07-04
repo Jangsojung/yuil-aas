@@ -30,8 +30,8 @@ export default function TransmitPage() {
 
     try {
       const rawData = await handleVerifyAPI(selectedFile);
-      if (rawData) {
-        const transformedData = transformAASXData(rawData);
+      if (rawData && rawData.aasData) {
+        const transformedData = transformAASXData(rawData.aasData);
         if (transformedData) {
           setAasxData(transformedData);
           setIsVerified(true);
@@ -39,9 +39,33 @@ export default function TransmitPage() {
         } else {
           showAlert('오류', 'AASX 데이터 변환에 실패했습니다.');
         }
+      } else {
+        showAlert('오류', '파일 데이터를 가져올 수 없습니다.');
       }
     } catch (error) {
       console.error('검증 중 오류 발생:', error);
+
+      // AAS 파일이 너무 큰 경우 특별 처리
+      if (error instanceof Error && error.message === 'AAS_FILE_TOO_LARGE') {
+        showAlert(
+          '파일 크기 초과',
+          '500MB 이상의 파일은 검증할 수 없습니다.\nAASX Package Viewer를 통해 확인해주세요.'
+        );
+        return;
+      }
+
+      // API 응답에서 에러 메시지 확인
+      if (error instanceof Error) {
+        const errorMessage = error.message;
+        if (errorMessage.includes('AAS_FILE_TOO_LARGE')) {
+          showAlert(
+            '파일 크기 초과',
+            '500MB 이상의 파일은 검증할 수 없습니다.\nAASX Package Viewer를 통해 확인해주세요.'
+          );
+          return;
+        }
+      }
+
       showAlert('오류', '파일 검증 중 오류가 발생했습니다.');
     }
   };
