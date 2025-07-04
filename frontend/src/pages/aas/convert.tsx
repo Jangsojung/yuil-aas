@@ -11,9 +11,10 @@ import ConvertTableRow from '../../components/tableRow/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
 import { userState, navigationResetState } from '../../recoil/atoms';
 import LoadingOverlay from '../../components/loading/LodingOverlay';
-import { SearchBox, ActionBox } from '../../components/common';
+import { SearchBox, ActionBox, SortableTableHeader } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import ProgressOverlay from '../../components/loading/ProgressOverlay';
+import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 
 interface Base {
   ab_idx: number;
@@ -22,8 +23,6 @@ interface Base {
   sn_length: number;
   createdAt?: string;
 }
-
-const cells = ['기초코드명', '센서 개수', '생성 일자', '시작 날짜', '종료 날짜'];
 
 export default function ConvertPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -45,11 +44,26 @@ export default function ConvertPage() {
   const [alertContent, setAlertContent] = useState('');
   const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
 
+  // 정렬 기능
+  const {
+    sortedData: sortedBases,
+    sortField,
+    sortDirection,
+    handleSort,
+  } = useSortableData<Base>(filteredBases, 'createdAt', 'desc');
+
+  // 정렬 컬럼 정의
+  const sortableColumns: SortableColumn<Base>[] = [
+    { field: 'ab_name', label: '기초코드명' },
+    { field: 'sn_length', label: '센서 개수' },
+    { field: 'createdAt', label: '생성 일자' },
+  ];
+
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    filteredBases?.length || 0
+    sortedBases?.length || 0
   );
 
-  const pagedData = paginatedData(filteredBases || []);
+  const pagedData = paginatedData(sortedBases || []);
 
   const [progress, setProgress] = useState(0);
   const [progressOpen, setProgressOpen] = useState(false);
@@ -314,9 +328,12 @@ export default function ConvertPage() {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ width: '50px' }}></TableCell>
-                    {cells.map((cell, idx) => (
-                      <TableCell key={idx}>{cell}</TableCell>
-                    ))}
+                    <SortableTableHeader
+                      columns={sortableColumns}
+                      sortField={sortField}
+                      sortDirection={sortDirection}
+                      onSort={handleSort}
+                    />
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -337,7 +354,7 @@ export default function ConvertPage() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={cells.length + 1} align='center'>
+                      <TableCell colSpan={sortableColumns.length + 1} align='center'>
                         데이터가 없습니다.
                       </TableCell>
                     </TableRow>

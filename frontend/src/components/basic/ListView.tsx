@@ -12,17 +12,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Pagination from '../pagination';
 import BasicDatePicker from '../datepicker';
-import { SearchBox, ActionBox } from '../common';
+import { SearchBox, ActionBox, SortableTableHeader } from '../common';
+import { Base } from '../../types/api';
 import { Dayjs } from 'dayjs';
-
-interface Base {
-  ab_idx: number;
-  ab_name: string;
-  ab_note: string;
-  sn_length: number;
-  createdAt: Date;
-  updatedAt?: Date;
-}
+import { SortDirection, SortableColumn } from '../../hooks/useSortableData';
 
 interface ListViewProps {
   // 상태
@@ -33,6 +26,9 @@ interface ListViewProps {
   pagedData: Base[];
   selectAll: boolean;
   selectedBases: number[];
+  sortField?: keyof Base;
+  sortDirection: SortDirection;
+  sortableColumns: SortableColumn<Base>[];
 
   // 핸들러
   onSearch: () => void;
@@ -46,14 +42,13 @@ interface ListViewProps {
   onCheckboxChange: (baseIdx: number) => void;
   onClick: (base: Base) => void;
   formatDate: (dateString: string | undefined) => string;
+  onSort: (field: keyof Base) => void;
 
   // 페이지네이션
   currentPage: number;
   rowsPerPage: number;
   calculatedTotalPages: number;
 }
-
-const cells = ['기초코드명', '센서 개수', '생성 일자', '수정 일자', '비고'];
 
 export const ListView: React.FC<ListViewProps> = ({
   startDate,
@@ -63,6 +58,9 @@ export const ListView: React.FC<ListViewProps> = ({
   pagedData,
   selectAll,
   selectedBases,
+  sortField,
+  sortDirection,
+  sortableColumns,
   onSearch,
   onReset,
   onDateChange,
@@ -74,6 +72,7 @@ export const ListView: React.FC<ListViewProps> = ({
   onCheckboxChange,
   onClick,
   formatDate,
+  onSort,
   currentPage,
   rowsPerPage,
   calculatedTotalPages,
@@ -149,12 +148,15 @@ export const ListView: React.FC<ListViewProps> = ({
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
-                <TableCell>
-                  <Checkbox checked={selectAll} onChange={onSelectAllChange} />
-                </TableCell>
-                {cells.map((cell, idx) => (
-                  <TableCell key={idx}>{cell}</TableCell>
-                ))}
+                <SortableTableHeader
+                  columns={sortableColumns}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={onSort}
+                  showCheckbox={true}
+                  onSelectAllChange={onSelectAllChange}
+                  selectAll={selectAll}
+                />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -181,7 +183,7 @@ export const ListView: React.FC<ListViewProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={cells.length + 1} align='center'>
+                  <TableCell colSpan={sortableColumns.length + 1} align='center'>
                     데이터가 없습니다.
                   </TableCell>
                 </TableRow>

@@ -53,8 +53,9 @@ export interface Base {
   ab_name: string;
   ab_note: string;
   sn_length: number;
-  createdAt: Date;
-  fc_idx: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  fc_idx?: number;
 }
 
 export interface FacilityGroup {

@@ -10,8 +10,9 @@ import { usePagination } from '../../hooks/usePagination';
 import AASXTableRow from '../../components/tableRow/AASXTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
-import { SearchBox, ActionBox } from '../../components/common';
+import { SearchBox, ActionBox, SortableTableHeader } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
+import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 
 interface File {
   af_idx: number;
@@ -47,11 +48,26 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     onConfirm: undefined as (() => void) | undefined,
   });
 
+  // 정렬 기능
+  const {
+    sortedData: sortedFiles,
+    sortField,
+    sortDirection,
+    handleSort,
+  } = useSortableData<File>(files, 'createdAt', 'desc');
+
+  // 정렬 컬럼 정의
+  const sortableColumns: SortableColumn<File>[] = [
+    { field: 'af_name', label: '파일명' },
+    { field: 'af_size', label: '파일 크기' },
+    { field: 'createdAt', label: '생성 일자' },
+  ];
+
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    files?.length || 0
+    sortedFiles?.length || 0
   );
 
-  const pagedData = paginatedData(files || []);
+  const pagedData = paginatedData(sortedFiles || []);
 
   const handleDelete = async () => {
     if (selectedFiles.length === 0) {
@@ -242,16 +258,15 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
-                <TableCell>
-                  <Checkbox
-                    checked={selectAll}
-                    onChange={handleSelectAllChange}
-                    disabled={!files || files.length === 0}
-                  />
-                </TableCell>
-                {cells.map((cell, idx) => (
-                  <TableCell key={idx}>{cell}</TableCell>
-                ))}
+                <SortableTableHeader
+                  columns={sortableColumns}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                  showCheckbox={true}
+                  onSelectAllChange={handleSelectAllChange}
+                  selectAll={selectAll}
+                />
                 <TableCell>수정</TableCell>
               </TableRow>
             </TableHead>
@@ -269,7 +284,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={cells.length + 2} align='center'>
+                  <TableCell colSpan={sortableColumns.length + 2} align='center'>
                     데이터가 없습니다.
                   </TableCell>
                 </TableRow>

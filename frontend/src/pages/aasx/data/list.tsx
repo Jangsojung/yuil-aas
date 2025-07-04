@@ -4,11 +4,20 @@ import Paper from '@mui/material/Paper';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
 import Pagination from '../../../components/pagination';
 import DataTableRow from '../../../components/tableRow/DataTableRow';
-import { SearchBox, FilterBox } from '../../../components/common';
+import { SearchBox, FilterBox, SortableTableHeader } from '../../../components/common';
 import AlertModal from '../../../components/modal/alert';
 import { useWordManagement } from '../../../hooks/useWordManagement';
 import { useAlertModal } from '../../../hooks/useAlertModal';
 import { usePagination } from '../../../hooks/usePagination';
+import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
+
+// Word 타입 정의
+interface Word {
+  as_kr: string;
+  as_en: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export default function DataList() {
   // 커스텀 훅 사용
@@ -30,12 +39,28 @@ export default function DataList() {
     handleSearch,
   } = useWordManagement();
 
+  // 정렬 기능
+  const {
+    sortedData: sortedWords,
+    sortField,
+    sortDirection,
+    handleSort,
+  } = useSortableData(filteredWords, 'as_kr', 'asc');
+
+  // 정렬 컬럼 정의
+  const sortableColumns: SortableColumn<Word>[] = [
+    { field: 'as_kr', label: '한글명' },
+    { field: 'as_en', label: '식별 ID' },
+    { field: 'createdAt', label: '생성 일자' },
+    { field: 'updatedAt', label: '수정 일자' },
+  ];
+
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    filteredWords?.length || 0,
+    sortedWords?.length || 0,
     -1 // 기본값: 전체
   );
 
-  const pagedData = paginatedData(filteredWords || []);
+  const pagedData = paginatedData(sortedWords || []);
 
   useEffect(() => {
     getWords();
@@ -112,13 +137,15 @@ export default function DataList() {
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ minWidth: '60px', width: '60px' }}>
-                  <Checkbox checked={pagedData ? checkAllCurrentPageSelected() : false} onChange={handleSelectAll} />
-                </TableCell>
-                <TableCell sx={{ width: '35%' }}>한글명</TableCell>
-                <TableCell sx={{ width: '35%' }}>식별 ID</TableCell>
-                <TableCell sx={{ minWidth: '140px', width: '140px' }}>생성 일자</TableCell>
-                <TableCell sx={{ minWidth: '140px', width: '140px' }}>수정 일자</TableCell>
+                <SortableTableHeader
+                  columns={sortableColumns}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                  showCheckbox={true}
+                  onSelectAllChange={handleSelectAll}
+                  selectAll={pagedData ? checkAllCurrentPageSelected() : false}
+                />
               </TableRow>
             </TableHead>
             <TableBody>

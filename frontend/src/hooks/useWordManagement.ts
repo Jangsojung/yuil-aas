@@ -4,6 +4,8 @@ import { getWordsAPI, updateWordsAPI } from '../apis/api/data_manage';
 interface Word {
   as_kr: string;
   as_en: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const useWordManagement = () => {

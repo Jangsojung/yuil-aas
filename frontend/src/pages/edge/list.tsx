@@ -5,11 +5,12 @@ import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
-import { ActionBox } from '../../components/common';
+import { ActionBox, SortableTableHeader } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { usePagination } from '../../hooks/usePagination';
 import EdgeTableRow from '../../components/tableRow/EdgeTableRow';
 import LoadingOverlay from '../../components/loading/LodingOverlay';
+import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 
 interface EdgeGateway {
   eg_idx: number;
@@ -44,11 +45,29 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     onConfirm: undefined as (() => void) | undefined,
   });
 
+  // 정렬 기능
+  const {
+    sortedData: sortedEdgeGateways,
+    sortField,
+    sortDirection,
+    handleSort,
+  } = useSortableData<EdgeGateway>(edgeGateways, 'createdAt', 'desc');
+
+  // 정렬 컬럼 정의
+  const sortableColumns: SortableColumn<EdgeGateway>[] = [
+    { field: 'eg_pc_name', label: 'PC명' },
+    { field: 'eg_ip_port', label: 'IP:Port' },
+    { field: 'eg_server_temp', label: '서버 온도' },
+    { field: 'eg_network', label: '네트워크' },
+    { field: 'eg_pc_temp', label: 'PC 온도' },
+    { field: 'createdAt', label: '생성 일자' },
+  ];
+
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    edgeGateways?.length || 0
+    sortedEdgeGateways?.length || 0
   );
 
-  const pagedData = paginatedData(edgeGateways || []);
+  const pagedData = paginatedData(sortedEdgeGateways || []);
 
   const [loading, setLoading] = useState(true);
 
@@ -225,16 +244,15 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
-                <TableCell>
-                  <Checkbox
-                    checked={selectAll}
-                    onChange={handleSelectAll}
-                    disabled={!edgeGateways || edgeGateways.length === 0}
-                  />
-                </TableCell>
-                {cells.map((cell, idx) => (
-                  <TableCell key={idx}>{cell}</TableCell>
-                ))}
+                <SortableTableHeader
+                  columns={sortableColumns}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                  showCheckbox={true}
+                  onSelectAllChange={handleSelectAll}
+                  selectAll={selectAll}
+                />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -251,7 +269,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={cells.length + 2} align='center'>
+                  <TableCell colSpan={sortableColumns.length + 2} align='center'>
                     데이터가 없습니다.
                   </TableCell>
                 </TableRow>

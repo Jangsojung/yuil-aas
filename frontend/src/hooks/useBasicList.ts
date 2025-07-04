@@ -2,16 +2,10 @@ import { useState, useCallback, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { navigationResetState, selectedBasesState, selectedBaseState } from '../recoil/atoms';
 import { getBasesAPI, deleteBasesAPI } from '../apis/api/basic';
+import { Base } from '../types/api';
 import { Dayjs } from 'dayjs';
 import { PAGINATION, MODAL_TYPE } from '../constants';
-
-interface Base {
-  ab_idx: number;
-  ab_name: string;
-  ab_note: string;
-  sn_length: number;
-  createdAt: Date;
-}
+import { useSortableData, SortableColumn } from './useSortableData';
 
 export const useBasicList = () => {
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
@@ -33,9 +27,27 @@ export const useBasicList = () => {
 
   const [rowsPerPage, setRowsPerPage] = useState<number>(PAGINATION.DEFAULT_ROWS_PER_PAGE);
 
+  // 정렬 기능
+  const {
+    sortedData: sortedBases,
+    sortField,
+    sortDirection,
+    handleSort,
+    resetSort,
+  } = useSortableData<Base>(filteredBases, 'createdAt', 'desc');
+
   // 페이지네이션 데이터 계산
-  const pagedData = filteredBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
+  const pagedData = sortedBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
   const calculatedTotalPages = Math.ceil((filteredBases?.length || 0) / rowsPerPage);
+
+  // 정렬 컬럼 정의
+  const sortableColumns: SortableColumn<Base>[] = [
+    { field: 'ab_name', label: '기초코드명' },
+    { field: 'sn_length', label: '센서 개수' },
+    { field: 'createdAt', label: '생성 일자' },
+    { field: 'updatedAt', label: '수정 일자' },
+    { field: 'ab_note', label: '비고' },
+  ];
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((event: unknown, page: number) => {
@@ -266,6 +278,9 @@ export const useBasicList = () => {
     alertContent,
     alertType,
     selectedBases,
+    sortField,
+    sortDirection,
+    sortableColumns,
 
     // 핸들러
     handlePageChange,
@@ -281,5 +296,6 @@ export const useBasicList = () => {
     handleAdd,
     handleCloseAlert,
     formatDate,
+    handleSort,
   };
 };

@@ -20,6 +20,9 @@ export default function BasicList() {
     currentPage,
     rowsPerPage,
     calculatedTotalPages,
+    sortField,
+    sortDirection,
+    sortableColumns,
 
     // 핸들러
     handleSearch,
@@ -35,6 +38,7 @@ export default function BasicList() {
     formatDate,
     handleConfirmDelete,
     handleCloseAlert,
+    handleSort,
   } = useBasicList();
 
   return (
@@ -47,6 +51,9 @@ export default function BasicList() {
         pagedData={pagedData}
         selectAll={selectAll}
         selectedBases={selectedBases}
+        sortField={sortField}
+        sortDirection={sortDirection}
+        sortableColumns={sortableColumns}
         onSearch={handleSearch}
         onReset={handleReset}
         onDateChange={handleDateChange}
@@ -58,6 +65,7 @@ export default function BasicList() {
         onCheckboxChange={handleCheckboxChange}
         onClick={handleClick}
         formatDate={formatDate}
+        onSort={handleSort}
         currentPage={currentPage}
         rowsPerPage={rowsPerPage}
         calculatedTotalPages={calculatedTotalPages}
