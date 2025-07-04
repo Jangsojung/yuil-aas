@@ -196,7 +196,7 @@ export default function ConvertPage() {
         setBaseDates({});
       }
       setProgress(100);
-      setTimeout(() => setProgressOpen(false), 300);
+      setProgressOpen(false);
     } catch (error) {
       setProgressOpen(false);
       console.error('변환 오류:', error);

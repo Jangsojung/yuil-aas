@@ -59,7 +59,7 @@ export const useFacilityManagement = () => {
       setProgress(80);
       setTreeData(finalFilteredData);
       setProgress(100);
-      setTimeout(() => setProgressOpen(false), 300); // 0.3초 후 overlay 닫기
+      setProgressOpen(false);
       return { success: true };
     } catch (err) {
       setProgressOpen(false);
