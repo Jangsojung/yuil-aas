@@ -42,10 +42,10 @@ export const getBasesFromDB = async (fc_idx) => {
   });
 };
 
-export const insertBasesToDB = async (name, note, ids, user_idx) => {
+export const insertBasesToDB = async (name, note, ids, user_idx, fc_idx) => {
   try {
-    const query = `insert into tb_aasx_base (ab_name, ab_note, creator, updater) values (?, ?, ?, ?);`;
-    const [result] = await pool.promise().query(query, [name, note || null, user_idx, user_idx]);
+    const query = `insert into tb_aasx_base (ab_name, ab_note, creator, updater, fc_idx) values (?, ?, ?, ?, ?);`;
+    const [result] = await pool.promise().query(query, [name, note || null, user_idx, user_idx, fc_idx]);
 
     const ab_idx = result.insertId;
 

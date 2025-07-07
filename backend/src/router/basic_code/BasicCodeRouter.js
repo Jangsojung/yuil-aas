@@ -27,8 +27,8 @@ export default () => {
 
   router.post('/bases/insert', (req, res) => {
     const { user_idx } = req.body;
-    const { name, note, ids } = req.body;
-    insertBases(name, note, ids, user_idx, res);
+    const { name, note, ids, fc_idx } = req.body;
+    insertBases(name, note, ids, user_idx, fc_idx, res);
   });
 
   router.put('/bases', (req, res) => {

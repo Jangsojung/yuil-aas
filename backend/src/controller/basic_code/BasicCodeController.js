@@ -27,9 +27,9 @@ export const getBases = async (fc_idx, res) => {
   }
 };
 
-export const insertBases = async (name, note, ids, user_idx, res) => {
+export const insertBases = async (name, note, ids, user_idx, fc_idx, res) => {
   try {
-    const result = await insertBasesToDB(name, note, ids, user_idx);
+    const result = await insertBasesToDB(name, note, ids, user_idx, fc_idx);
 
     res.status(200).json(result);
   } catch (err) {
