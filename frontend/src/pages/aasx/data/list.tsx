@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../../recoil/atoms';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
@@ -20,6 +22,8 @@ interface Word {
 }
 
 export default function DataList() {
+  const navigationReset = useRecoilValue(navigationResetState);
+
   // 커스텀 훅 사용
   const { alertModal, showAlert, closeAlert } = useAlertModal();
   const {
@@ -65,6 +69,17 @@ export default function DataList() {
   useEffect(() => {
     getWords();
   }, [getWords]);
+
+  // 네비게이션 리셋 처리
+  useEffect(() => {
+    if (navigationReset) {
+      // 검색 조건 초기화
+      handleSearchKeywordChange('');
+      handleUnmatchedOnly(false);
+      // 데이터 다시 로드
+      getWords();
+    }
+  }, [navigationReset, handleSearchKeywordChange, handleUnmatchedOnly, getWords]);
 
   const handleSaveClick = async () => {
     const result = await handleSave();
@@ -190,5 +205,3 @@ export default function DataList() {
     </div>
   );
 }
-
-// const cells = ['한글명', '식별 ID', '생성 일자', '수정 일자'];
