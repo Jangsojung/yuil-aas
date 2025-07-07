@@ -1,5 +1,4 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
-import { DEFAULTS } from '../../constants';
 
 // 파일 삭제
 export const deleteAASXAPI = async (ids) => {
@@ -11,11 +10,11 @@ export const deleteAASXAPI = async (ids) => {
   }
 };
 
-export const getFilesAPI = async (startDate, endDate, af_kind = DEFAULTS.AASX_KIND) => {
+export const getFilesAPI = async (startDate, endDate, fc_idx, af_kind = 3) => {
   try {
     const result = await apiHelpers.post('/api/file/aasxFiles', {
       af_kind,
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      fc_idx,
       startDate,
       endDate,
     });
@@ -34,11 +33,11 @@ export const getAASXAPI = async () => {
   }
 };
 
-export const getAASXFilesAPI = async (start, end) => {
+export const getAASXFilesAPI = async (start, end, fc_idx, af_kind = 3) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
-      af_kind: DEFAULTS.AASX_KIND,
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      af_kind,
+      fc_idx,
       startDate: start,
       endDate: end,
     });
@@ -49,10 +48,10 @@ export const getAASXFilesAPI = async (start, end) => {
 };
 
 // AASX 파일 업로드
-export const uploadAASXFileAPI = async (fileData, userIdx) => {
+export const uploadAASXFileAPI = async (fileData, userIdx, fc_idx) => {
   try {
     const formData = new FormData();
-    formData.append('fc_idx', DEFAULTS.FACILITY_GROUP_ID.toString());
+    formData.append('fc_idx', fc_idx.toString());
     formData.append('user_idx', userIdx.toString());
     formData.append('file', fileData);
 
