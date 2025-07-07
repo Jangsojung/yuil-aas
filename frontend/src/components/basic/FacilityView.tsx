@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Grid from '@mui/system/Grid';
 import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
@@ -91,6 +91,21 @@ export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean
 }) => {
   // treeData는 이미 4단계 구조로 반환됨
   const convertedTreeData: FactoryTree[] = treeData as FactoryTree[];
+
+  // expandedItems 상태 관리
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  // treeData가 변경될 때 expandedItems 초기화
+  useEffect(() => {
+    const defaultExpandedItems = convertedTreeData.flatMap((factory, factoryIdx) => [
+      `factory-${factoryIdx}`,
+      ...factory.facilityGroups.flatMap((fg, fgIdx) => [
+        `facility-group-${factoryIdx}-${fgIdx}`,
+        ...fg.facilities.map((fa, faIdx) => `subfacility-${factoryIdx}-${fgIdx}-${faIdx}`),
+      ]),
+    ]);
+    setExpandedItems(defaultExpandedItems);
+  }, [convertedTreeData]);
 
   const handleSearch = async () => {
     const result = await handleTreeSearch();
@@ -302,13 +317,8 @@ export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean
           <div className='text-center text-muted padding-lg'>조회 결과 없음</div>
         ) : (
           <SimpleTreeView
-            defaultExpandedItems={convertedTreeData.flatMap((factory, factoryIdx) => [
-              `factory-${factoryIdx}`,
-              ...factory.facilityGroups.flatMap((fg, fgIdx) => [
-                `facility-group-${factoryIdx}-${fgIdx}`,
-                ...fg.facilities.map((fa, faIdx) => `subfacility-${factoryIdx}-${fgIdx}-${faIdx}`),
-              ]),
-            ])}
+            expandedItems={expandedItems}
+            onExpandedItemsChange={(event, itemIds) => setExpandedItems(itemIds)}
           >
             {convertedTreeData.map((factory, factoryIdx) => (
               <TreeItem

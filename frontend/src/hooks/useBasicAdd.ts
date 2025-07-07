@@ -10,7 +10,6 @@ export const useBasicAdd = () => {
   const userIdx = useRecoilValue(userState)?.user_idx;
   const { alertModal, showAlert, closeAlert } = useAlertModal();
 
-  // 상태 관리
   const [treeData, setTreeData] = useState<FacilityGroupTree[]>([]);
   const [treeLoading, setTreeLoading] = useState(false);
   const [basicModalOpen, setBasicModalOpen] = useState(false);
@@ -21,20 +20,18 @@ export const useBasicAdd = () => {
   const [sensorName, setSensorName] = useState('');
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
 
-  // 공장 변경 시 체크된 센서들 리셋
   const handleFactoryChange = useCallback(
     (factory: number | '') => {
       setSelectedFactory(factory);
       if (factory !== '') {
-        setSelectedSensors([]); // 체크된 센서들 리셋
-        setSelectedFacilityGroups([]); // 설비그룹 선택 리셋
-        setTreeData([]); // 트리 데이터도 리셋
+        setSelectedSensors([]);
+        setSelectedFacilityGroups([]);
+        setTreeData([]);
       }
     },
     [setSelectedSensors]
   );
 
-  // 기초코드 추가
   const handleAdd = useCallback(async () => {
     if (selectedSensors.length === 0) {
       return { success: false, message: '센서를 선택해주세요.' };
@@ -70,7 +67,6 @@ export const useBasicAdd = () => {
     }
   }, [selectedSensors, basicName, basicDesc, userIdx, selectedFactory, setSelectedSensors]);
 
-  // 트리 검색
   const handleTreeSearch = useCallback(async () => {
     if (!selectedFactory) {
       return { success: false, message: '공장을 선택해주세요.' };
@@ -97,7 +93,6 @@ export const useBasicAdd = () => {
     }
   }, [selectedFactory, selectedFacilityGroups, facilityName, sensorName]);
 
-  // 모달 핸들러
   const handleBasicModalAdd = useCallback(
     async (navigate: (path: string) => void) => {
       const result = await handleAdd();
@@ -116,7 +111,6 @@ export const useBasicAdd = () => {
     setBasicDesc('');
   }, []);
 
-  // 초기화
   const handleReset = useCallback(() => {
     setTreeData([]);
     setSelectedSensors([]);
@@ -130,7 +124,6 @@ export const useBasicAdd = () => {
   }, [setSelectedSensors]);
 
   return {
-    // 상태
     treeData,
     treeLoading,
     basicModalOpen,
@@ -149,7 +142,6 @@ export const useBasicAdd = () => {
     selectedFactory,
     setSelectedFactory,
 
-    // 핸들러
     handleAdd,
     handleTreeSearch,
     handleBasicModalAdd,
@@ -157,7 +149,6 @@ export const useBasicAdd = () => {
     handleReset,
     handleFactoryChange,
 
-    // 알림
     alertModal,
     closeAlert,
   };

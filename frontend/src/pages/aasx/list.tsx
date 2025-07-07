@@ -6,26 +6,21 @@ import BasicDatePicker from '../../components/datepicker';
 import { FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../components/pagination';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
-import { usePagination } from '../../hooks/usePagination';
+import { useTablePagination } from '../../hooks/useTablePagination';
 import AASXTableRow from '../../components/tableRow/AASXTableRow';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
-import { SearchBox, ActionBox, SortableTableHeader } from '../../components/common';
+import { SearchBox, ActionBox, SortableTableHeader, TableEmptyRow } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 import FactorySelect from '../../components/select/factory_select';
+import { AASXFile, AlertModalState } from '../../types';
 
 interface File {
   af_idx: number;
   af_name: string;
   createdAt: string;
   updatedAt?: string;
-}
-
-interface AASXFile {
-  af_idx: number;
-  af_name: string;
-  createdAt: Date;
 }
 
 interface AASXListProps {
@@ -49,12 +44,12 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     },
   }));
 
-  const [alertModal, setAlertModal] = useState({
+  const [alertModal, setAlertModal] = useState<AlertModalState>({
     open: false,
     title: '',
     content: '',
-    type: 'alert' as 'alert' | 'confirm',
-    onConfirm: undefined as (() => void) | undefined,
+    type: 'alert',
+    onConfirm: undefined,
   });
 
   // 정렬 기능
@@ -72,11 +67,10 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     { field: 'updatedAt', label: '수정 일자' },
   ];
 
-  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    sortedFiles?.length || 0
-  );
-
-  const pagedData = paginatedData(sortedFiles || []);
+  const { currentPage, rowsPerPage, totalPages, handlePageChange, handleRowsPerPageChange, paginatedData } =
+    useTablePagination({
+      totalCount: sortedFiles?.length || 0,
+    });
 
   const handleDelete = async () => {
     if (selectedFiles.length === 0) {
@@ -203,7 +197,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     const aasxFile: AASXFile = {
       af_idx: file.af_idx,
       af_name: file.af_name,
-      createdAt: new Date(file.createdAt),
+      createdAt: file.createdAt,
     };
     onEditClick(aasxFile);
   };
@@ -215,7 +209,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   const handleNavigationReset = () => {
     setSelectedFiles([]);
     setSelectAll(false);
-    goToPage(0);
+    handlePageChange(null, 0);
     // 초기화 시에는 날짜만 설정하고 파일 조회는 하지 않음
     const defaultStart = dayjs().subtract(1, 'month');
     const defaultEnd = dayjs();
@@ -319,8 +313,8 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
               </TableRow>
             </TableHead>
             <TableBody>
-              {pagedData && pagedData.length > 0 ? (
-                pagedData.map((file, idx) => (
+              {paginatedData(sortedFiles || []).length > 0 ? (
+                paginatedData(sortedFiles || []).map((file: File, idx: number) => (
                   <AASXTableRow
                     file={file}
                     key={idx}
@@ -331,11 +325,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                   />
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={sortableColumns.length + 2} align='center'>
-                    조회 결과 없음
-                  </TableCell>
-                </TableRow>
+                <TableEmptyRow colSpan={sortableColumns.length + 2} />
               )}
             </TableBody>
           </Table>
@@ -344,7 +334,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
           count={files ? files.length : 0}
           page={currentPage}
           rowsPerPage={rowsPerPage}
-          onPageChange={(event, page) => goToPage(page)}
+          onPageChange={handlePageChange}
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </div>

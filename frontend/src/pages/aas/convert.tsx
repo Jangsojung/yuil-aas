@@ -14,24 +14,17 @@ import {
 import Grid from '@mui/system/Grid';
 import BasicDatePicker from '../../components/datepicker';
 import Pagination from '../../components/pagination';
-import { usePagination } from '../../hooks/usePagination';
+import { useTablePagination } from '../../hooks/useTablePagination';
 import Paper from '@mui/material/Paper';
 import ConvertTableRow from '../../components/tableRow/ConvertTableRow';
 import { useRecoilValue } from 'recoil';
 import { userState, navigationResetState } from '../../recoil/atoms';
-import { SearchBox, ActionBox, SortableTableHeader } from '../../components/common';
+import { SearchBox, ActionBox, SortableTableHeader, TableEmptyRow } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import ProgressOverlay from '../../components/loading/ProgressOverlay';
 import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 import FactorySelect from '../../components/select/factory_select';
-
-interface Base {
-  ab_idx: number;
-  ab_name: string;
-  ab_note: string;
-  sn_length: number;
-  createdAt?: string;
-}
+import { Base, AlertModalState } from '../../types';
 
 export default function ConvertPage() {
   const [isLoading] = useState(false);
@@ -49,12 +42,14 @@ export default function ConvertPage() {
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
 
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertContent, setAlertContent] = useState('');
-  const [alertType, setAlertType] = useState<'alert' | 'confirm'>('alert');
+  const [alertModal, setAlertModal] = useState<AlertModalState>({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert',
+    onConfirm: undefined,
+  });
 
-  // 정렬 기능
   const {
     sortedData: sortedBases,
     sortField,
@@ -62,18 +57,16 @@ export default function ConvertPage() {
     handleSort,
   } = useSortableData<Base>(filteredBases, 'createdAt', 'desc');
 
-  // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<Base>[] = [
     { field: 'ab_name', label: '기초코드명' },
     { field: 'sn_length', label: '센서 개수' },
     { field: 'createdAt', label: '생성 일자' },
   ];
 
-  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    sortedBases?.length || 0
-  );
-
-  const pagedData = paginatedData(sortedBases || []);
+  const { currentPage, rowsPerPage, totalPages, handlePageChange, handleRowsPerPageChange, paginatedData } =
+    useTablePagination({
+      totalCount: sortedBases?.length || 0,
+    });
 
   const [progress, setProgress] = useState(0);
   const [progressOpen, setProgressOpen] = useState(false);
@@ -85,10 +78,13 @@ export default function ConvertPage() {
 
   const handleSearch = async () => {
     if (!selectedFactory) {
-      setAlertTitle('알림');
-      setAlertContent('공장을 선택해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '공장을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 
@@ -129,7 +125,7 @@ export default function ConvertPage() {
       }
 
       setFilteredBases(filtered);
-      goToPage(0);
+      handlePageChange(null, 0);
     } catch (error) {
       console.error('Error fetching bases:', error);
       setBases([]);
@@ -141,14 +137,16 @@ export default function ConvertPage() {
     setSearchKeyword('');
     setStartDate(null);
     setEndDate(null);
-    setFilteredBases(bases);
-    goToPage(0);
+    setSelectedFactory('');
+    setSelectedConvert(null);
+    setBaseDates({});
+    setBases([]);
+    setFilteredBases([]);
+    handlePageChange(null, 0);
   };
 
-  // 공장 변경 핸들러
   const handleFactoryChange = (factoryId: number) => {
     setSelectedFactory(factoryId);
-    // 공장 변경 시 기초코드 목록은 그대로 유지 (검색 버튼을 눌러야만 새로 조회)
   };
 
   const handleStartDateChange = (baseId: number, date: Dayjs | null) => {
@@ -184,12 +182,11 @@ export default function ConvertPage() {
     setSelectedConvert(baseId);
   };
 
-  // 파일 크기 추정 함수 (센서 개수와 기간을 기반으로)
   const estimateFileSize = (sensorCount: number, startDate: Dayjs, endDate: Dayjs) => {
     const daysDiff = endDate.diff(startDate, 'day') + 1;
     const hoursPerDay = 24;
-    const dataPointsPerHour = 60; // 1분마다 데이터
-    const bytesPerDataPoint = 100; // 예상 데이터 포인트 크기
+    const dataPointsPerHour = 60;
+    const bytesPerDataPoint = 100;
 
     const totalDataPoints = sensorCount * daysDiff * hoursPerDay * dataPointsPerHour;
     const estimatedSizeBytes = totalDataPoints * bytesPerDataPoint;
@@ -197,81 +194,121 @@ export default function ConvertPage() {
     return estimatedSizeBytes;
   };
 
-  // 실제 변환 실행 함수
   const executeConvert = async () => {
+    if (!selectedConvert || userIdx === undefined || userIdx === null) {
+      return;
+    }
+
+    const selectedBaseDates = baseDates[selectedConvert];
+    if (!selectedBaseDates?.startDate || !selectedBaseDates?.endDate) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '시작날짜와 종료날짜를 모두 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
     setProgressOpen(true);
-    setProgress(10);
+    setProgress(0);
+
     try {
-      setProgress(30);
-      const selectedBaseDates = baseDates[selectedConvert!];
-      const formattedStartDate = selectedBaseDates.startDate!.format('YYMMDD');
-      const formattedEndDate = selectedBaseDates.endDate!.format('YYMMDD');
-      setProgress(60);
-      const data = await insertBaseAPI(
-        formattedStartDate,
-        formattedEndDate,
-        selectedConvert!,
-        userIdx,
-        selectedFactory
-      );
-      setProgress(90);
-      if (data) {
-        setAlertTitle('알림');
-        setAlertContent('성공적으로 json파일을 생성하였습니다.\n파일 위치: /files/front');
-        setAlertType('alert');
-        setAlertOpen(true);
-        setSelectedConvert(null);
-        setBaseDates({});
-      }
+      const startDateStr = selectedBaseDates.startDate.format('YYYY-MM-DD');
+      const endDateStr = selectedBaseDates.endDate.format('YYYY-MM-DD');
+
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 500);
+
+      const result = await insertBaseAPI({
+        ab_idx: selectedConvert,
+        startDate: startDateStr,
+        endDate: endDateStr,
+        user_idx: userIdx,
+        fc_idx: selectedFactory,
+      });
+
+      clearInterval(progressInterval);
       setProgress(100);
-      setProgressOpen(false);
+
+      setTimeout(() => {
+        setProgressOpen(false);
+        setProgress(0);
+
+        if (result) {
+          setAlertModal({
+            open: true,
+            title: '성공',
+            content: 'JSON 파일 변환이 완료되었습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
+        } else {
+          setAlertModal({
+            open: true,
+            title: '오류',
+            content: 'JSON 파일 변환 중 오류가 발생했습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
+        }
+      }, 1000);
     } catch (error) {
       setProgressOpen(false);
-      console.error('변환 오류:', error);
-      let errorMessage = '파일 생성 중 오류가 발생했습니다.';
+      setProgress(0);
+
+      let errorMessage = 'JSON 파일 변환 중 오류가 발생했습니다.';
       if (error instanceof Error) {
         errorMessage = error.message;
-      } else if (typeof error === 'object' && error !== null) {
-        const errorObj = error as Record<string, any>;
-        if ('message' in errorObj) {
-          errorMessage = String(errorObj.message);
-        } else if (
-          'response' in errorObj &&
-          errorObj.response &&
-          typeof errorObj.response === 'object' &&
-          errorObj.response !== null
-        ) {
-          const response = errorObj.response as Record<string, any>;
-          if ('data' in response) {
-            errorMessage = String(response.data);
-          }
-        }
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = String(error.message);
       }
-      setAlertTitle('에러');
-      setAlertContent(errorMessage);
-      setAlertType('alert');
-      setAlertOpen(true);
+
+      setAlertModal({
+        open: true,
+        title: '오류',
+        content: errorMessage,
+        type: 'alert',
+        onConfirm: undefined,
+      });
     }
   };
 
   const handleConvert = async () => {
     if (!selectedConvert) {
-      setAlertTitle('알림');
-      setAlertContent('변환할 기초코드를 선택해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
-      return;
-    }
-    const selectedBaseDates = baseDates[selectedConvert];
-    if (!selectedBaseDates || !selectedBaseDates.startDate || !selectedBaseDates.endDate) {
-      setAlertTitle('알림');
-      setAlertContent('시작날짜와 종료날짜를 모두 선택해주세요.');
-      setAlertType('alert');
-      setAlertOpen(true);
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '변환할 기초코드를 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 
-    // 파일 크기 추정
+    const selectedBaseDates = baseDates[selectedConvert];
+
+    if (!selectedBaseDates?.startDate || !selectedBaseDates?.endDate) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '시작날짜와 종료날짜를 모두 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
     const selectedBase = bases.find((base) => base.ab_idx === selectedConvert);
     if (selectedBase) {
       const estimatedSizeBytes = estimateFileSize(
@@ -281,19 +318,19 @@ export default function ConvertPage() {
       );
       const estimatedSizeMB = estimatedSizeBytes / (1024 * 1024);
 
-      // 50MB 초과 시 확인 알림
       if (estimatedSizeMB > 50) {
-        setAlertTitle('AASX 파일 변환');
-        setAlertContent(
-          '생성되는 파일의 크기가 50MB를 초과할 경우, AASX 파일 변환에 다소 시간이 소요될 수 있습니다.\n변환하시겠습니까?'
-        );
-        setAlertType('confirm');
-        setAlertOpen(true);
+        setAlertModal({
+          open: true,
+          title: 'JSON 파일 변환',
+          content:
+            '생성되는 파일의 크기가 50MB를 초과할 경우, JSON 파일 변환에 다소 시간이 소요될 수 있습니다.\n변환하시겠습니까?',
+          type: 'confirm',
+          onConfirm: executeConvert,
+        });
         return;
       }
     }
 
-    // 바로 변환 실행
     await executeConvert();
   };
 
@@ -311,20 +348,15 @@ export default function ConvertPage() {
   };
 
   const handleNavigationReset = () => {
-    setSelectedConvert(null);
-    setStartDate(null);
-    setEndDate(null);
-    setSelectedFactory('');
-    goToPage(0);
-    setSearchKeyword('');
-    setBaseDates({});
-    setBases([]);
-    setFilteredBases([]);
+    handleReset();
+  };
+
+  const handleCloseAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   useEffect(() => {
     handleNavigationReset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
   return (
@@ -421,8 +453,8 @@ export default function ConvertPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {pagedData && pagedData.length > 0 ? (
-                    pagedData.map((base, idx) => (
+                  {paginatedData(sortedBases || []).length > 0 ? (
+                    paginatedData(sortedBases || []).map((base: Base, idx: number) => (
                       <ConvertTableRow
                         base={base}
                         key={idx}
@@ -437,11 +469,7 @@ export default function ConvertPage() {
                       />
                     ))
                   ) : (
-                    <TableRow>
-                      <TableCell colSpan={sortableColumns.length + 3} align='center'>
-                        조회 결과 없음
-                      </TableCell>
-                    </TableRow>
+                    <TableEmptyRow colSpan={sortableColumns.length + 3} />
                   )}
                 </TableBody>
               </Table>
@@ -450,19 +478,19 @@ export default function ConvertPage() {
               count={filteredBases ? filteredBases.length : 0}
               page={currentPage}
               rowsPerPage={rowsPerPage}
-              onPageChange={(event, page) => goToPage(page)}
+              onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
             />
           </div>
         </div>
 
         <AlertModal
-          open={alertOpen}
-          handleClose={() => setAlertOpen(false)}
-          title={alertTitle}
-          content={alertContent}
-          type={alertType}
-          onConfirm={alertType === 'confirm' ? executeConvert : undefined}
+          open={alertModal.open}
+          handleClose={handleCloseAlert}
+          title={alertModal.title}
+          content={alertModal.content}
+          type={alertModal.type}
+          onConfirm={alertModal.onConfirm}
         />
       </div>
     </>

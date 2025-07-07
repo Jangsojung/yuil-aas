@@ -1,11 +1,6 @@
 import React from 'react';
 import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
-
-interface AASXFile {
-  af_idx: number;
-  af_name: string;
-  createdAt: Date;
-}
+import { AASXFile } from '../../types/api';
 
 interface AASXEditProps {
   open: boolean;

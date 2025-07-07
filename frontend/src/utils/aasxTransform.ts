@@ -11,7 +11,6 @@ export const transformAASXData = (rawData: any): AASXData | null => {
     SM: [],
   };
 
-  // AAS 데이터 변환
   rawData.assetAdministrationShells.forEach((aas: any) => {
     const aasItem: AASItem = {
       name: aas.idShort || 'AAS',
@@ -26,7 +25,6 @@ export const transformAASXData = (rawData: any): AASXData | null => {
     result.AAS.push(aasItem);
   });
 
-  // Submodel 데이터 변환
   rawData.submodels.forEach((submodel: any) => {
     const smResult: SubmodelItem = {
       name: submodel.idShort,
@@ -72,7 +70,6 @@ export const transformAASXData = (rawData: any): AASXData | null => {
       });
     }
 
-    // 부모 AAS 찾기
     const parentAAS = result.AAS.filter((aas) => aas.submodelRefs && aas.submodelRefs.includes(submodel.id));
 
     if (parentAAS.length > 0) {

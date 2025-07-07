@@ -16,6 +16,7 @@ import { userState } from '../../recoil/atoms';
 import AlertModal from './alert';
 import { updateAASXFileAPI, uploadAASXFileAPI, getFileFCIdxAPI } from '../../apis/api/aasx_manage';
 import ProgressOverlay from '../loading/ProgressOverlay';
+import { AASXFile } from '../../types/api';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -48,21 +49,15 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-interface File {
-  af_idx: number;
-  af_name: string;
-  createdAt: Date;
-}
-
 interface Props {
   open: boolean;
   handleClose: () => void;
-  fileData: File | null;
-  handleUpdate: (file: File) => void;
+  fileData: AASXFile | null;
+  handleUpdate: (file: AASXFile) => void;
 }
 
 export default function CustomizedDialogs({ open, handleClose, fileData = null, handleUpdate }: Props) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<AASXFile | null>(null);
   const [uploadFile, setUploadFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [af_idx, setAf_Idx] = useState<number | null>(null);
@@ -152,7 +147,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       const newFile = {
         af_idx: result.af_idx || fileData?.af_idx || af_idx,
         af_name: result.fileName,
-        createdAt: fileData?.createdAt || new Date(),
+        createdAt: typeof fileData?.createdAt === 'string' ? fileData.createdAt : new Date().toISOString(),
       };
 
       setAlertModal({

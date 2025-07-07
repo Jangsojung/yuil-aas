@@ -5,30 +5,14 @@ import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
-import { ActionBox, SortableTableHeader } from '../../components/common';
+import { ActionBox, SortableTableHeader, TableEmptyRow } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
-import { usePagination } from '../../hooks/usePagination';
+import { useTablePagination } from '../../hooks/useTablePagination';
 import EdgeTableRow from '../../components/tableRow/EdgeTableRow';
 import LoadingOverlay from '../../components/loading/LodingOverlay';
 import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
-
-interface EdgeGateway {
-  eg_idx: number;
-  eg_pc_name?: string;
-  eg_ip_port: string;
-  eg_server_temp?: number;
-  eg_network?: number;
-  eg_pc_temp?: number;
-  createdAt?: string;
-  created_at?: string;
-  createDate?: string;
-  create_date?: string;
-  date?: string;
-  updatedAt?: string;
-  updated_at?: string;
-  updateDate?: string;
-  update_date?: string;
-}
+import { formatDate } from '../../utils/dateUtils';
+import { EdgeGateway, AlertModalState } from '../../types';
 
 interface EdgeListProps {
   onAddClick: () => void;
@@ -41,12 +25,12 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
   const navigationReset = useRecoilValue(navigationResetState);
 
   const [selectAll, setSelectAll] = useState(false);
-  const [alertModal, setAlertModal] = useState({
+  const [alertModal, setAlertModal] = useState<AlertModalState>({
     open: false,
     title: '',
     content: '',
-    type: 'alert' as 'alert' | 'confirm',
-    onConfirm: undefined as (() => void) | undefined,
+    type: 'alert',
+    onConfirm: undefined,
   });
 
   // 정렬 기능
@@ -68,11 +52,10 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     { field: 'updatedAt', label: '수정 일자' },
   ];
 
-  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    sortedEdgeGateways?.length || 0
-  );
-
-  const pagedData = paginatedData(sortedEdgeGateways || []);
+  const { currentPage, rowsPerPage, totalPages, handlePageChange, handleRowsPerPageChange, paginatedData } =
+    useTablePagination({
+      totalCount: sortedEdgeGateways?.length || 0,
+    });
 
   const [loading, setLoading] = useState(true);
 
@@ -127,7 +110,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       setEdgeGateways(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to get edge gateways with status:', error);
-      // 실시간 상태 가져오기 실패 시 기본 데이터로 폴백
       await getEdge();
     } finally {
       setLoading(false);
@@ -162,17 +144,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     });
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}.${month}.${day} ${hours}:${minutes}`;
-  };
-
   const handleCloseAlert = () => {
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
@@ -180,31 +151,26 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
   const handleNavigationReset = () => {
     setSelectedEdgeGateways([]);
     setSelectAll(false);
-    goToPage(0);
+    handlePageChange(null, 0);
   };
 
   useEffect(() => {
-    // 페이지 접속 시 실시간 상태로 초기 로드
     getEdgeWithStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    // 10분마다 실시간 상태 업데이트
     const interval = setInterval(
       () => {
         getEdgeWithStatus();
       },
       10 * 60 * 1000
-    ); // 10분
+    );
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     handleNavigationReset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
   useEffect(() => {
@@ -217,7 +183,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     }
   }, [selectedEdgeGateways, edgeGateways]);
 
-  // getEdge를 ref로 노출
   useImperativeHandle(ref, () => ({
     refresh: getEdgeWithStatus,
   }));
@@ -257,8 +222,8 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
               </TableRow>
             </TableHead>
             <TableBody>
-              {pagedData && pagedData.length > 0 ? (
-                pagedData.map((eg, idx) => (
+              {paginatedData(sortedEdgeGateways || []).length > 0 ? (
+                paginatedData(sortedEdgeGateways || []).map((eg: EdgeGateway, idx: number) => (
                   <EdgeTableRow
                     key={eg.eg_idx}
                     edgeGateway={eg}
@@ -269,11 +234,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
                   />
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={sortableColumns.length + 2} align='center'>
-                    조회 결과 없음
-                  </TableCell>
-                </TableRow>
+                <TableEmptyRow colSpan={sortableColumns.length + 2} />
               )}
             </TableBody>
           </Table>
@@ -284,7 +245,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
         page={currentPage}
         count={edgeGateways?.length || 0}
         rowsPerPage={rowsPerPage}
-        onPageChange={(event, page) => goToPage(page)}
+        onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
       />
 

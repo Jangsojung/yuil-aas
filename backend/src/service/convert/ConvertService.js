@@ -51,7 +51,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       [snIdxList]
     );
 
-    // 별칭 검증
     const missingAliases = [];
     for (const item of aliasesCheck) {
       const [aliasCheck] = await pool.promise().query(
@@ -143,10 +142,20 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
     }
 
     const jsonContent = JSON.stringify(jsonStructure, null, 2);
-    const file_name = `${selectedConvert}-${startDate}-${endDate}.json`;
+
+    const formatDateForFileName = (dateStr) => {
+      const date = new Date(dateStr);
+      const year = date.getFullYear().toString().slice(-2);
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}${month}${day}`;
+    };
+
+    const startDateFormatted = formatDateForFileName(startDate);
+    const endDateFormatted = formatDateForFileName(endDate);
+    const file_name = `${selectedConvert}-${startDateFormatted}-${endDateFormatted}.json`;
     const filePath = path.join(__dirname, '..', '..', '..', '..', 'files', 'front', file_name);
 
-    // 파일명 중복 체크
     const [existing] = await pool
       .promise()
       .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 1', [file_name]);

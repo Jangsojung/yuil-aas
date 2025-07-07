@@ -32,7 +32,6 @@ export const useWordManagement = () => {
       setWords([]);
       setFilteredWords([]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const applyFilters = useCallback(
@@ -74,7 +73,6 @@ export const useWordManagement = () => {
 
   useEffect(() => {
     applyFilters(words);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showUnmatchedOnly, words]);
 
   const handleItemCheckboxChange = useCallback((item: Word) => {
@@ -152,6 +150,9 @@ export const useWordManagement = () => {
 
     const invalidEntries = Object.keys(modifiedData).filter((key) => {
       const new_as_en = modifiedData[key];
+      if (new_as_en === '') {
+        return false;
+      }
       const validPattern = /^[a-zA-Z0-9_]+$/;
       return !validPattern.test(new_as_en);
     });

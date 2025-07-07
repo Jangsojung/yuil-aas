@@ -1,4 +1,3 @@
-// AASX 관련 타입들
 export interface AASXFile {
   af_idx: number;
   af_name: string;
@@ -47,14 +46,13 @@ export interface Property {
   value: any;
 }
 
-// 기본 코드 관련 타입들
 export interface Base {
   ab_idx: number;
   ab_name: string;
   ab_note: string;
   sn_length: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
   fc_idx?: number;
 }
 
@@ -83,8 +81,7 @@ export interface Sensor {
   origin_check?: number;
 }
 
-// API 응답 타입들
-export interface ApiResponse<T = any> {
+export interface ApiResponseData<T = any> {
   success?: boolean;
   data?: T;
   error?: string;
@@ -98,7 +95,6 @@ export interface PaginatedResponse<T> {
   limit: number;
 }
 
-// 공통 타입들
 export interface AlertModalState {
   open: boolean;
   title: string;
@@ -131,4 +127,22 @@ export interface FactoryTree {
   fc_name: string;
   origin_check?: number;
   facilityGroups: FacilityGroupTree[];
+}
+
+export interface EdgeGateway {
+  eg_idx: number;
+  eg_pc_name?: string;
+  eg_ip_port: string;
+  eg_server_temp?: number;
+  eg_network?: number;
+  eg_pc_temp?: number;
+  createdAt?: string;
+  created_at?: string;
+  createDate?: string;
+  create_date?: string;
+  date?: string;
+  updatedAt?: string;
+  updated_at?: string;
+  updateDate?: string;
+  update_date?: string;
 }

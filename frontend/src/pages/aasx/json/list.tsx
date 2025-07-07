@@ -1,20 +1,22 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import Grid from '@mui/system/Grid';
+import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
+import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import dayjs, { Dayjs } from 'dayjs';
-import BasicDatePicker from '../../../components/datepicker';
-import { FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import Grid from '@mui/system/Grid';
 import Pagination from '../../../components/pagination';
-import { usePagination } from '../../../hooks/usePagination';
-import { deleteJSONAPI, getJSONFilesAPI } from '../../../apis/api/json_manage';
 import JSONTableRow from '../../../components/tableRow/JSONTableRow';
-import { useRecoilValue } from 'recoil';
-import { navigationResetState } from '../../../recoil/atoms';
-import { SearchBox, ActionBox, SortableTableHeader } from '../../../components/common';
+import { SearchBox, ActionBox, SortableTableHeader, TableEmptyRow } from '../../../components/common';
 import AlertModal from '../../../components/modal/alert';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { usePagination } from '../../../hooks/usePagination';
 import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
 import FactorySelect from '../../../components/select/factory_select';
+import { getJSONFilesAPI, deleteJSONAPI } from '../../../apis/api/json_manage';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../../recoil/atoms';
+import { useLocation, useNavigate } from 'react-router-dom';
+import dayjs, { Dayjs } from 'dayjs';
+import BasicDatePicker from '../../../components/datepicker';
+import FormControl from '@mui/material/FormControl';
 
 interface File {
   af_idx: number;
@@ -323,11 +325,7 @@ export default function JSONList() {
                   />
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={sortableColumns.length + 1} align='center'>
-                    조회 결과 없음
-                  </TableCell>
-                </TableRow>
+                <TableEmptyRow colSpan={sortableColumns.length + 1} />
               )}
             </TableBody>
           </Table>

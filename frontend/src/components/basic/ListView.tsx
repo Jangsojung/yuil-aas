@@ -17,6 +17,7 @@ import { Base } from '../../types/api';
 import { Dayjs } from 'dayjs';
 import { SortDirection, SortableColumn } from '../../hooks/useSortableData';
 import FactorySelect from '../select/factory_select';
+import TableEmptyRow from '../common/TableEmptyRow';
 
 interface ListViewProps {
   // 상태
@@ -200,11 +201,7 @@ export const ListView: React.FC<ListViewProps> = ({
                   </TableRow>
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={sortableColumns.length + 1} align='center'>
-                    조회 결과 없음
-                  </TableCell>
-                </TableRow>
+                <TableEmptyRow colSpan={sortableColumns.length + 1} />
               )}
             </TableBody>
           </Table>

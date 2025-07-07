@@ -12,6 +12,7 @@ import { useWordManagement } from '../../../hooks/useWordManagement';
 import { useAlertModal } from '../../../hooks/useAlertModal';
 import { usePagination } from '../../../hooks/usePagination';
 import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
+import TableEmptyRow from '../../../components/common/TableEmptyRow';
 
 // Word 타입 정의
 interface Word {
@@ -176,11 +177,7 @@ export default function DataList() {
                   />
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={5} align='center'>
-                    조회 결과 없음
-                  </TableCell>
-                </TableRow>
+                <TableEmptyRow colSpan={5} />
               )}
             </TableBody>
           </Table>
