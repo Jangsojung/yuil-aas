@@ -11,10 +11,10 @@ export const getBasesAPI = async (fc_idx) => {
   }
 };
 
-export const insertBaseAPI = async (formattedStartDate, formattedEndDate, selectedConvert, userIdx) => {
+export const insertBaseAPI = async (formattedStartDate, formattedEndDate, selectedConvert, userIdx, fc_idx) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.CONVERT, {
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      fc_idx: fc_idx,
       user_idx: userIdx,
       startDate: formattedStartDate,
       endDate: formattedEndDate,

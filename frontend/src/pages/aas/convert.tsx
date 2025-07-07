@@ -214,7 +214,13 @@ export default function ConvertPage() {
       const formattedStartDate = selectedBaseDates.startDate!.format('YYMMDD');
       const formattedEndDate = selectedBaseDates.endDate!.format('YYMMDD');
       setProgress(60);
-      const data = await insertBaseAPI(formattedStartDate, formattedEndDate, selectedConvert!, userIdx);
+      const data = await insertBaseAPI(
+        formattedStartDate,
+        formattedEndDate,
+        selectedConvert!,
+        userIdx,
+        selectedFactory
+      );
       setProgress(90);
       if (data) {
         setAlertTitle('알림');
