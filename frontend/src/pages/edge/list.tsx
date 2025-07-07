@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI, downloadDeployFilesAPI } from '../../apis/api/edge';
+import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI } from '../../apis/api/edge';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
@@ -227,11 +227,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       {loading && <LoadingOverlay />}
       <ActionBox
         buttons={[
-          {
-            text: '배포파일 다운로드',
-            onClick: downloadDeployFilesAPI,
-            color: 'info',
-          },
           {
             text: '등록',
             onClick: onAddClick,
