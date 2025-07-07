@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { getBasesAPI, insertBaseAPI } from '../../apis/api/convert';
 import { Dayjs } from 'dayjs';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from '@mui/material';
+import {
+  FormControl,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+} from '@mui/material';
 import Grid from '@mui/system/Grid';
 import BasicDatePicker from '../../components/datepicker';
 import Pagination from '../../components/pagination';
@@ -14,6 +23,7 @@ import { SearchBox, ActionBox, SortableTableHeader } from '../../components/comm
 import AlertModal from '../../components/modal/alert';
 import ProgressOverlay from '../../components/loading/ProgressOverlay';
 import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
+import FactorySelect from '../../components/select/factory_select';
 
 interface Base {
   ab_idx: number;
@@ -37,6 +47,7 @@ export default function ConvertPage() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
 
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
@@ -72,44 +83,65 @@ export default function ConvertPage() {
     setEndDate(newEndDate);
   };
 
-  const getBases = async () => {
-    const data: Base[] = await getBasesAPI();
-    setBases(data);
-    setFilteredBases(data);
-  };
-
-  const handleSearch = () => {
-    let filtered = bases;
-
-    if (searchKeyword.trim()) {
-      filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+  const handleSearch = async () => {
+    if (!selectedFactory) {
+      setAlertTitle('알림');
+      setAlertContent('공장을 선택해주세요.');
+      setAlertType('alert');
+      setAlertOpen(true);
+      return;
     }
 
-    if (startDate || endDate) {
-      filtered = filtered.filter((base) => {
-        if (!base.createdAt) return false;
+    try {
+      console.log('변환 페이지 검색 시작:', { selectedFactory, searchKeyword, startDate, endDate });
 
-        const baseDate = new Date(base.createdAt);
-        const baseDateOnly = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+      // 검색 시에만 기초코드 목록 조회
+      const data = await getBasesAPI(selectedFactory);
+      const fetchedBases = Array.isArray(data) ? data : [];
+      console.log('변환 페이지 API에서 받은 데이터:', fetchedBases);
+      setBases(fetchedBases);
 
-        if (startDate && endDate) {
-          const start = startDate.toDate();
-          const end = endDate.toDate();
-          return baseDateOnly >= start && baseDateOnly <= end;
-        } else if (startDate) {
-          const start = startDate.toDate();
-          return baseDateOnly >= start;
-        } else if (endDate) {
-          const end = endDate.toDate();
-          return baseDateOnly <= end;
-        }
+      let filtered = fetchedBases;
 
-        return true;
-      });
+      if (searchKeyword.trim()) {
+        console.log('변환 페이지 기초코드명 필터링:', searchKeyword);
+        filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+        console.log('변환 페이지 기초코드명 필터링 후:', filtered);
+      }
+
+      if (startDate || endDate) {
+        console.log('변환 페이지 날짜 필터링:', { startDate, endDate });
+        filtered = filtered.filter((base) => {
+          if (!base.createdAt) return false;
+
+          const baseDate = new Date(base.createdAt);
+          const baseDateOnly = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+
+          if (startDate && endDate) {
+            const start = startDate.toDate();
+            const end = endDate.toDate();
+            return baseDateOnly >= start && baseDateOnly <= end;
+          } else if (startDate) {
+            const start = startDate.toDate();
+            return baseDateOnly >= start;
+          } else if (endDate) {
+            const end = endDate.toDate();
+            return baseDateOnly <= end;
+          }
+
+          return true;
+        });
+        console.log('변환 페이지 날짜 필터링 후:', filtered);
+      }
+
+      console.log('변환 페이지 최종 필터링 결과:', filtered);
+      setFilteredBases(filtered);
+      goToPage(0);
+    } catch (error) {
+      console.error('Error fetching bases:', error);
+      setBases([]);
+      setFilteredBases([]);
     }
-
-    setFilteredBases(filtered);
-    goToPage(0);
   };
 
   const handleReset = () => {
@@ -118,6 +150,12 @@ export default function ConvertPage() {
     setEndDate(null);
     setFilteredBases(bases);
     goToPage(0);
+  };
+
+  // 공장 변경 핸들러
+  const handleFactoryChange = (factoryId: number) => {
+    setSelectedFactory(factoryId);
+    // 공장 변경 시 기초코드 목록은 그대로 유지 (검색 버튼을 눌러야만 새로 조회)
   };
 
   const handleStartDateChange = (baseId: number, date: Dayjs | null) => {
@@ -277,24 +315,18 @@ export default function ConvertPage() {
     setSelectedConvert(null);
     setStartDate(null);
     setEndDate(null);
+    setSelectedFactory('');
     goToPage(0);
     setSearchKeyword('');
     setBaseDates({});
+    setBases([]);
+    setFilteredBases([]);
   };
 
   useEffect(() => {
     handleNavigationReset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
-
-  useEffect(() => {
-    getBases();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setFilteredBases(bases);
-  }, [bases]);
 
   return (
     <>
@@ -317,6 +349,23 @@ export default function ConvertPage() {
             ]}
           >
             <Grid container spacing={4}>
+              {/* 공장 선택 */}
+              <Grid container spacing={2}>
+                <Grid className='sort-title'>
+                  <div>공장</div>
+                </Grid>
+                <Grid sx={{ flexGrow: 1 }}>
+                  <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                    <FactorySelect
+                      value={selectedFactory}
+                      onChange={handleFactoryChange}
+                      placeholder='공장을 선택하세요'
+                    />
+                  </FormControl>
+                </Grid>
+              </Grid>
+              {/* 공장 선택 */}
+
               {/* 기초코드명 */}
               <Grid container spacing={2}>
                 <Grid className='sort-title'>

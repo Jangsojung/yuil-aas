@@ -74,23 +74,6 @@ export const useBasicList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setSelectedBases]);
 
-  // 기초코드 목록 조회
-  const getBases = useCallback(async () => {
-    if (!selectedFactory) {
-      setBases([]);
-      setFilteredBases([]);
-      return;
-    }
-
-    try {
-      const data = await getBasesAPI(selectedFactory);
-      setBases(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Error fetching bases:', error);
-      setBases([]);
-    }
-  }, [selectedFactory]);
-
   // 전체 선택 체크박스 핸들러
   const handleSelectAllChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,7 +141,7 @@ export const useBasicList = () => {
   }, [selectedBases, bases, setSelectedBases, handleReset]);
 
   // 검색 핸들러
-  const handleSearch = useCallback(() => {
+  const handleSearch = useCallback(async () => {
     if (!selectedFactory) {
       setAlertTitle('알림');
       setAlertContent('공장을 선택해주세요.');
@@ -167,15 +150,25 @@ export const useBasicList = () => {
       return;
     }
 
-    // 검색 시에만 기초코드 목록 조회
-    getBases().then(() => {
-      let filtered = bases;
+    try {
+      console.log('검색 시작:', { selectedFactory, searchKeyword, startDate, endDate });
+
+      // 검색 시에만 기초코드 목록 조회
+      const data = await getBasesAPI(selectedFactory);
+      const fetchedBases = Array.isArray(data) ? data : [];
+      console.log('API에서 받은 데이터:', fetchedBases);
+      setBases(fetchedBases);
+
+      let filtered = fetchedBases;
 
       if (searchKeyword.trim().length > 0) {
+        console.log('기초코드명 필터링:', searchKeyword);
         filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+        console.log('기초코드명 필터링 후:', filtered);
       }
 
       if (startDate || endDate) {
+        console.log('날짜 필터링:', { startDate, endDate });
         filtered = filtered.filter((base) => {
           if (!base.createdAt) return false;
 
@@ -196,23 +189,18 @@ export const useBasicList = () => {
 
           return true;
         });
+        console.log('날짜 필터링 후:', filtered);
       }
 
+      console.log('최종 필터링 결과:', filtered);
       setFilteredBases(filtered);
       setCurrentPage(0);
-    });
-  }, [
-    selectedFactory,
-    searchKeyword,
-    startDate,
-    endDate,
-    setAlertTitle,
-    setAlertContent,
-    setAlertType,
-    setAlertOpen,
-    getBases,
-    bases,
-  ]);
+    } catch (error) {
+      console.error('Error fetching bases:', error);
+      setBases([]);
+      setFilteredBases([]);
+    }
+  }, [selectedFactory, searchKeyword, startDate, endDate, setAlertTitle, setAlertContent, setAlertType, setAlertOpen]);
 
   // 날짜 변경 핸들러
   const handleDateChange = useCallback((newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
@@ -279,10 +267,6 @@ export const useBasicList = () => {
       setSelectAll(false);
     }
   }, [selectedBases, pagedData]);
-
-  useEffect(() => {
-    setFilteredBases(bases);
-  }, [bases]);
 
   useEffect(() => {
     if (navigationReset) {

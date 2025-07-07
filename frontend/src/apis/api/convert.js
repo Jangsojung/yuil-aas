@@ -1,9 +1,9 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
 import { DEFAULTS } from '../../constants';
 
-export const getBasesAPI = async () => {
+export const getBasesAPI = async (fc_idx) => {
   try {
-    const data = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES);
+    const data = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES, { fc_idx });
     return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('Error fetching bases:', error);
