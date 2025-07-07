@@ -44,12 +44,17 @@ export const useBasicAdd = () => {
       return { success: false, message: '기초코드명을 입력해주세요.' };
     }
 
+    if (!selectedFactory) {
+      return { success: false, message: '공장을 선택해주세요.' };
+    }
+
     try {
       await insertBaseAPI({
         user_idx: userIdx,
         name: basicName,
         note: basicDesc,
         ids: selectedSensors,
+        fc_idx: selectedFactory,
       });
 
       setBasicName('');
@@ -63,7 +68,7 @@ export const useBasicAdd = () => {
         message: '기초코드 등록 중 오류가 발생했습니다.',
       };
     }
-  }, [selectedSensors, basicName, basicDesc, userIdx, setSelectedSensors]);
+  }, [selectedSensors, basicName, basicDesc, userIdx, selectedFactory, setSelectedSensors]);
 
   // 트리 검색
   const handleTreeSearch = useCallback(async () => {

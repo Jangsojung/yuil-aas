@@ -16,6 +16,7 @@ import { SearchBox, ActionBox, SortableTableHeader } from '../common';
 import { Base } from '../../types/api';
 import { Dayjs } from 'dayjs';
 import { SortDirection, SortableColumn } from '../../hooks/useSortableData';
+import FactorySelect from '../select/factory_select';
 
 interface ListViewProps {
   // 상태
@@ -23,6 +24,7 @@ interface ListViewProps {
   endDate: Dayjs | null;
   searchKeyword: string;
   setSearchKeyword: (value: string) => void;
+  selectedFactory: number | '';
   pagedData: Base[];
   selectAll: boolean;
   selectedBases: number[];
@@ -34,6 +36,7 @@ interface ListViewProps {
   onSearch: () => void;
   onReset: () => void;
   onDateChange: (startDate: Dayjs | null, endDate: Dayjs | null) => void;
+  onFactoryChange: (factoryId: number) => void;
   onAdd: () => void;
   onDelete: () => void;
   onPageChange: (event: unknown, page: number) => void;
@@ -55,6 +58,7 @@ export const ListView: React.FC<ListViewProps> = ({
   endDate,
   searchKeyword,
   setSearchKeyword,
+  selectedFactory,
   pagedData,
   selectAll,
   selectedBases,
@@ -64,6 +68,7 @@ export const ListView: React.FC<ListViewProps> = ({
   onSearch,
   onReset,
   onDateChange,
+  onFactoryChange,
   onAdd,
   onDelete,
   onPageChange,
@@ -95,7 +100,20 @@ export const ListView: React.FC<ListViewProps> = ({
             },
           ]}
         >
-          <Grid container spacing={4}>
+          <Grid container spacing={1} className='flex-center-gap-lg'>
+            {/* 공장 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>공장</div>
+              </Grid>
+              <Grid sx={{ flexGrow: 1 }}>
+                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                  <FactorySelect value={selectedFactory} onChange={onFactoryChange} placeholder='선택' />
+                </FormControl>
+              </Grid>
+            </Grid>
+            {/* 공장 */}
+
             {/* 기초코드명 */}
             <Grid container spacing={2}>
               <Grid className='sort-title'>

@@ -4,9 +4,9 @@ import { API_ENDPOINTS, apiHelpers } from '../../config/api';
 import { DEFAULTS } from '../../constants';
 
 // 기초코드 목록 조회
-export const getBasesAPI = async () => {
+export const getBasesAPI = async (fc_idx) => {
   try {
-    const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES);
+    const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES, { fc_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
     console.error('Error fetching bases:', error);

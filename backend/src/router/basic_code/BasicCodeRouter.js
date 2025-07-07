@@ -21,7 +21,8 @@ const router = express.Router();
 
 export default () => {
   router.post('/bases', (req, res) => {
-    getBases(res);
+    const { fc_idx } = req.body;
+    getBases(fc_idx, res);
   });
 
   router.post('/bases/insert', (req, res) => {

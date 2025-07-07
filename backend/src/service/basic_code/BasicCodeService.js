@@ -1,52 +1,40 @@
 import { pool } from '../../index.js';
 
-export const getBasesFromDB = async () => {
+export const getBasesFromDB = async (fc_idx) => {
   return new Promise((resolve, reject) => {
-    const query =
-      'select b.ab_idx, b.ab_name, b.ab_note, COUNT(bs.sn_idx) as sn_length, b.createdAt, b.updatedAt from tb_aasx_base b, tb_aasx_base_sensor bs where b.ab_idx = bs.ab_idx group by b.ab_idx, b.ab_name, b.ab_note, b.createdAt, b.updatedAt order by b.ab_idx desc';
+    const query = `
+      SELECT DISTINCT b.ab_idx, b.ab_name, b.ab_note, COUNT(bs.sn_idx) as sn_length, b.createdAt, b.updatedAt 
+      FROM tb_aasx_base b
+      JOIN tb_aasx_base_sensor bs ON b.ab_idx = bs.ab_idx
+      JOIN tb_aasx_data_prop p ON bs.sn_idx = p.sn_idx
+      JOIN tb_aasx_data_sm s ON p.fa_idx = s.fa_idx
+      JOIN tb_aasx_data_aas a ON s.fg_idx = a.fg_idx
+      WHERE a.fc_idx = ?
+      GROUP BY b.ab_idx, b.ab_name, b.ab_note, b.createdAt, b.updatedAt 
+      ORDER BY b.ab_idx DESC
+    `;
 
-    pool.query(query, async (err, results) => {
+    pool.query(query, [fc_idx], async (err, results) => {
       if (err) {
         reject(err);
       } else {
         if (results.length === 0) {
-          resolve(null);
+          resolve([]);
           return;
         }
 
-        // ab_idx별로 fc_idx를 찾아서 추가
-        const bases = await Promise.all(
-          results.map(async (base) => {
-            // ab_idx로 센서-설비-설비그룹-공장 조인
-            const fcQuery = `
-            SELECT a.fc_idx
-            FROM tb_aasx_base_sensor bs
-            JOIN tb_aasx_data_prop p ON bs.sn_idx = p.sn_idx
-            JOIN tb_aasx_data_sm s ON p.fa_idx = s.fa_idx
-            JOIN tb_aasx_data_aas a ON s.fg_idx = a.fg_idx
-            WHERE bs.ab_idx = ?
-            LIMIT 1
-          `;
-            let fc_idx = null;
-            try {
-              const [fcRows] = await pool.promise().query(fcQuery, [base.ab_idx]);
-              if (fcRows && fcRows.length > 0) {
-                fc_idx = fcRows[0].fc_idx;
-              }
-            } catch (e) {
-              fc_idx = null;
-            }
-            return {
-              ab_idx: base.ab_idx,
-              ab_name: base.ab_name,
-              ab_note: base.ab_note,
-              fc_idx: fc_idx,
-              sn_length: base.sn_length,
-              createdAt: base.createdAt,
-              updatedAt: base.updatedAt,
-            };
-          })
-        );
+        // fc_idx 정보 추가
+        const bases = results.map((base) => {
+          return {
+            ab_idx: base.ab_idx,
+            ab_name: base.ab_name,
+            ab_note: base.ab_note,
+            fc_idx: fc_idx,
+            sn_length: base.sn_length,
+            createdAt: base.createdAt,
+            updatedAt: base.updatedAt,
+          };
+        });
 
         resolve(bases);
       }

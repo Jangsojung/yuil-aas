@@ -16,9 +16,9 @@ import {
   syncFactoriesToAasxData,
 } from '../../service/basic_code/BasicCodeService.js';
 
-export const getBases = async (res) => {
+export const getBases = async (fc_idx, res) => {
   try {
-    const result = await getBasesFromDB();
+    const result = await getBasesFromDB(fc_idx);
 
     res.status(200).json(result);
   } catch (err) {

@@ -10,6 +10,7 @@ export default function BasicList() {
     endDate,
     searchKeyword,
     setSearchKeyword,
+    selectedFactory,
     pagedData,
     selectAll,
     selectedBases,
@@ -28,6 +29,7 @@ export default function BasicList() {
     handleSearch,
     handleReset,
     handleDateChange,
+    handleFactoryChange,
     handleAdd,
     handleDelete,
     handlePageChange,
@@ -48,6 +50,7 @@ export default function BasicList() {
         endDate={endDate}
         searchKeyword={searchKeyword}
         setSearchKeyword={setSearchKeyword}
+        selectedFactory={selectedFactory}
         pagedData={pagedData}
         selectAll={selectAll}
         selectedBases={selectedBases}
@@ -57,6 +60,7 @@ export default function BasicList() {
         onSearch={handleSearch}
         onReset={handleReset}
         onDateChange={handleDateChange}
+        onFactoryChange={handleFactoryChange}
         onAdd={handleAdd}
         onDelete={handleDelete}
         onPageChange={handlePageChange}

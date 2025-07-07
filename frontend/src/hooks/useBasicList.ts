@@ -19,6 +19,7 @@ export const useBasicList = () => {
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
   const [currentPage, setCurrentPage] = useState(0);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
@@ -66,20 +67,29 @@ export const useBasicList = () => {
     setSearchKeyword('');
     setStartDate(null);
     setEndDate(null);
-    getBases();
+    setSelectedFactory('');
+    setBases([]);
+    setFilteredBases([]);
+    setSelectedBases([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setSelectedBases]);
 
   // 기초코드 목록 조회
   const getBases = useCallback(async () => {
+    if (!selectedFactory) {
+      setBases([]);
+      setFilteredBases([]);
+      return;
+    }
+
     try {
-      const data = await getBasesAPI();
+      const data = await getBasesAPI(selectedFactory);
       setBases(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching bases:', error);
       setBases([]);
     }
-  }, []);
+  }, [selectedFactory]);
 
   // 전체 선택 체크박스 핸들러
   const handleSelectAllChange = useCallback(
@@ -149,44 +159,76 @@ export const useBasicList = () => {
 
   // 검색 핸들러
   const handleSearch = useCallback(() => {
-    let filtered = bases;
-
-    if (searchKeyword.trim().length > 0) {
-      filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+    if (!selectedFactory) {
+      setAlertTitle('알림');
+      setAlertContent('공장을 선택해주세요.');
+      setAlertType(MODAL_TYPE.ALERT);
+      setAlertOpen(true);
+      return;
     }
 
-    if (startDate || endDate) {
-      filtered = filtered.filter((base) => {
-        if (!base.createdAt) return false;
+    // 검색 시에만 기초코드 목록 조회
+    getBases().then(() => {
+      let filtered = bases;
 
-        const baseDate = new Date(base.createdAt);
-        const baseDateOnly = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+      if (searchKeyword.trim().length > 0) {
+        filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+      }
 
-        if (startDate && endDate) {
-          const start = startDate.toDate();
-          const end = endDate.toDate();
-          return baseDateOnly >= start && baseDateOnly <= end;
-        } else if (startDate) {
-          const start = startDate.toDate();
-          return baseDateOnly >= start;
-        } else if (endDate) {
-          const end = endDate.toDate();
-          return baseDateOnly <= end;
-        }
+      if (startDate || endDate) {
+        filtered = filtered.filter((base) => {
+          if (!base.createdAt) return false;
 
-        return true;
-      });
-    }
+          const baseDate = new Date(base.createdAt);
+          const baseDateOnly = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
 
-    setFilteredBases(filtered);
-    setCurrentPage(0);
-  }, [bases, searchKeyword, startDate, endDate]);
+          if (startDate && endDate) {
+            const start = startDate.toDate();
+            const end = endDate.toDate();
+            return baseDateOnly >= start && baseDateOnly <= end;
+          } else if (startDate) {
+            const start = startDate.toDate();
+            return baseDateOnly >= start;
+          } else if (endDate) {
+            const end = endDate.toDate();
+            return baseDateOnly <= end;
+          }
+
+          return true;
+        });
+      }
+
+      setFilteredBases(filtered);
+      setCurrentPage(0);
+    });
+  }, [
+    selectedFactory,
+    searchKeyword,
+    startDate,
+    endDate,
+    setAlertTitle,
+    setAlertContent,
+    setAlertType,
+    setAlertOpen,
+    getBases,
+    bases,
+  ]);
 
   // 날짜 변경 핸들러
   const handleDateChange = useCallback((newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
     setStartDate(newStartDate);
     setEndDate(newEndDate);
   }, []);
+
+  // 공장 변경 핸들러
+  const handleFactoryChange = useCallback(
+    (factoryId: number) => {
+      setSelectedFactory(factoryId);
+      setSelectedBases([]);
+      // 공장 변경 시 기초코드 목록은 그대로 유지 (검색 버튼을 눌러야만 새로 조회)
+    },
+    [setSelectedBases]
+  );
 
   // 행 클릭 핸들러
   const handleClick = useCallback(
@@ -243,18 +285,16 @@ export const useBasicList = () => {
   }, [bases]);
 
   useEffect(() => {
-    getBases();
-  }, [getBases]);
-
-  useEffect(() => {
     if (navigationReset) {
-      getBases();
       setSearchKeyword('');
       setStartDate(null);
       setEndDate(null);
+      setSelectedFactory('');
+      setBases([]);
+      setFilteredBases([]);
       setSelectedBases([]);
     }
-  }, [navigationReset, getBases, setSelectedBases]);
+  }, [navigationReset, setSelectedBases]);
 
   return {
     // 상태
@@ -265,6 +305,7 @@ export const useBasicList = () => {
     endDate,
     searchKeyword,
     setSearchKeyword,
+    selectedFactory,
     currentPage,
     rowsPerPage,
     pagedData,
@@ -288,6 +329,7 @@ export const useBasicList = () => {
     handleConfirmDelete,
     handleSearch,
     handleDateChange,
+    handleFactoryChange,
     handleClick,
     handleAdd,
     handleCloseAlert,
