@@ -438,7 +438,7 @@ export default function ConvertPage() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={sortableColumns.length + 1} align='center'>
+                      <TableCell colSpan={sortableColumns.length + 3} align='center'>
                         조회 결과 없음
                       </TableCell>
                     </TableRow>
