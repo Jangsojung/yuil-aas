@@ -14,7 +14,7 @@ import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import AlertModal from './alert';
-import { updateAASXFileAPI, uploadAASXFileAPI } from '../../apis/api/aasx_manage';
+import { updateAASXFileAPI, uploadAASXFileAPI, getFileFCIdxAPI } from '../../apis/api/aasx_manage';
 import ProgressOverlay from '../loading/ProgressOverlay';
 
 const GreyButton = styled(Button)(({ theme }) => ({
@@ -115,7 +115,11 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         setProgressLabel('기존 파일 삭제 완료 ...');
         setProgress(50);
         setProgressLabel('AAS 파일 생성 중 ...');
-        result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx);
+        // 파일명으로 fc_idx 조회
+        const fcIdxResult = await getFileFCIdxAPI(uploadFile.name);
+        const fc_idx = fcIdxResult?.data?.fc_idx || 1; // 기본값 1
+
+        result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx, fc_idx);
         setProgress(80);
         setProgressLabel('AASX 파일 생성 중 ...');
         setProgress(90);
@@ -134,7 +138,11 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         setProgressLabel('파일 업로드 완료 ...');
         setProgress(50);
         setProgressLabel('AAS 파일 생성 중 ...');
-        result = await uploadAASXFileAPI(uploadFile, userIdx);
+        // 파일명으로 fc_idx 조회
+        const fcIdxResult = await getFileFCIdxAPI(uploadFile.name);
+        const fc_idx = fcIdxResult?.data?.fc_idx || 1; // 기본값 1
+
+        result = await uploadAASXFileAPI(uploadFile, userIdx, fc_idx);
         setProgress(80);
         setProgressLabel('AASX 파일 생성 중 ...');
         setProgress(90);

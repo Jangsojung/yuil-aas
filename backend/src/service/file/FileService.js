@@ -6,6 +6,27 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// 파일명으로 fc_idx 조회
+export const getFileFCIdxFromDB = async (fileName) => {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 1 LIMIT 1`;
+
+    pool.query(query, [fileName], (err, results) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      if (results.length === 0) {
+        resolve(null);
+        return;
+      }
+
+      resolve(results[0].fc_idx);
+    });
+  });
+};
+
 export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, endDate = null) => {
   return new Promise((resolve, reject) => {
     let query = '';
@@ -32,6 +53,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
           f.af_name, 
           f.createdAt,
           f.updatedAt,
+          f.fc_idx,
           b.ab_name AS base_name,
            COUNT(DISTINCT bs.sn_idx) AS sn_length
         FROM tb_aasx_file f
@@ -41,7 +63,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
           ON bs.ab_idx = b.ab_idx
         WHERE ${baseWhereClause}
         ${dateClause}
-        GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, b.ab_name
+        GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, b.ab_name
         ORDER BY f.af_idx DESC
       `;
     } else {
@@ -73,6 +95,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, 
             af_name: file.af_name,
             createdAt: file.createdAt,
             updatedAt: file.updatedAt,
+            fc_idx: file.fc_idx,
             base_name: file.base_name || '삭제된 기초코드',
             sn_length: Number(file.sn_length) || 0,
           };
@@ -262,7 +285,7 @@ const cleanupCreatedFiles = async (createdFiles) => {
   }
 };
 
-export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
+export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => {
   let newAasInsertId = null;
   let newAasxInsertId = null;
   let createdFiles = [];
@@ -339,7 +362,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
       await pool.promise().query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName]);
     } else {
       const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
-      const [aasResult] = await pool.promise().query(insertAasQuery, [3, newAasFileName, user_idx, user_idx]);
+      const [aasResult] = await pool.promise().query(insertAasQuery, [fc_idx, newAasFileName, user_idx, user_idx]);
       newAasInsertId = aasResult.insertId;
       createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: newAasInsertId });
     }
@@ -374,7 +397,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx) => {
 
     // 새 AASX 파일 DB 저장
     const insertAasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, '/files/aasx', ?, ?)`;
-    const [aasxResult] = await pool.promise().query(insertAasxQuery, [3, newAasxFileName, user_idx, user_idx]);
+    const [aasxResult] = await pool.promise().query(insertAasxQuery, [fc_idx, newAasxFileName, user_idx, user_idx]);
     newAasxInsertId = aasxResult.insertId;
     createdFiles.push({ type: 'aasx', path: `../files/aasx/${newAasxFileName}`, insertId: newAasxInsertId });
 

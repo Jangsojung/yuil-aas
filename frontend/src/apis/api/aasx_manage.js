@@ -47,6 +47,17 @@ export const getAASXFilesAPI = async (start, end, fc_idx, af_kind = 3) => {
   }
 };
 
+// 파일명으로 fc_idx 조회
+export const getFileFCIdxAPI = async (fileName) => {
+  try {
+    const result = await apiHelpers.post('/api/file/getFileFCIdx', { fileName });
+    return result;
+  } catch (error) {
+    console.error('Error fetching file fc_idx:', error);
+    return null;
+  }
+};
+
 // AASX 파일 업로드
 export const uploadAASXFileAPI = async (fileData, userIdx, fc_idx) => {
   try {
@@ -76,11 +87,14 @@ export const uploadAASXFileAPI = async (fileData, userIdx, fc_idx) => {
 };
 
 // AASX 파일 수정
-export const updateAASXFileAPI = async (af_idx, fileName, userIdx) => {
+export const updateAASXFileAPI = async (af_idx, fileName, userIdx, fc_idx) => {
   try {
-    const result = await apiHelpers.post(`${API_ENDPOINTS.FILE.AASX_UPDATE}?af_idx=${af_idx}&user_idx=${userIdx}`, {
-      fileName,
-    });
+    const result = await apiHelpers.post(
+      `${API_ENDPOINTS.FILE.AASX_UPDATE}?af_idx=${af_idx}&user_idx=${userIdx}&fc_idx=${fc_idx}`,
+      {
+        fileName,
+      }
+    );
     return result;
   } catch (error) {
     throw error;

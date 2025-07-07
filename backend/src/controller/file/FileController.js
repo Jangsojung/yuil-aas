@@ -8,6 +8,7 @@ import {
   getSearchFromDB,
   updateWordsToDB,
   getFilesFromDB,
+  getFileFCIdxFromDB,
 } from '../../service/file/FileService.js';
 import fs from 'fs';
 import path from 'path';
@@ -66,9 +67,9 @@ export const uploadAASXFile = async (req, res) => {
   }
 };
 
-export const updateAASXFile = async (af_idx, fileName, user_idx, res) => {
+export const updateAASXFile = async (af_idx, fileName, user_idx, fc_idx, res) => {
   try {
-    const result = await updateAASXFileToDB(af_idx, fileName, user_idx);
+    const result = await updateAASXFileToDB(af_idx, fileName, user_idx, fc_idx);
     res.status(200).json(result);
   } catch (err) {
     console.error(err.message);
@@ -156,5 +157,32 @@ export const updateWords = async (updates, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+// 파일명으로 fc_idx 조회
+export const getFileFCIdx = async (req, res) => {
+  try {
+    const { fileName } = req.body;
+
+    if (!fileName) {
+      return res.status(400).json({
+        success: false,
+        message: '파일명이 필요합니다.',
+      });
+    }
+
+    const fc_idx = await getFileFCIdxFromDB(fileName);
+
+    res.json({
+      success: true,
+      data: { fc_idx },
+    });
+  } catch (error) {
+    console.error('Error in getFileFCIdx:', error);
+    res.status(500).json({
+      success: false,
+      message: '파일 fc_idx 조회 중 오류가 발생했습니다.',
+    });
   }
 };
