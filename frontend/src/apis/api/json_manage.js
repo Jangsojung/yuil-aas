@@ -1,12 +1,11 @@
 import { apiHelpers } from '../../config/api';
-import { DEFAULTS } from '../../constants';
 
 // JSON 파일 목록 조회 (af_kind=1)
-export const getJSONFilesAPI = async (startDate, endDate) => {
+export const getJSONFilesAPI = async (startDate, endDate, fc_idx) => {
   try {
     const result = await apiHelpers.post('/api/file/aasxFiles', {
       af_kind: 1,
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      fc_idx,
       startDate,
       endDate,
     });

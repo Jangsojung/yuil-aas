@@ -49,6 +49,7 @@ export default function FacilityGroupSelect({
 
   useEffect(() => {
     handleFetchFacilityGroups();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFactory, showFactorySelect]);
 
   const handleChange = (event: SelectChangeEvent<number>) => {

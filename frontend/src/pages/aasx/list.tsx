@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../components/datepicker';
-import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../components/pagination';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
 import { usePagination } from '../../hooks/usePagination';
@@ -235,7 +235,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
           <Grid item>
             <Grid container spacing={1}>
               <Grid item className='d-flex gap-5'>
-                <div className='sort-title'>기간</div>
+                <div className='sort-title'>생성일</div>
               </Grid>
               <Grid item>
                 <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
@@ -319,5 +319,3 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     </div>
   );
 });
-
-const cells = ['파일명', '생성 일자', '수정 일자'];

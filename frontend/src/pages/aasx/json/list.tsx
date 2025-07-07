@@ -1,9 +1,9 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../../components/datepicker';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../../components/pagination';
 import { usePagination } from '../../../hooks/usePagination';
 import { deleteJSONAPI, getJSONFilesAPI } from '../../../apis/api/json_manage';
@@ -14,6 +14,7 @@ import { SearchBox, ActionBox, SortableTableHeader } from '../../../components/c
 import AlertModal from '../../../components/modal/alert';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
+import FactorySelect from '../../../components/select/factory_select';
 
 interface File {
   af_idx: number;
@@ -29,6 +30,7 @@ export default function JSONList() {
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
   const navigationReset = useRecoilValue(navigationResetState);
   const navigate = useNavigate();
   const location = useLocation();
@@ -112,9 +114,32 @@ export default function JSONList() {
     setEndDate(newEndDate);
   };
 
+  const handleFactoryChange = (factoryId: number) => {
+    setSelectedFactory(factoryId);
+    setSelectedFiles([]);
+    // 공장 변경 시 파일 목록은 그대로 유지 (검색 버튼을 눌러야만 새로 조회)
+  };
+
   const handleSearch = () => {
-    if (!startDate || !endDate) {
-      alert('날짜를 선택해주세요.');
+    if (!startDate || !endDate || startDate > endDate) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '올바른 시작, 종료일을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
+    if (!selectedFactory) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '공장을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
       return;
     }
 
@@ -126,15 +151,16 @@ export default function JSONList() {
     const defaultEnd = dayjs();
     setStartDate(defaultStart);
     setEndDate(defaultEnd);
+    setSelectedFactory('');
     setSelectedFiles([]);
-    getFiles(defaultStart, defaultEnd);
+    setFiles([]); // 파일 목록 초기화
   };
 
   const getFiles = async (start = startDate, end = endDate) => {
     const startDateStr = start ? dayjs(start).format('YYYY-MM-DD') : '';
     const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
 
-    const data: File[] = await getJSONFilesAPI(startDateStr, endDateStr);
+    const data: File[] = await getJSONFilesAPI(startDateStr, endDateStr, selectedFactory);
     setFiles(Array.isArray(data) ? data : []);
   };
 
@@ -181,7 +207,6 @@ export default function JSONList() {
     const defaultEnd = dayjs();
     setStartDate(defaultStart);
     setEndDate(defaultEnd);
-    getFiles(defaultStart, defaultEnd);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -230,9 +255,31 @@ export default function JSONList() {
           },
         ]}
       >
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <BasicDatePicker startDate={startDate} endDate={endDate} onDateChange={handleDateChange} />
+        <Grid container spacing={1} className='flex-center-gap-lg'>
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>공장</div>
+            </Grid>
+            <Grid sx={{ flexGrow: 1 }}>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <FactorySelect
+                  value={selectedFactory}
+                  onChange={handleFactoryChange}
+                  placeholder='선택'
+                  // refreshKey={factoryRefreshKey}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+          <Grid>
+            <Grid container spacing={1}>
+              <Grid className='d-flex gap-5'>
+                <div className='sort-title'>생성일</div>
+              </Grid>
+              <Grid>
+                <BasicDatePicker startDate={startDate} endDate={endDate} onDateChange={handleDateChange} />
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </SearchBox>

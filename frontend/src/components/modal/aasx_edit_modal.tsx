@@ -13,7 +13,6 @@ import { grey } from '@mui/material/colors';
 import { FileUpload, FileUploadProps } from '../../components/fileupload';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
-import LoadingOverlay from '../loading/LodingOverlay';
 import AlertModal from './alert';
 import { updateAASXFileAPI, uploadAASXFileAPI } from '../../apis/api/aasx_manage';
 import ProgressOverlay from '../loading/ProgressOverlay';
@@ -77,7 +76,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   const userIdx = useRecoilValue(userState)?.user_idx;
   const [progress, setProgress] = useState(100);
   const [progressLabel, setProgressLabel] = useState('');
-  const [sizeWarning, setSizeWarning] = useState('');
+  const [, setSizeWarning] = useState('');
 
   const title = fileData ? (selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정') : '파일 등록';
 
@@ -107,41 +106,41 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       if (fileData) {
         // 수정 과정
         setProgress(10);
-        setProgressLabel('시작 ...'); // 시작
+        setProgressLabel('시작 ...');
         setProgress(20);
-        setProgressLabel('파일 검증 ...'); // 파일 검증
+        setProgressLabel('파일 검증 ...');
         setProgress(30);
-        setProgressLabel('기존 파일 삭제 시작 ...'); // 기존 파일 삭제 시작
+        setProgressLabel('기존 파일 삭제 시작 ...');
         setProgress(40);
-        setProgressLabel('기존 파일 삭제 완료 ...'); // 기존 파일 삭제 완료
+        setProgressLabel('기존 파일 삭제 완료 ...');
         setProgress(50);
-        setProgressLabel('AAS 파일 생성 중 ...'); // AAS 파일 생성 시작
+        setProgressLabel('AAS 파일 생성 중 ...');
         result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx);
         setProgress(80);
-        setProgressLabel('AASX 파일 생성 중 ...'); // AASX 파일 생성 시작
+        setProgressLabel('AASX 파일 생성 중 ...');
         setProgress(90);
-        setProgressLabel('DB 업데이트 ...'); // DB 업데이트
+        setProgressLabel('DB 업데이트 ...');
         setProgress(100);
-        setProgressLabel('완료 ...'); // 완료
+        setProgressLabel('완료 ...');
       } else {
         // 등록 과정
         setProgress(10);
-        setProgressLabel('시작 ...'); // 시작
+        setProgressLabel('시작 ...');
         setProgress(20);
-        setProgressLabel('파일 검증 ...'); // 파일 검증
+        setProgressLabel('파일 검증 ...');
         setProgress(30);
-        setProgressLabel('파일 업로드 시작 ...'); // 파일 업로드 시작
+        setProgressLabel('파일 업로드 시작 ...');
         setProgress(40);
-        setProgressLabel('파일 업로드 완료 ...'); // 파일 업로드 완료
+        setProgressLabel('파일 업로드 완료 ...');
         setProgress(50);
-        setProgressLabel('AAS 파일 생성 중 ...'); // AAS 파일 생성 시작
+        setProgressLabel('AAS 파일 생성 중 ...');
         result = await uploadAASXFileAPI(uploadFile, userIdx);
         setProgress(80);
-        setProgressLabel('AASX 파일 생성 중 ...'); // AASX 파일 생성 시작
+        setProgressLabel('AASX 파일 생성 중 ...');
         setProgress(90);
-        setProgressLabel('DB 저장 ...'); // DB 저장
+        setProgressLabel('DB 저장 ...');
         setProgress(100);
-        setProgressLabel('완료 ...'); // 완료
+        setProgressLabel('완료 ...');
       }
 
       const newFile = {
