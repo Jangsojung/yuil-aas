@@ -160,7 +160,6 @@ export const updateWords = async (updates, res) => {
   }
 };
 
-// 파일명으로 fc_idx 조회
 export const getFileFCIdx = async (req, res) => {
   try {
     const { fileName } = req.body;
@@ -179,7 +178,6 @@ export const getFileFCIdx = async (req, res) => {
       data: { fc_idx },
     });
   } catch (error) {
-    console.error('Error in getFileFCIdx:', error);
     res.status(500).json({
       success: false,
       message: '파일 fc_idx 조회 중 오류가 발생했습니다.',

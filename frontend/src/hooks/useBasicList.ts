@@ -34,7 +34,6 @@ export const useBasicList = () => {
     sortField,
     sortDirection,
     handleSort,
-    resetSort,
   } = useSortableData<Base>(filteredBases, 'createdAt', 'desc');
 
   // 페이지네이션 데이터 계산
@@ -151,24 +150,18 @@ export const useBasicList = () => {
     }
 
     try {
-      console.log('검색 시작:', { selectedFactory, searchKeyword, startDate, endDate });
-
       // 검색 시에만 기초코드 목록 조회
       const data = await getBasesAPI(selectedFactory);
       const fetchedBases = Array.isArray(data) ? data : [];
-      console.log('API에서 받은 데이터:', fetchedBases);
       setBases(fetchedBases);
 
       let filtered = fetchedBases;
 
       if (searchKeyword.trim().length > 0) {
-        console.log('기초코드명 필터링:', searchKeyword);
         filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
-        console.log('기초코드명 필터링 후:', filtered);
       }
 
       if (startDate || endDate) {
-        console.log('날짜 필터링:', { startDate, endDate });
         filtered = filtered.filter((base) => {
           if (!base.createdAt) return false;
 
@@ -189,10 +182,8 @@ export const useBasicList = () => {
 
           return true;
         });
-        console.log('날짜 필터링 후:', filtered);
       }
 
-      console.log('최종 필터링 결과:', filtered);
       setFilteredBases(filtered);
       setCurrentPage(0);
     } catch (error) {

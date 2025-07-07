@@ -47,13 +47,11 @@ export const getAASXFilesAPI = async (start, end, fc_idx, af_kind = 3) => {
   }
 };
 
-// 파일명으로 fc_idx 조회
 export const getFileFCIdxAPI = async (fileName) => {
   try {
     const result = await apiHelpers.post('/api/file/getFileFCIdx', { fileName });
     return result;
   } catch (error) {
-    console.error('Error fetching file fc_idx:', error);
     return null;
   }
 };

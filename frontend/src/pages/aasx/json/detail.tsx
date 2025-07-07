@@ -44,8 +44,6 @@ export default function JsonDetail() {
     // 먼저 파일 크기 확인
     checkJSONFileSizeAPI(id)
       .then((fileSizeData) => {
-        console.log('파일 크기 확인 결과:', fileSizeData);
-
         // 파일이 너무 큰 경우
         if (fileSizeData.isLargeFile) {
           clearInterval(progressInterval);
@@ -111,7 +109,6 @@ export default function JsonDetail() {
 
         // 파일이 너무 큰 경우는 이미 처리됨
         if (error === 'FILE_TOO_LARGE') {
-          console.log('파일이 너무 큰 경우 - 이미 처리됨');
           return;
         }
 

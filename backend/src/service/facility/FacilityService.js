@@ -47,8 +47,6 @@ export const insertSensor = async (fa_idx, name) => {
 
 export const deleteSensors = async (sensorIds) => {
   try {
-    console.log('삭제 요청된 센서 ID:', sensorIds);
-    // 삭제할 센서들의 정보를 먼저 조회
     const query = 'SELECT sn_idx, sn_name, fa_idx, origin_check FROM tb_aasx_data_prop WHERE sn_idx IN (?)';
     const [results] = await pool.promise().query(query, [sensorIds]);
 
@@ -60,7 +58,6 @@ export const deleteSensors = async (sensorIds) => {
       };
     }
 
-    // origin_check가 1인 센서는 삭제 불가
     const protectedSensors = results.filter((sensor) => sensor.origin_check === 1);
     if (protectedSensors.length > 0) {
       return {
@@ -70,7 +67,6 @@ export const deleteSensors = async (sensorIds) => {
       };
     }
 
-    // 삭제 가능한 센서만 필터링
     const deletableSensors = results.filter((sensor) => sensor.origin_check === 0);
     if (deletableSensors.length === 0) {
       return {
@@ -82,10 +78,8 @@ export const deleteSensors = async (sensorIds) => {
 
     const deletableSensorIds = deletableSensors.map((sensor) => sensor.sn_idx);
 
-    // DB에서 센서 정보 삭제
     const deleteQuery = 'DELETE FROM tb_aasx_data_prop WHERE sn_idx IN (?)';
     const [deleteResult] = await pool.promise().query(deleteQuery, [deletableSensorIds]);
-    console.log('센서 삭제 쿼리 결과:', deleteResult);
 
     return {
       success: true,
@@ -94,7 +88,6 @@ export const deleteSensors = async (sensorIds) => {
       deletedSensors: deletableSensors.map((sensor) => sensor.sn_name),
     };
   } catch (err) {
-    console.error('Failed to delete Sensors: ', err);
     throw err;
   }
 };
@@ -358,8 +351,6 @@ export const synchronizeFacilityData = async () => {
 // 설비 삭제
 export const deleteFacilities = async (facilityIds) => {
   try {
-    console.log('삭제 요청된 설비 ID:', facilityIds);
-    // 삭제할 설비들의 정보를 먼저 조회
     const query = 'SELECT fa_idx, fa_name, fg_idx, origin_check FROM tb_aasx_data_sm WHERE fa_idx IN (?)';
     const [results] = await pool.promise().query(query, [facilityIds]);
 
@@ -371,7 +362,6 @@ export const deleteFacilities = async (facilityIds) => {
       };
     }
 
-    // origin_check가 1인 설비는 삭제 불가
     const protectedFacilities = results.filter((facility) => facility.origin_check === 1);
     if (protectedFacilities.length > 0) {
       return {
@@ -381,7 +371,6 @@ export const deleteFacilities = async (facilityIds) => {
       };
     }
 
-    // 삭제 가능한 설비만 필터링
     const deletableFacilities = results.filter((facility) => facility.origin_check === 0);
     if (deletableFacilities.length === 0) {
       return {
@@ -393,15 +382,12 @@ export const deleteFacilities = async (facilityIds) => {
 
     const deletableFacilityIds = deletableFacilities.map((facility) => facility.fa_idx);
 
-    // 트랜잭션 시작
     const connection = await pool.promise().getConnection();
     try {
       await connection.beginTransaction();
 
-      // 설비 삭제 (on delete cascade로 센서 자동 삭제)
       const deleteFacilitiesQuery = 'DELETE FROM tb_aasx_data_sm WHERE fa_idx IN (?)';
       const [deleteResult] = await connection.query(deleteFacilitiesQuery, [deletableFacilityIds]);
-      console.log('설비 삭제 쿼리 결과:', deleteResult);
 
       await connection.commit();
 
@@ -418,7 +404,6 @@ export const deleteFacilities = async (facilityIds) => {
       connection.release();
     }
   } catch (err) {
-    console.error('Failed to delete Facilities: ', err);
     throw err;
   }
 };
@@ -426,8 +411,6 @@ export const deleteFacilities = async (facilityIds) => {
 // 설비그룹 삭제
 export const deleteFacilityGroups = async (facilityGroupIds) => {
   try {
-    console.log('삭제 요청된 설비그룹 ID:', facilityGroupIds);
-    // 삭제할 설비그룹들의 정보를 먼저 조회
     const query = 'SELECT fg_idx, fg_name, fc_idx, origin_check FROM tb_aasx_data_aas WHERE fg_idx IN (?)';
     const [results] = await pool.promise().query(query, [facilityGroupIds]);
 
@@ -439,7 +422,6 @@ export const deleteFacilityGroups = async (facilityGroupIds) => {
       };
     }
 
-    // origin_check가 1인 설비그룹은 삭제 불가
     const protectedGroups = results.filter((group) => group.origin_check === 1);
     if (protectedGroups.length > 0) {
       return {
@@ -449,7 +431,6 @@ export const deleteFacilityGroups = async (facilityGroupIds) => {
       };
     }
 
-    // 삭제 가능한 설비그룹만 필터링
     const deletableGroups = results.filter((group) => group.origin_check === 0);
     if (deletableGroups.length === 0) {
       return {
@@ -461,15 +442,12 @@ export const deleteFacilityGroups = async (facilityGroupIds) => {
 
     const deletableGroupIds = deletableGroups.map((group) => group.fg_idx);
 
-    // 트랜잭션 시작
     const connection = await pool.promise().getConnection();
     try {
       await connection.beginTransaction();
 
-      // 설비그룹 삭제 (on delete cascade로 하위 설비/센서 자동 삭제)
       const deleteGroupsQuery = 'DELETE FROM tb_aasx_data_aas WHERE fg_idx IN (?)';
       const [deleteResult] = await connection.query(deleteGroupsQuery, [deletableGroupIds]);
-      console.log('설비그룹 삭제 쿼리 결과:', deleteResult);
 
       await connection.commit();
 
@@ -486,7 +464,6 @@ export const deleteFacilityGroups = async (facilityGroupIds) => {
       connection.release();
     }
   } catch (err) {
-    console.error('Failed to delete Facility Groups: ', err);
     throw err;
   }
 };
@@ -494,8 +471,6 @@ export const deleteFacilityGroups = async (facilityGroupIds) => {
 // 공장 삭제
 export const deleteFactories = async (factoryIds) => {
   try {
-    console.log('삭제 요청된 공장 ID:', factoryIds);
-    // 삭제할 공장들의 정보를 먼저 조회
     const query = 'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx IN (?)';
     const [results] = await pool.promise().query(query, [factoryIds]);
 
@@ -507,7 +482,6 @@ export const deleteFactories = async (factoryIds) => {
       };
     }
 
-    // origin_check가 1인 공장은 삭제 불가
     const protectedFactories = results.filter((factory) => factory.origin_check === 1);
     if (protectedFactories.length > 0) {
       return {
@@ -517,7 +491,6 @@ export const deleteFactories = async (factoryIds) => {
       };
     }
 
-    // 삭제 가능한 공장만 필터링
     const deletableFactories = results.filter((factory) => factory.origin_check === 0);
     if (deletableFactories.length === 0) {
       return {
@@ -529,15 +502,12 @@ export const deleteFactories = async (factoryIds) => {
 
     const deletableFactoryIds = deletableFactories.map((factory) => factory.fc_idx);
 
-    // 트랜잭션 시작
     const connection = await pool.promise().getConnection();
     try {
       await connection.beginTransaction();
 
-      // 공장 삭제 (on delete cascade로 하위 설비그룹/설비/센서 자동 삭제)
       const deleteFactoriesQuery = 'DELETE FROM tb_aasx_data WHERE fc_idx IN (?)';
       const [deleteResult] = await connection.query(deleteFactoriesQuery, [deletableFactoryIds]);
-      console.log('공장 삭제 쿼리 결과:', deleteResult);
 
       await connection.commit();
 
@@ -554,7 +524,6 @@ export const deleteFactories = async (factoryIds) => {
       connection.release();
     }
   } catch (err) {
-    console.error('Failed to delete Factories: ', err);
     throw err;
   }
 };

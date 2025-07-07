@@ -1,5 +1,4 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
-import { DEFAULTS } from '../../constants';
 
 export const getBasesAPI = async (fc_idx) => {
   try {

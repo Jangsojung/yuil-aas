@@ -1,5 +1,27 @@
 import { pool } from '../../index.js';
 
+export const getBaseByIdFromDB = async (ab_idx) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT b.ab_idx, b.ab_name, b.ab_note, b.fc_idx, b.createdAt, b.updatedAt 
+      FROM tb_aasx_base b
+      WHERE b.ab_idx = ?
+    `;
+
+    pool.query(query, [ab_idx], (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (results.length === 0) {
+          resolve(null);
+          return;
+        }
+        resolve(results[0]);
+      }
+    });
+  });
+};
+
 export const getBasesFromDB = async (fc_idx) => {
   return new Promise((resolve, reject) => {
     const query = `

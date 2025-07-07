@@ -10,7 +10,7 @@ import { EditView } from '../../../components/basic/EditView';
 import {
   updateBaseAPI,
   getBaseSensorsAPI,
-  getBasesAPI,
+  getBaseByIdAPI,
   buildTreeFromSensorIdsAPI,
   buildTreeDataForBasicAPI,
 } from '../../../apis/api/basic';
@@ -66,8 +66,8 @@ export default function BasiccodeEditPage() {
   const loadBaseForDetail = async (baseId: number) => {
     setDetailLoading(true);
     try {
-      const basesData = await getBasesAPI();
-      const targetBase = basesData.find((base: Base) => base.ab_idx === baseId);
+      // 기초코드 ID로 직접 조회
+      const targetBase = await getBaseByIdAPI(baseId);
 
       if (!targetBase) {
         showAlert('오류', '기초코드를 찾을 수 없습니다.');
@@ -81,10 +81,10 @@ export default function BasiccodeEditPage() {
         ? sensorIds.map((item) => (typeof item === 'object' ? item.sn_idx : item))
         : [];
 
-      const treeData = await buildTreeFromSensorIdsAPI(sensorIdList);
+      // fc_idx를 전달하여 트리 데이터 구축
+      const treeData = await buildTreeFromSensorIdsAPI(sensorIdList, targetBase.fc_idx);
       setDetailTreeData(treeData);
     } catch (err: any) {
-      console.error('기초코드 상세 로딩 에러:', err.message);
       setDetailTreeData([]);
     } finally {
       setDetailLoading(false);
@@ -93,8 +93,8 @@ export default function BasiccodeEditPage() {
 
   const loadBaseForEdit = async (baseId: number) => {
     try {
-      const basesData = await getBasesAPI();
-      const targetBase = basesData.find((base: Base) => base.ab_idx === baseId);
+      // 기초코드 ID로 직접 조회
+      const targetBase = await getBaseByIdAPI(baseId);
 
       if (!targetBase) {
         showAlert('오류', '기초코드를 찾을 수 없습니다.');
@@ -112,16 +112,15 @@ export default function BasiccodeEditPage() {
         : [];
 
       setSelectedSensors(sensorIdList);
-      await loadAllFacilityGroupsForEdit(sensorIdList);
+      await loadAllFacilityGroupsForEdit(sensorIdList, targetBase.fc_idx);
     } catch (err: any) {
-      console.error('수정 모드 초기화 에러:', err.message);
       showAlert('오류', '기초코드 정보를 불러오는데 실패했습니다.');
     }
   };
 
-  const loadAllFacilityGroupsForEdit = async (selectedSensorIds: number[]) => {
+  const loadAllFacilityGroupsForEdit = async (selectedSensorIds: number[], fc_idx: number) => {
     try {
-      const treeData = await buildTreeFromSensorIdsAPI(selectedSensorIds);
+      const treeData = await buildTreeFromSensorIdsAPI(selectedSensorIds, fc_idx);
       setTreeData(treeData);
 
       const relevantFacilityGroups = new Set<number>();
@@ -137,7 +136,7 @@ export default function BasiccodeEditPage() {
 
       setSelectedFacilityGroups(Array.from(relevantFacilityGroups));
     } catch (err) {
-      console.error('설비그룹 로드 에러:', err);
+      // 에러 처리
     }
   };
 
@@ -157,7 +156,6 @@ export default function BasiccodeEditPage() {
       showAlert('알림', '기초코드가 수정되었습니다.');
       window.location.href = '/aas/basic';
     } catch (error) {
-      console.error('수정 중 오류 발생:', error);
       showAlert('오류', '기초코드 수정 중 오류가 발생했습니다.');
     }
   };
@@ -182,7 +180,6 @@ export default function BasiccodeEditPage() {
       const finalFilteredData = await buildTreeDataForBasicAPI(selectedFacilityGroups, facilityName, sensorName);
       setTreeData(finalFilteredData);
     } catch (err) {
-      console.error('검색 에러:', err);
       setTreeData([]);
       showAlert('오류', '검색 중 오류가 발생했습니다.');
     } finally {

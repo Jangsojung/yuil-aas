@@ -151,12 +151,6 @@ export const useFacilityManagement = () => {
     const hasSelectedFacilityGroups = selectedFacilityGroupsForDelete.length > 0;
     const hasSelectedFactories = selectedFactoriesForDelete.length > 0;
 
-    console.log('삭제 함수 호출됨');
-    console.log('선택된 센서:', selectedSensors);
-    console.log('선택된 설비:', selectedFacilities);
-    console.log('선택된 설비그룹:', selectedFacilityGroupsForDelete);
-    console.log('선택된 공장:', selectedFactoriesForDelete);
-
     if (!hasSelectedSensors && !hasSelectedFacilities && !hasSelectedFacilityGroups && !hasSelectedFactories) {
       showAlert('알림', '삭제할 항목을 선택해주세요.');
       return;

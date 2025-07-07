@@ -11,7 +11,7 @@ import FactorySelect from '../select/factory_select';
 import BasicTable from '../table/basic_code';
 import { SearchBox, ActionBox } from '../common';
 import FacilityAddModal from '../modal/FacilityAddModal';
-import { FacilityGroupTree, FactoryTree } from '../../types/api';
+import { FactoryTree } from '../../types/api';
 import { Dispatch, SetStateAction } from 'react';
 
 interface FacilityViewProps {
@@ -96,7 +96,6 @@ export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean
     const result = await handleTreeSearch();
     if (!result.success && result.message) {
       // 에러 메시지는 상위에서 처리
-      console.error(result.message);
     }
   };
 
@@ -112,8 +111,6 @@ export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean
   };
 
   const handleFacilityCheckboxChange = (facility: any) => {
-    console.log('설비 체크박스 클릭:', facility.fa_idx, facility.fa_name);
-
     // 설비 선택 상태 업데이트
     const isFacilitySelected = selectedFacilities.includes(facility.fa_idx);
     if (isFacilitySelected) {

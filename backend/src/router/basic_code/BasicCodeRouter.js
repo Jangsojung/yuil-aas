@@ -15,6 +15,7 @@ import {
   insertFacility,
   insertSensor,
   syncFactories,
+  getBaseById,
 } from '../../controller/basic_code/BasicCodeController.js';
 
 const router = express.Router();
@@ -101,6 +102,12 @@ export default () => {
   // 공장 동기화 엔드포인트
   router.post('/sync-factories', async (req, res) => {
     await syncFactories(res);
+  });
+
+  // 기초코드 ID로 조회
+  router.get('/bases/:id', (req, res) => {
+    const { id } = req.params;
+    getBaseById(id, res);
   });
 
   return router;

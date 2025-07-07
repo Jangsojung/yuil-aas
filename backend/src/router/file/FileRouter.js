@@ -89,7 +89,6 @@ export default () => {
     getSearch(fc_idx, type, text, res);
   });
 
-  // 파일명으로 fc_idx 조회
   router.post('/getFileFCIdx', getFileFCIdx);
 
   router.get('/files', (req, res) => {

@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 파일명으로 fc_idx 조회
 export const getFileFCIdxFromDB = async (fileName) => {
   return new Promise((resolve, reject) => {
     const query = `SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 1 LIMIT 1`;
@@ -150,7 +149,6 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
       // 응답 내용 확인
       const responseText = await aasResponse.text();
-      console.log('AAS 파일 생성 응답:', responseText);
     } catch (error) {
       console.error('AAS 파일 생성 중 오류가 발생했습니다:', error.message);
 
@@ -162,7 +160,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
         // 파일 크기 확인
         const stats = fs.statSync(aasFilePath);
         if (stats.size > 0) {
-          console.log('AAS 파일이 생성되었습니다. 계속 진행합니다.');
+          // AAS 파일이 생성되었습니다. 계속 진행합니다.
         } else {
           console.error('AAS 파일이 생성되었지만 크기가 0입니다.');
           throw new Error('AAS 파일 생성에 실패했습니다.');
@@ -202,7 +200,6 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
       // 응답 내용 확인
       const responseText = await aasxResponse.text();
-      console.log('AASX 파일 생성 응답:', responseText);
     } catch (error) {
       console.error('AASX 파일 생성 중 오류가 발생했습니다:', error.message);
 
@@ -215,7 +212,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
         // 파일 크기 확인
         const stats = fs.statSync(aasxFilePath);
         if (stats.size > 0) {
-          console.log('AASX 파일이 생성되었습니다. 계속 진행합니다.');
+          // AASX 파일이 생성되었습니다. 계속 진행합니다.
         } else {
           console.error('AASX 파일이 생성되었지만 크기가 0입니다.');
           throw new Error('AASX 파일 생성에 실패했습니다.');
@@ -279,7 +276,7 @@ const cleanupCreatedFiles = async (createdFiles) => {
       }
     }
 
-    console.log('생성된 파일들이 정리되었습니다.');
+    // 생성된 파일들이 정리되었습니다.
   } catch (cleanupError) {
     console.error('파일 정리 중 오류 발생:', cleanupError);
   }
@@ -346,7 +343,6 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
 
       // 응답 내용 확인
       const responseText = await aasResponse.text();
-      console.log('AAS 파일 생성 응답:', responseText);
     } catch (error) {
       console.error('AAS 파일 생성 중 오류가 발생했습니다:', error.message);
       throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
@@ -389,7 +385,6 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
 
       // 응답 내용 확인
       const responseText = await aasxResponse.text();
-      console.log('AASX 파일 생성 응답:', responseText);
     } catch (error) {
       console.error('AASX 파일 생성 중 오류가 발생했습니다:', error.message);
       throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
@@ -520,13 +515,11 @@ export const deleteFilesFromDB = async (ids) => {
 export const checkFileSizeFromDB = async (file) => {
   return new Promise((resolve, reject) => {
     try {
-      console.log('파일 크기 확인 시작:', file);
       let af_path = file.af_path;
       let af_name = file.af_name;
       let af_kind = file.af_kind;
 
       if (!af_path || !af_name || !af_kind) {
-        console.log('DB에서 파일 정보 조회 중...');
         pool.query(
           'SELECT af_path, af_name, af_kind FROM tb_aasx_file WHERE af_idx = ?',
           [file.af_idx],
@@ -539,7 +532,7 @@ export const checkFileSizeFromDB = async (file) => {
             af_path = rows[0].af_path;
             af_name = rows[0].af_name;
             af_kind = rows[0].af_kind;
-            console.log('DB에서 조회된 파일 정보:', { af_path, af_name, af_kind });
+            // DB에서 조회된 파일 정보
 
             let filePath;
             let fileName;
@@ -548,12 +541,10 @@ export const checkFileSizeFromDB = async (file) => {
               // JSON 파일 (front/ 폴더)
               fileName = af_name;
               filePath = path.join(__dirname, '../../../../files/front', fileName);
-              console.log('JSON 파일 경로:', filePath);
             } else {
               // AAS 파일 (aas/ 폴더)
               fileName = af_name.replace(/\.aasx$/i, '.json');
               filePath = path.join(__dirname, '../../../../files/aas', fileName);
-              console.log('AAS 파일 경로:', filePath);
             }
 
             // 파일 존재 여부 확인
@@ -565,7 +556,6 @@ export const checkFileSizeFromDB = async (file) => {
 
             // 파일 크기 확인
             const fileStats = fs.statSync(filePath);
-            console.log(`파일 크기: ${fileStats.size} bytes`);
 
             const result = {
               size: fileStats.size,
@@ -573,7 +563,6 @@ export const checkFileSizeFromDB = async (file) => {
               filePath: filePath,
               isLargeFile: fileStats.size > 500 * 1024 * 1024,
             };
-            console.log('파일 크기 확인 결과:', result);
             resolve(result);
           }
         );
@@ -585,12 +574,10 @@ export const checkFileSizeFromDB = async (file) => {
           // JSON 파일 (front/ 폴더)
           fileName = af_name;
           filePath = path.join(__dirname, '../../../../files/front', fileName);
-          console.log('JSON 파일 경로:', filePath);
         } else {
           // AAS 파일 (aas/ 폴더)
           fileName = af_name.replace(/\.aasx$/i, '.json');
           filePath = path.join(__dirname, '../../../../files/aas', fileName);
-          console.log('AAS 파일 경로:', filePath);
         }
 
         // 파일 존재 여부 확인
@@ -602,7 +589,6 @@ export const checkFileSizeFromDB = async (file) => {
 
         // 파일 크기 확인
         const fileStats = fs.statSync(filePath);
-        console.log(`파일 크기: ${fileStats.size} bytes`);
 
         const result = {
           size: fileStats.size,
@@ -610,7 +596,6 @@ export const checkFileSizeFromDB = async (file) => {
           filePath: filePath,
           isLargeFile: fileStats.size > 500 * 1024 * 1024,
         };
-        console.log('파일 크기 확인 결과:', result);
         resolve(result);
       }
     } catch (error) {
@@ -648,7 +633,6 @@ export const getVerifyFromDB = async (file) => {
         // JSON 파일 (front/ 폴더)
         fileName = af_name;
         filePath = path.join(__dirname, '../../../../files/front', fileName);
-        console.log('JSON 파일 경로:', filePath);
       } else {
         // AASX 파일 경로
         const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
@@ -656,7 +640,6 @@ export const getVerifyFromDB = async (file) => {
         // AAS 파일명 생성 (.aasx -> .json)
         fileName = af_name.replace(/\.aasx$/i, '.json');
         filePath = path.join(__dirname, '../../../../files/aas', fileName);
-        console.log('AAS 파일 경로:', filePath);
 
         // AASX 파일 존재 여부 확인
         if (!fs.existsSync(aasxFilePath)) {
@@ -673,7 +656,6 @@ export const getVerifyFromDB = async (file) => {
 
       // 파일 크기 확인
       const fileStats = fs.statSync(filePath);
-      console.log(`파일 크기: ${fileStats.size} bytes`);
 
       // 파일이 너무 큰 경우 처리
       if (fileStats.size > 500 * 1024 * 1024) {

@@ -115,9 +115,8 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         setProgressLabel('기존 파일 삭제 완료 ...');
         setProgress(50);
         setProgressLabel('AAS 파일 생성 중 ...');
-        // 파일명으로 fc_idx 조회
         const fcIdxResult = await getFileFCIdxAPI(uploadFile.name);
-        const fc_idx = fcIdxResult?.data?.fc_idx || 1; // 기본값 1
+        const fc_idx = fcIdxResult?.data?.fc_idx || 1;
 
         result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx, fc_idx);
         setProgress(80);
@@ -138,9 +137,8 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         setProgressLabel('파일 업로드 완료 ...');
         setProgress(50);
         setProgressLabel('AAS 파일 생성 중 ...');
-        // 파일명으로 fc_idx 조회
         const fcIdxResult = await getFileFCIdxAPI(uploadFile.name);
-        const fc_idx = fcIdxResult?.data?.fc_idx || 1; // 기본값 1
+        const fc_idx = fcIdxResult?.data?.fc_idx || 1;
 
         result = await uploadAASXFileAPI(uploadFile, userIdx, fc_idx);
         setProgress(80);

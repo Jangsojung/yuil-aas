@@ -93,24 +93,17 @@ export default function ConvertPage() {
     }
 
     try {
-      console.log('변환 페이지 검색 시작:', { selectedFactory, searchKeyword, startDate, endDate });
-
-      // 검색 시에만 기초코드 목록 조회
       const data = await getBasesAPI(selectedFactory);
       const fetchedBases = Array.isArray(data) ? data : [];
-      console.log('변환 페이지 API에서 받은 데이터:', fetchedBases);
       setBases(fetchedBases);
 
       let filtered = fetchedBases;
 
       if (searchKeyword.trim()) {
-        console.log('변환 페이지 기초코드명 필터링:', searchKeyword);
         filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
-        console.log('변환 페이지 기초코드명 필터링 후:', filtered);
       }
 
       if (startDate || endDate) {
-        console.log('변환 페이지 날짜 필터링:', { startDate, endDate });
         filtered = filtered.filter((base) => {
           if (!base.createdAt) return false;
 
@@ -131,10 +124,8 @@ export default function ConvertPage() {
 
           return true;
         });
-        console.log('변환 페이지 날짜 필터링 후:', filtered);
       }
 
-      console.log('변환 페이지 최종 필터링 결과:', filtered);
       setFilteredBases(filtered);
       goToPage(0);
     } catch (error) {
