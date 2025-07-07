@@ -158,7 +158,9 @@ export const useBasicList = (navigate: any) => {
       let filtered = fetchedBases;
 
       if (searchKeyword.trim().length > 0) {
-        filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+        filtered = filtered.filter(
+          (base) => base.ab_name && base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase())
+        );
       }
 
       if (startDate || endDate) {

@@ -163,7 +163,7 @@ export default function DataList() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} align='center'>
-                    데이터가 없습니다.
+                    조회 결과 없음
                   </TableCell>
                 </TableRow>
               )}

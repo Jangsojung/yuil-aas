@@ -100,7 +100,9 @@ export default function ConvertPage() {
       let filtered = fetchedBases;
 
       if (searchKeyword.trim()) {
-        filtered = filtered.filter((base) => base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase()));
+        filtered = filtered.filter(
+          (base) => base.ab_name && base.ab_name.toLowerCase().includes(searchKeyword.toLowerCase())
+        );
       }
 
       if (startDate || endDate) {
@@ -437,7 +439,7 @@ export default function ConvertPage() {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={sortableColumns.length + 1} align='center'>
-                        데이터가 없습니다.
+                        조회 결과 없음
                       </TableCell>
                     </TableRow>
                   )}

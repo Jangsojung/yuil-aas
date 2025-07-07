@@ -276,7 +276,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
               ) : (
                 <TableRow>
                   <TableCell colSpan={sortableColumns.length + 2} align='center'>
-                    데이터가 없습니다.
+                    조회 결과 없음
                   </TableCell>
                 </TableRow>
               )}

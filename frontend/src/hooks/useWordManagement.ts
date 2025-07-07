@@ -42,7 +42,9 @@ export const useWordManagement = () => {
       if (searchKeyword.trim()) {
         const keyword = searchKeyword.toLowerCase();
         filtered = filtered.filter(
-          (word) => word.as_kr.toLowerCase().includes(keyword) || word.as_en.toLowerCase().includes(keyword)
+          (word) =>
+            (word.as_kr && word.as_kr.toLowerCase().includes(keyword)) ||
+            (word.as_en && word.as_en.toLowerCase().includes(keyword))
         );
       }
 
