@@ -38,14 +38,21 @@ export const useFacilityManagement = () => {
   const handleTreeSearch = useCallback(async () => {
     setProgressOpen(true);
     setProgress(10); // 시작
+
+    // 공장 선택 검증
     if (!selectedFactory) {
       setProgressOpen(false);
+      showAlert('알림', '공장을 선택해주세요.');
       return { success: false, message: '공장을 선택해주세요.' };
     }
-    if (!facilityName.trim() && !sensorName.trim() && selectedFacilityGroups.length === 0) {
+
+    // 설비그룹 선택 검증
+    if (selectedFacilityGroups.length === 0) {
       setProgressOpen(false);
-      return { success: false, message: '검색 조건을 입력해주세요.' };
+      showAlert('알림', '설비그룹을 선택해주세요.');
+      return { success: false, message: '설비그룹을 선택해주세요.' };
     }
+
     setTreeLoading(true);
     try {
       setProgress(20);
@@ -68,7 +75,7 @@ export const useFacilityManagement = () => {
     } finally {
       setTreeLoading(false);
     }
-  }, [selectedFactory, selectedFacilityGroups, facilityName, sensorName]);
+  }, [selectedFactory, selectedFacilityGroups, facilityName, sensorName, showAlert]);
 
   // 초기화
   const handleReset = useCallback(() => {
@@ -107,6 +114,11 @@ export const useFacilityManagement = () => {
 
   const handleFactoryAddSuccess = useCallback(() => {
     setFacilityAddModalOpen(false);
+    // 추가 후 선택 상태 초기화하고 검색
+    setSelectedSensors([]);
+    setSelectedFacilities([]);
+    setSelectedFacilityGroupsForDelete([]);
+    setSelectedFactoriesForDelete([]);
     handleTreeSearch();
     setFactoryRefreshKey((prev) => prev + 1);
   }, [handleTreeSearch]);
@@ -122,6 +134,11 @@ export const useFacilityManagement = () => {
 
   const handleFacilityGroupAddSuccess = useCallback(() => {
     setFacilityAddModalOpen(false);
+    // 추가 후 선택 상태 초기화하고 검색
+    setSelectedSensors([]);
+    setSelectedFacilities([]);
+    setSelectedFacilityGroupsForDelete([]);
+    setSelectedFactoriesForDelete([]);
     handleTreeSearch();
     setFacilityGroupRefreshKey((prev) => prev + 1);
   }, [handleTreeSearch]);
@@ -189,11 +206,16 @@ export const useFacilityManagement = () => {
         } else if (hasSelectedFacilities) {
           await deleteFacilities(selectedFacilities);
           showAlert('알림', `${deleteType} 삭제 완료`);
-          // 설비 삭제 시 검색조건 유지(필요시 별도 처리)
+          // 설비 삭제 후 선택 상태 초기화하고 검색
+          setSelectedFacilities([]);
+          setSelectedSensors([]);
+          handleTreeSearch();
         } else if (hasSelectedSensors) {
           await deleteSensors(selectedSensors);
           showAlert('알림', `${deleteType} 삭제 완료`);
-          // 센서 삭제 시 검색조건 유지(필요시 별도 처리)
+          // 센서 삭제 후 선택 상태 초기화하고 검색
+          setSelectedSensors([]);
+          handleTreeSearch();
         }
       } catch (err) {
         console.error(`${deleteType} 삭제 중 오류 발생:`, err);
