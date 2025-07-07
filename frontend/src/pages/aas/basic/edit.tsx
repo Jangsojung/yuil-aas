@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedSensorsState, userState } from '../../../recoil/atoms';
 import { useAlertModal } from '../../../hooks/useAlertModal';
@@ -17,6 +17,7 @@ import {
 
 export default function BasiccodeEditPage() {
   const { id, mode } = useParams<{ id: string; mode?: string }>();
+  const navigate = useNavigate();
   const [detailMode, setDetailMode] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
@@ -154,7 +155,7 @@ export default function BasiccodeEditPage() {
       });
 
       showAlert('알림', '기초코드가 수정되었습니다.');
-      window.location.href = '/aas/basic';
+      navigate(-1); // 이전 페이지로 돌아가기
     } catch (error) {
       showAlert('오류', '기초코드 수정 중 오류가 발생했습니다.');
     }
@@ -188,12 +189,12 @@ export default function BasiccodeEditPage() {
   };
 
   const handleBackToList = () => {
-    window.location.href = '/aas/basic';
+    navigate(-1); // 이전 페이지로 돌아가기
   };
 
   const handleEdit = () => {
     if (selectedBaseForDetail) {
-      window.location.href = `/aas/basic/edit/${selectedBaseForDetail.ab_idx}/edit`;
+      navigate(`/aas/basic/edit/${selectedBaseForDetail.ab_idx}/edit`);
     }
   };
 

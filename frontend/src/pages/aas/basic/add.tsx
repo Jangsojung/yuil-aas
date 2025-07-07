@@ -6,9 +6,11 @@ import { useSensorSelection } from '../../../hooks/useSensorSelection';
 import { EditView } from '../../../components/basic/EditView';
 import BasicModal from '../../../components/modal/basicmodal';
 import AlertModal from '../../../components/modal/alert';
+import { useNavigate } from 'react-router-dom';
 
 export default function BasiccodeAddPage() {
   const navigationReset = useRecoilValue(navigationResetState);
+  const navigate = useNavigate();
 
   // 커스텀 훅 사용
   const {
@@ -65,7 +67,7 @@ export default function BasiccodeAddPage() {
   };
 
   const handleBackToList = () => {
-    window.location.href = '/aas/basic';
+    navigate('/aas/basic');
   };
 
   return (
@@ -93,7 +95,7 @@ export default function BasiccodeAddPage() {
         onFacilitySelectAll={handleFacilitySelectAllWrapper}
         isAllSensorsSelectedInGroup={isAllSensorsSelectedInGroupWrapper}
         isAllSensorsSelectedInFacility={isAllSensorsSelectedInFacilityWrapper}
-        onBasicModalAdd={handleBasicModalAdd}
+        onBasicModalAdd={() => handleBasicModalAdd(navigate)}
         onBasicModalReset={handleBasicModalReset}
         onBackToList={handleBackToList}
       />
@@ -101,7 +103,7 @@ export default function BasiccodeAddPage() {
       <BasicModal
         open={basicModalOpen}
         handleClose={() => setBasicModalOpen(false)}
-        handleAdd={handleBasicModalAdd}
+        handleAdd={() => handleBasicModalAdd(navigate)}
         handleReset={handleBasicModalReset}
         selectedSensorCount={selectedSensors.length}
         name={basicName}

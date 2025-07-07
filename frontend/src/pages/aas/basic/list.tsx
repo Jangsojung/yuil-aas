@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useBasicList } from '../../../hooks/useBasicList';
 import { ListView } from '../../../components/basic/ListView';
 import AlertModal from '../../../components/modal/alert';
 
 export default function BasicList() {
+  const navigate = useNavigate();
   const {
     // 상태
     startDate,
@@ -41,7 +43,7 @@ export default function BasicList() {
     handleConfirmDelete,
     handleCloseAlert,
     handleSort,
-  } = useBasicList();
+  } = useBasicList(navigate);
 
   return (
     <div className='table-outer'>

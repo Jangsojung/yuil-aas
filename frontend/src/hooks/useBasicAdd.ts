@@ -98,15 +98,18 @@ export const useBasicAdd = () => {
   }, [selectedFactory, selectedFacilityGroups, facilityName, sensorName]);
 
   // 모달 핸들러
-  const handleBasicModalAdd = useCallback(async () => {
-    const result = await handleAdd();
-    if (result.success) {
-      showAlert('알림', result.message);
-      window.location.href = '/aas/basic';
-    } else {
-      showAlert('알림', result.message);
-    }
-  }, [handleAdd, showAlert]);
+  const handleBasicModalAdd = useCallback(
+    async (navigate: (path: string) => void) => {
+      const result = await handleAdd();
+      if (result.success) {
+        showAlert('알림', result.message);
+        navigate('/aas/basic');
+      } else {
+        showAlert('알림', result.message);
+      }
+    },
+    [handleAdd, showAlert]
+  );
 
   const handleBasicModalReset = useCallback(() => {
     setBasicName('');

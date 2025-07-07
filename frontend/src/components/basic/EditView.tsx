@@ -156,7 +156,7 @@ export const EditView: React.FC<EditViewProps> = ({
               color: 'primary',
             },
             {
-              text: '목록',
+              text: '취소',
               onClick: onBackToList,
               color: 'inherit',
               variant: 'outlined',

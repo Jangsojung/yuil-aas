@@ -7,7 +7,7 @@ import { Dayjs } from 'dayjs';
 import { PAGINATION, MODAL_TYPE } from '../constants';
 import { useSortableData, SortableColumn } from './useSortableData';
 
-export const useBasicList = () => {
+export const useBasicList = (navigate: any) => {
   const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
   const [, setSelectedBase] = useRecoilState(selectedBaseState);
   const navigationReset = useRecoilValue(navigationResetState);
@@ -213,15 +213,15 @@ export const useBasicList = () => {
   const handleClick = useCallback(
     (base: Base) => {
       setSelectedBase(base);
-      window.location.href = `/aas/basic/edit/${base.ab_idx}/view`;
+      navigate(`/aas/basic/edit/${base.ab_idx}/view`);
     },
-    [setSelectedBase]
+    [setSelectedBase, navigate]
   );
 
   // 추가 페이지 이동 핸들러
   const handleAdd = useCallback(() => {
-    window.location.href = '/aas/basic/add';
-  }, []);
+    navigate('/aas/basic/add');
+  }, [navigate]);
 
   // 알림 모달 닫기 핸들러
   const handleCloseAlert = useCallback(() => {
