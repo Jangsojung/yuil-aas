@@ -1,10 +1,16 @@
+.header-user {
+  font-size: 0.875rem;
+}
+
 main {
   > .MuiContainer-root {
     max-width: 100%;
+    padding: 20px 32px;
+    height: 100%;
   }
+  
   .MuiContainer-root {
     //컨테이너
-
     .MuiBox-root {
       background-color: #fff;
 
@@ -14,14 +20,35 @@ main {
       }
     }
 
-    .MuiBreadcrumbs-root {
-      display: none;
+    //타이포
+    .MuiTypography-root {
+      margin: 0;
+      font-weight: 600;
+      line-height: 1.5;
+      font-size: 1rem;
+      font-family: Public Sans, sans-serif;
     }
 
+    //pageHeader 영역
+    div:has(nav) {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .MuiBreadcrumbs-ol .MuiBreadcrumbs-li>* {
+      font-size: 0.875rem;
+      font-family: Public Sans, sans-serif;
+      letter-spacing: -0.03rem;
+    }
+
+    
+
     .MuiTypography-h4 {
-      font-weight: bold;
-      font-size: 20px;
-      color: #607d8b;
+      font-weight: 700;
+      font-size: 1.25rem;
+      font-family: 'Public Sans' ,sans-serif !important;
     }
 
     //검색영역
@@ -30,10 +57,11 @@ main {
       border-radius: 5px;
       padding: 10px 15px;
       flex-grow: 1;
+      margin-bottom: 16px;
 
       .sort-title {
         color: #37474f;
-        font-weight: bold;
+        font-weight: 700;
       }
 
       .MuiGrid-root.MuiGrid-container {
@@ -43,6 +71,9 @@ main {
       .w-100 .MuiFormControl-root {
         width: 100%;
       }
+    }
+    .sort-box + .sort-box {
+      border: 0;
     }
     .MuiFormControl-root {
       .MuiInputBase-root.MuiOutlinedInput-root {
@@ -54,15 +85,12 @@ main {
         padding: 6px 14px;
       }
     }
-    .sort-box + .sort-box {
-      border-top: 1px solid #d6d9dc;
-    }
 
     //버튼
     .MuiButtonBase-root.MuiButton-root {
       padding: 4px 5px;
       min-width: 55px;
-      font-size: 0.875rem;
+      font-size: 0.813rem;
       line-height: 1.4;
       font-weight: bold;
       box-shadow: none;
@@ -113,6 +141,16 @@ main {
     //체크박스
     .MuiButtonBase-root.MuiCheckbox-root {
       padding: 0;
+      color: rgb(103, 139, 163) !important;
+      border-radius: 50%;
+    }
+
+    .MuiButtonBase-root.MuiCheckbox-root svg {
+     
+    }
+
+    .MuiCheckbox-root.Mui-checked {
+      color: rgb(103, 139, 163);
     }
 
     .basic-checkbox {
@@ -129,6 +167,10 @@ main {
     }
 
     //테이블영역
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+    }
     .MuiTableContainer-root {
       border-radius: 0;
       box-shadow: none;
@@ -141,10 +183,13 @@ main {
       // border: 1px solid #E5E8EB;
     }
     .table-wrap {
-      height: calc(100% - 50px);
+      height: calc(100% - 180px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      border: 1px solid rgba(145, 158, 171, 0.24);
+      margin-top: 8px;
+      overflow-y: scroll;
 
       .MuiTableContainer-root {
         height: 100%;

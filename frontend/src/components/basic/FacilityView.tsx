@@ -14,6 +14,8 @@ import FacilityAddModal from '../modal/FacilityAddModal';
 import { FactoryTree } from '../../types/api';
 import { Dispatch, SetStateAction } from 'react';
 
+import Typography from '@mui/material/Typography';
+
 interface FacilityViewProps {
   // 상태
   treeData: FactoryTree[];
@@ -289,25 +291,33 @@ export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean
           </Grid>
         </SearchBox>
 
-        <ActionBox
-          buttons={[
-            {
-              text: '동기화',
-              onClick: handleSynchronize || (() => {}),
-              color: 'primary',
-            },
-            {
-              text: '설비 추가',
-              onClick: handleAddFactory,
-              color: 'success',
-            },
-            {
-              text: '설비 삭제',
-              onClick: handleDeleteFacility,
-              color: 'error',
-            },
-          ]}
-        />
+        
+      </div>
+
+      <div className='list-header'>
+          <Typography variant="h6" gutterBottom>
+            설비목록
+          </Typography>
+
+          <ActionBox
+            buttons={[
+              {
+                text: '동기화',
+                onClick: handleSynchronize || (() => {}),
+                color: 'primary',
+              },
+              {
+                text: '설비 추가',
+                onClick: handleAddFactory,
+                color: 'primary',
+              },
+              {
+                text: '설비 삭제',
+                onClick: handleDeleteFacility,
+                color: 'error',
+              },
+            ]}
+          />
       </div>
 
       <div className='table-wrap'>
