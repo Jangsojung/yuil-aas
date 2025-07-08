@@ -27,7 +27,14 @@ export const getFileFCIdxFromDB = async (fileName, af_kind) => {
   });
 };
 
-export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate = null, user_idx = null) => {
+export const getFilesFromDB = async (
+  af_kind,
+  fc_idx,
+  startDate = null,
+  endDate = null,
+  user_idx = null,
+  limit = null
+) => {
   return new Promise((resolve, reject) => {
     let query = '';
     const queryParams = [];
@@ -68,8 +75,8 @@ export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate 
         WHERE ${baseWhereClause}
         ${dateClause}
         GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name, b.ab_name
-        ORDER BY f.af_idx DESC
-      `;
+        ORDER BY f.af_idx DESC`;
+      if (limit) query += ` LIMIT ?`;
     } else if (af_kind === FILE_KINDS.AASX_KIND) {
       query = `
         SELECT 
@@ -85,17 +92,19 @@ export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate 
         WHERE ${baseWhereClause}
         ${dateClause}
         GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name
-        ORDER BY f.af_idx DESC
-      `;
+        ORDER BY f.af_idx DESC`;
+      if (limit) query += ` LIMIT ?`;
     } else {
       query = `
         SELECT f.af_idx, f.af_name, f.createdAt, f.updatedAt
         FROM tb_aasx_file f
         WHERE ${baseWhereClause}
         ${dateClause}
-        ORDER BY f.af_idx DESC
-      `;
+        ORDER BY f.af_idx DESC`;
+      if (limit) query += ` LIMIT ?`;
     }
+
+    if (limit) queryParams.push(limit);
 
     pool.query(query, queryParams, (err, results) => {
       if (err) {

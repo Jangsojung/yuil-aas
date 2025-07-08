@@ -17,10 +17,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const getFiles = async (af_kind, fc_idx, startDate, endDate, res) => {
+export const getFiles = async (af_kind, fc_idx, startDate, endDate, res, limit = null) => {
   try {
-    const result = await getFilesFromDB(af_kind, fc_idx, startDate, endDate);
-
+    const result = await getFilesFromDB(af_kind, fc_idx, startDate, endDate, null, limit);
     res.status(200).json(result);
   } catch (err) {
     console.error(err.message);

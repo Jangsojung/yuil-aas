@@ -2,13 +2,14 @@ import { apiHelpers } from '../../config/api';
 import { KINDS } from '../../constants';
 
 // JSON 파일 목록 조회
-export const getJSONFilesAPI = async (startDate, endDate, fc_idx) => {
+export const getJSONFilesAPI = async (startDate, endDate, fc_idx, limit = null) => {
   try {
     const result = await apiHelpers.post('/api/file/aasxFiles', {
       af_kind: KINDS.JSON_KIND,
       fc_idx,
       startDate,
       endDate,
+      limit,
     });
     return Array.isArray(result) ? result : [];
   } catch (error) {

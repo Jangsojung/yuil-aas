@@ -11,13 +11,14 @@ export const deleteAASXAPI = async (ids) => {
   }
 };
 
-export const getFilesAPI = async (startDate, endDate, fc_idx, af_kind = KINDS.AASX_KIND) => {
+export const getFilesAPI = async (startDate, endDate, fc_idx, af_kind = KINDS.AASX_KIND, limit = null) => {
   try {
     const result = await apiHelpers.post('/api/file/aasxFiles', {
       af_kind,
       fc_idx,
       startDate,
       endDate,
+      limit,
     });
     return Array.isArray(result) ? result : [];
   } catch (error) {

@@ -55,13 +55,13 @@ export default () => {
   });
 
   router.post('/aasxFiles', (req, res) => {
-    const { af_kind, fc_idx, startDate, endDate } = req.body;
-    getFiles(af_kind, fc_idx, startDate, endDate, res);
+    const { af_kind, fc_idx, startDate, endDate, limit } = req.body;
+    getFiles(af_kind, fc_idx, startDate, endDate, res, limit);
   });
 
   router.post('/jsonFiles', (req, res) => {
-    const { af_kind, fc_idx, startDate, endDate } = req.body;
-    getFiles(af_kind, fc_idx, startDate, endDate, res);
+    const { af_kind, fc_idx, startDate, endDate, limit } = req.body;
+    getFiles(af_kind, fc_idx, startDate, endDate, res, limit);
   });
 
   router.post('/checkFileSize', (req, res) => {
