@@ -21,11 +21,11 @@ export const getDataAPI = async () => {
   }
 };
 
-export const getAASXFilesAPI = async (start, end) => {
+export const getAASXFilesAPI = async (start, end, fc_idx) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
       af_kind: 2,
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      fc_idx: fc_idx,
       startDate: start,
       endDate: end,
     });
@@ -36,10 +36,10 @@ export const getAASXFilesAPI = async (start, end) => {
   }
 };
 
-export const getWordsAPI = async () => {
+export const getWordsAPI = async (fc_idx) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.WORDS, {
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      fc_idx: fc_idx,
     });
     return Array.isArray(data) ? data : [];
   } catch (error) {
@@ -48,10 +48,10 @@ export const getWordsAPI = async () => {
   }
 };
 
-export const getSearchAPI = async (type, text) => {
+export const getSearchAPI = async (type, text, fc_idx) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.SEARCH, {
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      fc_idx: fc_idx,
       type: type,
       text: text,
     });
@@ -62,10 +62,10 @@ export const getSearchAPI = async (type, text) => {
   }
 };
 
-export const updateWordAPI = async (as_kr, original_as_en, new_as_en) => {
+export const updateWordAPI = async (as_kr, original_as_en, new_as_en, fc_idx) => {
   try {
     const data = await apiHelpers.put(API_ENDPOINTS.FILE.WORDS, {
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      fc_idx: fc_idx,
       as_kr: as_kr,
       original_as_en: original_as_en,
       new_as_en: new_as_en,

@@ -100,7 +100,6 @@ export const useFacilityManagement = () => {
     setSelectedFacilities([]);
     setSelectedFacilityGroupsForDelete([]);
     setSelectedFactoriesForDelete([]);
-    // setSelectedFactory(''); // 공장 선택은 유지
   }, []);
 
   // 공장 추가 모달

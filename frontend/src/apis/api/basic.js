@@ -71,7 +71,7 @@ export const getBaseSensorsAPI = async (ab_idx) => {
 };
 
 // 설비그룹 조회
-export const getFacilityGroupsAPI = async (fc_idx = DEFAULTS.FACILITY_GROUP_ID) => {
+export const getFacilityGroupsAPI = async (fc_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.FACILITY_GROUPS, { fc_idx });
     return Array.isArray(result)
@@ -119,12 +119,7 @@ export const getSensorsAPI = async (fa_idx) => {
 };
 
 // 트리 데이터 구축을 위한 통합 API
-export const buildTreeDataAPI = async (
-  selectedFacilityGroups = [],
-  facilityName = '',
-  sensorName = '',
-  fc_idx = DEFAULTS.FACILITY_GROUP_ID
-) => {
+export const buildTreeDataAPI = async (selectedFacilityGroups = [], facilityName = '', sensorName = '', fc_idx) => {
   try {
     // 1. 공장 정보 조회 - 선택된 공장의 정보를 가져옴
     const factoryInfo = await getFactoriesByCmIdxAPI(1);
@@ -198,7 +193,7 @@ export const buildTreeDataAPI = async (
 };
 
 // 센서 ID로부터 트리 데이터 구축
-export const buildTreeFromSensorIdsAPI = async (sensorIds, fc_idx = DEFAULTS.FACILITY_GROUP_ID) => {
+export const buildTreeFromSensorIdsAPI = async (sensorIds, fc_idx) => {
   try {
     // 1. 모든 설비그룹 조회
     const allFacilityGroups = await getFacilityGroupsAPI(fc_idx);
@@ -331,7 +326,7 @@ export const buildTreeDataForBasicAPI = async (
   selectedFacilityGroups = [],
   facilityName = '',
   sensorName = '',
-  fc_idx = DEFAULTS.FACILITY_GROUP_ID
+  fc_idx
 ) => {
   try {
     // 1. 모든 설비그룹 조회
