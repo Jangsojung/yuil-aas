@@ -5,8 +5,7 @@ import Select from '@mui/material/Select';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import { getFacilityGroupsAPI } from '../../apis/api/basic';
 
 interface FacilityGroup {
@@ -62,6 +61,15 @@ export default function FacilityGroupSelect({
     }
   };
 
+  const handleIndividualSelect = (fg_idx: number) => {
+    const isSelected = selectedFacilityGroups.includes(fg_idx);
+    if (isSelected) {
+      setSelectedFacilityGroups(selectedFacilityGroups.filter((id) => id !== fg_idx));
+    } else {
+      setSelectedFacilityGroups([...selectedFacilityGroups, fg_idx]);
+    }
+  };
+
   const getDisplayText = () => {
     if (selectedFacilityGroups.length === 0) {
       return '선택';
@@ -73,68 +81,76 @@ export default function FacilityGroupSelect({
     return `${selectedFacilityGroups.length}개 선택됨`;
   };
 
+  const isAllSelected = selectedFacilityGroups.length === facilityGroups.length && facilityGroups.length > 0;
+
   useEffect(() => {
     getFacilityGroups(selectedFactory as number);
   }, [selectedFactory, refreshKey]);
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <FormControl fullWidth size='small'>
-        <Select
-          multiple
-          value={selectedFacilityGroups}
-          onChange={handleChange}
-          IconComponent={ExpandMoreIcon}
-          displayEmpty
-          disabled={loading}
-          renderValue={() => getDisplayText()}
-          MenuProps={{
-            PaperProps: {
-              style: {
-                maxHeight: 500,
-              },
+    <FormControl fullWidth size='small'>
+      <Select
+        multiple
+        value={selectedFacilityGroups}
+        onChange={handleChange}
+        IconComponent={ExpandMoreIcon}
+        displayEmpty
+        disabled={loading}
+        renderValue={() => getDisplayText()}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 500,
             },
-          }}
-        >
-          {loading ? (
-            <MenuItem disabled value=''>
-              로딩 중...
+          },
+        }}
+      >
+        {loading ? (
+          <MenuItem disabled value=''>
+            로딩 중...
+          </MenuItem>
+        ) : !selectedFactory ? (
+          <MenuItem disabled value=''>
+            공장을 먼저 선택해주세요.
+          </MenuItem>
+        ) : facilityGroups && facilityGroups.length > 0 ? (
+          <>
+            {/* 전체선택 체크박스 */}
+            <MenuItem
+              sx={{
+                backgroundColor: '#f5f5f5',
+                '&:hover': {
+                  backgroundColor: '#e8e8e8',
+                },
+              }}
+            >
+              <Checkbox checked={isAllSelected} onChange={handleSelectAll} />
+              <ListItemText
+                primary='전체 선택'
+                primaryTypographyProps={{
+                  fontWeight: 'bold',
+                  color: '#666',
+                }}
+              />
             </MenuItem>
-          ) : !selectedFactory ? (
-            <MenuItem disabled value=''>
-              공장을 먼저 선택해주세요.
-            </MenuItem>
-          ) : facilityGroups && facilityGroups.length > 0 ? (
-            facilityGroups.map((fg) => (
+            <Divider />
+            {/* 개별 설비그룹 체크박스들 */}
+            {facilityGroups.map((fg) => (
               <MenuItem key={fg.fg_idx} value={fg.fg_idx}>
-                <Checkbox checked={selectedFacilityGroups.indexOf(fg.fg_idx) > -1} />
+                <Checkbox
+                  checked={selectedFacilityGroups.includes(fg.fg_idx)}
+                  onChange={() => handleIndividualSelect(fg.fg_idx)}
+                />
                 <ListItemText primary={fg.fg_name} />
               </MenuItem>
-            ))
-          ) : (
-            <MenuItem disabled value=''>
-              해당 공장에 설비그룹이 없습니다.
-            </MenuItem>
-          )}
-        </Select>
-      </FormControl>
-      {selectedFactory && facilityGroups && facilityGroups.length > 0 && (
-        <Button
-          size='small'
-          onClick={handleSelectAll}
-          variant='outlined'
-          sx={{
-            color: '#666',
-            borderColor: '#ccc',
-            '&:hover': {
-              borderColor: '#999',
-              backgroundColor: '#f5f5f5',
-            },
-          }}
-        >
-          {selectedFacilityGroups.length === facilityGroups.length ? '전체 해제' : '전체 선택'}
-        </Button>
-      )}
-    </Box>
+            ))}
+          </>
+        ) : (
+          <MenuItem disabled value=''>
+            해당 공장에 설비그룹이 없습니다.
+          </MenuItem>
+        )}
+      </Select>
+    </FormControl>
   );
 }
