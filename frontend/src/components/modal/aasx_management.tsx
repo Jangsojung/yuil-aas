@@ -265,11 +265,7 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
                 <div>공장</div>
               </Grid>
               <Grid>
-                <FactorySelect
-                  value={selectedFactory || ''}
-                  onChange={handleFactoryChange}
-                  placeholder='공장을 선택하세요'
-                />
+                <FactorySelect value={selectedFactory || ''} onChange={handleFactoryChange} placeholder='선택' />
               </Grid>
             </Grid>
 

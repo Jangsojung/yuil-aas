@@ -27,10 +27,8 @@ export default function FacilityGroupSelect({
   refreshKey = 0,
 }: Props) {
   const [facilityGroups, setFacilityGroups] = useState<FacilityGroup[]>([]);
-  const [loading, setLoading] = useState(false);
 
   const getFacilityGroups = async (fc_idx?: number) => {
-    setLoading(true);
     try {
       // 공장이 선택되지 않았으면 빈 배열 반환
       if (!fc_idx) {
@@ -43,8 +41,6 @@ export default function FacilityGroupSelect({
     } catch (error) {
       console.error('Error fetching facility groups:', error);
       setFacilityGroups([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -95,7 +91,6 @@ export default function FacilityGroupSelect({
         onChange={handleChange}
         IconComponent={ExpandMoreIcon}
         displayEmpty
-        disabled={loading}
         renderValue={() => getDisplayText()}
         MenuProps={{
           PaperProps: {
@@ -105,11 +100,7 @@ export default function FacilityGroupSelect({
           },
         }}
       >
-        {loading ? (
-          <MenuItem disabled value=''>
-            로딩 중...
-          </MenuItem>
-        ) : !selectedFactory ? (
+        {!selectedFactory ? (
           <MenuItem disabled value=''>
             공장을 먼저 선택해주세요.
           </MenuItem>

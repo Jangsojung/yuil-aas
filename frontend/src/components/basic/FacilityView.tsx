@@ -290,34 +290,32 @@ export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean
             {/* 센서명 */}
           </Grid>
         </SearchBox>
-
-        
       </div>
 
       <div className='list-header'>
-          <Typography variant="h6" gutterBottom>
-            설비목록
-          </Typography>
+        <Typography variant='h6' gutterBottom>
+          설비목록
+        </Typography>
 
-          <ActionBox
-            buttons={[
-              {
-                text: '동기화',
-                onClick: handleSynchronize || (() => {}),
-                color: 'primary',
-              },
-              {
-                text: '설비 추가',
-                onClick: handleAddFactory,
-                color: 'primary',
-              },
-              {
-                text: '설비 삭제',
-                onClick: handleDeleteFacility,
-                color: 'error',
-              },
-            ]}
-          />
+        <ActionBox
+          buttons={[
+            {
+              text: '동기화',
+              onClick: handleSynchronize || (() => {}),
+              color: 'primary',
+            },
+            {
+              text: '설비 추가',
+              onClick: handleAddFactory,
+              color: 'primary',
+            },
+            {
+              text: '설비 삭제',
+              onClick: handleDeleteFacility,
+              color: 'error',
+            },
+          ]}
+        />
       </div>
 
       <div className='table-wrap'>

@@ -26,7 +26,6 @@ export default function FacilityGroupSelect({
   onFactoryChange,
 }: FacilityGroupSelectProps) {
   const [facilityGroups, setFacilityGroups] = useState<FacilityGroup[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const user = useRecoilValue(userState);
 
@@ -42,7 +41,6 @@ export default function FacilityGroupSelect({
       return;
     }
 
-    setLoading(true);
     setError(null);
     try {
       const data = await getFacilityGroupsAPI(selectedFactory as number);
@@ -50,8 +48,6 @@ export default function FacilityGroupSelect({
     } catch (err) {
       console.error('설비 그룹 조회 실패:', err);
       setError('설비 그룹을 불러오는데 실패했습니다.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -102,16 +98,14 @@ export default function FacilityGroupSelect({
               value={value}
               onChange={handleChange}
               displayEmpty
-              disabled={disabled || loading || !selectedFactory || facilityGroups.length === 0}
+              disabled={disabled || !selectedFactory || facilityGroups.length === 0}
             >
               <MenuItem disabled value=''>
-                {loading
-                  ? '로딩 중...'
-                  : !selectedFactory
-                    ? '공장을 먼저 선택해주세요'
-                    : facilityGroups.length === 0
-                      ? '사용 가능한 설비 그룹이 없습니다'
-                      : placeholder}
+                {!selectedFactory
+                  ? '공장을 먼저 선택해주세요'
+                  : facilityGroups.length === 0
+                    ? '사용 가능한 설비 그룹이 없습니다'
+                    : placeholder}
               </MenuItem>
               {facilityGroups.map((group) => (
                 <MenuItem key={group.fg_idx} value={group.fg_idx}>
@@ -131,18 +125,6 @@ export default function FacilityGroupSelect({
         <Select value='' displayEmpty disabled>
           <MenuItem disabled value=''>
             {error}
-          </MenuItem>
-        </Select>
-      </FormControl>
-    );
-  }
-
-  if (loading) {
-    return (
-      <FormControl fullWidth size='small'>
-        <Select value='' displayEmpty disabled>
-          <MenuItem disabled value=''>
-            로딩 중...
           </MenuItem>
         </Select>
       </FormControl>
