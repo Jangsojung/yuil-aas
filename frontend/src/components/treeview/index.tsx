@@ -47,6 +47,10 @@ interface TreeData {
   SM?: SMData | SMData[];
 }
 
+interface TreeViewProps {
+  data?: any;
+}
+
 const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
   [`& .${treeItemClasses.content}`]: {
     padding: theme.spacing(0.5, 1),
@@ -199,10 +203,11 @@ const createTreeItems = (data: TreeData): JSX.Element[] => {
             );
           });
         } else {
-          for (const key in sm.Prop) {
+          const propObj = sm.Prop as Record<string, any>;
+          for (const key in propObj) {
             const singlePropId = `${propId}-${key}`;
             propSubItems.push(
-              <CustomTreeItem key={singlePropId} itemId={singlePropId} label={`${key}: ${sm.Prop[key]}`} />
+              <CustomTreeItem key={singlePropId} itemId={singlePropId} label={`${key}: ${propObj[key]}`} />
             );
           }
         }
@@ -231,9 +236,12 @@ const createTreeItems = (data: TreeData): JSX.Element[] => {
   return result;
 };
 
-export default function BorderedTreeView() {
-  const aasxData = useRecoilValue(aasxDataState);
-  const isVerified = useRecoilValue(isVerifiedState);
+export default function BorderedTreeView({ data }: TreeViewProps) {
+  // 항상 recoil에서 값을 가져오고, data가 있으면 덮어씀
+  const recoilAasxData = useRecoilValue(aasxDataState);
+  const recoilIsVerified = useRecoilValue(isVerifiedState);
+  const aasxData = data !== undefined ? data : recoilAasxData;
+  const isVerified = data !== undefined ? true : recoilIsVerified;
 
   return (
     <SimpleTreeView

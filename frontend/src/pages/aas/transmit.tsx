@@ -13,8 +13,10 @@ import { useAlertModal } from '../../hooks/useAlertModal';
 import FactorySelect from '../../components/select/factory_select';
 import { FormControl } from '@mui/material';
 import { getAASXFilesAPI } from '../../apis/api/aasx_manage';
+import { useLocation } from 'react-router-dom';
 
 export default function TransmitPage() {
+  const location = useLocation();
   const currentFile = useRecoilValue(currentFileState);
   const [, setAasxData] = useRecoilState(aasxDataState);
   const [, setIsVerified] = useRecoilState(isVerifiedState);
@@ -107,12 +109,14 @@ export default function TransmitPage() {
   };
 
   const handleFactoryChange = async (factoryId: number) => {
+    console.log('선택된 factoryId:', factoryId);
     setSelectedFactory(factoryId);
     setSelectedFile(undefined);
     setCurrentFile(null);
 
-    if (factoryId) {
+    if (factoryId !== undefined && factoryId !== null) {
       try {
+        console.log('getAASXFilesAPI 호출 factoryId:', factoryId);
         // 공장별 AASX 파일 가져오기
         const files = await getAASXFilesAPI(null, null, factoryId);
         setAasxFiles(Array.isArray(files) ? files : []);
@@ -138,6 +142,23 @@ export default function TransmitPage() {
     handleResetStates();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset, setAasxData, setIsVerified, setCurrentFile]);
+
+  // location.state로 전달된 fc_idx, af_idx가 있으면 자동 선택
+  useEffect(() => {
+    if (location.state && (location.state as any).fc_idx !== undefined) {
+      setSelectedFactory((location.state as any).fc_idx);
+    }
+  }, [location.state]);
+
+  // aasxFiles가 로드된 후 af_idx로 자동 선택
+  useEffect(() => {
+    if (location.state && (location.state as any).af_idx !== undefined && aasxFiles.length > 0) {
+      const found = aasxFiles.find((file) => file.af_idx === (location.state as any).af_idx);
+      if (found) {
+        setSelectedFile(found);
+      }
+    }
+  }, [location.state, aasxFiles]);
 
   // 현재 파일 변경 시 검증 상태 리셋
   useEffect(() => {
