@@ -24,9 +24,6 @@ export const getEdgeGatewaysFromDB = async () => {
             eg_idx: eg.eg_idx,
             eg_pc_name: eg.eg_pc_name,
             eg_ip_port: eg.eg_ip_port,
-            eg_server_temp: eg.eg_server_temp,
-            eg_network: eg.eg_network,
-            eg_pc_temp: eg.eg_pc_temp,
             createdAt: eg.createdAt,
             updatedAt: eg.updatedAt,
           };
@@ -71,58 +68,6 @@ export const checkNetworkStatus = async (ip) => {
   }
 };
 
-// 서버 온도 API 호출 (여러 엔드포인트 시도)
-export const getServerTemperature = async (ip, port) => {
-  try {
-    // 여러 가능한 엔드포인트를 시도
-    const endpoints = [`/api/temperature`, `/temperature`, `/api/status`, `/status`, `/api/health`, `/health`, `/`];
-
-    for (const endpoint of endpoints) {
-      try {
-        const url = `http://${ip}:${port}${endpoint}`;
-
-        // AbortController를 사용한 타임아웃 설정
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2초 타임아웃
-
-        const response = await fetch(url, {
-          method: 'GET',
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          const data = await response.json();
-
-          // 다양한 응답 구조에서 온도 값 추출
-          const temperature =
-            data.temperature ||
-            data.temp ||
-            data.cpu_temp ||
-            data.server_temp ||
-            data.data?.temperature ||
-            data.data?.temp ||
-            data.status?.temperature ||
-            data.status?.temp ||
-            null;
-
-          if (temperature !== null && temperature !== undefined) {
-            return temperature;
-          }
-        }
-      } catch (endpointError) {
-        continue; // 다음 엔드포인트 시도
-      }
-    }
-
-    return null;
-  } catch (error) {
-    console.error(`Temperature API failed for ${ip}:${port}:`, error.message);
-    return null;
-  }
-};
-
 // 모든 Edge Gateway의 실시간 상태 가져오기
 export const getEdgeGatewaysWithRealTimeStatus = async () => {
   try {
@@ -140,24 +85,9 @@ export const getEdgeGatewaysWithRealTimeStatus = async () => {
 
           // 네트워크 상태 확인
           const networkStatus = await checkNetworkStatus(ip);
-
-          // 서버 온도 확인 (네트워크가 연결된 경우에만, 빠른 검사)
-          let serverTemp = null;
-          if (networkStatus) {
-            // 온도 검사를 별도로 처리하여 전체 응답 시간 단축
-            getServerTemperature(ip, port)
-              .then((temp) => {
-                // 온도 업데이트 로직 (필요시 추가)
-              })
-              .catch((err) => {
-                // 온도 검사 실패 처리 (필요시 추가)
-              });
-          }
-
           const result = {
             ...eg,
             eg_network: networkStatus ? 1 : 0,
-            eg_server_temp: serverTemp,
           };
 
           return result;
@@ -167,7 +97,6 @@ export const getEdgeGatewaysWithRealTimeStatus = async () => {
           return {
             ...eg,
             eg_network: 0,
-            eg_server_temp: null,
           };
         }
       })

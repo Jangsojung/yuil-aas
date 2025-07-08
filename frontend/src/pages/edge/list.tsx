@@ -45,17 +45,14 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
   const sortableColumns: SortableColumn<EdgeGateway>[] = [
     { field: 'eg_pc_name', label: 'PC명' },
     { field: 'eg_ip_port', label: 'IP:Port' },
-    { field: 'eg_server_temp', label: '서버 온도' },
     { field: 'eg_network', label: '네트워크' },
-    { field: 'eg_pc_temp', label: 'PC 온도' },
     { field: 'createdAt', label: '생성 일자' },
     { field: 'updatedAt', label: '수정 일자' },
   ];
 
-  const { currentPage, rowsPerPage, totalPages, handlePageChange, handleRowsPerPageChange, paginatedData } =
-    useTablePagination({
-      totalCount: sortedEdgeGateways?.length || 0,
-    });
+  const { currentPage, rowsPerPage, handlePageChange, handleRowsPerPageChange, paginatedData } = useTablePagination({
+    totalCount: sortedEdgeGateways?.length || 0,
+  });
 
   const [loading, setLoading] = useState(true);
 

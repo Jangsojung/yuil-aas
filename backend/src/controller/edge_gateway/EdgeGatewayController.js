@@ -5,7 +5,6 @@ import {
   updateEdgeGatewayToDB,
   deleteEdgeGatewaysFromDB,
   checkNetworkStatus,
-  getServerTemperature,
 } from '../../service/edge_gateway/EdgeGatewayService.js';
 import fs from 'fs';
 import path from 'path';
@@ -90,7 +89,6 @@ export const downloadDeployFiles = async (res) => {
 
     // 응답 헤더 설정
     res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', 'attachment; filename="temperature-server-deploy.zip"');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
@@ -117,14 +115,5 @@ export const checkEdgeGatewayPing = async (ip, port, res) => {
     res.status(200).json({ connected: isConnected });
   } catch (err) {
     res.status(500).json({ error: 'Ping check failed' });
-  }
-};
-
-export const checkEdgeGatewayTemperature = async (ip, port, res) => {
-  try {
-    const temperature = await getServerTemperature(ip, port);
-    res.status(200).json({ temperature: temperature });
-  } catch (err) {
-    res.status(500).json({ error: 'Temperature check failed' });
   }
 };

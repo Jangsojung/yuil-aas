@@ -7,7 +7,6 @@ import {
   deleteEdgeGateways,
   downloadDeployFiles,
   checkEdgeGatewayPing,
-  checkEdgeGatewayTemperature,
 } from '../../controller/edge_gateway/EdgeGatewayController.js';
 
 const router = express.Router();
@@ -46,11 +45,6 @@ export default () => {
   router.post('/ping', (req, res) => {
     const { ip, port } = req.body;
     checkEdgeGatewayPing(ip, port, res);
-  });
-
-  router.post('/temperature', (req, res) => {
-    const { ip, port } = req.body;
-    checkEdgeGatewayTemperature(ip, port, res);
   });
 
   return router;
