@@ -172,32 +172,38 @@ export const ListView: React.FC<ListViewProps> = ({
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
+                <TableCell padding='checkbox'>
+                  <Checkbox
+                    checked={selectAll}
+                    onChange={onSelectAllChange}
+                    inputProps={{ 'aria-label': 'select all' }}
+                  />
+                </TableCell>
                 <SortableTableHeader
                   columns={sortableColumns}
                   sortField={sortField}
                   sortDirection={sortDirection}
                   onSort={onSort}
-                  showCheckbox={true}
-                  onSelectAllChange={onSelectAllChange}
-                  selectAll={selectAll}
+                  showCheckbox={false}
                 />
               </TableRow>
             </TableHead>
             <TableBody>
               {pagedData && pagedData.length > 0 ? (
-                pagedData.map((base, idx) => (
+                pagedData.map((base: Base, idx) => (
                   <TableRow
                     key={base.ab_idx}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     onClick={() => onClick(base)}
                     className='cursor-pointer'
                   >
-                    <TableCell onClick={(e) => e.stopPropagation()}>
+                    <TableCell onClick={(e) => e.stopPropagation()} padding='checkbox'>
                       <Checkbox
                         checked={selectedBases.includes(base.ab_idx)}
                         onChange={() => onCheckboxChange(base.ab_idx)}
                       />
                     </TableCell>
+                    <TableCell>{base.fc_name || '-'}</TableCell>
                     <TableCell>{base.ab_name}</TableCell>
                     <TableCell>{base.sn_length || 0}</TableCell>
                     <TableCell>{formatDate(base.createdAt?.toString())}</TableCell>
@@ -206,7 +212,7 @@ export const ListView: React.FC<ListViewProps> = ({
                   </TableRow>
                 ))
               ) : (
-                <TableEmptyRow colSpan={sortableColumns.length + 1} />
+                <TableEmptyRow colSpan={7} />
               )}
             </TableBody>
           </Table>

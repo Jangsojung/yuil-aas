@@ -3,7 +3,7 @@ import Grid from '@mui/system/Grid';
 import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../components/datepicker';
-import { FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox } from '@mui/material';
 import Pagination from '../../components/pagination';
 import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
 import { useTablePagination } from '../../hooks/useTablePagination';
@@ -22,6 +22,8 @@ interface File {
   af_name: string;
   createdAt: string;
   updatedAt?: string;
+  fc_idx?: number;
+  fc_name?: string;
 }
 
 interface AASXListProps {
@@ -63,6 +65,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
 
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<File>[] = [
+    { field: 'fc_name', label: '공장명' },
     { field: 'af_name', label: '파일명' },
     { field: 'createdAt', label: '생성 일자' },
     { field: 'updatedAt', label: '수정 일자' },
@@ -306,16 +309,20 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
+                <TableCell padding='checkbox'>
+                  <Checkbox
+                    indeterminate={selectedFiles.length > 0 && selectedFiles.length < files.length}
+                    checked={selectAll}
+                    onChange={handleSelectAllChange}
+                    inputProps={{ 'aria-label': 'select all files' }}
+                  />
+                </TableCell>
                 <SortableTableHeader
                   columns={sortableColumns}
                   sortField={sortField}
                   sortDirection={sortDirection}
                   onSort={handleSort}
-                  showCheckbox={true}
-                  onSelectAllChange={handleSelectAllChange}
-                  selectAll={selectAll}
                 />
-                <TableCell>수정</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

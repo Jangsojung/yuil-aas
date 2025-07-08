@@ -3,8 +3,10 @@ export interface AASXFile {
   af_name: string;
   af_kind?: number;
   fc_idx?: number;
+  fc_name?: string;
   user_idx?: number;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AASXData {
@@ -54,6 +56,7 @@ export interface Base {
   createdAt?: string;
   updatedAt?: string;
   fc_idx?: number;
+  fc_name?: string;
 }
 
 export interface FacilityGroup {
@@ -136,4 +139,13 @@ export interface EdgeGateway {
   eg_network?: number;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface File {
+  af_idx: number;
+  af_name: string;
+  createdAt: string;
+  updatedAt?: string;
+  fc_idx?: number;
+  fc_name?: string;
 }

@@ -42,6 +42,7 @@ export const useBasicList = (navigate: any) => {
 
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<Base>[] = [
+    { field: 'fc_name', label: '공장명' },
     { field: 'ab_name', label: '기초코드명' },
     { field: 'sn_length', label: '센서 개수' },
     { field: 'createdAt', label: '생성 일자' },

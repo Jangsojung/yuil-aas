@@ -55,16 +55,36 @@ export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate 
           f.createdAt,
           f.updatedAt,
           f.fc_idx,
+          d.fc_name,
           b.ab_name AS base_name,
-           COUNT(DISTINCT bs.sn_idx) AS sn_length
+          COUNT(DISTINCT bs.sn_idx) AS sn_length
         FROM tb_aasx_file f
         LEFT JOIN tb_aasx_base b 
           ON b.ab_idx = CAST(SUBSTRING_INDEX(f.af_name, '-', 1) AS UNSIGNED)
         LEFT JOIN tb_aasx_base_sensor bs 
           ON bs.ab_idx = b.ab_idx
+        LEFT JOIN tb_aasx_data d
+          ON f.fc_idx = d.fc_idx
         WHERE ${baseWhereClause}
         ${dateClause}
-        GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, b.ab_name
+        GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name, b.ab_name
+        ORDER BY f.af_idx DESC
+      `;
+    } else if (af_kind === FILE_KINDS.AASX_KIND) {
+      query = `
+        SELECT 
+          f.af_idx, 
+          f.af_name, 
+          f.createdAt,
+          f.updatedAt,
+          f.fc_idx,
+          d.fc_name
+        FROM tb_aasx_file f
+        LEFT JOIN tb_aasx_data d
+          ON f.fc_idx = d.fc_idx
+        WHERE ${baseWhereClause}
+        ${dateClause}
+        GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name
         ORDER BY f.af_idx DESC
       `;
     } else {
@@ -96,8 +116,18 @@ export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate 
             createdAt: file.createdAt,
             updatedAt: file.updatedAt,
             fc_idx: file.fc_idx,
+            fc_name: file.fc_name || '-',
             base_name: file.base_name || '삭제된 기초코드',
             sn_length: Number(file.sn_length) || 0,
+          };
+        } else if (af_kind === FILE_KINDS.AASX_KIND) {
+          return {
+            af_idx: file.af_idx,
+            af_name: file.af_name,
+            createdAt: file.createdAt,
+            updatedAt: file.updatedAt,
+            fc_idx: file.fc_idx,
+            fc_name: file.fc_name || '-',
           };
         } else {
           return {

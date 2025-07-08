@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
-import { Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableContainer, TableHead, TableRow, TableCell, Checkbox } from '@mui/material';
 import Grid from '@mui/system/Grid';
 import Pagination from '../../../components/pagination';
 import JSONTableRow from '../../../components/tableRow/JSONTableRow';
@@ -22,7 +22,9 @@ interface File {
   af_name: string;
   createdAt: string;
   base_name?: string;
-  sensor_count?: number;
+  sn_length?: number;
+  fc_idx?: number;
+  fc_name?: string;
 }
 
 export default function JSONList() {
@@ -54,9 +56,10 @@ export default function JSONList() {
 
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<File>[] = [
+    { field: 'fc_name', label: '공장명' },
     { field: 'af_name', label: '파일명' },
     { field: 'base_name', label: '기초코드명' },
-    { field: 'sensor_count', label: '센서 개수' },
+    { field: 'sn_length', label: '센서 개수' },
     { field: 'createdAt', label: '생성 일자' },
   ];
 
@@ -300,14 +303,19 @@ export default function JSONList() {
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead>
               <TableRow>
+                <TableCell padding='checkbox'>
+                  <Checkbox
+                    indeterminate={selectedFiles.length > 0 && selectedFiles.length < files.length}
+                    checked={selectAll}
+                    onChange={handleSelectAllChange}
+                    inputProps={{ 'aria-label': 'select all files' }}
+                  />
+                </TableCell>
                 <SortableTableHeader
                   columns={sortableColumns}
                   sortField={sortField}
                   sortDirection={sortDirection}
                   onSort={handleSort}
-                  showCheckbox={true}
-                  onSelectAllChange={handleSelectAllChange}
-                  selectAll={selectAll}
                 />
               </TableRow>
             </TableHead>

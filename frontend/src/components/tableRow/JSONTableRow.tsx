@@ -8,6 +8,8 @@ interface JSONTableRowProps {
     createdAt: string;
     base_name?: string;
     sn_length?: number;
+    fc_idx?: number;
+    fc_name?: string;
   };
   onCheckboxChange: (id: number) => void;
   checked: boolean;
@@ -36,6 +38,7 @@ export default function JSONTableRow({ file, onCheckboxChange, checked, totalCou
       <TableCell onClick={(e) => e.stopPropagation()}>
         <Checkbox checked={checked} onChange={() => onCheckboxChange(file.af_idx)} />
       </TableCell>
+      <TableCell>{file.fc_name || '-'}</TableCell>
       <TableCell>{file.af_name}</TableCell>
       <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
       <TableCell>{file.sn_length || 0}</TableCell>

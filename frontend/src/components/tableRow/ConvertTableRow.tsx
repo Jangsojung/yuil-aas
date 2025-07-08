@@ -12,6 +12,7 @@ interface ConvertTableRowProps {
     ab_note: string;
     sn_length: number;
     createdAt?: string;
+    fc_name?: string;
   };
   checked: boolean;
   onCheckboxChange: (id: number) => void;
@@ -74,6 +75,7 @@ export default function ConvertTableRow({
       <TableCell sx={{ width: '50px' }}>
         <Checkbox checked={checked} onChange={() => onCheckboxChange(base.ab_idx)} />
       </TableCell>
+      <TableCell sx={{ width: '120px' }}>{base.fc_name || '-'}</TableCell>
       <TableCell sx={{ width: '200px' }}>{base.ab_name}</TableCell>
       <TableCell sx={{ width: '100px' }}>{base.sn_length}</TableCell>
       <TableCell sx={{ width: '150px' }}>{base.createdAt ? formatDate(base.createdAt) : ''}</TableCell>

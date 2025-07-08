@@ -10,6 +10,8 @@ interface AASXTableRowProps {
     af_name: string;
     createdAt: string;
     updatedAt?: string;
+    fc_idx?: number;
+    fc_name?: string;
   };
   onCheckboxChange: (id: number) => void;
   checked: boolean;
@@ -34,6 +36,7 @@ export default function AASXTableRow({ file, onCheckboxChange, checked, onEditCl
       <TableCell>
         <Checkbox checked={checked} onChange={() => onCheckboxChange(file.af_idx)} />
       </TableCell>
+      <TableCell>{file.fc_name || '-'}</TableCell>
       <TableCell>{file.af_name}</TableCell>
       <TableCell>{formatDate(file.createdAt)}</TableCell>
       <TableCell>{formatDate(file.updatedAt)}</TableCell>
