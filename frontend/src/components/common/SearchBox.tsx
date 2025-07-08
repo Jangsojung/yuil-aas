@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import Box from '@mui/system/Box';
 import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -31,12 +30,10 @@ export default function SearchBox({ children, buttons = [], buttonAlign = 'right
 
   return (
     <Grid container className='sort-box'>
-      <Grid size={buttons.length > 0 ? 10 : 12}>
-        {children}
-      </Grid>
+      <Grid size={buttons.length > 0 ? 10 : 12}>{children}</Grid>
       {buttons.length > 0 && (
         <Grid size={2}>
-          <Stack direction='row' style={{ gap:5,justifyContent: getAlignment() }}>
+          <Stack direction='row' style={{ gap: 5, justifyContent: getAlignment() }}>
             {buttons.map((button, index) => (
               <Button
                 key={index}

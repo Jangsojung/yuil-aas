@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
@@ -387,8 +387,17 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                     background: '#fff',
                   }}
                 >
-                  <Grid container spacing={1} alignItems='center'>
-                    <Grid item xs={7}>
+                  <Grid
+                    container
+                    spacing={1}
+                    alignItems='center'
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '7fr 5fr',
+                      gap: 1,
+                    }}
+                  >
+                    <Grid>
                       <FormControl fullWidth size='small'>
                         <Select
                           key={`factory-select-${factories.length}`} // 강제 리렌더링을 위한 key
@@ -414,7 +423,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         </Select>
                       </FormControl>
                     </Grid>
-                    <Grid item xs={5}>
+                    <Grid>
                       <TextField
                         value={newFactoryName}
                         onChange={(e) => setNewFactoryName(e.target.value)}
@@ -453,8 +462,17 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                     background: '#fff',
                   }}
                 >
-                  <Grid container spacing={1} alignItems='center'>
-                    <Grid item xs={7}>
+                  <Grid
+                    container
+                    spacing={1}
+                    alignItems='center'
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '7fr 5fr',
+                      gap: 1,
+                    }}
+                  >
+                    <Grid>
                       <FormControl fullWidth size='small'>
                         <Select
                           key={`group-select-${groupList.length}`} // 강제 리렌더링을 위한 key
@@ -480,7 +498,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         </Select>
                       </FormControl>
                     </Grid>
-                    <Grid item xs={5}>
+                    <Grid>
                       <TextField
                         value={groupInput}
                         onChange={(e) => setGroupInput(e.target.value)}
@@ -520,8 +538,17 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                     background: '#fff',
                   }}
                 >
-                  <Grid container spacing={1} alignItems='center'>
-                    <Grid item xs={7}>
+                  <Grid
+                    container
+                    spacing={1}
+                    alignItems='center'
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: '7fr 5fr',
+                      gap: 1,
+                    }}
+                  >
+                    <Grid>
                       <FormControl fullWidth size='small'>
                         <Select
                           key={`facility-select-${facilityList.length}`} // 강제 리렌더링을 위한 key
@@ -547,7 +574,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         </Select>
                       </FormControl>
                     </Grid>
-                    <Grid item xs={5}>
+                    <Grid>
                       <TextField
                         value={facilityInput}
                         onChange={(e) => setFacilityInput(e.target.value)}

@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
@@ -93,11 +93,18 @@ export default function BasicModal({
           <span className='sensor-count-value'>{selectedSensorCount}개</span>
         </Box>
         <Box component='form' noValidate autoComplete='off'>
-          <Grid container spacing={2} alignItems='center'>
-            <Grid item xs={3} className='form-label'>
-              기초코드명
-            </Grid>
-            <Grid item xs={9}>
+          <Grid
+            container
+            spacing={2}
+            alignItems='center'
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 3fr',
+              gap: 2,
+            }}
+          >
+            <Grid className='form-label'>기초코드명</Grid>
+            <Grid>
               <TextField
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -106,10 +113,8 @@ export default function BasicModal({
                 placeholder='기초코드명'
               />
             </Grid>
-            <Grid item xs={3} className='form-label'>
-              비고
-            </Grid>
-            <Grid item xs={9}>
+            <Grid className='form-label'>비고</Grid>
+            <Grid>
               <TextField
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}

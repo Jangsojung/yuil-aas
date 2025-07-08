@@ -11,9 +11,6 @@ import { grey } from '@mui/material/colors';
 
 import { Link } from 'react-router-dom';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import HelpGuideModal from '../../components/modal/HelpGuideModal';
 

@@ -3,7 +3,7 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -76,9 +76,17 @@ export const DetailView: React.FC<DetailViewProps> = ({
                               return rows.map((rowSensors, rowIndex) => (
                                 <TableRow key={rowIndex}>
                                   <TableCell colSpan={3}>
-                                    <Grid container spacing={1}>
+                                    <Grid
+                                      container
+                                      spacing={1}
+                                      sx={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(6, minmax(120px, 1fr))',
+                                        gap: 1,
+                                      }}
+                                    >
                                       {rowSensors.map((sensor, idx) => (
-                                        <Grid item xs={2} key={sensor.sn_idx}>
+                                        <Grid key={sensor.sn_idx}>
                                           <List
                                             sx={{
                                               width: '100%',

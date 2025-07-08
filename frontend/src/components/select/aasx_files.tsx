@@ -45,7 +45,7 @@ export default function SelectSmall({ setSelectedFile }: Props) {
   }, []);
 
   return (
-    <FormControl sx={{width: '100%' }} size='small'>
+    <FormControl sx={{ width: '100%' }} size='small'>
       <Select value={currentFile || ''} onChange={handleChange} IconComponent={ExpandMoreIcon} displayEmpty>
         <MenuItem disabled value='' className='menu-item-disabled'>
           aasx 파일을 선택해 주세요.

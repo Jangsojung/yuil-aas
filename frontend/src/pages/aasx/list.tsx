@@ -67,10 +67,9 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     { field: 'updatedAt', label: '수정 일자' },
   ];
 
-  const { currentPage, rowsPerPage, totalPages, handlePageChange, handleRowsPerPageChange, paginatedData } =
-    useTablePagination({
-      totalCount: sortedFiles?.length || 0,
-    });
+  const { currentPage, rowsPerPage, handlePageChange, handleRowsPerPageChange, paginatedData } = useTablePagination({
+    totalCount: sortedFiles?.length || 0,
+  });
 
   const handleDelete = async () => {
     if (selectedFiles.length === 0) {

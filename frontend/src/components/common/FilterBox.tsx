@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import Box from '@mui/system/Box';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
@@ -31,12 +31,18 @@ export default function FilterBox({ leftContent, buttons = [], buttonAlign = 'ri
 
   return (
     <Box sx={{ flexGrow: 1 }} className='sort-box'>
-      <Grid container spacing={1}>
-        <Grid item xs={buttons.length > 0 ? 8 : 12}>
-          {leftContent}
-        </Grid>
+      <Grid
+        container
+        spacing={1}
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: buttons.length > 0 ? '2fr 1fr' : '1fr',
+          gap: 1,
+        }}
+      >
+        <Grid>{leftContent}</Grid>
         {buttons.length > 0 && (
-          <Grid item xs={4}>
+          <Grid>
             <Stack spacing={1} direction='row' sx={{ justifyContent: getAlignment() }}>
               {buttons.map((button, index) => (
                 <Button

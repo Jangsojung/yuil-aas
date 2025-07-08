@@ -4,7 +4,7 @@ import { aasxDataState, currentFileState, isVerifiedState, navigationResetState 
 import { handleVerifyAPI } from '../../apis/api/transmit';
 import SelectAASXFile from '../../components/select/aasx_files';
 import TransmitView from '../../section/aas/transmit/view';
-import { Grid } from '@mui/material';
+import Grid from '@mui/system/Grid';
 import { SearchBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { AASXFile } from '../../types/api';
@@ -102,12 +102,12 @@ export default function TransmitPage() {
         ]}
       >
         <Grid container spacing={1}>
-          <Grid item xs={8}>
+          <Grid>
             <Grid container spacing={1}>
-              <Grid item>
+              <Grid>
                 <div className='sort-title'>AASX 파일</div>
               </Grid>
-              <Grid item xs={10}>
+              <Grid>
                 <SelectAASXFile setSelectedFile={setSelectedFile} />
               </Grid>
             </Grid>

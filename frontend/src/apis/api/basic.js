@@ -1,7 +1,4 @@
-'// Basic API functions';
-
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
-import { DEFAULTS } from '../../constants';
 
 // 기초코드 ID로 조회
 export const getBaseByIdAPI = async (ab_idx) => {

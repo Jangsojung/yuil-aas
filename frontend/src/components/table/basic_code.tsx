@@ -5,7 +5,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -118,10 +118,18 @@ export default function BasicTable({
           {rows.map((rowSensors, rowIndex) => (
             <TableRow key={rowIndex}>
               <TableCell colSpan={3}>
-                <Grid container spacing={1}>
+                <Grid
+                  container
+                  spacing={1}
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(6, 1fr)',
+                    gap: 1,
+                  }}
+                >
                   {rowSensors &&
                     rowSensors.map((sensor, idx) => (
-                      <Grid item xs={2} key={sensor.sn_idx}>
+                      <Grid key={sensor.sn_idx}>
                         <List sx={style} className='basic-checkbox'>
                           {showCheckboxes && (!useOriginCheck || sensor.origin_check !== 1) && (
                             <Checkbox
