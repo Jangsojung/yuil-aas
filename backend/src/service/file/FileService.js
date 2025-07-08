@@ -27,13 +27,17 @@ export const getFileFCIdxFromDB = async (fileName, af_kind) => {
   });
 };
 
-export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate = null) => {
+export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate = null, user_idx = null) => {
   return new Promise((resolve, reject) => {
     let query = '';
     const queryParams = [];
 
-    const baseWhereClause = `f.af_kind = ? AND f.fc_idx = ?`;
-    queryParams.push(af_kind, fc_idx);
+    let baseWhereClause = `f.af_kind = ?`;
+    queryParams.push(af_kind);
+    if (fc_idx !== -1) {
+      baseWhereClause += ` AND f.fc_idx = ?`;
+      queryParams.push(fc_idx);
+    }
 
     let dateClause = '';
     if (startDate && endDate) {

@@ -267,7 +267,7 @@ export default function JSONList() {
                   value={selectedFactory}
                   onChange={handleFactoryChange}
                   placeholder='선택'
-                  // refreshKey={factoryRefreshKey}
+                  showAllOption={true}
                 />
               </FormControl>
             </Grid>

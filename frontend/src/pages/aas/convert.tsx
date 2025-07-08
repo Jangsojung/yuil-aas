@@ -389,7 +389,12 @@ export default function ConvertPage() {
                 </Grid>
                 <Grid sx={{ flexGrow: 1 }}>
                   <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                    <FactorySelect value={selectedFactory} onChange={handleFactoryChange} placeholder='선택' />
+                    <FactorySelect
+                      value={selectedFactory}
+                      onChange={handleFactoryChange}
+                      placeholder='선택'
+                      showAllOption={true}
+                    />
                   </FormControl>
                 </Grid>
               </Grid>

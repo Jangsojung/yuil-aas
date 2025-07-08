@@ -11,6 +11,7 @@ interface FactorySelectProps {
   disabled?: boolean;
   placeholder?: string;
   refreshKey?: number;
+  showAllOption?: boolean;
 }
 
 export default function FactorySelect({
@@ -19,6 +20,7 @@ export default function FactorySelect({
   disabled = false,
   placeholder = '공장',
   refreshKey = 0,
+  showAllOption = false,
 }: FactorySelectProps) {
   const [factories, setFactories] = useState<Factory[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export default function FactorySelect({
   }, [user?.cm_idx, refreshKey]);
 
   const handleChange = (event: SelectChangeEvent<number>) => {
-    const selectedValue = event.target.value as number;
+    const selectedValue = Number(event.target.value);
     onChange(selectedValue);
   };
 
@@ -67,6 +69,7 @@ export default function FactorySelect({
         <MenuItem disabled value=''>
           {factories.length === 0 ? '사용 가능한 공장이 없습니다' : placeholder}
         </MenuItem>
+        {showAllOption && <MenuItem value={-1}>전체</MenuItem>}
         {factories.map((factory) => (
           <MenuItem key={factory.fc_idx} value={factory.fc_idx}>
             {factory.fc_name}
