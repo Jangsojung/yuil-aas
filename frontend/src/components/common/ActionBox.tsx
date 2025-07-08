@@ -31,7 +31,7 @@ export default function ActionBox({ buttons, align = 'right', leftContent }: Act
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }} className='sort-box'>
+    <Box>
       <Grid
         container
         spacing={1}

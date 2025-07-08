@@ -45,8 +45,12 @@ input,
 select,
 table,
 textarea {
-  font-family: 'Malgun Gothic', '맑은 고딕', helvetica, sans-serif;
+  font-family: 'Public Sans' ,sans-serif !important;
   letter-spacing: -0.03em;
+}
+
+body {
+  color: #637381 !important;
 }
 
 // 링크 초기화

@@ -101,7 +101,7 @@ export const ListView: React.FC<ListViewProps> = ({
             },
           ]}
         >
-          <Grid container spacing={1} className='flex-center-gap-lg'>
+          <Grid container spacing={4} className='flex-center-gap-lg'>
             {/* 공장 */}
             <Grid container spacing={2}>
               <Grid className='sort-title'>

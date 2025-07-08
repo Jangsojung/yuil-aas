@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
+import Container from '@mui/material/Container';
+import { PageHeader } from '@toolpad/core/PageContainer';
 import Logo from '../../assets/sambo.png';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState, navigationResetState } from '../../recoil/atoms';
@@ -18,9 +19,9 @@ const GreyButton = styled(Button)<ButtonProps>(() => ({
   color: '#637381',
   fontWeight: 'bold',
   backgroundColor: '#ffffff',
-  borderColor: grey[300],
+  borderColor: grey[200],
   '&:hover': {
-    backgroundColor: grey[300],
+    backgroundColor: grey[200],
   },
   padding: '3px 10px',
 }));
@@ -54,13 +55,13 @@ function ToolbarActionsAdmin({ user }: ToolbarActionsAdminProps) {
   const handleHelpClose = () => setHelpOpen(false);
 
   return (
-    <div className='flex-center-gap'>
-      <span>{user}</span>
+    <div className='d-flex align-center gap-10'>
+      <p className='header-user'>{user}</p>
       <GreyButton variant='outlined' onClick={handleLogout}>
         로그아웃
       </GreyButton>
-      <IconButton onClick={handleHelpOpen} sx={{ ml: 1 }} aria-label='도움말'>
-        <HelpOutlineIcon />
+      <IconButton onClick={handleHelpOpen} sx={{p:0}} aria-label='도움말'>
+        <HelpOutlineIcon sx={{fontSize: '1.8rem'}} />
       </IconButton>
       <HelpGuideModal open={helpOpen} onClose={handleHelpClose} />
     </div>
@@ -101,9 +102,10 @@ export default function Layout() {
         toolbarActions: () => <ToolbarActionsAdmin user={`${user?.user_name}님(${user?.user_id})`} />,
       }}
     >
-      <PageContainer>
+      <Container>
+        <PageHeader />
         <Outlet />
-      </PageContainer>
+      </Container>
     </DashboardLayout>
   );
 }
