@@ -26,7 +26,7 @@ export const getFileFCIdxFromDB = async (fileName) => {
   });
 };
 
-export const getFilesFromDB = async (af_kind = 3, fc_idx = 3, startDate = null, endDate = null) => {
+export const getFilesFromDB = async (af_kind = 3, fc_idx, startDate = null, endDate = null) => {
   return new Promise((resolve, reject) => {
     let query = '';
     const queryParams = [];

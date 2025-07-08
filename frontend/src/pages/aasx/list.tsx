@@ -15,6 +15,7 @@ import AlertModal from '../../components/modal/alert';
 import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 import FactorySelect from '../../components/select/factory_select';
 import { AASXFile, AlertModalState } from '../../types';
+import { KINDS } from '../../constants';
 
 interface File {
   af_idx: number;
@@ -164,8 +165,9 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   const getFiles = async (start = startDate, end = endDate) => {
     const startDateStr = start ? dayjs(start).format('YYYY-MM-DD') : '';
     const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
+    const af_kind = KINDS.AASX_KIND;
 
-    const data: File[] = await getFilesAPI(startDateStr, endDateStr, selectedFactory);
+    const data: File[] = await getFilesAPI(startDateStr, endDateStr, selectedFactory, af_kind);
     setFiles(Array.isArray(data) ? data : []);
   };
 

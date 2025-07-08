@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedConvert, user_idx) => {
+export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedConvert, user_idx, af_kind) => {
   const formattedStart = startDate.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
   const formattedEnd = endDate.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
   const startDateTime = `${formattedStart} 00:00:00`;
@@ -158,7 +158,7 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
 
     const [existing] = await pool
       .promise()
-      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 1', [file_name]);
+      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?', [file_name, af_kind]);
     if (existing.length > 0) {
       throw new Error('이미 생성되어있는 파일입니다.');
     }

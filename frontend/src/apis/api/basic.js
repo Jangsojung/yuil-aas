@@ -3,9 +3,7 @@ import { API_ENDPOINTS, apiHelpers } from '../../config/api';
 // 기초코드 ID로 조회
 export const getBaseByIdAPI = async (ab_idx) => {
   try {
-    const result = await apiHelpers.fetchWithConfig(`${API_ENDPOINTS.BASE_CODE.BASES}/${ab_idx}`, {
-      method: 'GET',
-    });
+    const result = await apiHelpers.post(`${API_ENDPOINTS.BASE_CODE.BASES}/${ab_idx}`, { ab_idx });
     return result;
   } catch (error) {
     return null;
@@ -267,9 +265,7 @@ export const getSensorsForTableAPI = async (fa_idx) => {
 
 export const getFactoriesByCmIdxAPI = async (cm_idx) => {
   try {
-    const result = await apiHelpers.fetchWithConfig(`/api/base_code/factories/${cm_idx}`, {
-      method: 'GET',
-    });
+    const result = await apiHelpers.post(`/api/base_code/factories/${cm_idx}`, { cm_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
     console.error('Error fetching factories:', error);

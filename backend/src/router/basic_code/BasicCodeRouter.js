@@ -73,7 +73,7 @@ export default () => {
     getAllSensorsInGroup(fg_idx, res);
   });
 
-  router.get('/factories/:cm_idx', async (req, res) => {
+  router.post('/factories/:cm_idx', async (req, res) => {
     const { cm_idx } = req.params;
     await getFactoriesByCmIdx(cm_idx, res);
   });
@@ -105,7 +105,7 @@ export default () => {
   });
 
   // 기초코드 ID로 조회
-  router.get('/bases/:id', (req, res) => {
+  router.post('/bases/:id', (req, res) => {
     const { id } = req.params;
     getBaseById(id, res);
   });

@@ -91,7 +91,7 @@ export default () => {
 
   router.post('/getFileFCIdx', getFileFCIdx);
 
-  router.get('/files', (req, res) => {
+  router.post('/files', (req, res) => {
     const { ids } = req.body;
     deleteFiles(ids, res);
   });

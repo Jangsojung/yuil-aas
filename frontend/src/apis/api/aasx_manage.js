@@ -1,4 +1,5 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+import { KINDS } from '../../constants';
 
 // 파일 삭제
 export const deleteAASXAPI = async (ids) => {
@@ -10,7 +11,7 @@ export const deleteAASXAPI = async (ids) => {
   }
 };
 
-export const getFilesAPI = async (startDate, endDate, fc_idx, af_kind = 3) => {
+export const getFilesAPI = async (startDate, endDate, fc_idx, af_kind = KINDS.AASX_KIND) => {
   try {
     const result = await apiHelpers.post('/api/file/aasxFiles', {
       af_kind,
@@ -33,7 +34,7 @@ export const getAASXAPI = async () => {
   }
 };
 
-export const getAASXFilesAPI = async (start, end, fc_idx, af_kind = 3) => {
+export const getAASXFilesAPI = async (start, end, fc_idx, af_kind = KINDS.AASX_KIND) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
       af_kind,

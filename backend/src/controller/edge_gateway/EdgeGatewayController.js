@@ -6,10 +6,6 @@ import {
   deleteEdgeGatewaysFromDB,
   checkNetworkStatus,
 } from '../../service/edge_gateway/EdgeGatewayService.js';
-import fs from 'fs';
-import path from 'path';
-import archiver from 'archiver';
-import { fileURLToPath } from 'url';
 
 export const getEdgeGateways = async (res) => {
   try {
@@ -68,44 +64,6 @@ export const deleteEdgeGateways = async (ids, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
-  }
-};
-
-export const downloadDeployFiles = async (res) => {
-  try {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const deployPath = path.join(__dirname, '../../../deploy');
-
-    // 배포 폴더가 존재하는지 확인
-    if (!fs.existsSync(deployPath)) {
-      return res.status(404).json({ error: '배포 파일을 찾을 수 없습니다.' });
-    }
-
-    // ZIP 파일 생성
-    const archive = archiver('zip', {
-      zlib: { level: 9 }, // 최대 압축
-    });
-
-    // 응답 헤더 설정
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Content-Disposition');
-    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
-
-    // 스트림 연결
-    archive.pipe(res);
-
-    // 배포 폴더의 모든 파일을 ZIP에 추가
-    archive.directory(deployPath, false);
-
-    // ZIP 파일 생성 완료
-    await archive.finalize();
-  } catch (err) {
-    console.error('배포 파일 다운로드 오류:', err);
-    res.status(500).json({ error: '배포 파일 생성 실패' });
   }
 };
 

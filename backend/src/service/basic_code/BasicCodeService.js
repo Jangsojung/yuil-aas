@@ -159,7 +159,7 @@ export const getSelectedSensorsFromDB = async (ab_idx) => {
   });
 };
 
-export const getFacilityGroupsFromDB = async (fc_idx = 3, order = 'asc') => {
+export const getFacilityGroupsFromDB = async (fc_idx, order = 'asc') => {
   return new Promise((resolve, reject) => {
     const validOrder = order;
 

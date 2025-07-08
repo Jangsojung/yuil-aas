@@ -10,7 +10,7 @@ export const getBasesAPI = async (fc_idx) => {
   }
 };
 
-export const insertBaseAPI = async (params) => {
+export const insertJSONAPI = async (params) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.CONVERT, {
       fc_idx: params.fc_idx,
@@ -18,6 +18,7 @@ export const insertBaseAPI = async (params) => {
       startDate: params.startDate,
       endDate: params.endDate,
       selectedConvert: params.ab_idx,
+      af_kind: params.af_kind,
     });
     return data;
   } catch (error) {

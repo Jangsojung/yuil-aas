@@ -50,19 +50,6 @@ export const updateEdgeAPI = async (data) => {
   }
 };
 
-export const downloadDeployFilesAPI = async () => {
-  try {
-    // 새 창에서 다운로드 URL 열기
-    const downloadUrl = `${API_BASE_URL}/api/edge_gateway/download-deploy`;
-    window.open(downloadUrl, '_blank');
-
-    return true;
-  } catch (error) {
-    console.error('Error downloading deploy files:', error);
-    throw error;
-  }
-};
-
 export const checkEdgePingAPI = async (ip, port) => {
   const url = `${API_BASE_URL}/api/edge_gateway/ping`;
   const response = await fetch(url, {

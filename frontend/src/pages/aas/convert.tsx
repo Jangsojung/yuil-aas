@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getBasesAPI, insertBaseAPI } from '../../apis/api/convert';
+import { getBasesAPI, insertJSONAPI } from '../../apis/api/convert';
 import { Dayjs } from 'dayjs';
 import {
   FormControl,
@@ -25,6 +25,7 @@ import ProgressOverlay from '../../components/loading/ProgressOverlay';
 import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 import FactorySelect from '../../components/select/factory_select';
 import { Base, AlertModalState } from '../../types';
+import { KINDS } from '../../constants';
 
 export default function ConvertPage() {
   const [isLoading] = useState(false);
@@ -227,12 +228,13 @@ export default function ConvertPage() {
         });
       }, 500);
 
-      const result = await insertBaseAPI({
+      const result = await insertJSONAPI({
         ab_idx: selectedConvert,
         startDate: startDateStr,
         endDate: endDateStr,
         user_idx: userIdx,
         fc_idx: selectedFactory,
+        af_kind: KINDS.JSON_KIND,
       });
 
       clearInterval(progressInterval);

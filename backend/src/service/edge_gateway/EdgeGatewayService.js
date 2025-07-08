@@ -1,7 +1,6 @@
 import { pool } from '../../index.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import fetch from 'node-fetch';
 
 const execAsync = promisify(exec);
 
@@ -42,9 +41,9 @@ export const checkNetworkStatus = async (ip) => {
     let command;
 
     if (platform === 'win32') {
-      command = `ping -n 1 -w 2000 ${ip}`; // Windows: 2초 타임아웃 추가
+      command = `ping -n 1 -w 2000 ${ip}`; // Windows
     } else {
-      command = `ping -c 1 -W 2 ${ip}`; // Linux/Mac: 2초 타임아웃 추가
+      command = `ping -c 1 -W 2 ${ip}`; // Linux/Mac
     }
 
     const { stdout, stderr } = await execAsync(command);
@@ -52,10 +51,10 @@ export const checkNetworkStatus = async (ip) => {
     // ping 결과에서 응답 시간이나 특정 패턴을 확인
     let isConnected = false;
     if (platform === 'win32') {
-      // Windows ping 결과 확인
+      // Windows
       isConnected = stdout.includes('TTL=') || stdout.includes('시간=') || stdout.includes('Reply from');
     } else {
-      // Linux/Mac ping 결과 확인
+      // Linux/Mac
       isConnected =
         stdout.includes('1 received') || stdout.includes('1 packets received') || stdout.includes('bytes from');
     }

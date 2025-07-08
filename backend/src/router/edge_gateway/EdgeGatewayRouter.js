@@ -5,7 +5,6 @@ import {
   insertEdgeGateways,
   updateEdgeGateway,
   deleteEdgeGateways,
-  downloadDeployFiles,
   checkEdgeGatewayPing,
 } from '../../controller/edge_gateway/EdgeGatewayController.js';
 
@@ -36,10 +35,6 @@ export default () => {
   router.delete('/', (req, res) => {
     const { ids } = req.body;
     deleteEdgeGateways(ids, res);
-  });
-
-  router.get('/download-deploy', (req, res) => {
-    downloadDeployFiles(res);
   });
 
   router.post('/ping', (req, res) => {
