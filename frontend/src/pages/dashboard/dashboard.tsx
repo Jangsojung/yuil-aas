@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/system/Grid';
 import {
   Box,
   Table,
@@ -64,7 +64,18 @@ export default function DashboardPage() {
   }, [latestAasx]);
 
   return (
-    <Box sx={{ p: 2, height: 'calc(100vh - 100px)', overflow: 'hidden', boxSizing: 'border-box' }}>
+    <Box
+      sx={{
+        p: 3,
+        height: 'calc(100vh - 100px)',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        background: '#f8fafc',
+        border: '1px solid #e0e7ef',
+        borderRadius: 3,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+      }}
+    >
       <Grid
         container
         direction='column'
@@ -72,10 +83,23 @@ export default function DashboardPage() {
         spacing={2}
       >
         {/* 윗줄 */}
-        <Grid container sx={{ flex: 1, minHeight: 0, display: 'flex' }} spacing={2}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1, minHeight: 0, gap: 1 }}>
           {/* 왼쪽 위: JSON 파일 */}
-          <Grid xs={6} sx={{ height: '100%' }}>
-            <Box sx={{ border: '1px solid #222', height: '100%', background: '#fff', p: 2, overflow: 'auto' }}>
+          <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <Box
+              sx={{
+                border: '1px solid #d0d7e5',
+                borderRadius: 2,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                height: '100%',
+                background: '#fff',
+                p: 2,
+                overflow: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+              }}
+            >
               <Typography variant='h6' gutterBottom>
                 JSON 파일 (최신 10개)
               </Typography>
@@ -104,10 +128,23 @@ export default function DashboardPage() {
                 </Table>
               </TableContainer>
             </Box>
-          </Grid>
+          </Box>
           {/* 오른쪽 위: AASX 파일 */}
-          <Grid xs={6} sx={{ height: '100%' }}>
-            <Box sx={{ border: '1px solid #222', height: '100%', background: '#fff', p: 2, overflow: 'auto' }}>
+          <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <Box
+              sx={{
+                border: '1px solid #d0d7e5',
+                borderRadius: 2,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                height: '100%',
+                background: '#fff',
+                p: 2,
+                overflow: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+              }}
+            >
               <Typography variant='h6' gutterBottom>
                 AASX 파일 (최신 10개)
               </Typography>
@@ -134,19 +171,24 @@ export default function DashboardPage() {
                 </Table>
               </TableContainer>
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
         {/* 아랫줄 (왼쪽: 최신 JSON 파일 뷰어) */}
-        <Grid container sx={{ flex: 2, minHeight: 0, display: 'flex' }} spacing={2}>
-          <Grid xs={6} sx={{ height: '100%', p: 2, overflow: 'auto' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', flex: 2, minHeight: 0, gap: 1 }}>
+          <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Box
               sx={{
-                border: '1px solid #222',
+                border: '1px solid #d0d7e5',
+                borderRadius: 2,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                 height: '100%',
                 background: '#fff',
                 p: 2,
                 overflow: 'auto',
                 position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
               }}
             >
               <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}>
@@ -186,16 +228,21 @@ export default function DashboardPage() {
                 <Typography color='textSecondary'>데이터 없음</Typography>
               )}
             </Box>
-          </Grid>
-          <Grid xs={6} sx={{ height: '100%', p: 2, overflow: 'auto' }}>
+          </Box>
+          <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Box
               sx={{
-                border: '1px solid #222',
+                border: '1px solid #d0d7e5',
+                borderRadius: 2,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                 height: '100%',
                 background: '#fff',
                 p: 2,
                 overflow: 'auto',
                 position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
               }}
             >
               <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}>
@@ -228,8 +275,8 @@ export default function DashboardPage() {
                 <Typography color='textSecondary'>데이터 없음</Typography>
               )}
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Grid>
     </Box>
   );
