@@ -1,10 +1,11 @@
 import { apiHelpers } from '../../config/api';
+import { KINDS } from '../../constants';
 
-// JSON 파일 목록 조회 (af_kind=1)
+// JSON 파일 목록 조회
 export const getJSONFilesAPI = async (startDate, endDate, fc_idx) => {
   try {
     const result = await apiHelpers.post('/api/file/aasxFiles', {
-      af_kind: 1,
+      af_kind: KINDS.JSON_KIND,
       fc_idx,
       startDate,
       endDate,
@@ -30,7 +31,7 @@ export const deleteJSONAPI = async (fileIds) => {
 // 파일 크기 확인
 export const checkJSONFileSizeAPI = async (af_idx) => {
   try {
-    const result = await apiHelpers.post('/api/file/checkFileSize', { file: { af_idx, af_kind: 1 } });
+    const result = await apiHelpers.post('/api/file/checkFileSize', { file: { af_idx, af_kind: KINDS.JSON_KIND } });
     return result;
   } catch (error) {
     console.error('Error checking JSON file size:', error);
@@ -41,7 +42,7 @@ export const checkJSONFileSizeAPI = async (af_idx) => {
 // 단일 JSON 파일 상세 조회
 export const getJSONFileDetailAPI = async (af_idx) => {
   try {
-    const result = await apiHelpers.post('/api/file/verify', { file: { af_idx, af_kind: 1 } });
+    const result = await apiHelpers.post('/api/file/verify', { file: { af_idx, af_kind: KINDS.JSON_KIND } });
     return result;
   } catch (error) {
     console.error('Error fetching JSON file detail:', error);

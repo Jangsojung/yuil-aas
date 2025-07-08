@@ -162,7 +162,7 @@ export const updateWords = async (updates, res) => {
 
 export const getFileFCIdx = async (req, res) => {
   try {
-    const { fileName } = req.body;
+    const { fileName, af_kind } = req.body;
 
     if (!fileName) {
       return res.status(400).json({
@@ -171,7 +171,14 @@ export const getFileFCIdx = async (req, res) => {
       });
     }
 
-    const fc_idx = await getFileFCIdxFromDB(fileName);
+    if (!af_kind) {
+      return res.status(400).json({
+        success: false,
+        message: '파일 타입(af_kind)이 필요합니다.',
+      });
+    }
+
+    const fc_idx = await getFileFCIdxFromDB(fileName, af_kind);
 
     res.json({
       success: true,

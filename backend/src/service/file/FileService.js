@@ -2,15 +2,16 @@ import { pool } from '../../index.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { FILE_KINDS } from '../../constants/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const getFileFCIdxFromDB = async (fileName) => {
+export const getFileFCIdxFromDB = async (fileName, af_kind) => {
   return new Promise((resolve, reject) => {
-    const query = `SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 1 LIMIT 1`;
+    const query = `SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ? LIMIT 1`;
 
-    pool.query(query, [fileName], (err, results) => {
+    pool.query(query, [fileName, af_kind], (err, results) => {
       if (err) {
         reject(err);
         return;
@@ -26,7 +27,7 @@ export const getFileFCIdxFromDB = async (fileName) => {
   });
 };
 
-export const getFilesFromDB = async (af_kind = 3, fc_idx, startDate = null, endDate = null) => {
+export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate = null) => {
   return new Promise((resolve, reject) => {
     let query = '';
     const queryParams = [];
@@ -42,7 +43,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx, startDate = null, endD
       queryParams.push(startDateTime, endDateTime);
     }
 
-    if (af_kind === 1) {
+    if (af_kind === FILE_KINDS.JSON_KIND) {
       query = `
         SELECT 
           f.af_idx, 
@@ -84,7 +85,7 @@ export const getFilesFromDB = async (af_kind = 3, fc_idx, startDate = null, endD
       }
 
       const files = results.map((file) => {
-        if (af_kind === 1) {
+        if (af_kind === FILE_KINDS.JSON_KIND) {
           return {
             af_idx: file.af_idx,
             af_name: file.af_name,
@@ -117,7 +118,11 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
   try {
     const [existing] = await pool
       .promise()
-      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = 2 OR af_kind = 3)', [fileName]);
+      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = ? OR af_kind = ?)', [
+        fileName,
+        FILE_KINDS.AAS_KIND,
+        FILE_KINDS.AASX_KIND,
+      ]);
     if (existing.length > 0) {
       throw new Error('이미 생성되어있는 파일입니다.');
     }
@@ -162,8 +167,10 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
     }
 
     const aasFileName = fileName;
-    const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
-    const [aasResult] = await pool.promise().query(aasQuery, [fc_idx, aasFileName, user_idx, user_idx]);
+    const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aas', ?, ?)`;
+    const [aasResult] = await pool
+      .promise()
+      .query(aasQuery, [fc_idx, FILE_KINDS.AAS_KIND, aasFileName, user_idx, user_idx]);
     aasInsertId = aasResult.insertId;
     createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: aasInsertId });
 
@@ -208,8 +215,10 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
     }
 
     const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
-    const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, '/files/aasx', ?, ?)`;
-    const [aasxResult] = await pool.promise().query(aasxQuery, [fc_idx, aasxFileName, user_idx, user_idx]);
+    const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aasx', ?, ?)`;
+    const [aasxResult] = await pool
+      .promise()
+      .query(aasxQuery, [fc_idx, FILE_KINDS.AASX_KIND, aasxFileName, user_idx, user_idx]);
     aasxInsertId = aasxResult.insertId;
     createdFiles.push({ type: 'aasx', path: `../files/aasx/${aasxFileName}`, insertId: aasxInsertId });
 
@@ -272,8 +281,10 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
     const newAasxFileName = fileName.replace(/\.json$/i, '.aasx');
     const [existing] = await pool
       .promise()
-      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = 2 OR af_kind = 3) AND af_idx != ?', [
+      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = ? OR af_kind = ?) AND af_idx != ?', [
         newAasxFileName,
+        FILE_KINDS.AAS_KIND,
+        FILE_KINDS.AASX_KIND,
         af_idx,
       ]);
     if (existing.length > 0) {
@@ -282,7 +293,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
 
     const [aasxRows] = await pool
       .promise()
-      .query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ? AND af_kind = 3', [af_idx]);
+      .query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ? AND af_kind = ?', [af_idx, FILE_KINDS.AASX_KIND]);
 
     if (aasxRows.length === 0) {
       throw new Error('수정할 AASX 파일을 찾을 수 없습니다.');
@@ -326,14 +337,19 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
 
     const [existingAasRows] = await pool
       .promise()
-      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = 2', [oldAasFileName]);
+      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?', [
+        oldAasFileName,
+        FILE_KINDS.AAS_KIND,
+      ]);
 
     if (existingAasRows.length > 0) {
-      const updateAasQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_name = ? AND af_kind = 2`;
-      await pool.promise().query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName]);
+      const updateAasQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_name = ? AND af_kind = ?`;
+      await pool.promise().query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName, FILE_KINDS.AAS_KIND]);
     } else {
-      const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 2, ?, '/files/aas', ?, ?)`;
-      const [aasResult] = await pool.promise().query(insertAasQuery, [fc_idx, newAasFileName, user_idx, user_idx]);
+      const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aas', ?, ?)`;
+      const [aasResult] = await pool
+        .promise()
+        .query(insertAasQuery, [fc_idx, FILE_KINDS.AAS_KIND, newAasFileName, user_idx, user_idx]);
       newAasInsertId = aasResult.insertId;
       createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: newAasInsertId });
     }
@@ -363,8 +379,10 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
       throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
     }
 
-    const insertAasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 3, ?, '/files/aasx', ?, ?)`;
-    const [aasxResult] = await pool.promise().query(insertAasxQuery, [fc_idx, newAasxFileName, user_idx, user_idx]);
+    const insertAasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aasx', ?, ?)`;
+    const [aasxResult] = await pool
+      .promise()
+      .query(insertAasxQuery, [fc_idx, FILE_KINDS.AASX_KIND, newAasxFileName, user_idx, user_idx]);
     newAasxInsertId = aasxResult.insertId;
     createdFiles.push({ type: 'aasx', path: `../files/aasx/${newAasxFileName}`, insertId: newAasxInsertId });
 
@@ -383,8 +401,12 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
       console.error('기존 파일 삭제 중 오류 발생:', errorText);
     }
 
-    await pool.promise().query('DELETE FROM tb_aasx_file WHERE af_name = ? AND af_kind = 2', [oldAasFileName]);
-    await pool.promise().query('DELETE FROM tb_aasx_file WHERE af_idx = ? AND af_kind = 3', [af_idx]);
+    await pool
+      .promise()
+      .query('DELETE FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?', [oldAasFileName, FILE_KINDS.AAS_KIND]);
+    await pool
+      .promise()
+      .query('DELETE FROM tb_aasx_file WHERE af_idx = ? AND af_kind = ?', [af_idx, FILE_KINDS.AASX_KIND]);
 
     return {
       success: true,
@@ -415,8 +437,8 @@ export const deleteFilesFromDB = async (ids) => {
       };
     }
 
-    const aasxFiles = results.filter((file) => file.af_kind === 3);
-    const jsonFiles = results.filter((file) => file.af_kind === 1);
+    const aasxFiles = results.filter((file) => file.af_kind === FILE_KINDS.AASX_KIND);
+    const jsonFiles = results.filter((file) => file.af_kind === FILE_KINDS.JSON_KIND);
 
     const deletePaths = [];
 
@@ -430,8 +452,8 @@ export const deleteFilesFromDB = async (ids) => {
         deletePaths.push(`../files/aas/${aasFileName}`);
       });
 
-      const deleteAasQuery = `delete from tb_aasx_file where af_name in (?) and af_kind = 2`;
-      await pool.promise().query(deleteAasQuery, [aasFileNames]);
+      const deleteAasQuery = `delete from tb_aasx_file where af_name in (?) and af_kind = ?`;
+      await pool.promise().query(deleteAasQuery, [aasFileNames, FILE_KINDS.AAS_KIND]);
     }
 
     if (jsonFiles.length > 0) {
@@ -495,7 +517,7 @@ export const checkFileSizeFromDB = async (file) => {
             let filePath;
             let fileName;
 
-            if (af_kind === 1) {
+            if (af_kind === FILE_KINDS.JSON_KIND) {
               fileName = af_name;
               filePath = path.join(__dirname, '../../../../files/front', fileName);
             } else {
@@ -524,7 +546,7 @@ export const checkFileSizeFromDB = async (file) => {
         let filePath;
         let fileName;
 
-        if (af_kind === 1) {
+        if (af_kind === FILE_KINDS.JSON_KIND) {
           fileName = af_name;
           filePath = path.join(__dirname, '../../../../files/front', fileName);
         } else {
@@ -578,7 +600,7 @@ export const getVerifyFromDB = async (file) => {
       let filePath;
       let fileName;
 
-      if (af_kind === 1) {
+      if (af_kind === FILE_KINDS.JSON_KIND) {
         fileName = af_name;
         filePath = path.join(__dirname, '../../../../files/front', fileName);
       } else {
@@ -633,7 +655,7 @@ export const getVerifyFromDB = async (file) => {
         try {
           const jsonData = JSON.parse(fileData);
 
-          if (af_kind === 1) {
+          if (af_kind === FILE_KINDS.JSON_KIND) {
             resolve({
               aasData: jsonData,
               jsonFile: {

@@ -15,6 +15,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import AlertModal from './alert';
 import { updateAASXFileAPI, uploadAASXFileAPI, getFileFCIdxAPI } from '../../apis/api/aasx_manage';
+import { KINDS } from '../../constants';
 import ProgressOverlay from '../loading/ProgressOverlay';
 import { AASXFile } from '../../types/api';
 
@@ -110,7 +111,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         setProgressLabel('기존 파일 삭제 완료 ...');
         setProgress(50);
         setProgressLabel('AAS 파일 생성 중 ...');
-        const fcIdxResult = await getFileFCIdxAPI(uploadFile.name);
+        const fcIdxResult = await getFileFCIdxAPI(uploadFile.name, KINDS.JSON_KIND);
         const fc_idx = fcIdxResult?.data?.fc_idx || 1;
 
         result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx, fc_idx);
@@ -132,7 +133,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         setProgressLabel('파일 업로드 완료 ...');
         setProgress(50);
         setProgressLabel('AAS 파일 생성 중 ...');
-        const fcIdxResult = await getFileFCIdxAPI(uploadFile.name);
+        const fcIdxResult = await getFileFCIdxAPI(uploadFile.name, KINDS.JSON_KIND);
         const fc_idx = fcIdxResult?.data?.fc_idx || 1;
 
         result = await uploadAASXFileAPI(uploadFile, userIdx, fc_idx);

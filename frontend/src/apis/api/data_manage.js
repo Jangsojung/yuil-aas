@@ -1,4 +1,5 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
+import { KINDS } from '../../constants';
 
 export const deleteDataAPI = async (selectedFiles) => {
   try {
@@ -23,7 +24,7 @@ export const getDataAPI = async () => {
 export const getAASXFilesAPI = async (start, end, fc_idx) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
-      af_kind: 2,
+      af_kind: KINDS.AAS_KIND,
       fc_idx: fc_idx,
       startDate: start,
       endDate: end,

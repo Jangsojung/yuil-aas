@@ -25,9 +25,11 @@ export const getFilesAPI = async (startDate, endDate, fc_idx, af_kind = KINDS.AA
   }
 };
 
-export const getAASXAPI = async () => {
+export const getAASXAPI = async (af_kind = KINDS.AASX_KIND) => {
   try {
-    const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX);
+    const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX, {
+      af_kind,
+    });
     return data;
   } catch (error) {
     throw error;
@@ -48,9 +50,9 @@ export const getAASXFilesAPI = async (start, end, fc_idx, af_kind = KINDS.AASX_K
   }
 };
 
-export const getFileFCIdxAPI = async (fileName) => {
+export const getFileFCIdxAPI = async (fileName, af_kind = KINDS.JSON_KIND) => {
   try {
-    const result = await apiHelpers.post('/api/file/getFileFCIdx', { fileName });
+    const result = await apiHelpers.post('/api/file/getFileFCIdx', { fileName, af_kind });
     return result;
   } catch (error) {
     return null;
@@ -101,9 +103,11 @@ export const updateAASXFileAPI = async (af_idx, fileName, userIdx, fc_idx) => {
 };
 
 // AASX 파일 목록 조회 (간단한 버전)
-export const getAASXFilesListAPI = async () => {
+export const getAASXFilesListAPI = async (af_kind = KINDS.AASX_KIND) => {
   try {
-    const result = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES);
+    const result = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
+      af_kind,
+    });
     return result;
   } catch (error) {
     throw error;

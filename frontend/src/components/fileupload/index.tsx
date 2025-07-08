@@ -1,5 +1,6 @@
 import React, { ChangeEvent, DragEvent, FC, useState } from 'react';
 import { FILE } from '../../constants';
+import AlertModal from '../modal/alert';
 
 export type FileUploadProps = {
   imageButton?: boolean;
@@ -35,6 +36,15 @@ export const FileUpload: FC<FileUploadProps> = ({
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [labelText, setLabelText] = useState(hoverLabel);
+  const [alertModal, setAlertModal] = useState<{
+    open: boolean;
+    title: string;
+    content: string;
+  }>({
+    open: false,
+    title: '',
+    content: '',
+  });
 
   const stopDefaults = (e: DragEvent) => {
     e.stopPropagation();
@@ -63,7 +73,11 @@ export const FileUpload: FC<FileUploadProps> = ({
     if (files.length > 0) {
       const file = files[0];
       if (file.size > FILE.MAX_SIZE) {
-        alert(`파일 크기는 ${FILE.MAX_SIZE / (1024 * 1024)}MB 이하여야 합니다.`);
+        setAlertModal({
+          open: true,
+          title: '알림',
+          content: `파일 크기는 ${FILE.MAX_SIZE / (1024 * 1024)}MB 이하여야 합니다.`,
+        });
         return;
       }
     }
@@ -74,7 +88,11 @@ export const FileUpload: FC<FileUploadProps> = ({
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.size > FILE.MAX_SIZE) {
-      alert(`파일 크기는 ${FILE.MAX_SIZE / (1024 * 1024)}MB 이하여야 합니다.`);
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: `파일 크기는 ${FILE.MAX_SIZE / (1024 * 1024)}MB 이하여야 합니다.`,
+      });
       event.target.value = '';
       return;
     }
@@ -82,22 +100,31 @@ export const FileUpload: FC<FileUploadProps> = ({
   };
 
   return (
-    <div
-      className={`file-upload-container ${isDragOver ? 'drag-over' : ''}`}
-      style={{
-        width,
-        height,
-        backgroundColor: isDragOver ? '#e0e0e0' : backgroundColor,
-      }}
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-    >
-      <input onChange={handleChange} accept={accept} id='file-upload' type='file' className='file-upload-input' />
-      <label htmlFor='file-upload' className='file-upload-label'>
-        {selectedFileName ? selectedFileName : labelText}
-      </label>
-    </div>
+    <>
+      <div
+        className={`file-upload-container ${isDragOver ? 'drag-over' : ''}`}
+        style={{
+          width,
+          height,
+          backgroundColor: isDragOver ? '#e0e0e0' : backgroundColor,
+        }}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        <input onChange={handleChange} accept={accept} id='file-upload' type='file' className='file-upload-input' />
+        <label htmlFor='file-upload' className='file-upload-label'>
+          {selectedFileName ? selectedFileName : labelText}
+        </label>
+      </div>
+      <AlertModal
+        open={alertModal.open}
+        handleClose={() => setAlertModal({ ...alertModal, open: false })}
+        title={alertModal.title}
+        content={alertModal.content}
+        type='alert'
+      />
+    </>
   );
 };
