@@ -63,10 +63,9 @@ export default function ConvertPage() {
     { field: 'createdAt', label: '생성 일자' },
   ];
 
-  const { currentPage, rowsPerPage, totalPages, handlePageChange, handleRowsPerPageChange, paginatedData } =
-    useTablePagination({
-      totalCount: sortedBases?.length || 0,
-    });
+  const { currentPage, rowsPerPage, handlePageChange, handleRowsPerPageChange, paginatedData } = useTablePagination({
+    totalCount: sortedBases?.length || 0,
+  });
 
   const [progress, setProgress] = useState(0);
   const [progressOpen, setProgressOpen] = useState(false);
@@ -357,6 +356,7 @@ export default function ConvertPage() {
 
   useEffect(() => {
     handleNavigationReset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
   return (

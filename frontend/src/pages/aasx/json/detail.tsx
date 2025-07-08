@@ -55,7 +55,7 @@ export default function JsonDetail() {
             state: {
               showAlert: true,
               alertTitle: '파일 크기 초과',
-              alertContent: `파일 크기: ${(fileSizeData.size / (1024 * 1024)).toFixed(1)}MB\n\n500MB 이상의 파일은 상세보기를 할 수 없습니다.\nAASX Package Viewer를 통해 확인해주세요.`,
+              alertContent: `파일 크기: ${(fileSizeData.size / (1024 * 1024)).toFixed(1)}MB\n\n500MB 이상의 파일은 상세보기를 할 수 없습니다.\nText Viewer를 통해 확인해주세요.`,
             },
           });
           return Promise.reject('FILE_TOO_LARGE'); // 체인 중단

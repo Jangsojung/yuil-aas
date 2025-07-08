@@ -10,6 +10,9 @@ import AlertModal from '../../components/modal/alert';
 import { AASXFile } from '../../types/api';
 import { transformAASXData } from '../../utils/aasxTransform';
 import { useAlertModal } from '../../hooks/useAlertModal';
+import FactorySelect from '../../components/select/factory_select';
+import { FormControl } from '@mui/material';
+import { getAASXFilesAPI } from '../../apis/api/aasx_manage';
 
 export default function TransmitPage() {
   const currentFile = useRecoilValue(currentFileState);
@@ -17,14 +20,23 @@ export default function TransmitPage() {
   const [, setIsVerified] = useRecoilState(isVerifiedState);
   const [, setCurrentFile] = useRecoilState(currentFileState);
   const [selectedFile, setSelectedFile] = useState<AASXFile | undefined>(undefined);
+  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
+  const [aasxFiles, setAasxFiles] = useState<AASXFile[]>([]);
   const navigationReset = useRecoilValue(navigationResetState);
 
   // 커스텀 훅 사용
   const { alertModal, showAlert, closeAlert } = useAlertModal();
 
   const handleVerify = async () => {
+    // 공장 선택 여부 확인
+    if (!selectedFactory) {
+      showAlert('알림', '공장을 선택해주세요.');
+      return;
+    }
+
+    // AASX 파일 선택 여부 확인
     if (!selectedFile) {
-      showAlert('알림', '선택된 파일이 없습니다.');
+      showAlert('알림', '검증할 AASX 파일을 선택해주세요.');
       return;
     }
 
@@ -44,20 +56,17 @@ export default function TransmitPage() {
       }
     } catch (error) {
       console.error('검증 중 오류 발생:', error);
+      console.error('에러 타입:', typeof error);
 
-      // AAS 파일이 너무 큰 경우 특별 처리
-      if (error instanceof Error && error.message === 'AAS_FILE_TOO_LARGE') {
-        showAlert(
-          '파일 크기 초과',
-          '500MB 이상의 파일은 검증할 수 없습니다.\nAASX Package Viewer를 통해 확인해주세요.'
-        );
-        return;
+      if (error instanceof Error) {
+        console.error('에러 메시지:', error.message);
+        console.error('에러 객체:', error);
       }
 
-      // API 응답에서 에러 메시지 확인
+      // 파일 크기 초과 에러 처리 - Error 객체의 message에서 확인
       if (error instanceof Error) {
         const errorMessage = error.message;
-        if (errorMessage.includes('AAS_FILE_TOO_LARGE')) {
+        if (errorMessage === 'FILE_TOO_LARGE') {
           showAlert(
             '파일 크기 초과',
             '500MB 이상의 파일은 검증할 수 없습니다.\nAASX Package Viewer를 통해 확인해주세요.'
@@ -66,7 +75,53 @@ export default function TransmitPage() {
         }
       }
 
+      // API 응답에서 에러 메시지 확인 (백엔드에서 JSON 형태로 반환하는 경우)
+      if (error && typeof error === 'object' && 'error' in error) {
+        const apiError = (error as any).error;
+        if (apiError === 'FILE_TOO_LARGE') {
+          showAlert(
+            '파일 크기 초과',
+            '500MB 이상의 파일은 검증할 수 없습니다.\nAASX Package Viewer를 통해 확인해주세요.'
+          );
+          return;
+        }
+      }
+
+      // 응답 데이터에서 에러 확인 (apiHelpers에서 설정한 response.data)
+      if (error && typeof error === 'object' && 'response' in error) {
+        const response = (error as any).response;
+        if (response && response.data) {
+          console.error('응답 데이터:', response.data);
+          if (response.data === 'FILE_TOO_LARGE') {
+            showAlert(
+              '파일 크기 초과',
+              '500MB 이상의 파일은 검증할 수 없습니다.\nAASX Package Viewer를 통해 확인해주세요.'
+            );
+            return;
+          }
+        }
+      }
+
       showAlert('오류', '파일 검증 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleFactoryChange = async (factoryId: number) => {
+    setSelectedFactory(factoryId);
+    setSelectedFile(undefined);
+    setCurrentFile(null);
+
+    if (factoryId) {
+      try {
+        // 공장별 AASX 파일 가져오기
+        const files = await getAASXFilesAPI(null, null, factoryId);
+        setAasxFiles(Array.isArray(files) ? files : []);
+      } catch (error) {
+        console.error('공장별 AASX 파일 가져오기 실패:', error);
+        setAasxFiles([]);
+      }
+    } else {
+      setAasxFiles([]);
     }
   };
 
@@ -75,6 +130,8 @@ export default function TransmitPage() {
     setAasxData(null);
     setIsVerified(false);
     setCurrentFile(null);
+    setSelectedFactory('');
+    setAasxFiles([]);
   };
 
   useEffect(() => {
@@ -97,23 +154,38 @@ export default function TransmitPage() {
             text: '검증하기',
             onClick: handleVerify,
             color: 'success',
-            disabled: !currentFile,
           },
         ]}
       >
-        <Grid container spacing={1}>
-          <Grid>
-            <Grid container spacing={1}>
-              <Grid>
-                <div className='sort-title'>AASX 파일</div>
-              </Grid>
-              <Grid>
-                <SelectAASXFile setSelectedFile={setSelectedFile} />
-              </Grid>
+        <Grid container spacing={4}>
+          {/* 공장 선택 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>공장</div>
+            </Grid>
+            <Grid sx={{ flexGrow: 1 }}>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <FactorySelect value={selectedFactory} onChange={handleFactoryChange} placeholder='공장을 선택하세요' />
+              </FormControl>
             </Grid>
           </Grid>
+          {/* 공장 선택 */}
+
+          {/* AASX 파일 선택 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>AASX 파일</div>
+            </Grid>
+            <Grid sx={{ flexGrow: 1 }}>
+              <FormControl sx={{ width: '100%' }} size='small'>
+                <SelectAASXFile setSelectedFile={setSelectedFile} files={aasxFiles} disabled={!selectedFactory} />
+              </FormControl>
+            </Grid>
+          </Grid>
+          {/* AASX 파일 선택 */}
         </Grid>
       </SearchBox>
+
       <TransmitView />
 
       <AlertModal

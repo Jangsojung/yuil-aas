@@ -117,8 +117,8 @@ export const getVerify = async (file, res) => {
     console.error(err.message);
     if (res) {
       // 특별한 에러 코드 처리
-      if (err.message === 'AAS_FILE_TOO_LARGE') {
-        return res.status(400).json({ error: 'AAS_FILE_TOO_LARGE' });
+      if (err.message === 'FILE_TOO_LARGE' || err.message === 'AAS_FILE_TOO_LARGE') {
+        return res.status(400).json({ error: 'FILE_TOO_LARGE' });
       }
       res.status(500).json({ error: 'Internal Server Error' });
     } else {
