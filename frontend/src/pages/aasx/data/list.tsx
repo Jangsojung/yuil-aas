@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../../recoil/atoms';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
-import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
+import { Checkbox, Table, TableBody, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
 import Pagination from '../../../components/pagination';
 import DataTableRow from '../../../components/tableRow/DataTableRow';
 import { SearchBox, FilterBox, SortableTableHeader } from '../../../components/common';

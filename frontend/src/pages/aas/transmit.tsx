@@ -117,7 +117,7 @@ export default function TransmitPage() {
         const files = await getAASXFilesAPI(null, null, factoryId);
         setAasxFiles(Array.isArray(files) ? files : []);
       } catch (error) {
-        console.error('공장별 AASX 파일 가져오기 실패:', error);
+        console.error('공장별 데이터 가져오기 실패:', error);
         setAasxFiles([]);
       }
     } else {

@@ -37,7 +37,7 @@ export default function TransmitView() {
                 borderRadius: '4px',
               }}
             >
-              검증 버튼을 눌러 AASX 파일을 검증해주세요.
+              검증하기 버튼을 눌러 AASX 파일을 검증해주세요.
             </Box>
           )}
         </Grid>

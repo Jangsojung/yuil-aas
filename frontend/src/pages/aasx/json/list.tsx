@@ -1,7 +1,6 @@
-import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import { TextField } from '@mui/material';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
-import { Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import Grid from '@mui/system/Grid';
 import Pagination from '../../../components/pagination';
 import JSONTableRow from '../../../components/tableRow/JSONTableRow';

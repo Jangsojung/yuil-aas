@@ -32,6 +32,7 @@ export const useWordManagement = () => {
       setWords([]);
       setFilteredWords([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const applyFilters = useCallback(
@@ -73,6 +74,7 @@ export const useWordManagement = () => {
 
   useEffect(() => {
     applyFilters(words);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showUnmatchedOnly, words]);
 
   const handleItemCheckboxChange = useCallback((item: Word) => {

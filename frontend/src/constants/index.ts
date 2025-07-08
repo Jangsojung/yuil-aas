@@ -5,22 +5,10 @@ export const PAGINATION = {
   ROWS_PER_PAGE_OPTIONS: [5, 10, 25, 50, 100, { label: '전체', value: -1 }],
 } as const;
 
-// API 관련 상수
-export const API = {
-  // TIMEOUT: 300000, // 타임아웃 제거 (큰 파일 처리용)
-  RETRY_COUNT: 3,
-} as const;
-
 // 파일 관련 상수
 export const FILE = {
   MAX_SIZE: 100 * 1024 * 1024, // 100MB
   ALLOWED_TYPES: ['.aasx', '.json'],
-} as const;
-
-// 검색 관련 상수
-export const SEARCH = {
-  MIN_LENGTH: 2,
-  DEBOUNCE_DELAY: 300,
 } as const;
 
 // 모달 타입
@@ -30,7 +18,8 @@ export const MODAL_TYPE = {
 } as const;
 
 // 기본값들
-export const DEFAULTS = {
-  FACILITY_GROUP_ID: 3,
+export const KINDS = {
+  JSON_KIND: 1,
+  AAS_KIND: 2,
   AASX_KIND: 3,
 };

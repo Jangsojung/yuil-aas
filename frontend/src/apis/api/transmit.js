@@ -1,5 +1,4 @@
 import { API_ENDPOINTS, apiHelpers } from '../../config/api';
-import { DEFAULTS } from '../../constants';
 
 export const handleVerifyAPI = async (selectedFile) => {
   try {
@@ -14,10 +13,10 @@ export const handleVerifyAPI = async (selectedFile) => {
 };
 
 // 설비그룹 조회 (transmit용)
-export const getFacilityGroupsForTransmitAPI = async () => {
+export const getFacilityGroupsForTransmitAPI = async (factoryId) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.FACILITY_GROUPS, {
-      fc_idx: DEFAULTS.FACILITY_GROUP_ID,
+      fc_idx: factoryId,
     });
     return Array.isArray(result) ? result : [];
   } catch (error) {
@@ -49,10 +48,10 @@ export const getSensorsForTransmitAPI = async (fa_idx) => {
 };
 
 // 트리 데이터 구축 (transmit용)
-export const buildTransmitTreeDataAPI = async () => {
+export const buildTransmitTreeDataAPI = async (factoryId) => {
   try {
-    // 1. 모든 설비그룹 조회
-    const facilityGroups = await getFacilityGroupsForTransmitAPI();
+    // 1. 선택된 공장의 설비그룹 조회
+    const facilityGroups = await getFacilityGroupsForTransmitAPI(factoryId);
 
     // 2. 각 설비그룹별로 설비와 센서 정보 조회
     const facilitiesAll = await Promise.all(

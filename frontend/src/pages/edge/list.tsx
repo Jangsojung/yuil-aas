@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI } from '../../apis/api/edge';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Pagination from '../../components/pagination';
 import { useRecoilValue } from 'recoil';
@@ -153,6 +153,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
 
   useEffect(() => {
     getEdgeWithStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -164,10 +165,12 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     );
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     handleNavigationReset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
   useEffect(() => {

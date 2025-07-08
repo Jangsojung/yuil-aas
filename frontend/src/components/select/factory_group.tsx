@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { getFacilityGroupsAPI } from '../../apis/api/basic';
-import { DEFAULTS } from '../../constants';
 import { FacilityGroup } from '../../types/api';
 import FactorySelect from './factory_select';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../recoil/atoms';
 
 interface FacilityGroupSelectProps {
   value: number | '';
@@ -27,17 +28,24 @@ export default function FacilityGroupSelect({
   const [facilityGroups, setFacilityGroups] = useState<FacilityGroup[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const user = useRecoilValue(userState);
 
   const handleFetchFacilityGroups = async () => {
     if (showFactorySelect && !selectedFactory) {
       setFacilityGroups([]);
       return;
     }
+
+    // 공장 선택이 필수
+    if (!selectedFactory) {
+      setFacilityGroups([]);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const fc_idx = showFactorySelect ? (selectedFactory as number) : DEFAULTS.FACILITY_GROUP_ID;
-      const data = await getFacilityGroupsAPI(fc_idx);
+      const data = await getFacilityGroupsAPI(selectedFactory as number);
       setFacilityGroups(data || []);
     } catch (err) {
       console.error('설비 그룹 조회 실패:', err);
