@@ -64,13 +64,13 @@ export default function DashboardPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getJSONFilesAPI('', '', -1, 10 as any as null).then((files) => {
+    getJSONFilesAPI('', '', -1, null).then((files) => {
       setJsonFiles(files);
       if (files && files.length > 0) {
         setLatestJson(files[0]);
       }
     });
-    getFilesAPI('', '', -1, undefined, 10 as any as null).then((files) => {
+    getFilesAPI('', '', -1, undefined, null).then((files) => {
       setAasxFiles(files);
       if (files && files.length > 0) {
         setLatestAasx(files[0]);
@@ -129,7 +129,7 @@ export default function DashboardPage() {
           <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Box sx={dashboardPanelStyle}>
               <Typography variant='h6' gutterBottom>
-                JSON 파일 (최신 10개)
+                JSON 파일
               </Typography>
               <TableContainer component={Paper}>
                 <Table size='small'>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
           <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Box sx={dashboardPanelStyle}>
               <Typography variant='h6' gutterBottom>
-                AASX 파일 (최신 10개)
+                AASX 파일
               </Typography>
               <TableContainer component={Paper}>
                 <Table size='small'>
