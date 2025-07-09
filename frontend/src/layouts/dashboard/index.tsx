@@ -10,7 +10,7 @@ import { Button, ButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
 
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import IconButton from '@mui/material/IconButton';
 import HelpGuideModal from '../../components/modal/HelpGuideModal';
@@ -29,9 +29,9 @@ const GrayButton = styled(Button)<ButtonProps>(() => ({
 function CustomAppTitle() {
   return (
     <div className='logo'>
-      <Link to='/dashboard/dashboard'>
+      <RouterLink to='/dashboard/dashboard'>
         <img src={Logo} alt='삼보에이앤티' />
-      </Link>
+      </RouterLink>
     </div>
   );
 }
@@ -60,8 +60,8 @@ function ToolbarActionsAdmin({ user }: ToolbarActionsAdminProps) {
       <GrayButton variant='outlined' onClick={handleLogout}>
         로그아웃
       </GrayButton>
-      <IconButton onClick={handleHelpOpen} sx={{p:0}} aria-label='도움말'>
-        <HelpOutlineIcon sx={{fontSize: '1.8rem'}} />
+      <IconButton onClick={handleHelpOpen} sx={{ p: 0 }} aria-label='도움말'>
+        <HelpOutlineIcon sx={{ fontSize: '1.8rem' }} />
       </IconButton>
       <HelpGuideModal open={helpOpen} onClose={handleHelpClose} />
     </div>
@@ -93,6 +93,49 @@ export default function Layout() {
       document.removeEventListener('click', handleNavigationClick);
     };
   }, [location.pathname, setNavigationReset]);
+
+  // 기존 브레드크럼에 홈 아이콘 추가
+  React.useEffect(() => {
+    const addHomeIconToBreadcrumb = () => {
+      const breadcrumbOl = document.querySelector('.MuiBreadcrumbs-ol');
+      if (breadcrumbOl && !breadcrumbOl.querySelector('.home-icon-added')) {
+        const firstLi = breadcrumbOl.querySelector('li');
+        if (firstLi) {
+          // 홈 아이콘 생성
+          const homeIcon = document.createElement('a');
+          homeIcon.href = '/dashboard/dashboard';
+          homeIcon.className =
+            'MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineHover home-icon-added';
+          homeIcon.style.display = 'flex';
+          homeIcon.style.alignItems = 'center';
+          homeIcon.innerHTML = `
+            <svg style="width: 1.2rem; height: 1.2rem; margin-right: 4px;" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+          `;
+
+          // 첫 번째 아이템 앞에 홈 아이콘 추가
+          const homeLi = document.createElement('li');
+          homeLi.className = 'MuiBreadcrumbs-li';
+          homeLi.appendChild(homeIcon);
+
+          // 구분자 추가
+          const separator = document.createElement('li');
+          separator.className = 'MuiBreadcrumbs-separator';
+          separator.setAttribute('aria-hidden', 'true');
+          separator.style.margin = '0 8px';
+          separator.innerHTML = '/';
+
+          breadcrumbOl.insertBefore(separator, firstLi);
+          breadcrumbOl.insertBefore(homeLi, separator);
+        }
+      }
+    };
+
+    // DOM이 업데이트된 후 실행
+    const timer = setTimeout(addHomeIconToBreadcrumb, 100);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   return (
     <DashboardLayout
