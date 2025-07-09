@@ -77,7 +77,6 @@ export const synchronizeFacility = async (res) => {
     const result = await synchronizeFacilityData();
     res.status(200).json(result);
   } catch (err) {
-    console.error('설비 동기화 오류:', err);
     res.status(500).json({
       success: false,
       error: true,

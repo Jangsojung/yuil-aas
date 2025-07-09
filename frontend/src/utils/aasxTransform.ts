@@ -2,7 +2,6 @@ import { AASXData, AASItem, SubmodelItem, SubmodelElementCollection, ChildCollec
 
 export const transformAASXData = (rawData: any): AASXData | null => {
   if (!rawData || !rawData.assetAdministrationShells || !rawData.submodels) {
-    console.error('유효하지 않은 AASX 데이터 형식');
     return null;
   }
 

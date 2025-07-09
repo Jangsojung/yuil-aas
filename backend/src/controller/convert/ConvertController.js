@@ -6,8 +6,6 @@ export const insertConverts = async (fc_idx, startDate, endDate, selectedConvert
 
     res.status(200).json(result);
   } catch (err) {
-    console.error('Convert error:', err.message);
-
     res.status(400).json({
       success: false,
       error: true,

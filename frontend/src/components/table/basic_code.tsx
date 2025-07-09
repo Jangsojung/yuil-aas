@@ -57,21 +57,13 @@ export default function BasicTable({
   };
 
   const getSelectedSensors = async (selectedBase: Base) => {
-    try {
-      const data = await getBaseSensorsForTableAPI(selectedBase.ab_idx);
-      setInternalSelectedSensors(data);
-    } catch (error) {
-      console.error('Error fetching selected sensors:', error);
-    }
+    const data = await getBaseSensorsForTableAPI(selectedBase.ab_idx);
+    setInternalSelectedSensors(data);
   };
 
   const getSensors = async (fa_idx: number) => {
-    try {
-      const data = await getSensorsForTableAPI(fa_idx);
-      setSensors(data);
-    } catch (error) {
-      console.error('Error fetching sensors:', error);
-    }
+    const data = await getSensorsForTableAPI(fa_idx);
+    setSensors(data);
   };
 
   const handleCheckboxChange = (sensorIdx: number) => {

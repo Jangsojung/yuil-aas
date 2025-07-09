@@ -22,7 +22,6 @@ export const getFiles = async (af_kind, fc_idx, startDate, endDate, res, limit =
     const result = await getFilesFromDB(af_kind, fc_idx, startDate, endDate, null, limit);
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -32,7 +31,6 @@ export const insertAASXFile = async (fc_idx, fileName, user_idx, res) => {
     const result = await insertAASXFileToDB(fc_idx, fileName, user_idx);
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
       return res.status(400).json({ error: err.message });
     }
@@ -58,7 +56,6 @@ export const uploadAASXFile = async (req, res) => {
     const result = await insertAASXFileToDB(fc_idx, fileName, user_idx);
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
       return res.status(400).json({ error: err.message });
     }
@@ -71,7 +68,6 @@ export const updateAASXFile = async (af_idx, fileName, user_idx, fc_idx, res) =>
     const result = await updateAASXFileToDB(af_idx, fileName, user_idx, fc_idx);
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
       return res.status(400).json({ error: err.message });
     }
@@ -85,7 +81,6 @@ export const deleteFiles = async (ids, res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -95,11 +90,8 @@ export const checkFileSize = async (file, res) => {
     const result = await checkFileSizeFromDB(file);
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     if (res) {
       res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      console.error('Internal Server Error (no res)');
     }
   }
 };
@@ -113,15 +105,12 @@ export const getVerify = async (file, res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     if (res) {
       // 특별한 에러 코드 처리
       if (err.message === 'FILE_TOO_LARGE' || err.message === 'AAS_FILE_TOO_LARGE') {
         return res.status(400).json({ error: 'FILE_TOO_LARGE' });
       }
       res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      console.error('Internal Server Error (no res)');
     }
   }
 };
@@ -132,7 +121,6 @@ export const getWords = async (fc_idx, res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -143,7 +131,6 @@ export const getSearch = async (fc_idx, type, text, res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -154,7 +141,6 @@ export const updateWords = async (updates, res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };

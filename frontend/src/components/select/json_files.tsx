@@ -38,7 +38,6 @@ export default function SelectJSONFile({ setSelectedFile, selectedFactory }: Pro
       setCurrentFile('');
       setSelectedFile(undefined);
     } catch (error) {
-      console.error('Error fetching JSON files:', error);
       setFiles([]);
     }
   };

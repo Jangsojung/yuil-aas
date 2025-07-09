@@ -13,7 +13,6 @@ export const getEdgeGateways = async (res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -23,7 +22,6 @@ export const getEdgeGatewaysWithStatus = async (res) => {
     const result = await getEdgeGatewaysWithRealTimeStatus();
     res.status(200).json(result);
   } catch (err) {
-    console.error('getEdgeGatewaysWithStatus error:', err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -40,7 +38,6 @@ export const insertEdgeGateways = async (pcName, pcIp, pcPort, user_idx, res) =>
 
     res.status(200).json(newEdgeGateway);
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -51,7 +48,6 @@ export const updateEdgeGateway = async (eg_idx, pcName, pcIp, pcPort, user_idx, 
 
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };
@@ -62,7 +58,6 @@ export const deleteEdgeGateways = async (ids, res) => {
 
     res.status(200).json(result);
   } catch (err) {
-    console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });
   }
 };

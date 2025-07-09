@@ -59,7 +59,6 @@ export const useBasicAdd = () => {
       setSelectedSensors([]);
       return { success: true, message: '기초코드가 등록되었습니다.' };
     } catch (error) {
-      console.error('Error inserting base:', error);
       return {
         success: false,
         message: '기초코드 등록 중 오류가 발생했습니다.',
@@ -85,7 +84,6 @@ export const useBasicAdd = () => {
       setTreeData(finalFilteredData);
       return { success: true };
     } catch (err) {
-      console.error('검색 에러:', err);
       setTreeData([]);
       return { success: false, message: '검색 중 오류가 발생했습니다.' };
     } finally {

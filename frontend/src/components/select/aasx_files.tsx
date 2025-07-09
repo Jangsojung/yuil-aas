@@ -23,15 +23,11 @@ export default function SelectSmall({ setSelectedFile, files: externalFiles, dis
   const [currentFile, setCurrentFile] = useRecoilState(currentFileState);
 
   const getFiles = async () => {
-    try {
-      const data = await getAASXFilesListAPI();
-      setFiles(data);
+    const data = await getAASXFilesListAPI();
+    setFiles(data);
 
-      setCurrentFile(null);
-      setSelectedFile(undefined);
-    } catch (error) {
-      console.error('Error fetching files:', error);
-    }
+    setCurrentFile(null);
+    setSelectedFile(undefined);
   };
 
   const handleChange = (event: any) => {

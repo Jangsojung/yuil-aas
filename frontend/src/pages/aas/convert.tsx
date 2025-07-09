@@ -128,7 +128,6 @@ export default function ConvertPage() {
       setFilteredBases(filtered);
       handlePageChange(null, 0);
     } catch (error) {
-      console.error('Error fetching bases:', error);
       setBases([]);
       setFilteredBases([]);
     }

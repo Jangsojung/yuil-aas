@@ -121,7 +121,6 @@ export const insertBasesToDB = async (name, note, ids, user_idx, fc_idx) => {
       ab_note: note,
     };
   } catch (err) {
-    console.error('Failed to insert new Bases: ', err);
     throw err;
   }
 };
@@ -151,7 +150,6 @@ export const updateBaseToDB = async (ab_idx, name, note, ids, user_idx) => {
     };
   } catch (err) {
     await connection.rollback();
-    console.error('Failed to update Bases:', err);
     throw err;
   } finally {
     connection.release();
@@ -168,7 +166,6 @@ export const deleteBasesFromDB = async (ids) => {
 
     return { success: true, message: 'Bases deleted successfully' };
   } catch (err) {
-    console.error('Failed to delete Bases: ', err);
     throw err;
   }
 };
@@ -206,7 +203,6 @@ export const getFacilityGroupsFromDB = async (fc_idx, order = 'asc') => {
 
     pool.query(query, [fc_idx], (err, results) => {
       if (err) {
-        console.error('Error querying facility groups:', err);
         reject(err);
       } else {
         if (results.length === 0) {
@@ -234,7 +230,6 @@ export const getSensorsFromDB = async (fa_idx) => {
 
     pool.query(query, [fa_idx], (err, results) => {
       if (err) {
-        console.error('Error querying sensors:', err);
         reject(err);
       } else {
         if (results.length === 0) {
@@ -262,7 +257,6 @@ export const getBaseCodeFromDB = async (fg_idx) => {
 
     pool.query(query, [fg_idx], (err, results) => {
       if (err) {
-        console.error('Error querying facilities:', err);
         reject(err);
       } else {
         if (results.length === 0) {
@@ -329,7 +323,6 @@ export const getFactoriesByCmIdxFromDB = async (cm_idx) => {
 
     pool.query(query, [cm_idx], (err, results) => {
       if (err) {
-        console.error('Error querying factories:', err);
         reject(err);
       } else {
         if (results.length === 0) {
@@ -387,7 +380,6 @@ export const insertFactoryToDB = async (cm_idx, fc_name) => {
       });
     } catch (err) {
       await connection.rollback();
-      console.error('Failed to insert factory:', err);
       reject(err);
     } finally {
       connection.release();
@@ -421,7 +413,6 @@ export const insertFacilityGroupToDB = async (fc_idx, fg_name) => {
       });
     } catch (err) {
       await connection.rollback();
-      console.error('Failed to insert facility group:', err);
       reject(err);
     } finally {
       connection.release();
@@ -455,7 +446,6 @@ export const insertFacilityToDB = async (fg_idx, fa_name) => {
       });
     } catch (err) {
       await connection.rollback();
-      console.error('Failed to insert facility:', err);
       reject(err);
     } finally {
       connection.release();
@@ -489,7 +479,6 @@ export const insertSensorToDB = async (fa_idx, sn_name) => {
       });
     } catch (err) {
       await connection.rollback();
-      console.error('Failed to insert sensor:', err);
       reject(err);
     } finally {
       connection.release();
@@ -531,7 +520,6 @@ export const syncFactoriesToAasxData = async () => {
       });
     } catch (err) {
       await connection.rollback();
-      console.error('Failed to sync factories:', err);
       reject(err);
     } finally {
       connection.release();

@@ -28,7 +28,6 @@ export const useWordManagement = () => {
         setFilteredWords([]);
       }
     } catch (error) {
-      console.error('단어 목록을 가져오는 중 오류 발생:', error);
       setWords([]);
       setFilteredWords([]);
     }
@@ -186,7 +185,6 @@ export const useWordManagement = () => {
 
       return { success: true, message: '저장되었습니다.' };
     } catch (error) {
-      console.error('저장 중 오류 발생:', error);
       return { success: false, message: '저장 중 오류가 발생했습니다.' };
     }
   }, [modifiedData, getWords]);

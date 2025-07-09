@@ -163,7 +163,6 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       handleUpdate(newFile);
       handleClose();
     } catch (err: any) {
-      console.error('AASX 파일 처리 중 오류:', err);
       const msg = err?.response?.data?.error || err?.message || (typeof err === 'string' ? err : '알 수 없는 오류');
 
       if (msg.includes('이미 생성되어있는 파일입니다.')) {

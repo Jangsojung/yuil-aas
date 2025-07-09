@@ -92,7 +92,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       const data = await getFactoriesByCmIdxAPI(user!.cm_idx);
       setFactories(data);
     } catch (error) {
-      console.error('공장 목록 조회 실패:', error);
       setError('공장 목록을 불러오는데 실패했습니다.');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,7 +106,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         const data = await getFacilityGroupsAPI(targetFcIdx as number);
         setGroupList(data.map((g: any) => ({ fg_idx: g.fg_idx, fg_name: g.fg_name })));
       } catch (error) {
-        console.error('설비그룹 목록 조회 실패:', error);
         setError('설비그룹 목록을 불러오는데 실패했습니다.');
       }
     },
@@ -203,20 +201,16 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         currentFcIdx = factoryResult.fc_idx;
 
         // 공장 목록을 직접 다시 조회하고 강제로 상태 업데이트
-        try {
-          const updatedFactories = await getFactoriesByCmIdxAPI(user!.cm_idx);
-          setFactories([...updatedFactories]);
+        const updatedFactories = await getFactoriesByCmIdxAPI(user!.cm_idx);
+        setFactories([...updatedFactories]);
 
-          // 새로 추가된 공장을 선택하고 신규등록 모드 해제
-          setIsNewFactory(false);
-          setNewFactoryName(''); // 입력 필드 초기화
-          setSelectedFactory(currentFcIdx);
+        // 새로 추가된 공장을 선택하고 신규등록 모드 해제
+        setIsNewFactory(false);
+        setNewFactoryName(''); // 입력 필드 초기화
+        setSelectedFactory(currentFcIdx);
 
-          // 추가 대기 시간으로 상태 업데이트 완료 보장
-          await new Promise((resolve) => setTimeout(resolve, 200));
-        } catch (error) {
-          console.error('공장 목록 갱신 실패:', error);
-        }
+        // 추가 대기 시간으로 상태 업데이트 완료 보장
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
 
       // 2. 설비그룹 처리
@@ -225,18 +219,14 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         currentFgIdx = facilityGroupResult.fg_idx;
 
         // 설비그룹 목록을 직접 다시 조회
-        try {
-          await fetchFacilityGroups(currentFcIdx);
+        await fetchFacilityGroups(currentFcIdx);
 
-          // 새로 추가된 설비그룹을 선택
-          setGroupValue(groupInput);
-          setGroupInput('');
+        // 새로 추가된 설비그룹을 선택
+        setGroupValue(groupInput);
+        setGroupInput('');
 
-          // 추가 대기 시간으로 상태 업데이트 완료 보장
-          await new Promise((resolve) => setTimeout(resolve, 200));
-        } catch (error) {
-          console.error('설비그룹 목록 갱신 실패:', error);
-        }
+        // 추가 대기 시간으로 상태 업데이트 완료 보장
+        await new Promise((resolve) => setTimeout(resolve, 200));
       } else {
         const selectedGroup = groupList.find((g) => g.fg_name === groupValue);
         currentFgIdx = selectedGroup!.fg_idx;
@@ -263,9 +253,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
 
           // 추가 대기 시간으로 상태 업데이트 완료 보장
           await new Promise((resolve) => setTimeout(resolve, 200));
-        } catch (error) {
-          console.error('설비 목록 갱신 실패:', error);
-        }
+        } catch (error) {}
       } else {
         const selectedFacility = facilityList.find((f) => f.fa_name === facilityValue);
         currentFaIdx = selectedFacility!.fa_idx;
@@ -281,7 +269,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       // 모달 닫기
       handleClose();
     } catch (error) {
-      console.error('설비 추가 실패:', error);
       setError('설비 추가 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);

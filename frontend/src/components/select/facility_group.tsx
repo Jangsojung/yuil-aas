@@ -39,7 +39,6 @@ export default function FacilityGroupSelect({
       const data = await getFacilityGroupsAPI(fc_idx);
       setFacilityGroups(data);
     } catch (error) {
-      console.error('Error fetching facility groups:', error);
       setFacilityGroups([]);
     }
   };

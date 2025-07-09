@@ -68,7 +68,6 @@ export const apiHelpers = {
             errorMessage = errorData.error;
           }
         } catch (e) {
-          console.error('Error parsing error response:', e);
           // JSON 파싱 실패 시 기본 메시지 사용
         }
 

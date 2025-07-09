@@ -185,14 +185,11 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
       if (!aasResponse.ok) {
         const errorText = await aasResponse.text();
-        console.error('AAS 파일 생성 응답 오류:', aasResponse.status, errorText);
         throw new Error(`AAS 파일 생성 중 오류가 발생했습니다. (${aasResponse.status})`);
       }
 
       const responseText = await aasResponse.text();
     } catch (error) {
-      console.error('AAS 파일 생성 중 오류가 발생했습니다:', error.message);
-
       const fs = await import('fs');
       const aasFilePath = `../files/aas/${fileName}`;
 
@@ -200,11 +197,9 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
         const stats = fs.statSync(aasFilePath);
         if (stats.size > 0) {
         } else {
-          console.error('AAS 파일이 생성되었지만 크기가 0입니다.');
           throw new Error('AAS 파일 생성에 실패했습니다.');
         }
       } else {
-        console.error('AAS 파일이 생성되지 않았습니다.');
         throw new Error('AAS 파일 생성에 실패했습니다.');
       }
     }
@@ -232,14 +227,11 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
       if (!aasxResponse.ok) {
         const errorText = await aasxResponse.text();
-        console.error('AASX 파일 생성 응답 오류:', aasxResponse.status, errorText);
         throw new Error(`AASX 파일 생성 중 오류가 발생했습니다. (${aasxResponse.status})`);
       }
 
       const responseText = await aasxResponse.text();
     } catch (error) {
-      console.error('AASX 파일 생성 중 오류가 발생했습니다:', error.message);
-
       const fs = await import('fs');
       const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
       const aasxFilePath = `../files/aasx/${aasxFileName}`;
@@ -248,11 +240,9 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
         const stats = fs.statSync(aasxFilePath);
         if (stats.size > 0) {
         } else {
-          console.error('AASX 파일이 생성되었지만 크기가 0입니다.');
           throw new Error('AASX 파일 생성에 실패했습니다.');
         }
       } else {
-        console.error('AASX 파일이 생성되지 않았습니다.');
         throw new Error('AASX 파일 생성에 실패했습니다.');
       }
     }
@@ -273,8 +263,6 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       message: '변환 완료: AAS JSON, AASX 파일이 모두 생성되었습니다.',
     };
   } catch (err) {
-    console.error('Failed to insert AASX File: ', err);
-
     await cleanupCreatedFiles(createdFiles);
 
     throw err;
@@ -306,11 +294,11 @@ const cleanupCreatedFiles = async (createdFiles) => {
       });
 
       if (!deleteResponse.ok) {
-        console.error('생성된 파일 정리 중 오류 발생');
+        throw new Error('생성된 파일 정리 중 오류 발생');
       }
     }
   } catch (cleanupError) {
-    console.error('파일 정리 중 오류 발생:', cleanupError);
+    throw new Error('파일 정리 중 오류 발생');
   }
 };
 
@@ -368,13 +356,11 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
 
       if (!aasResponse.ok) {
         const errorText = await aasResponse.text();
-        console.error('AAS 파일 생성 응답 오류:', aasResponse.status, errorText);
         throw new Error(`AAS 파일 생성 중 오류가 발생했습니다. (${aasResponse.status})`);
       }
 
       const responseText = await aasResponse.text();
     } catch (error) {
-      console.error('AAS 파일 생성 중 오류가 발생했습니다:', error.message);
       throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
     }
 
@@ -412,13 +398,11 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
 
       if (!aasxResponse.ok) {
         const errorText = await aasxResponse.text();
-        console.error('AASX 파일 생성 응답 오류:', aasxResponse.status, errorText);
         throw new Error(`AASX 파일 생성 중 오류가 발생했습니다. (${aasxResponse.status})`);
       }
 
       const responseText = await aasxResponse.text();
     } catch (error) {
-      console.error('AASX 파일 생성 중 오류가 발생했습니다:', error.message);
       throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
     }
 
@@ -441,7 +425,6 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
 
     if (!deleteResponse.ok) {
       const errorText = await deleteResponse.text();
-      console.error('기존 파일 삭제 중 오류 발생:', errorText);
     }
 
     await pool
@@ -459,8 +442,6 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
       message: '변환 완료: AAS JSON, AASX 파일이 모두 업데이트되었습니다.',
     };
   } catch (err) {
-    console.error('Failed to update AASX File: ', err);
-
     await cleanupCreatedFiles(createdFiles);
 
     throw err;
@@ -521,7 +502,7 @@ export const deleteFilesFromDB = async (ids) => {
       });
 
       if (!pythonResponse.ok) {
-        console.error('Python 서버에서 파일 삭제 중 오류 발생');
+        throw new Error(`Python 서버에서 파일 삭제 중 오류 발생`);
       }
     }
 
@@ -532,7 +513,6 @@ export const deleteFilesFromDB = async (ids) => {
       deletedFiles: results.map((file) => file.af_name),
     };
   } catch (err) {
-    console.error('Failed to delete Files: ', err);
     throw err;
   }
 };
@@ -550,7 +530,6 @@ export const checkFileSizeFromDB = async (file) => {
           [file.af_idx],
           (err, rows) => {
             if (err || !rows || rows.length === 0) {
-              console.error('DB 조회 실패:', err);
               reject(new Error('DB에서 파일 정보를 찾을 수 없습니다.'));
               return;
             }
@@ -569,7 +548,6 @@ export const checkFileSizeFromDB = async (file) => {
             }
 
             if (!fs.existsSync(filePath)) {
-              console.error('파일이 존재하지 않음:', filePath);
               reject(new Error('해당하는 파일이 존재하지 않습니다.'));
               return;
             }
@@ -598,7 +576,6 @@ export const checkFileSizeFromDB = async (file) => {
         }
 
         if (!fs.existsSync(filePath)) {
-          console.error('파일이 존재하지 않음:', filePath);
           reject(new Error('해당하는 파일이 존재하지 않습니다.'));
           return;
         }
@@ -614,7 +591,6 @@ export const checkFileSizeFromDB = async (file) => {
         resolve(result);
       }
     } catch (error) {
-      console.error('파일 크기 확인 오류:', error);
       reject(new Error('파일 크기 확인 실패'));
     }
   });
@@ -680,7 +656,6 @@ export const getVerifyFromDB = async (file) => {
         if (!isJsonStart && fileData.length > 0) {
           const trimmedStart = fileData.trim();
           if (!trimmedStart.startsWith('{') && !trimmedStart.startsWith('[')) {
-            console.error('JSON이 아닌 파일 내용 (처음 100자):', trimmedStart.substring(0, 100));
             readStream.destroy();
             reject(new Error('유효하지 않은 JSON 파일입니다.'));
             return;
@@ -711,7 +686,6 @@ export const getVerifyFromDB = async (file) => {
             const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
             fs.readFile(aasxFilePath, (err, aasxFileData) => {
               if (err) {
-                console.error('AASX 파일 읽기 오류:', err);
                 reject(new Error('AASX 파일 읽기 실패'));
                 return;
               }
@@ -737,18 +711,14 @@ export const getVerifyFromDB = async (file) => {
             });
           }
         } catch (parseError) {
-          console.error('JSON 파싱 오류:', parseError);
-          console.error('파일 내용 (처음 200자):', fileData.substring(0, 200));
           reject(new Error('JSON 파싱 실패'));
         }
       });
 
       readStream.on('error', (err) => {
-        console.error('파일 읽기 오류:', err);
         reject(new Error('파일 읽기 실패'));
       });
     } catch (error) {
-      console.error('파일 처리 오류:', error);
       reject(new Error('파일 처리 실패'));
     }
   });
@@ -858,7 +828,6 @@ export const updateWordsToDB = async (updates) => {
         });
       })
       .catch((error) => {
-        console.error('단어 업데이트 실패:', error);
         reject(error);
       });
   });

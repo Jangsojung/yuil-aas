@@ -132,7 +132,6 @@ export const useBasicList = (navigate: any) => {
       setAlertOpen(true);
       handleReset();
     } catch (err: any) {
-      console.error('삭제 중 오류:', err.message);
       setAlertTitle('오류');
       setAlertContent('삭제 중 오류가 발생했습니다.');
       setAlertType(MODAL_TYPE.ALERT);
@@ -190,7 +189,6 @@ export const useBasicList = (navigate: any) => {
       setFilteredBases(filtered);
       setCurrentPage(0);
     } catch (error) {
-      console.error('Error fetching bases:', error);
       setBases([]);
       setFilteredBases([]);
     }

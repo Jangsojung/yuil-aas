@@ -46,7 +46,6 @@ export default function FacilityGroupSelect({
       const data = await getFacilityGroupsAPI(selectedFactory as number);
       setFacilityGroups(data || []);
     } catch (err) {
-      console.error('설비 그룹 조회 실패:', err);
       setError('설비 그룹을 불러오는데 실패했습니다.');
     }
   };

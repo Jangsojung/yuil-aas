@@ -57,14 +57,6 @@ export default function TransmitPage() {
         showAlert('오류', '파일 데이터를 가져올 수 없습니다.');
       }
     } catch (error) {
-      console.error('검증 중 오류 발생:', error);
-      console.error('에러 타입:', typeof error);
-
-      if (error instanceof Error) {
-        console.error('에러 메시지:', error.message);
-        console.error('에러 객체:', error);
-      }
-
       // 파일 크기 초과 에러 처리 - Error 객체의 message에서 확인
       if (error instanceof Error) {
         const errorMessage = error.message;
@@ -93,7 +85,6 @@ export default function TransmitPage() {
       if (error && typeof error === 'object' && 'response' in error) {
         const response = (error as any).response;
         if (response && response.data) {
-          console.error('응답 데이터:', response.data);
           if (response.data === 'FILE_TOO_LARGE') {
             showAlert(
               '파일 크기 초과',
@@ -109,19 +100,16 @@ export default function TransmitPage() {
   };
 
   const handleFactoryChange = async (factoryId: number) => {
-    console.log('선택된 factoryId:', factoryId);
     setSelectedFactory(factoryId);
     setSelectedFile(undefined);
     setCurrentFile(null);
 
     if (factoryId !== undefined && factoryId !== null) {
       try {
-        console.log('getAASXFilesAPI 호출 factoryId:', factoryId);
         // 공장별 AASX 파일 가져오기
         const files = await getAASXFilesAPI(null, null, factoryId);
         setAasxFiles(Array.isArray(files) ? files : []);
       } catch (error) {
-        console.error('공장별 데이터 가져오기 실패:', error);
         setAasxFiles([]);
       }
     } else {

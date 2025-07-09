@@ -93,7 +93,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       const data: EdgeGateway[] = await getEdgeAPI();
       setEdgeGateways(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('getEdge failed:', error);
       setEdgeGateways([]);
     } finally {
       setLoading(false);
@@ -106,7 +105,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       const data: EdgeGateway[] = await getEdgeWithStatusAPI();
       setEdgeGateways(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Failed to get edge gateways with status:', error);
       await getEdge();
     } finally {
       setLoading(false);

@@ -36,7 +36,6 @@ export default function FactorySelect({
       const data = await getFactoriesByCmIdxAPI(user.cm_idx);
       setFactories(data || []);
     } catch (err) {
-      console.error('공장 정보 조회 실패:', err);
       setError('공장 정보를 불러오는 데 실패했습니다.');
     }
   };

@@ -6,8 +6,6 @@ export const useErrorHandler = () => {
 
   const handleError = useCallback(
     (error: any, defaultMessage: string = '오류가 발생했습니다.') => {
-      console.error('Error occurred:', error);
-
       let message = defaultMessage;
 
       if (error?.response?.data?.message) {

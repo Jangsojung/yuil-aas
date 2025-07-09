@@ -10,7 +10,6 @@ export const insertFacilityGroup = async (name) => {
     const [result] = await pool.promise().query(query, [nextFgIdx, name, 3, 0]);
     return nextFgIdx;
   } catch (err) {
-    console.error('Failed to insert Facility Group: ', err);
     throw err;
   }
 };
@@ -25,7 +24,6 @@ export const insertFacility = async (fg_idx, name) => {
     const [result] = await pool.promise().query(query, [nextFaIdx, fg_idx, name, 0]);
     return nextFaIdx;
   } catch (err) {
-    console.error('Failed to insert Facility: ', err);
     throw err;
   }
 };
@@ -40,7 +38,6 @@ export const insertSensor = async (fa_idx, name) => {
     const [result] = await pool.promise().query(query, [nextSnIdx, fa_idx, name, 0]);
     return nextSnIdx;
   } catch (err) {
-    console.error('Failed to insert Sensor: ', err);
     throw err;
   }
 };
@@ -343,7 +340,6 @@ export const synchronizeFacilityData = async () => {
 
     return { success: true, message: '설비 데이터 동기화가 완료되었습니다.' };
   } catch (error) {
-    console.error('설비 동기화 오류:', error);
     throw new Error('설비 데이터 동기화 중 오류가 발생했습니다.');
   }
 };

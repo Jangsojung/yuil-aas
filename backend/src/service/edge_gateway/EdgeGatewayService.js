@@ -61,7 +61,6 @@ export const checkNetworkStatus = async (ip) => {
 
     return isConnected;
   } catch (error) {
-    console.error(`Ping failed for ${ip}:`, error.message);
     // ping 실패 시 연결 안 됨으로 처리
     return false;
   }
@@ -91,7 +90,6 @@ export const getEdgeGatewaysWithRealTimeStatus = async () => {
 
           return result;
         } catch (error) {
-          console.error(`Error checking status for ${eg.eg_pc_name}:`, error.message);
           // 개별 Edge Gateway 에러 시 기본값으로 반환
           return {
             ...eg,
@@ -103,7 +101,6 @@ export const getEdgeGatewaysWithRealTimeStatus = async () => {
 
     return edgeGatewaysWithStatus;
   } catch (error) {
-    console.error('Failed to get Edge Gateways with real-time status:', error);
     throw error;
   }
 };
@@ -117,7 +114,6 @@ export const insertEdgeGatewaysToDB = async (pcName, pcIp, pcPort, user_idx) => 
 
     return result.insertId;
   } catch (err) {
-    // console.error('Failed to insert Edge Gateway: ', err);
     throw err;
   }
 };
@@ -129,7 +125,6 @@ export const updateEdgeGatewayToDB = async (eg_idx, pcName, pcIp, pcPort, user_i
     const query = `update tb_aasx_edge_gateway set eg_pc_name = ?, eg_ip_port = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where eg_idx = ?`;
     await pool.promise().query(query, [pcName, ipPort, user_idx, eg_idx]);
   } catch (err) {
-    // console.error('Failed to update Edge Gateway: ', err);
     throw err;
   }
 };
@@ -146,7 +141,6 @@ export const deleteEdgeGatewaysFromDB = async (ids) => {
 
     return { success: true, message: '삭제가 완료되었습니다.' };
   } catch (err) {
-    // console.error('Failed to delete Edge Gateway: ', err);
     throw err;
   }
 };

@@ -46,7 +46,6 @@ const signIn = async (
       });
     }
   } catch (error) {
-    console.error('로그인 에러:', error);
     setAlertModal({
       open: true,
       title: '오류',

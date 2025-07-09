@@ -180,7 +180,6 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
 
     return { success: true, fileName: file_name, filePath: '/files/front' };
   } catch (err) {
-    console.error('Failed to insert JSON:', err);
     throw err;
   }
 };

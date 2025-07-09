@@ -18,7 +18,6 @@ export const useAASXManagement = () => {
         setAasxFiles([]);
       }
     } catch (error) {
-      console.error('AASX 파일 목록을 가져오는 중 오류 발생:', error);
       setAasxFiles([]);
     } finally {
       setLoading(false);
@@ -55,7 +54,6 @@ export const useAASXManagement = () => {
         setSelectedFiles([]);
         return { success: true, message: '파일이 삭제되었습니다.' };
       } catch (error) {
-        console.error('파일 삭제 중 오류 발생:', error);
         return { success: false, message: '파일 삭제 중 오류가 발생했습니다.' };
       }
     },

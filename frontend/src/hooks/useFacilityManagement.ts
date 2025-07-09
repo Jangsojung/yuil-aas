@@ -69,7 +69,6 @@ export const useFacilityManagement = () => {
       return { success: true };
     } catch (err) {
       setProgressOpen(false);
-      console.error('검색 에러:', err);
       setTreeData([]);
       return { success: false, message: '검색 중 오류가 발생했습니다.' };
     } finally {
@@ -211,7 +210,6 @@ export const useFacilityManagement = () => {
           handleTreeSearch();
         }
       } catch (err) {
-        console.error(`${deleteType} 삭제 중 오류 발생:`, err);
         showAlert('에러', `${deleteType} 삭제 중 오류가 발생했습니다.`);
       }
     });
@@ -234,7 +232,6 @@ export const useFacilityManagement = () => {
       showAlert('알림', '동기화 완료');
       handleReset();
     } catch (err) {
-      console.error('동기화 중 오류 발생:', err);
       showAlert('에러', '동기화 중 오류가 발생했습니다.');
     } finally {
       setSyncLoading(false);

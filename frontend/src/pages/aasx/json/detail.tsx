@@ -105,8 +105,6 @@ export default function JsonDetail() {
         setLoading(false);
       })
       .catch((error) => {
-        console.error('JSON 파일 처리 오류:', error);
-
         // 파일이 너무 큰 경우는 이미 처리됨
         if (error === 'FILE_TOO_LARGE') {
           return;
