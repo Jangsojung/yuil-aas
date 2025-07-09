@@ -337,9 +337,6 @@ export const synchronizeFacilityData = async (progressCallback) => {
       ]);
 
       if (existingGroup.length === 0) {
-        console.log(
-          `설비그룹 ${facility.fg_idx}가 tb_aasx_data_aas에 존재하지 않아 설비 ${facility.fa_name}을 건너뜁니다.`
-        );
         continue; // 해당 설비그룹이 없으면 설비 추가를 건너뜀
       }
 
@@ -413,7 +410,6 @@ export const synchronizeFacilityData = async (progressCallback) => {
       ]);
 
       if (existingFacility.length === 0) {
-        console.log(`설비 ${sensor.fa_idx}가 tb_aasx_data_sm에 존재하지 않아 센서 ${sensor.sn_name}을 건너뜁니다.`);
         continue; // 해당 설비가 없으면 센서 추가를 건너뜀
       }
 
