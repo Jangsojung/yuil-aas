@@ -16,7 +16,6 @@ export const getBasesAPI = async (fc_idx) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES, { fc_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching bases:', error);
     return [];
   }
 };
@@ -27,7 +26,6 @@ export const deleteBasesAPI = async (ids) => {
     const result = await apiHelpers.delete(API_ENDPOINTS.BASE_CODE.BASES, { ids });
     return result;
   } catch (error) {
-    console.error('Error deleting bases:', error);
     throw error;
   }
 };
@@ -38,7 +36,6 @@ export const insertBaseAPI = async (data) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES_INSERT, data);
     return result;
   } catch (error) {
-    console.error('Error inserting base:', error);
     throw error;
   }
 };
@@ -49,7 +46,6 @@ export const updateBaseAPI = async (data) => {
     const result = await apiHelpers.put(API_ENDPOINTS.BASE_CODE.BASES, data);
     return result;
   } catch (error) {
-    console.error('Error updating base:', error);
     throw error;
   }
 };
@@ -60,7 +56,6 @@ export const getBaseSensorsAPI = async (ab_idx) => {
     const result = await apiHelpers.post(`${API_ENDPOINTS.BASE_CODE.BASES}/${ab_idx}/sensors`);
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching base sensors:', error);
     return [];
   }
 };
@@ -76,7 +71,6 @@ export const getFacilityGroupsAPI = async (fc_idx) => {
         }))
       : [];
   } catch (error) {
-    console.error('Error fetching facility groups:', error);
     return [];
   }
 };
@@ -92,7 +86,6 @@ export const getFacilitiesAPI = async (fg_idx) => {
         }))
       : [];
   } catch (error) {
-    console.error('Error fetching facilities:', error);
     return [];
   }
 };
@@ -108,7 +101,6 @@ export const getSensorsAPI = async (fa_idx) => {
         }))
       : [];
   } catch (error) {
-    console.error('Error fetching sensors:', error);
     return [];
   }
 };
@@ -182,7 +174,6 @@ export const buildTreeDataAPI = async (selectedFacilityGroups = [], facilityName
       },
     ];
   } catch (error) {
-    console.error('Error building tree data:', error);
     throw error;
   }
 };
@@ -236,7 +227,6 @@ export const buildTreeFromSensorIdsAPI = async (sensorIds, fc_idx) => {
 
     return result;
   } catch (error) {
-    console.error('Error building tree from sensor IDs:', error);
     throw error;
   }
 };
@@ -247,7 +237,6 @@ export const getBaseSensorsForTableAPI = async (ab_idx) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES_SENSORS, { ab_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching base sensors for table:', error);
     return [];
   }
 };
@@ -258,7 +247,6 @@ export const getSensorsForTableAPI = async (fa_idx) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.SENSORS, { fa_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching sensors for table:', error);
     return [];
   }
 };
@@ -268,7 +256,6 @@ export const getFactoriesByCmIdxAPI = async (cm_idx) => {
     const result = await apiHelpers.post(`/api/base_code/factories/${cm_idx}`, { cm_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching factories:', error);
     throw error;
   }
 };
@@ -279,7 +266,6 @@ export const insertFactoryAPI = async (cm_idx, fc_name) => {
     const result = await apiHelpers.post('/api/base_code/factory', { cm_idx, fc_name });
     return result;
   } catch (error) {
-    console.error('Error inserting factory:', error);
     throw error;
   }
 };
@@ -289,7 +275,6 @@ export const insertFacilityGroupAPI = async (fc_idx, fg_name) => {
     const result = await apiHelpers.post('/api/base_code/facilityGroup', { fc_idx, fg_name });
     return result;
   } catch (error) {
-    console.error('Error inserting facility group:', error);
     throw error;
   }
 };
@@ -299,7 +284,6 @@ export const insertFacilityAPI = async (fg_idx, fa_name) => {
     const result = await apiHelpers.post('/api/base_code/facility', { fg_idx, fa_name });
     return result;
   } catch (error) {
-    console.error('Error inserting facility:', error);
     throw error;
   }
 };
@@ -309,7 +293,6 @@ export const insertSensorAPI = async (fa_idx, sn_name) => {
     const result = await apiHelpers.post('/api/base_code/sensor', { fa_idx, sn_name });
     return result;
   } catch (error) {
-    console.error('Error inserting sensor:', error);
     throw error;
   }
 };
@@ -377,7 +360,6 @@ export const buildTreeDataForBasicAPI = async (
     );
     return finalFilteredData;
   } catch (error) {
-    console.error('Error building tree data for basic:', error);
     throw error;
   }
 };

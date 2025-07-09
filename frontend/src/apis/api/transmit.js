@@ -7,7 +7,6 @@ export const handleVerifyAPI = async (selectedFile) => {
     });
     return data;
   } catch (error) {
-    console.error('Error verifying file:', error);
     throw error;
   }
 };
@@ -20,7 +19,6 @@ export const getFacilityGroupsForTransmitAPI = async (factoryId) => {
     });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching facility groups for transmit:', error);
     return [];
   }
 };
@@ -31,7 +29,6 @@ export const getFacilitiesForTransmitAPI = async (fg_idx) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASE_CODE, { fg_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching facilities for transmit:', error);
     return [];
   }
 };
@@ -42,7 +39,6 @@ export const getSensorsForTransmitAPI = async (fa_idx) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.SENSORS, { fa_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching sensors for transmit:', error);
     return [];
   }
 };
@@ -69,7 +65,6 @@ export const buildTransmitTreeDataAPI = async (factoryId) => {
 
     return facilitiesAll;
   } catch (error) {
-    console.error('Error building transmit tree data:', error);
     return [];
   }
 };

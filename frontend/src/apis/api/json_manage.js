@@ -13,7 +13,6 @@ export const getJSONFilesAPI = async (startDate, endDate, fc_idx, limit = null) 
     });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching JSON files:', error);
     return [];
   }
 };
@@ -24,7 +23,6 @@ export const deleteJSONAPI = async (fileIds) => {
     const result = await apiHelpers.delete('/api/file/files', { ids: fileIds });
     return result;
   } catch (error) {
-    console.error('Error deleting JSON files:', error);
     throw error;
   }
 };
@@ -35,7 +33,6 @@ export const checkJSONFileSizeAPI = async (af_idx) => {
     const result = await apiHelpers.post('/api/file/checkFileSize', { file: { af_idx, af_kind: KINDS.JSON_KIND } });
     return result;
   } catch (error) {
-    console.error('Error checking JSON file size:', error);
     throw error;
   }
 };
@@ -46,7 +43,6 @@ export const getJSONFileDetailAPI = async (af_idx) => {
     const result = await apiHelpers.post('/api/file/verify', { file: { af_idx, af_kind: KINDS.JSON_KIND } });
     return result;
   } catch (error) {
-    console.error('Error fetching JSON file detail:', error);
     throw error; // 에러를 다시 던져서 상위에서 처리할 수 있도록 함
   }
 };

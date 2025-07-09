@@ -56,7 +56,6 @@ export const synchronizeFacility = async () => {
     const result = await apiHelpers.post('/api/facility/aasx/synchronize');
     return result;
   } catch (error) {
-    console.error('Error synchronizing facility:', error);
     throw error;
   }
 };

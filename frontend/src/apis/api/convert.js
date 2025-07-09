@@ -5,7 +5,6 @@ export const getBasesAPI = async (fc_idx) => {
     const data = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES, { fc_idx });
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error('Error fetching bases:', error);
     return [];
   }
 };
@@ -15,24 +14,26 @@ export const getBaseFCIdxAPI = async (ab_idx) => {
     const data = await apiHelpers.post(`${API_ENDPOINTS.BASE_CODE.BASES}/${ab_idx}/fc_idx`);
     return data.fc_idx;
   } catch (error) {
-    console.error('Error fetching base fc_idx:', error);
     throw error;
   }
 };
 
-export const insertJSONAPI = async (params) => {
+export const insertJSONAPI = async (params, signal) => {
   try {
-    const data = await apiHelpers.post(API_ENDPOINTS.CONVERT, {
-      fc_idx: params.fc_idx,
-      user_idx: params.user_idx,
-      startDate: params.startDate,
-      endDate: params.endDate,
-      selectedConvert: params.ab_idx,
-      af_kind: params.af_kind,
-    });
+    const data = await apiHelpers.post(
+      API_ENDPOINTS.CONVERT,
+      {
+        fc_idx: params.fc_idx,
+        user_idx: params.user_idx,
+        startDate: params.startDate,
+        endDate: params.endDate,
+        selectedConvert: params.ab_idx,
+        af_kind: params.af_kind,
+      },
+      signal
+    );
     return data;
   } catch (error) {
-    console.error('Error inserting base:', error);
     throw error;
   }
 };

@@ -6,7 +6,6 @@ export const getBaseSensorsForTableAPI = async (ab_idx) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES_SENSORS, { ab_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching base sensors for table:', error);
     return [];
   }
 };
@@ -17,7 +16,6 @@ export const getSensorsForTableAPI = async (fa_idx) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.SENSORS, { fa_idx });
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error('Error fetching sensors for table:', error);
     return [];
   }
 };
