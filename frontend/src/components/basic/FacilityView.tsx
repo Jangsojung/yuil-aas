@@ -6,6 +6,7 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import Checkbox from '@mui/material/Checkbox';
 import LoadingOverlay from '../loading/LodingOverlay';
+import ProgressOverlay from '../loading/ProgressOverlay';
 import FacilityGroupSelect from '../select/facility_group';
 import FactorySelect from '../select/factory_select';
 import BasicTable from '../table/basic_code';
@@ -55,7 +56,9 @@ interface FacilityViewProps {
   closeAlert: () => void;
 }
 
-export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean }> = ({
+export const FacilityView: React.FC<
+  FacilityViewProps & { progressOpen?: boolean; progress?: number; progressLabel?: string }
+> = ({
   treeData,
   treeLoading,
   selectedFacilityGroups,
@@ -90,6 +93,8 @@ export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean
   showConfirm,
   closeAlert,
   progressOpen = false,
+  progress = 0,
+  progressLabel = '설비 데이터 동기화 중...',
 }) => {
   // treeData는 이미 4단계 구조로 반환됨
   const convertedTreeData: FactoryTree[] = treeData as FactoryTree[];
@@ -411,6 +416,8 @@ export const FacilityView: React.FC<FacilityViewProps & { progressOpen?: boolean
         onClose={handleCloseFactoryAddModal || (() => {})}
         onSuccess={handleFactoryAddSuccess || (() => {})}
       />
+
+      <ProgressOverlay open={progressOpen} progress={progress} label={progressLabel} />
     </>
   );
 };

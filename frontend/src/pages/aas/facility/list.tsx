@@ -32,6 +32,9 @@ export default function FacilityList() {
     syncLoading,
     factoryRefreshKey,
     facilityGroupRefreshKey,
+    progress,
+    progressOpen,
+    progressLabel,
     handleTreeSearch,
     handleReset,
     handleAddFactory,
@@ -77,6 +80,9 @@ export default function FacilityList() {
         syncLoading={syncLoading}
         factoryRefreshKey={factoryRefreshKey}
         facilityGroupRefreshKey={facilityGroupRefreshKey}
+        progress={progress}
+        progressOpen={progressOpen}
+        progressLabel={progressLabel}
         handleTreeSearch={handleTreeSearch}
         handleReset={handleReset}
         handleAddFactory={handleAddFactory}

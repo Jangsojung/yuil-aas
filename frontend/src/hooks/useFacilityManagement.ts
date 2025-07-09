@@ -33,6 +33,7 @@ export const useFacilityManagement = () => {
   const [facilityGroupRefreshKey, setFacilityGroupRefreshKey] = useState(0);
   const [progress, setProgress] = useState(0);
   const [progressOpen, setProgressOpen] = useState(false);
+  const [progressLabel, setProgressLabel] = useState('설비 데이터 동기화 중...');
 
   // 트리 검색
   const handleTreeSearch = useCallback(async () => {
@@ -226,17 +227,48 @@ export const useFacilityManagement = () => {
   ]);
 
   const handleSynchronize = useCallback(async () => {
-    setSyncLoading(true);
+    setProgressOpen(true);
+    setProgress(0);
+
     try {
-      await synchronizeFacility();
+      // 프로그레스바 시뮬레이션 (실제로는 백엔드에서 단계별 진행상황을 받아야 함)
+      const progressSteps = [
+        { progress: 25, label: '공장 정보 동기화 중... (1/4)' },
+        { progress: 50, label: '설비그룹 정보 동기화 중... (2/4)' },
+        { progress: 75, label: '설비 정보 동기화 중... (3/4)' },
+        { progress: 100, label: '센서 정보 동기화 중... (4/4)' },
+      ];
+
+      for (let i = 0; i < progressSteps.length; i++) {
+        const step = progressSteps[i];
+        setProgress(step.progress);
+        setProgressLabel(step.label);
+        setProgressOpen(true);
+
+        // 마지막 단계에서만 실제 API 호출
+        if (i === progressSteps.length - 1) {
+          await synchronizeFacility();
+        } else {
+          // 각 단계별로 약간의 지연을 주어 진행상황을 보여줌
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+      }
+
       showAlert('알림', '동기화 완료');
-      handleReset();
+      // 동기화 후 트리 데이터 새로고침
+      handleTreeSearch();
+      // 선택 상태 초기화
+      setSelectedSensors([]);
+      setSelectedFacilities([]);
+      setSelectedFacilityGroupsForDelete([]);
+      setSelectedFactoriesForDelete([]);
     } catch (err) {
       showAlert('에러', '동기화 중 오류가 발생했습니다.');
     } finally {
-      setSyncLoading(false);
+      setProgressOpen(false);
+      setProgress(0);
     }
-  }, [showAlert, handleReset]);
+  }, [showAlert, handleTreeSearch]);
 
   return {
     treeData,
@@ -255,6 +287,7 @@ export const useFacilityManagement = () => {
     facilityGroupRefreshKey,
     progress,
     progressOpen,
+    progressLabel,
     handleTreeSearch,
     handleReset,
     handlePartialReset,

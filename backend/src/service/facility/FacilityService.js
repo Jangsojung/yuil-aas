@@ -200,12 +200,20 @@ export const deleteSensors = async (sensorIds) => {
   }
 };
 
-export const synchronizeFacilityData = async () => {
+export const synchronizeFacilityData = async (progressCallback) => {
   const connection = await pool.promise().getConnection();
   try {
     await connection.beginTransaction();
 
-    // 1. tb_factory_info -> tb_aasx_data 동기화
+    // 전체 단계 수: 4단계
+    const totalSteps = 4;
+    let currentStep = 0;
+
+    // 1. tb_factory_info -> tb_aasx_data 동기화 (25%)
+    currentStep++;
+    if (progressCallback) {
+      progressCallback((currentStep / totalSteps) * 100, `공장 정보 동기화 중... (${currentStep}/${totalSteps})`);
+    }
     const [factoryInfos] = await connection.query('SELECT fc_idx, fc_name FROM tb_factory_info');
 
     for (const factory of factoryInfos) {
@@ -260,7 +268,11 @@ export const synchronizeFacilityData = async () => {
       }
     }
 
-    // 2. tb_facility_group_info -> tb_aasx_data_aas 동기화
+    // 2. tb_facility_group_info -> tb_aasx_data_aas 동기화 (50%)
+    currentStep++;
+    if (progressCallback) {
+      progressCallback((currentStep / totalSteps) * 100, `설비그룹 정보 동기화 중... (${currentStep}/${totalSteps})`);
+    }
     const [facilityGroupInfos] = await connection.query('SELECT fg_idx, fg_name, fc_idx FROM tb_facility_group_info');
 
     for (const group of facilityGroupInfos) {
@@ -311,7 +323,11 @@ export const synchronizeFacilityData = async () => {
       }
     }
 
-    // 3. tb_facility_info -> tb_aasx_data_sm 동기화
+    // 3. tb_facility_info -> tb_aasx_data_sm 동기화 (75%)
+    currentStep++;
+    if (progressCallback) {
+      progressCallback((currentStep / totalSteps) * 100, `설비 정보 동기화 중... (${currentStep}/${totalSteps})`);
+    }
     const [facilityInfos] = await connection.query('SELECT fa_idx, fa_name, fg_idx FROM tb_facility_info');
 
     for (const facility of facilityInfos) {
@@ -383,7 +399,11 @@ export const synchronizeFacilityData = async () => {
       }
     }
 
-    // 4. tb_sensor_info -> tb_aasx_data_prop 동기화
+    // 4. tb_sensor_info -> tb_aasx_data_prop 동기화 (100%)
+    currentStep++;
+    if (progressCallback) {
+      progressCallback((currentStep / totalSteps) * 100, `센서 정보 동기화 중... (${currentStep}/${totalSteps})`);
+    }
     const [sensorInfos] = await connection.query('SELECT sn_idx, sn_name, fa_idx FROM tb_sensor_info');
 
     for (const sensor of sensorInfos) {
