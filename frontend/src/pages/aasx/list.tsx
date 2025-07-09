@@ -323,6 +323,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
+                <TableCell align='center'>수정</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -338,7 +339,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                   />
                 ))
               ) : (
-                <TableEmptyRow colSpan={sortableColumns.length + 2} />
+                <TableEmptyRow colSpan={sortableColumns.length + 3} />
               )}
             </TableBody>
           </Table>
