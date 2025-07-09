@@ -169,6 +169,7 @@ export default function TransmitPage() {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state]);
 
   // 현재 파일 변경 시 검증 상태 리셋

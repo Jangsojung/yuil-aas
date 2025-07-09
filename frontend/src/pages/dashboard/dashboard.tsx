@@ -19,12 +19,10 @@ import { useNavigate } from 'react-router-dom';
 import JSONViewer from '@uiw/react-json-view';
 import { getJSONFileDetailAPI } from '../../apis/api/json_manage';
 import TreeView from '../../components/treeview';
-import { getAASXAPI } from '../../apis/api/aasx_manage';
 import { handleVerifyAPI } from '../../apis/api/transmit';
 import { transformAASXData } from '../../utils/aasxTransform';
 import { formatDate } from '../../utils/dateUtils';
-import { PAGINATION, FILE, MODAL_TYPE, KINDS } from '../../constants';
-import type { AASXFile, AASXData, Base, File } from '../../types/api';
+import type { AASXFile, AASXData, File } from '../../types/api';
 
 type JsonFileRow = File & { base_name?: string; sn_length?: number };
 
