@@ -22,6 +22,7 @@ import TreeView from '../../components/treeview';
 import { handleVerifyAPI } from '../../apis/api/transmit';
 import { transformAASXData } from '../../utils/aasxTransform';
 import { formatDate } from '../../utils/dateUtils';
+import { FILE } from '../../constants';
 import type { AASXFile, AASXData, File } from '../../types/api';
 
 type JsonFileRow = File & { base_name?: string; sn_length?: number };
@@ -52,6 +53,17 @@ const detailButtonStyle = {
   zIndex: 2,
 };
 
+const fileSizeMessageStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '300px',
+  flexDirection: 'column',
+  gap: 2,
+  textAlign: 'center',
+  color: '#666',
+};
+
 export default function DashboardPage() {
   const [jsonFiles, setJsonFiles] = useState<JsonFileRow[]>([]);
   const [aasxFiles, setAasxFiles] = useState<AASXFile[]>([]);
@@ -61,6 +73,8 @@ export default function DashboardPage() {
   const [selectedAasxData, setSelectedAasxData] = useState<AASXData | null>(null);
   const [jsonLoading, setJsonLoading] = useState(false);
   const [aasxLoading, setAasxLoading] = useState(false);
+  const [jsonFileSize, setJsonFileSize] = useState<number | null>(null);
+  const [aasxFileSize, setAasxFileSize] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,9 +95,16 @@ export default function DashboardPage() {
   useEffect(() => {
     if (selectedJson && selectedJson.af_idx) {
       setJsonLoading(true);
+      setJsonFileSize(null);
       getJSONFileDetailAPI(selectedJson.af_idx)
         .then((data) => {
           setSelectedJsonData(data?.aasData || data);
+        })
+        .catch((error) => {
+          // 파일 크기 초과 에러 처리
+          if (error instanceof Error && error.message === 'FILE_TOO_LARGE') {
+            setJsonFileSize(FILE.MAX_SIZE);
+          }
         })
         .finally(() => {
           setJsonLoading(false);
@@ -94,9 +115,16 @@ export default function DashboardPage() {
   useEffect(() => {
     if (selectedAasx && selectedAasx.af_idx) {
       setAasxLoading(true);
+      setAasxFileSize(null);
       handleVerifyAPI(selectedAasx)
         .then((data) => {
           setSelectedAasxData(data?.aasData || data);
+        })
+        .catch((error) => {
+          // 파일 크기 초과 에러 처리
+          if (error instanceof Error && error.message === 'FILE_TOO_LARGE') {
+            setAasxFileSize(FILE.MAX_SIZE);
+          }
         })
         .finally(() => {
           setAasxLoading(false);
@@ -228,6 +256,18 @@ export default function DashboardPage() {
                   <CircularProgress size={40} />
                   <Typography color='textSecondary'>JSON 파일 로딩 중...</Typography>
                 </Box>
+              ) : jsonFileSize ? (
+                <Box sx={fileSizeMessageStyle}>
+                  <Typography variant='h6' color='textSecondary'>
+                    파일 크기 제한
+                  </Typography>
+                  <Typography color='textSecondary'>
+                    파일 크기가 {FILE.MAX_SIZE / (1024 * 1024)}MB를 초과하여 미리보기를 제공할 수 없습니다.
+                  </Typography>
+                  <Typography color='textSecondary' variant='body2'>
+                    상세보기 버튼을 통해 AASX Package Viewer로 확인해주세요.
+                  </Typography>
+                </Box>
               ) : selectedJsonData ? (
                 <div style={{ marginTop: 15 }}>
                   <JSONViewer
@@ -280,6 +320,18 @@ export default function DashboardPage() {
                 >
                   <CircularProgress size={40} />
                   <Typography color='textSecondary'>AASX 파일 로딩 중...</Typography>
+                </Box>
+              ) : aasxFileSize ? (
+                <Box sx={fileSizeMessageStyle}>
+                  <Typography variant='h6' color='textSecondary'>
+                    파일 크기 제한
+                  </Typography>
+                  <Typography color='textSecondary'>
+                    파일 크기가 {FILE.MAX_SIZE / (1024 * 1024)}MB를 초과하여 미리보기를 제공할 수 없습니다.
+                  </Typography>
+                  <Typography color='textSecondary' variant='body2'>
+                    상세보기 버튼을 통해 AASX Package Viewer로 확인해주세요.
+                  </Typography>
                 </Box>
               ) : selectedAasxData ? (
                 <div style={{ marginTop: 15 }}>
