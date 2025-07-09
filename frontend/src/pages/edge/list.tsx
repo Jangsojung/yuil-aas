@@ -13,6 +13,12 @@ import LoadingOverlay from '../../components/loading/LodingOverlay';
 import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
 import { formatDate } from '../../utils/dateUtils';
 import { EdgeGateway, AlertModalState } from '../../types';
+import { SearchBox } from '../../components/common';
+import Grid from '@mui/system/Grid';
+import FormControl from '@mui/material/FormControl';
+import { TextField } from '@mui/material';
+import BasicDatePicker from '../../components/datepicker';
+import { Dayjs } from 'dayjs';
 
 interface EdgeListProps {
   onAddClick: () => void;
@@ -21,8 +27,15 @@ interface EdgeListProps {
 
 export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeListProps, ref) {
   const [edgeGateways, setEdgeGateways] = useState<EdgeGateway[]>([]);
+  const [filteredEdgeGateways, setFilteredEdgeGateways] = useState<EdgeGateway[]>([]);
   const [selectedEdgeGateways, setSelectedEdgeGateways] = useState<number[]>([]);
   const navigationReset = useRecoilValue(navigationResetState);
+
+  // 검색 관련 상태
+  const [pcName, setPcName] = useState<string>('');
+  const [ipAddress, setIpAddress] = useState<string>('');
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
   const [selectAll, setSelectAll] = useState(false);
   const [alertModal, setAlertModal] = useState<AlertModalState>({
@@ -39,7 +52,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     sortField,
     sortDirection,
     handleSort,
-  } = useSortableData<EdgeGateway>(edgeGateways, 'createdAt', 'desc');
+  } = useSortableData<EdgeGateway>(filteredEdgeGateways, 'createdAt', 'desc');
 
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<EdgeGateway>[] = [
@@ -55,6 +68,50 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
   });
 
   const [loading, setLoading] = useState(true);
+
+  // 검색 기능
+  const handleSearch = () => {
+    // 검색 조건에 따라 필터링
+    let filteredData = edgeGateways;
+
+    if (pcName.trim()) {
+      filteredData = filteredData.filter(
+        (edge) => edge.eg_pc_name && edge.eg_pc_name.toLowerCase().includes(pcName.toLowerCase())
+      );
+    }
+
+    if (ipAddress.trim()) {
+      filteredData = filteredData.filter(
+        (edge) => edge.eg_ip_port && edge.eg_ip_port.toLowerCase().includes(ipAddress.toLowerCase())
+      );
+    }
+
+    if (startDate && endDate) {
+      filteredData = filteredData.filter((edge) => {
+        const createdAt = new Date(edge.createdAt || '');
+        const start = startDate.startOf('day').toDate();
+        const end = endDate.endOf('day').toDate();
+        return createdAt >= start && createdAt <= end;
+      });
+    }
+
+    setFilteredEdgeGateways(filteredData);
+  };
+
+  // 초기화 기능
+  const handleReset = () => {
+    setPcName('');
+    setIpAddress('');
+    setStartDate(null);
+    setEndDate(null);
+    setFilteredEdgeGateways(edgeGateways);
+  };
+
+  // 날짜 변경 핸들러
+  const handleDateChange = (start: Dayjs | null, end: Dayjs | null) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
 
   const handleDelete = async () => {
     if (selectedEdgeGateways.length === 0) {
@@ -92,6 +149,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       setLoading(true);
       const data: EdgeGateway[] = await getEdgeAPI();
       setEdgeGateways(Array.isArray(data) ? data : []);
+      setFilteredEdgeGateways(Array.isArray(data) ? data : []); // 초기 데이터 설정
     } catch (error) {
       setEdgeGateways([]);
     } finally {
@@ -104,6 +162,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       setLoading(true);
       const data: EdgeGateway[] = await getEdgeWithStatusAPI();
       setEdgeGateways(Array.isArray(data) ? data : []);
+      setFilteredEdgeGateways(Array.isArray(data) ? data : []); // 초기 데이터 설정
     } catch (error) {
       await getEdge();
     } finally {
@@ -116,8 +175,8 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     setSelectAll(checked);
 
     if (checked) {
-      if (edgeGateways && edgeGateways.length > 0) {
-        setSelectedEdgeGateways(edgeGateways.map((file) => file.eg_idx));
+      if (filteredEdgeGateways && filteredEdgeGateways.length > 0) {
+        setSelectedEdgeGateways(filteredEdgeGateways.map((file) => file.eg_idx));
       }
     } else {
       setSelectedEdgeGateways([]);
@@ -162,12 +221,12 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
   useEffect(() => {
     if (selectedEdgeGateways.length === 0) {
       setSelectAll(false);
-    } else if (selectedEdgeGateways.length === edgeGateways.length) {
+    } else if (selectedEdgeGateways.length === filteredEdgeGateways.length) {
       setSelectAll(true);
     } else {
       setSelectAll(false);
     }
-  }, [selectedEdgeGateways, edgeGateways]);
+  }, [selectedEdgeGateways, filteredEdgeGateways]);
 
   useImperativeHandle(ref, () => ({
     refresh: getEdgeWithStatus,
@@ -176,6 +235,72 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
   return (
     <div className='table-outer'>
       {loading && <LoadingOverlay />}
+
+      {/* 검색 박스 */}
+      <div>
+        <SearchBox
+          buttons={[
+            {
+              text: '검색',
+              onClick: handleSearch,
+              color: 'success',
+            },
+            {
+              text: '초기화',
+              onClick: handleReset,
+              color: 'inherit',
+              variant: 'outlined',
+            },
+          ]}
+        >
+          <Grid container spacing={4} className='flex-center-gap-lg'>
+            {/* PC명 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>PC명</div>
+              </Grid>
+              <Grid>
+                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                  <TextField
+                    size='small'
+                    value={pcName}
+                    onChange={(e) => setPcName(e.target.value)}
+                    placeholder='PC명을 입력하세요'
+                  />
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            {/* IP 주소 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>IP 주소</div>
+              </Grid>
+              <Grid>
+                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                  <TextField
+                    size='small'
+                    value={ipAddress}
+                    onChange={(e) => setIpAddress(e.target.value)}
+                    placeholder='IP 주소를 입력하세요'
+                  />
+                </FormControl>
+              </Grid>
+            </Grid>
+
+            {/* 생성일 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>생성일</div>
+              </Grid>
+              <Grid>
+                <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
+              </Grid>
+            </Grid>
+          </Grid>
+        </SearchBox>
+      </div>
+
       <ActionBox
         buttons={[
           {
@@ -202,25 +327,25 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
                   sortDirection={sortDirection}
                   onSort={handleSort}
                   showCheckbox={true}
-                  onSelectAllChange={handleSelectAll}
                   selectAll={selectAll}
+                  onSelectAllChange={handleSelectAll}
                 />
               </TableRow>
             </TableHead>
             <TableBody>
               {paginatedData(sortedEdgeGateways || []).length > 0 ? (
-                paginatedData(sortedEdgeGateways || []).map((eg: EdgeGateway, idx: number) => (
+                paginatedData(sortedEdgeGateways || []).map((edgeGateway: EdgeGateway) => (
                   <EdgeTableRow
-                    key={eg.eg_idx}
-                    edgeGateway={eg}
-                    checked={selectedEdgeGateways.includes(eg.eg_idx)}
+                    key={edgeGateway.eg_idx}
+                    edgeGateway={edgeGateway}
+                    checked={selectedEdgeGateways.includes(edgeGateway.eg_idx)}
                     onCheckboxChange={handleCheckboxChange}
                     onRowClick={handleRowClick}
                     formatDate={formatDate}
                   />
                 ))
               ) : (
-                <TableEmptyRow colSpan={sortableColumns.length + 2} />
+                <TableEmptyRow colSpan={sortableColumns.length + 1} />
               )}
             </TableBody>
           </Table>
@@ -228,8 +353,8 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       </div>
 
       <Pagination
+        count={sortedEdgeGateways?.length || 0}
         page={currentPage}
-        count={edgeGateways?.length || 0}
         rowsPerPage={rowsPerPage}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
