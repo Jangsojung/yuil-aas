@@ -11,16 +11,6 @@ export default function TransmitView() {
 
   return (
     <div className='table-wrap'>
-      {/* <Box
-        sx={{
-          backgroundColor: '#ececec',
-          padding: '10px',
-          marginBottom: '10px',
-        }}
-        className='second-title'
-      >
-        선택한 aasx 파일 검증
-      </Box> */}
       <Grid container spacing={2}>
         <Grid size={100}>
           {isVerified ? (

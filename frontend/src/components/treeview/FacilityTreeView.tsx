@@ -1,9 +1,28 @@
 import React from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { Checkbox } from '@mui/material';
 import { FacilityGroupTree } from '../../types/api';
 import BasicTable from '../table/basic_code';
+
+import { styled, alpha } from '@mui/material/styles';
+
+const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
+  [`& .${treeItemClasses.content}`]: {
+    padding: theme.spacing(0.5, 1),
+    margin: theme.spacing(0.2, 0),
+  },
+  [`& .${treeItemClasses.iconContainer}`]: {
+    '& .close': {
+      opacity: 0.3,
+    },
+  },
+  [`& .${treeItemClasses.groupTransition}`]: {
+    marginLeft: 15,
+    paddingLeft: 18,
+    borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
+  },
+}));
 
 interface FacilityTreeViewProps {
   treeData: FacilityGroupTree[];
@@ -29,7 +48,7 @@ export const FacilityTreeView: React.FC<FacilityTreeViewProps> = ({
   return (
     <SimpleTreeView defaultExpandedItems={defaultExpandedItems}>
       {treeData.map((fg, fgIdx) => (
-        <TreeItem
+        <CustomTreeItem
           key={fg.fg_idx}
           itemId={`aas-${fgIdx}`}
           label={
@@ -46,7 +65,7 @@ export const FacilityTreeView: React.FC<FacilityTreeViewProps> = ({
           }
         >
           {fg.facilities.map((fa, faIdx) => (
-            <TreeItem
+            <CustomTreeItem
               key={fa.fa_idx}
               itemId={`submodal-${fgIdx}-${faIdx}`}
               label={
@@ -65,9 +84,9 @@ export const FacilityTreeView: React.FC<FacilityTreeViewProps> = ({
               <div className='padding-y'>
                 <BasicTable sm_idx={`${fgIdx + 1}.${faIdx + 1}`} fa_idx={fa.fa_idx} sensors={fa.sensors} />
               </div>
-            </TreeItem>
+            </CustomTreeItem>
           ))}
-        </TreeItem>
+        </CustomTreeItem>
       ))}
     </SimpleTreeView>
   );

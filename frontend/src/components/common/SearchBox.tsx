@@ -37,8 +37,8 @@ export default function SearchBox({ children, buttons = [], buttonAlign = 'right
             {buttons.map((button, index) => (
               <Button
                 key={index}
-                variant={button.variant || 'contained'}
-                color={button.color || 'success'}
+                variant={button.variant || 'outlined'}
+                color={button.color || 'primary'}
                 onClick={button.onClick}
                 disabled={button.disabled}
               >

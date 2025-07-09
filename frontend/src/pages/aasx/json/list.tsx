@@ -249,7 +249,7 @@ export default function JSONList() {
           {
             text: '검색',
             onClick: handleSearch,
-            color: 'success',
+            color: 'primary',
           },
           {
             text: '초기화',

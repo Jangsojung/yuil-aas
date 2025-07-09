@@ -182,7 +182,7 @@ export default function TransmitPage() {
           {
             text: '검증하기',
             onClick: handleVerify,
-            color: 'success',
+            color: 'primary',
           },
         ]}
       >
@@ -211,7 +211,7 @@ export default function TransmitPage() {
               <div>AASX 파일</div>
             </Grid>
             <Grid sx={{ flexGrow: 1 }}>
-              <FormControl sx={{ width: '100%' }} size='small'>
+              <FormControl sx={{ minWidth: '300px',width: '100%' }} size='small'>
                 <SelectAASXFile setSelectedFile={setSelectedFile} files={aasxFiles} disabled={!selectedFactory} />
               </FormControl>
             </Grid>

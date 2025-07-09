@@ -40,19 +40,6 @@ const dashboardPanelStyle = {
   width: '100%',
 };
 
-const detailButtonStyle = {
-  position: 'absolute',
-  top: 16,
-  right: 16,
-  cursor: 'pointer',
-  padding: '4px 14px',
-  border: '1px solid #888',
-  borderRadius: 4,
-  background: '#f5f5f5',
-  fontWeight: 500,
-  zIndex: 2,
-};
-
 const fileSizeMessageStyle = {
   display: 'flex',
   justifyContent: 'center',
@@ -141,209 +128,189 @@ export default function DashboardPage() {
   };
 
   return (
-    <Box
-      sx={{
-        p: 3,
-        height: 'calc(100vh - 100px)',
-        overflow: 'hidden',
-        boxSizing: 'border-box',
-        background: '#f8fafc',
-        border: '1px solid #e0e7ef',
-        borderRadius: 3,
-        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-      }}
-    >
-      <Grid
-        container
-        direction='column'
-        sx={{ height: '100%', width: '100%', overflow: 'hidden', display: 'flex' }}
-        spacing={2}
-      >
-        {/* 윗줄 */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1, minHeight: 0, gap: 1 }}>
-          {/* 왼쪽 위: JSON 파일 */}
-          <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box sx={dashboardPanelStyle}>
-              <Typography variant='h6' gutterBottom>
-                JSON 파일
-              </Typography>
-              <TableContainer component={Paper}>
-                <Table size='small'>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>공장명</TableCell>
-                      <TableCell>파일명</TableCell>
-                      <TableCell>기초코드명</TableCell>
-                      <TableCell>센서 개수</TableCell>
-                      <TableCell>생성일</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {jsonFiles.map((file) => (
-                      <TableRow key={file.af_idx} onClick={() => handleJsonRowClick(file)} sx={{ cursor: 'pointer' }}>
-                        <TableCell>{file.fc_name || '-'}</TableCell>
-                        <TableCell>{file.af_name}</TableCell>
-                        <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
-                        <TableCell>{file.sn_length || 0}</TableCell>
-                        <TableCell>{formatDate(file.createdAt)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          </Box>
-          {/* 오른쪽 위: AASX 파일 */}
-          <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box sx={dashboardPanelStyle}>
-              <Typography variant='h6' gutterBottom>
-                AASX 파일
-              </Typography>
-              <TableContainer component={Paper}>
-                <Table size='small'>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>공장명</TableCell>
-                      <TableCell>파일명</TableCell>
-                      <TableCell>생성일</TableCell>
-                      <TableCell>수정일</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {aasxFiles.map((file) => (
-                      <TableRow key={file.af_idx} onClick={() => handleAasxRowClick(file)} sx={{ cursor: 'pointer' }}>
-                        <TableCell>{file.fc_name || '-'}</TableCell>
-                        <TableCell>{file.af_name}</TableCell>
-                        <TableCell>{formatDate(file.createdAt)}</TableCell>
-                        <TableCell>{formatDate(file.updatedAt)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
-          </Box>
-        </Box>
-        {/* 아랫줄 (왼쪽: 최신 JSON 파일 뷰어) */}
-        <Box sx={{ display: 'flex', flexDirection: 'row', flex: 2, minHeight: 0, gap: 1 }}>
-          <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box sx={{ ...dashboardPanelStyle, position: 'relative' }}>
-              <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}>
-                {selectedJson ? `JSON 파일 - ${selectedJson.af_name}` : 'JSON 파일 미리보기'}
-              </Typography>
-              {selectedJson && (
-                <Button
-                  onClick={() => navigate(`/aasx/json/detail/${selectedJson.af_idx}`)}
-                  sx={detailButtonStyle}
-                  disabled={!selectedJson}
-                  variant='outlined'
-                  size='small'
-                >
-                  상세보기
-                </Button>
-              )}
-              {jsonLoading ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '300px',
-                    flexDirection: 'column',
-                    gap: 2,
-                  }}
-                >
-                  <CircularProgress size={40} />
-                  <Typography color='textSecondary'>JSON 파일 로딩 중...</Typography>
-                </Box>
-              ) : jsonFileSize ? (
-                <Box sx={fileSizeMessageStyle}>
-                  <Typography variant='h6' color='textSecondary'>
-                    파일 크기 제한
-                  </Typography>
-                  <Typography color='textSecondary'>
-                    파일 크기가 {FILE.MAX_SIZE / (1024 * 1024)}MB를 초과하여 미리보기를 제공할 수 없습니다.
-                  </Typography>
-                  <Typography color='textSecondary' variant='body2'>
-                    상세보기 버튼을 통해 AASX Package Viewer로 확인해주세요.
-                  </Typography>
-                </Box>
-              ) : selectedJsonData ? (
-                <div style={{ marginTop: 15 }}>
-                  <JSONViewer
-                    value={selectedJsonData}
-                    collapsed={3}
-                    enableClipboard={true}
-                    displayDataTypes={false}
-                    displayObjectSize={true}
-                    style={{ fontSize: 16 }}
-                  />
-                </div>
-              ) : (
-                <Typography color='textSecondary'>데이터 없음</Typography>
-              )}
-            </Box>
-          </Box>
-          <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box sx={{ ...dashboardPanelStyle, position: 'relative' }}>
-              <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}>
-                {selectedAasx ? `AASX 파일 - ${selectedAasx.af_name}` : 'AASX 파일 미리보기'}
-              </Typography>
-              {selectedAasx && (
-                <Button
-                  onClick={() =>
-                    navigate('/aas/transmit', {
-                      state: {
-                        fc_idx: selectedAasx.fc_idx,
-                        af_idx: selectedAasx.af_idx,
-                      },
-                    })
-                  }
-                  sx={detailButtonStyle}
-                  disabled={!selectedAasx}
-                  variant='outlined'
-                  size='small'
-                >
-                  상세보기
-                </Button>
-              )}
-              {aasxLoading ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '300px',
-                    flexDirection: 'column',
-                    gap: 2,
-                  }}
-                >
-                  <CircularProgress size={40} />
-                  <Typography color='textSecondary'>AASX 파일 로딩 중...</Typography>
-                </Box>
-              ) : aasxFileSize ? (
-                <Box sx={fileSizeMessageStyle}>
-                  <Typography variant='h6' color='textSecondary'>
-                    파일 크기 제한
-                  </Typography>
-                  <Typography color='textSecondary'>
-                    파일 크기가 {FILE.MAX_SIZE / (1024 * 1024)}MB를 초과하여 미리보기를 제공할 수 없습니다.
-                  </Typography>
-                  <Typography color='textSecondary' variant='body2'>
-                    상세보기 버튼을 통해 AASX Package Viewer로 확인해주세요.
-                  </Typography>
-                </Box>
-              ) : selectedAasxData ? (
-                <div style={{ marginTop: 15 }}>
-                  <TreeView data={transformAASXData(selectedAasxData)} />
-                </div>
-              ) : (
-                <Typography color='textSecondary'>데이터 없음</Typography>
-              )}
-            </Box>
-          </Box>
+    <Grid container spacing={1} className='dashboard-wrap'>
+      {/* 윗줄 */}
+      {/* 왼쪽 위: JSON 파일 */}
+      <Grid size={6} sx={{height:'30%'}}>
+        <Box sx={dashboardPanelStyle}>
+          <Typography variant='h6' gutterBottom className='dashboard-title'>
+            JSON 파일
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>공장명</TableCell>
+                  <TableCell>파일명</TableCell>
+                  <TableCell>기초코드명</TableCell>
+                  <TableCell>센서 개수</TableCell>
+                  <TableCell>생성일</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {jsonFiles.map((file) => (
+                  <TableRow key={file.af_idx} onClick={() => handleJsonRowClick(file)} sx={{ cursor: 'pointer' }}>
+                    <TableCell>{file.fc_name || '-'}</TableCell>
+                    <TableCell>{file.af_name}</TableCell>
+                    <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
+                    <TableCell>{file.sn_length || 0}</TableCell>
+                    <TableCell>{formatDate(file.createdAt)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Box>
       </Grid>
-    </Box>
+      {/* 오른쪽 위: AASX 파일 */}
+      <Grid size={6} sx={{height:'30%'}}>
+        <Box sx={dashboardPanelStyle}>
+          <Typography variant='h6' gutterBottom  className='dashboard-title'>
+            AASX 파일
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table size='small'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>공장명</TableCell>
+                  <TableCell>파일명</TableCell>
+                  <TableCell>생성일</TableCell>
+                  <TableCell>수정일</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {aasxFiles.map((file) => (
+                  <TableRow key={file.af_idx} onClick={() => handleAasxRowClick(file)} sx={{ cursor: 'pointer' }}>
+                    <TableCell>{file.fc_name || '-'}</TableCell>
+                    <TableCell>{file.af_name}</TableCell>
+                    <TableCell>{formatDate(file.createdAt)}</TableCell>
+                    <TableCell>{formatDate(file.updatedAt)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Grid>
+
+      {/* 아랫줄 (왼쪽: 최신 JSON 파일 뷰어) */}
+      <Grid size={6} sx={{flexGrow:1, height:'68%'}}>
+        <Box sx={{ ...dashboardPanelStyle}}>
+          <Typography variant='h6' gutterBottom className='dashboard-title'>
+            {selectedJson ? `JSON 파일 - ${selectedJson.af_name}` : 'JSON 파일 미리보기'}
+            {selectedJson && (
+              <Button
+                onClick={() => navigate(`/aasx/json/detail/${selectedJson.af_idx}`)}
+                disabled={!selectedJson}
+                variant='outlined'
+                size='small'
+              >
+                상세보기
+              </Button>
+            )}
+          </Typography>
+          
+          {jsonLoading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '300px',
+                flexDirection: 'column',
+                gap: 2,
+              }}
+            >
+              <CircularProgress size={40} />
+              <Typography color='textSecondary'>JSON 파일 로딩 중...</Typography>
+            </Box>
+          ) : jsonFileSize ? (
+            <Box sx={fileSizeMessageStyle}>
+              <Typography variant='h6' color='textSecondary'>
+                파일 크기 제한
+              </Typography>
+              <Typography color='textSecondary'>
+                파일 크기가 {FILE.MAX_SIZE / (1024 * 1024)}MB를 초과하여 미리보기를 제공할 수 없습니다.
+              </Typography>
+              <Typography color='textSecondary' variant='body2'>
+                상세보기 버튼을 통해 AASX Package Viewer로 확인해주세요.
+              </Typography>
+            </Box>
+          ) : selectedJsonData ? (
+            <div style={{ marginTop: 15 }}>
+              <JSONViewer
+                value={selectedJsonData}
+                collapsed={3}
+                enableClipboard={true}
+                displayDataTypes={false}
+                displayObjectSize={true}
+                style={{ fontSize: 16 }}
+              />
+            </div>
+          ) : (
+            <Typography color='textSecondary'>데이터 없음</Typography>
+          )}
+        </Box>
+      </Grid>
+      <Grid size={6} sx={{flexGrow:1, height:'68%'}}>
+        <Box sx={{ ...dashboardPanelStyle }}>
+          <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}  className='dashboard-title'>
+            {selectedAasx ? `AASX 파일 - ${selectedAasx.af_name}` : 'AASX 파일 미리보기'}
+
+            {selectedAasx && (
+              <Button
+                onClick={() =>
+                  navigate('/aas/transmit', {
+                    state: {
+                      fc_idx: selectedAasx.fc_idx,
+                      af_idx: selectedAasx.af_idx,
+                    },
+                  })
+                }
+                disabled={!selectedAasx}
+                variant='outlined'
+                size='small'
+              >
+                상세보기
+              </Button>
+            )}
+          </Typography>
+          
+          {aasxLoading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '300px',
+                flexDirection: 'column',
+                gap: 2,
+              }}
+            >
+              <CircularProgress size={40} />
+              <Typography color='textSecondary'>AASX 파일 로딩 중...</Typography>
+            </Box>
+          ) : aasxFileSize ? (
+            <Box sx={fileSizeMessageStyle}>
+              <Typography variant='h6' color='textSecondary'>
+                파일 크기 제한
+              </Typography>
+              <Typography color='textSecondary'>
+                파일 크기가 {FILE.MAX_SIZE / (1024 * 1024)}MB를 초과하여 미리보기를 제공할 수 없습니다.
+              </Typography>
+              <Typography color='textSecondary' variant='body2'>
+                상세보기 버튼을 통해 AASX Package Viewer로 확인해주세요.
+              </Typography>
+            </Box>
+          ) : selectedAasxData ? (
+            <div style={{ marginTop: 15 }}>
+              <TreeView data={transformAASXData(selectedAasxData)} />
+            </div>
+          ) : (
+            <Typography color='textSecondary'>데이터 없음</Typography>
+          )}
+        </Box>
+      </Grid>
+    </Grid>
   );
 }

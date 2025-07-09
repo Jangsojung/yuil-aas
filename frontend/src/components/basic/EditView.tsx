@@ -1,5 +1,6 @@
 import React from 'react';
 import Grid from '@mui/system/Grid';
+import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
 import { FacilityGroupTree } from '../../types/api';
@@ -87,7 +88,7 @@ export const EditView: React.FC<EditViewProps> = ({
             {
               text: '검색',
               onClick: onTreeSearch,
-              color: 'success',
+              color: 'primary',
             },
           ]}
         >
@@ -153,6 +154,13 @@ export const EditView: React.FC<EditViewProps> = ({
           </Grid>
         </SearchBox>
 
+      </div>
+
+      <div className='list-header'>
+        <Typography variant='h6' gutterBottom>
+          설비목록
+        </Typography>
+
         <ActionBox
           buttons={[
             {
@@ -170,7 +178,7 @@ export const EditView: React.FC<EditViewProps> = ({
         />
       </div>
 
-      <div className='table-wrap'>
+      <div className='table-wrap tree-scroll-wrap'>
         {treeLoading ? (
           <LoadingOverlay />
         ) : treeData.length === 0 ? (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Grid from '@mui/system/Grid';
+import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
@@ -10,13 +11,10 @@ import LoadingOverlay from '../loading/LodingOverlay';
 import ProgressOverlay from '../loading/ProgressOverlay';
 import FacilityGroupSelect from '../select/facility_group';
 import FactorySelect from '../select/factory_select';
-import BasicTable from '../table/basic_code';
 import { SearchBox, ActionBox } from '../common';
 import FacilityAddModal from '../modal/FacilityAddModal';
 import { FactoryTree } from '../../types/api';
 import { Dispatch, SetStateAction } from 'react';
-
-import Typography from '@mui/material/Typography';
 
 import { styled, alpha } from '@mui/material/styles';
 
@@ -247,7 +245,7 @@ export const FacilityView: React.FC<
             {
               text: '검색',
               onClick: handleSearch,
-              color: 'success',
+              color: 'primary',
             },
           ]}
         >
@@ -319,7 +317,7 @@ export const FacilityView: React.FC<
 
       <div className='list-header'>
         <Typography variant='h6' gutterBottom>
-          설비목록
+          설비 목록
         </Typography>
 
         <ActionBox
@@ -343,7 +341,7 @@ export const FacilityView: React.FC<
         />
       </div>
 
-      <div className='table-wrap'>
+      <div className='table-wrap tree-scroll-wrap'>
         {treeLoading && !progressOpen ? (
           <LoadingOverlay />
         ) : treeData.length === 0 ? (
@@ -412,8 +410,8 @@ export const FacilityView: React.FC<
                           </div>
                         }
                       >
-                        <div style={{ padding: '20px 0' }}>
-                          <Grid container spacing={1} className='facility-item'>
+                        <div style={{ padding: '15px 0' }}>
+                          <Grid container className='facility-item'>
                             {fa.sensors && fa.sensors.length > 0 ? (
                               fa.sensors.map((sensor, sensorIdx) => (
                                 <Grid key={sensor.sn_idx} size={2}>

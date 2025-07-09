@@ -106,53 +106,28 @@ main {
     }
 
     //센서리스트
-    .facility-item {
-      
-    }
     .facility-item > div {
-      border: 1px solid #e0e0e0;
-      border-radius: 10px;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.25);
       padding: 8px 16px;
+      box-sizing: border-box;
 
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
       word-break: break-all;
     }
-    .facility-item > div:focus {
-      background: #000;
+    .facility-item > div + div, .facility-item > div:first-child {
+      border-left: 1px dashed rgba(0, 0, 0, 0.25);
     }
-    // .sensor-list-wrap {
-    //   border-top: 2px solid #787878;
-    // }
-    // .sensor-list > div {
-    //   border-bottom: 2px solid #ccc;
-    // }
-    // .sensor-list .MuiGrid-container {
-    //   padding: 15px 15px;
-    // }
-    // .sensor-list .MuiGrid-container.sensor-tit {
-    //   padding: 8px 15px;
-    // }
-    // .sensor-tit {
-    //   border-bottom: 1px solid #ccc;
-    //   background-color: #efefef;
-    //   color: #607d8b;
-    //   font-weight: 500;
-    //   justify-content: space-between;
-    // }
-    // .sensor-tit span {
-    //   font-weight: normal;
-    // }
-    // .sensor-tit .MuiFormControlLabel-root {
-    //   margin: 0;
-    //   .MuiCheckbox-root {
-    //     padding: 4px;
-    //   }
-    // }
-    // .sensor-list .MuiListItemText-secondary {
-    //   color: var(--mui-palette-text-primary);
-    // }
+
+    .facility-item > div:nth-child(6n), .facility-item > div:last-child {
+      border-right: 1px dashed rgba(0, 0, 0, 0.25);
+    }
+
+    .facility-item > div:nth-child(-n+6) {
+      border-top: 1px dashed rgba(0, 0, 0, 0.25);
+    }
+    
 
     //체크박스
     .MuiButtonBase-root.MuiCheckbox-root {
@@ -219,6 +194,7 @@ main {
         font-weight: bold;
         border-bottom: 2px solid #d9dcdf;
         position: relative;
+        font-family: 'Public Sans', sans-serif;
       }
       th:last-child::after {
         display: none;
@@ -239,6 +215,7 @@ main {
         padding: 8px;
         border-right: 1px solid #e5e8eb;
         border-bottom: 1px solid #e5e8eb;
+        font-family: 'Public Sans', sans-serif;
       }
       td:last-child {
         border-right: 0;
@@ -290,13 +267,36 @@ main {
       padding: 10px;
     }
 
-    //데이터 송신
-    .tree-wrap {
-      width: 100%;
-      background: #fff;
-      margin-top: 0;
-      margin-left: 0;
-      max-width: 100%;
+    //트리
+    .tree-scroll-wrap {
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    .MuiTreeItem-content .MuiTreeItem-label {
+      font-family: 'Public Sans' ,sans-serif !important;
+      color: #000;
+    }
+
+    //대시보드
+    .dashboard-wrap {
+      height: 100%;
+      justify-content: flex-start;
+      align-items: flex-start;
+      flex-grow: 1;
+    }
+    .dashboard-wrap > div {
+     flex-grow:1;
+
+      .MuiBox-root {
+        padding: 0;
+      }
+    }
+    .dashboard-title {
+      padding: 8px 15px;
+      border-bottom: 1px solid #d0d7e5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
   }
 }

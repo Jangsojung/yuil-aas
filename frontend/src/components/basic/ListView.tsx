@@ -1,6 +1,7 @@
 import React from 'react';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/system/Grid';
+import Typography from '@mui/material/Typography';
 import { TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
@@ -91,7 +92,7 @@ export const ListView: React.FC<ListViewProps> = ({
             {
               text: '검색',
               onClick: onSearch,
-              color: 'success',
+              color: 'primary',
             },
             {
               text: '초기화',
@@ -150,6 +151,13 @@ export const ListView: React.FC<ListViewProps> = ({
             {/* 기간 */}
           </Grid>
         </SearchBox>
+
+      </div>
+
+      <div className='list-header'>
+        <Typography variant='h6' gutterBottom>
+          기초코드 목록
+        </Typography>
 
         <ActionBox
           buttons={[

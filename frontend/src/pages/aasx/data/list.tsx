@@ -104,7 +104,7 @@ export default function DataList() {
           {
             text: '검색',
             onClick: handleSearch,
-            color: 'success',
+            color: 'primary',
           },
         ]}
       >

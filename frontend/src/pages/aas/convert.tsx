@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getBasesAPI, insertJSONAPI, getBaseFCIdxAPI } from '../../apis/api/convert';
+import Typography from '@mui/material/Typography';
 import { Dayjs } from 'dayjs';
 import {
   FormControl,
@@ -374,7 +375,7 @@ export default function ConvertPage() {
               {
                 text: '검색',
                 onClick: handleSearch,
-                color: 'success',
+                color: 'primary',
               },
               {
                 text: '초기화',
@@ -432,15 +433,21 @@ export default function ConvertPage() {
             </Grid>
           </SearchBox>
 
-          <ActionBox
-            buttons={[
-              {
-                text: '변환',
-                onClick: handleConvert,
-                color: 'success',
-              },
-            ]}
-          />
+          <div className='list-header'>
+            <Typography variant='h6' gutterBottom>
+              기초코드 목록
+            </Typography>
+
+            <ActionBox
+              buttons={[
+                {
+                  text: '변환',
+                  onClick: handleConvert,
+                  color: 'success',
+                },
+              ]}
+            />
+          </div>
 
           <div className='table-wrap'>
             <TableContainer component={Paper}>

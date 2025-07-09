@@ -250,7 +250,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
           {
             text: '검색',
             onClick: handleSearch,
-            color: 'success',
+            color: 'primary',
           },
           {
             text: '초기화',
