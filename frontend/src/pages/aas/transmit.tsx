@@ -176,7 +176,7 @@ export default function TransmitPage() {
   }, [currentFile, setIsVerified]);
 
   return (
-    <div>
+    <div className='table-outer'>
       <SearchBox
         buttons={[
           {

@@ -99,7 +99,10 @@ export const EditView: React.FC<EditViewProps> = ({
                   <div>공장</div>
                 </Grid>
                 <Grid>
-                  <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
+                  <FormControl sx={{ minWidth: '200px',width: '100%' }} size='small'>
+                    <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
+                  </FormControl>
+                  
                 </Grid>
               </Grid>
             )}
@@ -111,19 +114,21 @@ export const EditView: React.FC<EditViewProps> = ({
                 <div>설비그룹</div>
               </Grid>
               <Grid>
-                <FacilityGroupSelect
-                  selectedFacilityGroups={selectedFacilityGroups}
-                  setSelectedFacilityGroups={setSelectedFacilityGroups}
-                  selectedFactory={selectedFactory}
-                />
+                <FormControl sx={{ minWidth: '200px',width: '100%' }} size='small'>
+                  <FacilityGroupSelect
+                    selectedFacilityGroups={selectedFacilityGroups}
+                    setSelectedFacilityGroups={setSelectedFacilityGroups}
+                    selectedFactory={selectedFactory}
+                  />
+                </FormControl>
               </Grid>
             </Grid>
             {/* 설비그룹 */}
 
             {/* 설비명 */}
-            <Grid container size={3}>
+            <Grid container>
               <Grid className='sort-title'>
-                <div>설비</div>
+                <div>설비명</div>
               </Grid>
               <Grid>
                 <FormControl sx={{ width: '100%' }} size='small'>
@@ -134,9 +139,9 @@ export const EditView: React.FC<EditViewProps> = ({
             {/* 설비명 */}
 
             {/* 센서명 */}
-            <Grid container size={3}>
+            <Grid container>
               <Grid className='sort-title'>
-                <div>센서</div>
+                <div>센서명</div>
               </Grid>
               <Grid>
                 <FormControl sx={{ width: '100%' }} size='small'>

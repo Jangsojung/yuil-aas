@@ -3,7 +3,7 @@ import Grid from '@mui/system/Grid';
 import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import Checkbox from '@mui/material/Checkbox';
 import LoadingOverlay from '../loading/LodingOverlay';
 import ProgressOverlay from '../loading/ProgressOverlay';
@@ -16,6 +16,25 @@ import { FactoryTree } from '../../types/api';
 import { Dispatch, SetStateAction } from 'react';
 
 import Typography from '@mui/material/Typography';
+
+import { styled, alpha } from '@mui/material/styles';
+
+const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
+  [`& .${treeItemClasses.content}`]: {
+    padding: theme.spacing(0.5, 1),
+    margin: theme.spacing(0.2, 0),
+  },
+  [`& .${treeItemClasses.iconContainer}`]: {
+    '& .close': {
+      opacity: 0.3,
+    },
+  },
+  [`& .${treeItemClasses.groupTransition}`]: {
+    marginLeft: 15,
+    paddingLeft: 18,
+    borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
+  },
+}));
 
 interface FacilityViewProps {
   // 상태
@@ -334,7 +353,7 @@ export const FacilityView: React.FC<
             onExpandedItemsChange={(event, itemIds) => setExpandedItems(itemIds)}
           >
             {convertedTreeData.map((factory, factoryIdx) => (
-              <TreeItem
+              <CustomTreeItem
                 key={factory.fc_idx}
                 itemId={`factory-${factoryIdx}`}
                 label={
@@ -348,12 +367,12 @@ export const FacilityView: React.FC<
                         sx={{ mr: 1 }}
                       />
                     )}
-                    <span className='text-bold text-large'>{factory.fc_name}</span>
+                    <span>{factory.fc_name}</span>
                   </div>
                 }
               >
                 {factory.facilityGroups.map((fg, fgIdx) => (
-                  <TreeItem
+                  <CustomTreeItem
                     key={fg.fg_idx}
                     itemId={`facility-group-${factoryIdx}-${fgIdx}`}
                     label={
@@ -367,12 +386,12 @@ export const FacilityView: React.FC<
                             sx={{ mr: 1 }}
                           />
                         )}
-                        <span className='text-bold text-medium'>{fg.fg_name}</span>
+                        <span>{fg.fg_name}</span>
                       </div>
                     }
                   >
                     {fg.facilities.map((fa, faIdx) => (
-                      <TreeItem
+                      <CustomTreeItem
                         key={fa.fa_idx}
                         itemId={`subfacility-${factoryIdx}-${fgIdx}-${faIdx}`}
                         label={
@@ -386,12 +405,41 @@ export const FacilityView: React.FC<
                                 sx={{ mr: 1 }}
                               />
                             )}
-                            <span className='text-medium text-small'>{fa.fa_name}</span>
+                            <span>{fa.fa_name}</span>
                           </div>
                         }
                       >
-                        <div className='padding-y'>
-                          <BasicTable
+                        <div style={{padding: '20px 0'}}>
+                          <Grid container spacing={1} className='facility-item'>
+                            <Grid size={2}>
+                              온조기 현재온도 온조기 현재온도 온조기 현재온도
+                            </Grid>
+                            <Grid size={2}>
+                              2
+                            </Grid>
+                            <Grid size={2}>
+                              3
+                            </Grid>
+                            <Grid size={2}>
+                              4
+                            </Grid>
+                            <Grid size={2}>
+                              5
+                            </Grid>
+                            <Grid size={2}>
+                              6
+                            </Grid>
+                            <Grid size={2}>
+                              6
+                            </Grid>
+                            <Grid size={2}>
+                              6
+                            </Grid>
+                            <Grid size={2}>
+                              6
+                            </Grid>
+                          </Grid>
+                          {/* <BasicTable
                             sm_idx={`${factoryIdx + 1}.${fgIdx + 1}.${faIdx + 1}`}
                             fa_idx={fa.fa_idx}
                             sensors={fa.sensors}
@@ -399,13 +447,13 @@ export const FacilityView: React.FC<
                             selectedSensors={selectedSensors}
                             setSelectedSensors={setSelectedSensors}
                             useOriginCheck={true}
-                          />
+                          /> */}
                         </div>
-                      </TreeItem>
+                      </CustomTreeItem>
                     ))}
-                  </TreeItem>
+                  </CustomTreeItem>
                 ))}
-              </TreeItem>
+              </CustomTreeItem>
             ))}
           </SimpleTreeView>
         )}

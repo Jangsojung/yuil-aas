@@ -10,8 +10,8 @@ export default function TransmitView() {
   const isVerified = useRecoilValue(isVerifiedState);
 
   return (
-    <Container maxWidth='lg' className='tree-wrap'>
-      <Box
+    <div className='table-wrap'>
+      {/* <Box
         sx={{
           backgroundColor: '#ececec',
           padding: '10px',
@@ -20,7 +20,7 @@ export default function TransmitView() {
         className='second-title'
       >
         선택한 aasx 파일 검증
-      </Box>
+      </Box> */}
       <Grid container spacing={2}>
         <Grid size={100}>
           {isVerified ? (
@@ -42,6 +42,6 @@ export default function TransmitView() {
           )}
         </Grid>
       </Grid>
-    </Container>
+    </div>
   );
 }

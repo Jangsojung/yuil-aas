@@ -106,47 +106,59 @@ main {
     }
 
     //센서리스트
-    .sensor-list-wrap {
-      border-top: 2px solid #787878;
+    .facility-item {
+      
     }
-    .sensor-list > div {
-      border-bottom: 2px solid #ccc;
+    .facility-item > div {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 8px 16px;
+
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      word-break: break-all;
     }
-    .sensor-list .MuiGrid-container {
-      padding: 15px 15px;
+    .facility-item > div:focus {
+      background: #000;
     }
-    .sensor-list .MuiGrid-container.sensor-tit {
-      padding: 8px 15px;
-    }
-    .sensor-tit {
-      border-bottom: 1px solid #ccc;
-      background-color: #efefef;
-      color: #607d8b;
-      font-weight: 500;
-      justify-content: space-between;
-    }
-    .sensor-tit span {
-      font-weight: normal;
-    }
-    .sensor-tit .MuiFormControlLabel-root {
-      margin: 0;
-      .MuiCheckbox-root {
-        padding: 4px;
-      }
-    }
-    .sensor-list .MuiListItemText-secondary {
-      color: var(--mui-palette-text-primary);
-    }
+    // .sensor-list-wrap {
+    //   border-top: 2px solid #787878;
+    // }
+    // .sensor-list > div {
+    //   border-bottom: 2px solid #ccc;
+    // }
+    // .sensor-list .MuiGrid-container {
+    //   padding: 15px 15px;
+    // }
+    // .sensor-list .MuiGrid-container.sensor-tit {
+    //   padding: 8px 15px;
+    // }
+    // .sensor-tit {
+    //   border-bottom: 1px solid #ccc;
+    //   background-color: #efefef;
+    //   color: #607d8b;
+    //   font-weight: 500;
+    //   justify-content: space-between;
+    // }
+    // .sensor-tit span {
+    //   font-weight: normal;
+    // }
+    // .sensor-tit .MuiFormControlLabel-root {
+    //   margin: 0;
+    //   .MuiCheckbox-root {
+    //     padding: 4px;
+    //   }
+    // }
+    // .sensor-list .MuiListItemText-secondary {
+    //   color: var(--mui-palette-text-primary);
+    // }
 
     //체크박스
     .MuiButtonBase-root.MuiCheckbox-root {
       padding: 0;
       color: rgb(103, 139, 163) !important;
       border-radius: 50%;
-    }
-
-    .MuiButtonBase-root.MuiCheckbox-root svg {
-     
     }
 
     .MuiCheckbox-root.Mui-checked {
@@ -176,9 +188,9 @@ main {
       box-shadow: none;
     }
     .table-outer {
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
+      // display: flex;
+      // flex-direction: column;
+      // flex-grow: 1;
       height: 100%;
       // border: 1px solid #E5E8EB;
     }
@@ -189,7 +201,7 @@ main {
       justify-content: space-between;
       border: 1px solid rgba(145, 158, 171, 0.24);
       margin-top: 8px;
-      overflow-y: scroll;
+      // overflow-y: scroll;
 
       .MuiTableContainer-root {
         height: 100%;

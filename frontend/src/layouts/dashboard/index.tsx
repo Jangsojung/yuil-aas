@@ -15,7 +15,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import IconButton from '@mui/material/IconButton';
 import HelpGuideModal from '../../components/modal/HelpGuideModal';
 
-const GreyButton = styled(Button)<ButtonProps>(() => ({
+const GrayButton = styled(Button)<ButtonProps>(() => ({
   color: '#637381',
   fontWeight: 'bold',
   backgroundColor: '#ffffff',
@@ -23,7 +23,7 @@ const GreyButton = styled(Button)<ButtonProps>(() => ({
   '&:hover': {
     backgroundColor: grey[200],
   },
-  padding: '3px 10px',
+  padding: '2px 8px',
 }));
 
 function CustomAppTitle() {
@@ -57,9 +57,9 @@ function ToolbarActionsAdmin({ user }: ToolbarActionsAdminProps) {
   return (
     <div className='d-flex align-center gap-10'>
       <p className='header-user'>{user}</p>
-      <GreyButton variant='outlined' onClick={handleLogout}>
+      <GrayButton variant='outlined' onClick={handleLogout}>
         로그아웃
-      </GreyButton>
+      </GrayButton>
       <IconButton onClick={handleHelpOpen} sx={{p:0}} aria-label='도움말'>
         <HelpOutlineIcon sx={{fontSize: '1.8rem'}} />
       </IconButton>
