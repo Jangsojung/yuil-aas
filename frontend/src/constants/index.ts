@@ -7,7 +7,7 @@ export const PAGINATION = {
 
 // 파일 관련 상수
 export const FILE = {
-  MAX_SIZE: 100 * 1024 * 1024, // 100MB
+  MAX_SIZE: 500 * 1024 * 1024, // 500MB
   ALLOWED_TYPES: ['.aasx', '.json'],
 } as const;
 

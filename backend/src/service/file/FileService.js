@@ -2,7 +2,7 @@ import { pool } from '../../index.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { FILE_KINDS } from '../../constants/index.js';
+import { FILE_KINDS, FILE } from '../../constants/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -157,15 +157,17 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
   let aasInsertId = null;
   let aasxInsertId = null;
   let createdFiles = [];
+  let connection = null;
 
   try {
-    const [existing] = await pool
-      .promise()
-      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = ? OR af_kind = ?)', [
-        fileName,
-        FILE_KINDS.AAS_KIND,
-        FILE_KINDS.AASX_KIND,
-      ]);
+    // 트랜잭션 시작
+    connection = await pool.promise().getConnection();
+    await connection.beginTransaction();
+
+    const [existing] = await connection.query(
+      'SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = ? OR af_kind = ?)',
+      [fileName, FILE_KINDS.AAS_KIND, FILE_KINDS.AASX_KIND]
+    );
     if (existing.length > 0) {
       throw new Error('이미 생성되어있는 파일입니다.');
     }
@@ -206,9 +208,13 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
     const aasFileName = fileName;
     const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aas', ?, ?)`;
-    const [aasResult] = await pool
-      .promise()
-      .query(aasQuery, [fc_idx, FILE_KINDS.AAS_KIND, aasFileName, user_idx, user_idx]);
+    const [aasResult] = await connection.query(aasQuery, [
+      fc_idx,
+      FILE_KINDS.AAS_KIND,
+      aasFileName,
+      user_idx,
+      user_idx,
+    ]);
     aasInsertId = aasResult.insertId;
     createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: aasInsertId });
 
@@ -249,11 +255,18 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
     const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
     const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aasx', ?, ?)`;
-    const [aasxResult] = await pool
-      .promise()
-      .query(aasxQuery, [fc_idx, FILE_KINDS.AASX_KIND, aasxFileName, user_idx, user_idx]);
+    const [aasxResult] = await connection.query(aasxQuery, [
+      fc_idx,
+      FILE_KINDS.AASX_KIND,
+      aasxFileName,
+      user_idx,
+      user_idx,
+    ]);
     aasxInsertId = aasxResult.insertId;
     createdFiles.push({ type: 'aasx', path: `../files/aasx/${aasxFileName}`, insertId: aasxInsertId });
+
+    // 트랜잭션 커밋
+    await connection.commit();
 
     return {
       success: true,
@@ -263,9 +276,17 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       message: '변환 완료: AAS JSON, AASX 파일이 모두 생성되었습니다.',
     };
   } catch (err) {
-    await cleanupCreatedFiles(createdFiles);
+    // 트랜잭션 롤백
+    if (connection) {
+      await connection.rollback();
+    }
 
+    await cleanupCreatedFiles(createdFiles);
     throw err;
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 };
 
@@ -307,24 +328,26 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
   let newAasxInsertId = null;
   let createdFiles = [];
   let oldFileInfo = null;
+  let connection = null;
 
   try {
+    // 트랜잭션 시작
+    connection = await pool.promise().getConnection();
+    await connection.beginTransaction();
+
     const newAasxFileName = fileName.replace(/\.json$/i, '.aasx');
-    const [existing] = await pool
-      .promise()
-      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = ? OR af_kind = ?) AND af_idx != ?', [
-        newAasxFileName,
-        FILE_KINDS.AAS_KIND,
-        FILE_KINDS.AASX_KIND,
-        af_idx,
-      ]);
+    const [existing] = await connection.query(
+      'SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = ? OR af_kind = ?) AND af_idx != ?',
+      [newAasxFileName, FILE_KINDS.AAS_KIND, FILE_KINDS.AASX_KIND, af_idx]
+    );
     if (existing.length > 0) {
       throw new Error('이미 생성되어있는 파일입니다.');
     }
 
-    const [aasxRows] = await pool
-      .promise()
-      .query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ? AND af_kind = ?', [af_idx, FILE_KINDS.AASX_KIND]);
+    const [aasxRows] = await connection.query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ? AND af_kind = ?', [
+      af_idx,
+      FILE_KINDS.AASX_KIND,
+    ]);
 
     if (aasxRows.length === 0) {
       throw new Error('수정할 AASX 파일을 찾을 수 없습니다.');
@@ -364,21 +387,23 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
       throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
     }
 
-    const [existingAasRows] = await pool
-      .promise()
-      .query('SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?', [
-        oldAasFileName,
-        FILE_KINDS.AAS_KIND,
-      ]);
+    const [existingAasRows] = await connection.query(
+      'SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?',
+      [oldAasFileName, FILE_KINDS.AAS_KIND]
+    );
 
     if (existingAasRows.length > 0) {
       const updateAasQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_name = ? AND af_kind = ?`;
-      await pool.promise().query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName, FILE_KINDS.AAS_KIND]);
+      await connection.query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName, FILE_KINDS.AAS_KIND]);
     } else {
       const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aas', ?, ?)`;
-      const [aasResult] = await pool
-        .promise()
-        .query(insertAasQuery, [fc_idx, FILE_KINDS.AAS_KIND, newAasFileName, user_idx, user_idx]);
+      const [aasResult] = await connection.query(insertAasQuery, [
+        fc_idx,
+        FILE_KINDS.AAS_KIND,
+        newAasFileName,
+        user_idx,
+        user_idx,
+      ]);
       newAasInsertId = aasResult.insertId;
       createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: newAasInsertId });
     }
@@ -407,9 +432,13 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
     }
 
     const insertAasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aasx', ?, ?)`;
-    const [aasxResult] = await pool
-      .promise()
-      .query(insertAasxQuery, [fc_idx, FILE_KINDS.AASX_KIND, newAasxFileName, user_idx, user_idx]);
+    const [aasxResult] = await connection.query(insertAasxQuery, [
+      fc_idx,
+      FILE_KINDS.AASX_KIND,
+      newAasxFileName,
+      user_idx,
+      user_idx,
+    ]);
     newAasxInsertId = aasxResult.insertId;
     createdFiles.push({ type: 'aasx', path: `../files/aasx/${newAasxFileName}`, insertId: newAasxInsertId });
 
@@ -427,12 +456,14 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
       const errorText = await deleteResponse.text();
     }
 
-    await pool
-      .promise()
-      .query('DELETE FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?', [oldAasFileName, FILE_KINDS.AAS_KIND]);
-    await pool
-      .promise()
-      .query('DELETE FROM tb_aasx_file WHERE af_idx = ? AND af_kind = ?', [af_idx, FILE_KINDS.AASX_KIND]);
+    await connection.query('DELETE FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?', [
+      oldAasFileName,
+      FILE_KINDS.AAS_KIND,
+    ]);
+    await connection.query('DELETE FROM tb_aasx_file WHERE af_idx = ? AND af_kind = ?', [af_idx, FILE_KINDS.AASX_KIND]);
+
+    // 트랜잭션 커밋
+    await connection.commit();
 
     return {
       success: true,
@@ -442,9 +473,17 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
       message: '변환 완료: AAS JSON, AASX 파일이 모두 업데이트되었습니다.',
     };
   } catch (err) {
-    await cleanupCreatedFiles(createdFiles);
+    // 트랜잭션 롤백
+    if (connection) {
+      await connection.rollback();
+    }
 
+    await cleanupCreatedFiles(createdFiles);
     throw err;
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 };
 
@@ -558,7 +597,7 @@ export const checkFileSizeFromDB = async (file) => {
               size: fileStats.size,
               fileName: fileName,
               filePath: filePath,
-              isLargeFile: fileStats.size > 500 * 1024 * 1024,
+              isLargeFile: fileStats.size > FILE.MAX_SIZE,
             };
             resolve(result);
           }
@@ -586,7 +625,7 @@ export const checkFileSizeFromDB = async (file) => {
           size: fileStats.size,
           fileName: fileName,
           filePath: filePath,
-          isLargeFile: fileStats.size > 500 * 1024 * 1024,
+          isLargeFile: fileStats.size > FILE.MAX_SIZE,
         };
         resolve(result);
       }
@@ -641,7 +680,7 @@ export const getVerifyFromDB = async (file) => {
 
       const fileStats = fs.statSync(filePath);
 
-      if (fileStats.size > 500 * 1024 * 1024) {
+      if (fileStats.size > FILE.MAX_SIZE) {
         reject(new Error('FILE_TOO_LARGE'));
         return;
       }

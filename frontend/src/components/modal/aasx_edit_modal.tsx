@@ -73,6 +73,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   const [progress, setProgress] = useState(0);
   const [progressLabel, setProgressLabel] = useState('');
   const [, setSizeWarning] = useState('');
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   const title = fileData ? (selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정') : '파일 등록';
 
@@ -97,8 +98,56 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     setProgressLabel(label);
   };
 
+  // 작업 중단 함수
+  const abortOperation = () => {
+    if (abortController) {
+      abortController.abort();
+    }
+    setIsLoading(false);
+    setProgress(0);
+    setProgressLabel('');
+    setAbortController(null);
+  };
+
+  // ESC 키와 새로고침 처리
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isLoading) {
+        event.preventDefault();
+        abortOperation();
+        setAlertModal({
+          open: true,
+          title: '작업 중단',
+          content: '사용자에 의해 작업이 중단되었습니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+      }
+    };
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (isLoading) {
+        event.preventDefault();
+        event.returnValue = '작업이 진행 중입니다. 페이지를 떠나시겠습니까?';
+        return '작업이 진행 중입니다. 페이지를 떠나시겠습니까?';
+      }
+    };
+
+    if (isLoading) {
+      document.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isLoading]);
+
   // 실제 수정/등록 실행 함수
   const executeEdit = async () => {
+    const controller = new AbortController();
+    setAbortController(controller);
     setIsLoading(true);
     setProgress(0);
 
@@ -198,6 +247,18 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       handleUpdate(newFile);
       handleClose();
     } catch (err: any) {
+      // AbortError인 경우 사용자 중단으로 처리
+      if (err.name === 'AbortError') {
+        setAlertModal({
+          open: true,
+          title: '작업 중단',
+          content: '사용자에 의해 작업이 중단되었습니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+        return;
+      }
+
       const msg = err?.response?.data?.error || err?.message || (typeof err === 'string' ? err : '알 수 없는 오류');
 
       if (msg.includes('이미 생성되어있는 파일입니다.')) {
@@ -222,6 +283,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       setProgress(0);
       setProgressLabel('');
       setSizeWarning('');
+      setAbortController(null);
     }
   };
 
@@ -277,6 +339,21 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
+  const handleModalClose = () => {
+    if (isLoading) {
+      abortOperation();
+      setAlertModal({
+        open: true,
+        title: '작업 중단',
+        content: '모달이 닫혀서 작업이 중단되었습니다.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+    } else {
+      handleClose();
+    }
+  };
+
   const handleFileDataChange = () => {
     if (fileData && fileData.af_idx) {
       setSelectedFile(fileData);
@@ -296,14 +373,14 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
 
   return (
     <>
-      <BootstrapDialog onClose={handleClose} aria-labelledby='customized-dialog-title' open={open}>
+      <BootstrapDialog onClose={handleModalClose} aria-labelledby='customized-dialog-title' open={open}>
         {isLoading && <ProgressOverlay open={isLoading} progress={progress} label={progressLabel} />}
         <DialogTitle sx={{ m: 0, p: 2 }} id='customized-dialog-title'>
           {title}
         </DialogTitle>
         <IconButton
           aria-label='close'
-          onClick={handleClose}
+          onClick={handleModalClose}
           sx={(theme) => ({
             position: 'absolute',
             right: 8,
@@ -322,7 +399,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
             확인
           </Button>
 
-          <GreyButton variant='outlined' onClick={handleClose}>
+          <GreyButton variant='outlined' onClick={handleModalClose}>
             취소
           </GreyButton>
         </DialogActions>
