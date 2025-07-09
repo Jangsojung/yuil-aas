@@ -91,8 +91,16 @@ def transform_aas(path, data):
         obj_store.add(aas)
         aas_ids.append(id_)
 
-    output_path = f'../files/aas/{basename}'
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    # files 디렉토리와 aas 디렉토리 생성
+    files_dir = '../files'
+    aas_dir = '../files/aas'
+    
+    if not os.path.exists(files_dir):
+        os.makedirs(files_dir, exist_ok=True)
+    if not os.path.exists(aas_dir):
+        os.makedirs(aas_dir, exist_ok=True)
+    
+    output_path = f'{aas_dir}/{basename}'
     basyx_json.write_aas_json_file(output_path, obj_store, indent=2)
 
 
@@ -101,8 +109,17 @@ def transform_aasx(path):
     obj_store = basyx_json.read_aas_json_file(path)
 
     filename = os.path.splitext(os.path.basename(path))[0]
-    output_path = f'../files/aasx/{filename}.aasx'
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
+    # files 디렉토리와 aasx 디렉토리 생성
+    files_dir = '../files'
+    aasx_dir = '../files/aasx'
+    
+    if not os.path.exists(files_dir):
+        os.makedirs(files_dir, exist_ok=True)
+    if not os.path.exists(aasx_dir):
+        os.makedirs(aasx_dir, exist_ok=True)
+    
+    output_path = f'{aasx_dir}/{filename}.aasx'
 
     aas_ids = [
         aas.id for aas in obj_store

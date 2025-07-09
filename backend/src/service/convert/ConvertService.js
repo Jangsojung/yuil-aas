@@ -168,9 +168,15 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
       throw new Error('이미 생성되어있는 파일입니다.');
     }
 
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    // files 디렉토리와 front 디렉토리 생성
+    const filesDir = path.dirname(path.dirname(filePath)); // files 디렉토리
+    const frontDir = path.dirname(filePath); // front 디렉토리
+
+    if (!fs.existsSync(filesDir)) {
+      fs.mkdirSync(filesDir, { recursive: true });
+    }
+    if (!fs.existsSync(frontDir)) {
+      fs.mkdirSync(frontDir, { recursive: true });
     }
 
     fs.writeFileSync(filePath, jsonContent);

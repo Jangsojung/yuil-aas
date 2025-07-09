@@ -45,11 +45,18 @@ export const uploadAASXFile = async (req, res) => {
     }
     const { fc_idx, user_idx } = req.body;
     const fileName = req.file.originalname;
-    // front 폴더에 파일 저장
+
+    // files 디렉토리와 front 디렉토리 생성
+    const filesDir = path.join(__dirname, '../../../../files');
     const frontDir = path.join(__dirname, '../../../../files/front');
+
+    if (!fs.existsSync(filesDir)) {
+      fs.mkdirSync(filesDir, { recursive: true });
+    }
     if (!fs.existsSync(frontDir)) {
       fs.mkdirSync(frontDir, { recursive: true });
     }
+
     const frontFilePath = path.join(frontDir, fileName);
     fs.writeFileSync(frontFilePath, req.file.buffer);
     // AASX 파일 생성 및 DB 저장
