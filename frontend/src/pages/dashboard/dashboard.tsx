@@ -55,8 +55,8 @@ const detailButtonStyle = {
 export default function DashboardPage() {
   const [jsonFiles, setJsonFiles] = useState<JsonFileRow[]>([]);
   const [aasxFiles, setAasxFiles] = useState<AASXFile[]>([]);
-  const [latestJson, setLatestJson] = useState<JsonFileRow | null>(null);
-  const [latestJsonData, setLatestJsonData] = useState<any>(null);
+  const [selectedJson, setSelectedJson] = useState<JsonFileRow | null>(null);
+  const [selectedJsonData, setSelectedJsonData] = useState<any>(null);
   const [latestAasx, setLatestAasx] = useState<AASXFile | null>(null);
   const [latestAasxData, setLatestAasxData] = useState<AASXData | null>(null);
   const [jsonLoading, setJsonLoading] = useState(false);
@@ -67,7 +67,7 @@ export default function DashboardPage() {
     getJSONFilesAPI('', '', -1, null).then((files) => {
       setJsonFiles(files);
       if (files && files.length > 0) {
-        setLatestJson(files[0]);
+        setSelectedJson(files[0]); // 최신 파일을 초기 선택
       }
     });
     getFilesAPI('', '', -1, undefined, null).then((files) => {
@@ -79,17 +79,17 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (latestJson && latestJson.af_idx) {
+    if (selectedJson && selectedJson.af_idx) {
       setJsonLoading(true);
-      getJSONFileDetailAPI(latestJson.af_idx)
+      getJSONFileDetailAPI(selectedJson.af_idx)
         .then((data) => {
-          setLatestJsonData(data?.aasData || data);
+          setSelectedJsonData(data?.aasData || data);
         })
         .finally(() => {
           setJsonLoading(false);
         });
     }
-  }, [latestJson]);
+  }, [selectedJson]);
 
   useEffect(() => {
     if (latestAasx && latestAasx.af_idx) {
@@ -103,6 +103,10 @@ export default function DashboardPage() {
         });
     }
   }, [latestAasx]);
+
+  const handleJsonRowClick = (file: JsonFileRow) => {
+    setSelectedJson(file);
+  };
 
   return (
     <Box
@@ -144,7 +148,7 @@ export default function DashboardPage() {
                   </TableHead>
                   <TableBody>
                     {jsonFiles.map((file) => (
-                      <TableRow key={file.af_idx}>
+                      <TableRow key={file.af_idx} onClick={() => handleJsonRowClick(file)} sx={{ cursor: 'pointer' }}>
                         <TableCell>{file.fc_name || '-'}</TableCell>
                         <TableCell>{file.af_name}</TableCell>
                         <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
@@ -193,13 +197,13 @@ export default function DashboardPage() {
           <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Box sx={{ ...dashboardPanelStyle, position: 'relative' }}>
               <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}>
-                최신 JSON 파일 미리보기
+                {selectedJson ? `JSON 파일 - ${selectedJson.af_name}` : 'JSON 파일 미리보기'}
               </Typography>
-              {latestJson && (
+              {selectedJson && (
                 <Button
-                  onClick={() => navigate(`/aasx/json/detail/${latestJson.af_idx}`)}
+                  onClick={() => navigate(`/aasx/json/detail/${selectedJson.af_idx}`)}
                   sx={detailButtonStyle}
-                  disabled={!latestJson}
+                  disabled={!selectedJson}
                   variant='outlined'
                   size='small'
                 >
@@ -220,10 +224,10 @@ export default function DashboardPage() {
                   <CircularProgress size={40} />
                   <Typography color='textSecondary'>JSON 파일 로딩 중...</Typography>
                 </Box>
-              ) : latestJsonData ? (
+              ) : selectedJsonData ? (
                 <div style={{ marginTop: 15 }}>
                   <JSONViewer
-                    value={latestJsonData}
+                    value={selectedJsonData}
                     collapsed={3}
                     enableClipboard={true}
                     displayDataTypes={false}
