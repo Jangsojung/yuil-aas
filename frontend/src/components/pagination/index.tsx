@@ -48,6 +48,12 @@ export default function CustomPagination({
           justifyContent: 'space-between',
           padding: '8px 16px',
         },
+        '& .MuiTablePagination-actions': {
+          marginLeft: '16px',
+        },
+        '& .MuiTablePagination-displayedRows': {
+          marginRight: '16px',
+        },
       }}
     />
   );
