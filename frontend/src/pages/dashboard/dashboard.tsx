@@ -11,6 +11,7 @@ import {
   Paper,
   Typography,
   Button,
+  CircularProgress,
 } from '@mui/material';
 import { getJSONFilesAPI } from '../../apis/api/json_manage';
 import { getFilesAPI } from '../../apis/api/aasx_manage';
@@ -60,6 +61,8 @@ export default function DashboardPage() {
   const [latestJsonData, setLatestJsonData] = useState<any>(null);
   const [latestAasx, setLatestAasx] = useState<AASXFile | null>(null);
   const [latestAasxData, setLatestAasxData] = useState<AASXData | null>(null);
+  const [jsonLoading, setJsonLoading] = useState(false);
+  const [aasxLoading, setAasxLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,17 +82,27 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (latestJson && latestJson.af_idx) {
-      getJSONFileDetailAPI(latestJson.af_idx).then((data) => {
-        setLatestJsonData(data?.aasData || data);
-      });
+      setJsonLoading(true);
+      getJSONFileDetailAPI(latestJson.af_idx)
+        .then((data) => {
+          setLatestJsonData(data?.aasData || data);
+        })
+        .finally(() => {
+          setJsonLoading(false);
+        });
     }
   }, [latestJson]);
 
   useEffect(() => {
     if (latestAasx && latestAasx.af_idx) {
-      handleVerifyAPI(latestAasx).then((data) => {
-        setLatestAasxData(data?.aasData || data);
-      });
+      setAasxLoading(true);
+      handleVerifyAPI(latestAasx)
+        .then((data) => {
+          setLatestAasxData(data?.aasData || data);
+        })
+        .finally(() => {
+          setAasxLoading(false);
+        });
     }
   }, [latestAasx]);
 
@@ -195,7 +208,21 @@ export default function DashboardPage() {
                   상세보기
                 </Button>
               )}
-              {latestJsonData ? (
+              {jsonLoading ? (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '300px',
+                    flexDirection: 'column',
+                    gap: 2,
+                  }}
+                >
+                  <CircularProgress size={40} />
+                  <Typography color='textSecondary'>JSON 파일 로딩 중...</Typography>
+                </Box>
+              ) : latestJsonData ? (
                 <div style={{ marginTop: 15 }}>
                   <JSONViewer
                     value={latestJsonData}
@@ -227,7 +254,21 @@ export default function DashboardPage() {
                   상세보기
                 </Button>
               )}
-              {latestAasxData ? (
+              {aasxLoading ? (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '300px',
+                    flexDirection: 'column',
+                    gap: 2,
+                  }}
+                >
+                  <CircularProgress size={40} />
+                  <Typography color='textSecondary'>AASX 파일 로딩 중...</Typography>
+                </Box>
+              ) : latestAasxData ? (
                 <div style={{ marginTop: 15 }}>
                   <TreeView data={transformAASXData(latestAasxData)} />
                 </div>
