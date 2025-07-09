@@ -10,6 +10,7 @@ import {
   TableRow,
   Paper,
   Typography,
+  Button,
 } from '@mui/material';
 import { getJSONFilesAPI } from '../../apis/api/json_manage';
 import { getFilesAPI } from '../../apis/api/aasx_manage';
@@ -20,14 +21,45 @@ import TreeView from '../../components/treeview';
 import { getAASXAPI } from '../../apis/api/aasx_manage';
 import { handleVerifyAPI } from '../../apis/api/transmit';
 import { transformAASXData } from '../../utils/aasxTransform';
+import { formatDate } from '../../utils/dateUtils';
+import { PAGINATION, FILE, MODAL_TYPE, KINDS } from '../../constants';
+import type { AASXFile, AASXData, Base, File } from '../../types/api';
+
+type JsonFileRow = File & { base_name?: string; sn_length?: number };
+
+const dashboardPanelStyle = {
+  border: '1px solid #d0d7e5',
+  borderRadius: 2,
+  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+  height: '100%',
+  background: '#fff',
+  p: 2,
+  overflow: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+};
+
+const detailButtonStyle = {
+  position: 'absolute',
+  top: 16,
+  right: 16,
+  cursor: 'pointer',
+  padding: '4px 14px',
+  border: '1px solid #888',
+  borderRadius: 4,
+  background: '#f5f5f5',
+  fontWeight: 500,
+  zIndex: 2,
+};
 
 export default function DashboardPage() {
-  const [jsonFiles, setJsonFiles] = useState<any[]>([]);
-  const [aasxFiles, setAasxFiles] = useState<any[]>([]);
-  const [latestJson, setLatestJson] = useState<any>(null);
+  const [jsonFiles, setJsonFiles] = useState<JsonFileRow[]>([]);
+  const [aasxFiles, setAasxFiles] = useState<AASXFile[]>([]);
+  const [latestJson, setLatestJson] = useState<JsonFileRow | null>(null);
   const [latestJsonData, setLatestJsonData] = useState<any>(null);
-  const [latestAasx, setLatestAasx] = useState<any>(null);
-  const [latestAasxData, setLatestAasxData] = useState<any>(null);
+  const [latestAasx, setLatestAasx] = useState<AASXFile | null>(null);
+  const [latestAasxData, setLatestAasxData] = useState<AASXData | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,8 +88,6 @@ export default function DashboardPage() {
   useEffect(() => {
     if (latestAasx && latestAasx.af_idx) {
       handleVerifyAPI(latestAasx).then((data) => {
-        console.log('AASX handleVerifyAPI 응답:', data);
-        console.log('AASX handleVerifyAPI aaxData:', data?.aasData);
         setLatestAasxData(data?.aasData || data);
       });
     }
@@ -86,20 +116,7 @@ export default function DashboardPage() {
         <Box sx={{ display: 'flex', flexDirection: 'row', flex: 1, minHeight: 0, gap: 1 }}>
           {/* 왼쪽 위: JSON 파일 */}
           <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box
-              sx={{
-                border: '1px solid #d0d7e5',
-                borderRadius: 2,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                height: '100%',
-                background: '#fff',
-                p: 2,
-                overflow: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-              }}
-            >
+            <Box sx={dashboardPanelStyle}>
               <Typography variant='h6' gutterBottom>
                 JSON 파일 (최신 10개)
               </Typography>
@@ -131,20 +148,7 @@ export default function DashboardPage() {
           </Box>
           {/* 오른쪽 위: AASX 파일 */}
           <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box
-              sx={{
-                border: '1px solid #d0d7e5',
-                borderRadius: 2,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                height: '100%',
-                background: '#fff',
-                p: 2,
-                overflow: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-              }}
-            >
+            <Box sx={dashboardPanelStyle}>
               <Typography variant='h6' gutterBottom>
                 AASX 파일 (최신 10개)
               </Typography>
@@ -176,42 +180,20 @@ export default function DashboardPage() {
         {/* 아랫줄 (왼쪽: 최신 JSON 파일 뷰어) */}
         <Box sx={{ display: 'flex', flexDirection: 'row', flex: 2, minHeight: 0, gap: 1 }}>
           <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box
-              sx={{
-                border: '1px solid #d0d7e5',
-                borderRadius: 2,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                height: '100%',
-                background: '#fff',
-                p: 2,
-                overflow: 'auto',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-              }}
-            >
+            <Box sx={{ ...dashboardPanelStyle, position: 'relative' }}>
               <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}>
                 최신 JSON 파일 미리보기
               </Typography>
               {latestJson && (
-                <button
+                <Button
                   onClick={() => navigate(`/aasx/json/detail/${latestJson.af_idx}`)}
-                  style={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    cursor: 'pointer',
-                    padding: '4px 14px',
-                    border: '1px solid #888',
-                    borderRadius: 4,
-                    background: '#f5f5f5',
-                    fontWeight: 500,
-                  }}
+                  sx={detailButtonStyle}
                   disabled={!latestJson}
+                  variant='outlined'
+                  size='small'
                 >
                   상세보기
-                </button>
+                </Button>
               )}
               {latestJsonData ? (
                 <div style={{ marginTop: 15 }}>
@@ -230,42 +212,20 @@ export default function DashboardPage() {
             </Box>
           </Box>
           <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <Box
-              sx={{
-                border: '1px solid #d0d7e5',
-                borderRadius: 2,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                height: '100%',
-                background: '#fff',
-                p: 2,
-                overflow: 'auto',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-              }}
-            >
+            <Box sx={{ ...dashboardPanelStyle, position: 'relative' }}>
               <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}>
                 최신 AASX 파일 미리보기
               </Typography>
               {latestAasx && (
-                <button
+                <Button
                   onClick={() => navigate('/aas/transmit')}
-                  style={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    cursor: 'pointer',
-                    padding: '4px 14px',
-                    border: '1px solid #888',
-                    borderRadius: 4,
-                    background: '#f5f5f5',
-                    fontWeight: 500,
-                  }}
+                  sx={detailButtonStyle}
                   disabled={!latestAasx}
+                  variant='outlined'
+                  size='small'
                 >
                   상세보기
-                </button>
+                </Button>
               )}
               {latestAasxData ? (
                 <div style={{ marginTop: 15 }}>
@@ -280,15 +240,4 @@ export default function DashboardPage() {
       </Grid>
     </Box>
   );
-}
-
-function formatDate(dateString?: string) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${year}.${month}.${day} ${hours}:${minutes}`;
 }
