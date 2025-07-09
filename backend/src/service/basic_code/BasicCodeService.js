@@ -22,6 +22,26 @@ export const getBaseByIdFromDB = async (ab_idx) => {
   });
 };
 
+export const getBaseFCIdxFromDB = async (ab_idx) => {
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT fc_idx FROM tb_aasx_base WHERE ab_idx = ? LIMIT 1';
+
+    pool.query(query, [ab_idx], (err, results) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      if (results.length === 0) {
+        resolve(null);
+        return;
+      }
+
+      resolve(results[0].fc_idx);
+    });
+  });
+};
+
 export const getBasesFromDB = async (fc_idx) => {
   return new Promise((resolve, reject) => {
     let query = '';

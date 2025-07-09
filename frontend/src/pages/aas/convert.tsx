@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getBasesAPI, insertJSONAPI } from '../../apis/api/convert';
+import { getBasesAPI, insertJSONAPI, getBaseFCIdxAPI } from '../../apis/api/convert';
 import { Dayjs } from 'dayjs';
 import {
   FormControl,
@@ -229,12 +229,15 @@ export default function ConvertPage() {
         });
       }, 500);
 
+      // 선택된 기초코드의 fc_idx를 가져옴
+      const baseFCIdx = await getBaseFCIdxAPI(selectedConvert);
+
       const result = await insertJSONAPI({
         ab_idx: selectedConvert,
         startDate: startDateStr,
         endDate: endDateStr,
         user_idx: userIdx,
-        fc_idx: selectedFactory,
+        fc_idx: baseFCIdx,
         af_kind: KINDS.JSON_KIND,
       });
 

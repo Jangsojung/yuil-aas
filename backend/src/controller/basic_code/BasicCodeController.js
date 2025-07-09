@@ -15,12 +15,23 @@ import {
   insertSensorToDB,
   syncFactoriesToAasxData,
   getBaseByIdFromDB,
+  getBaseFCIdxFromDB,
 } from '../../service/basic_code/BasicCodeService.js';
 
 export const getBaseById = async (ab_idx, res) => {
   try {
     const result = await getBaseByIdFromDB(ab_idx);
     res.status(200).json(result);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ err: 'Internal Server Error' });
+  }
+};
+
+export const getBaseFCIdx = async (ab_idx, res) => {
+  try {
+    const result = await getBaseFCIdxFromDB(ab_idx);
+    res.status(200).json({ fc_idx: result });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ err: 'Internal Server Error' });

@@ -10,6 +10,16 @@ export const getBasesAPI = async (fc_idx) => {
   }
 };
 
+export const getBaseFCIdxAPI = async (ab_idx) => {
+  try {
+    const data = await apiHelpers.post(`${API_ENDPOINTS.BASE_CODE.BASES}/${ab_idx}/fc_idx`);
+    return data.fc_idx;
+  } catch (error) {
+    console.error('Error fetching base fc_idx:', error);
+    throw error;
+  }
+};
+
 export const insertJSONAPI = async (params) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.CONVERT, {

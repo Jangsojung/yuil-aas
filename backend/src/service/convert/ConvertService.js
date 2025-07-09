@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { pool } from '../../index.js';
 import { fileURLToPath } from 'url';
+import { getBaseFCIdxFromDB } from '../basic_code/BasicCodeService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,6 +14,10 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
   const endDateTime = `${formattedEnd} 23:59:59`;
 
   try {
+    const baseFCIdx = await getBaseFCIdxFromDB(selectedConvert);
+    if (!baseFCIdx) {
+      throw new Error('선택된 기초코드의 공장 정보를 찾을 수 없습니다.');
+    }
     const [snRows] = await pool
       .promise()
       .query(`SELECT sn_idx FROM tb_aasx_base_sensor WHERE ab_idx IN (?)`, [selectedConvert]);
@@ -171,7 +176,7 @@ export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedCon
     fs.writeFileSync(filePath, jsonContent);
 
     const query = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, 1, ?, '/files/front', ?, ?)`;
-    await pool.promise().query(query, [fc_idx, file_name, user_idx, user_idx]);
+    await pool.promise().query(query, [baseFCIdx, file_name, user_idx, user_idx]);
 
     return { success: true, fileName: file_name, filePath: '/files/front' };
   } catch (err) {

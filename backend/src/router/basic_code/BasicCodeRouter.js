@@ -16,6 +16,7 @@ import {
   insertSensor,
   syncFactories,
   getBaseById,
+  getBaseFCIdx,
 } from '../../controller/basic_code/BasicCodeController.js';
 
 const router = express.Router();
@@ -108,6 +109,12 @@ export default () => {
   router.post('/bases/:id', (req, res) => {
     const { id } = req.params;
     getBaseById(id, res);
+  });
+
+  // 기초코드의 fc_idx 조회
+  router.post('/bases/:id/fc_idx', (req, res) => {
+    const { id } = req.params;
+    getBaseFCIdx(id, res);
   });
 
   return router;
