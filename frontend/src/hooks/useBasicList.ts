@@ -120,37 +120,13 @@ export const useBasicList = (navigate: any) => {
     setAlertOpen(true);
   }, [selectedBases.length]);
 
-  // 삭제 확인 핸들러
-  const handleConfirmDelete = useCallback(async () => {
-    try {
-      await deleteBasesAPI(selectedBases);
-      setBases(bases.filter((base) => !selectedBases.includes(base.ab_idx)));
-      setSelectedBases([]);
-      setAlertTitle('알림');
-      setAlertContent('선택한 항목이 삭제되었습니다.');
-      setAlertType(MODAL_TYPE.ALERT);
-      setAlertOpen(true);
-      handleReset();
-    } catch (err: any) {
-      setAlertTitle('오류');
-      setAlertContent('삭제 중 오류가 발생했습니다.');
-      setAlertType(MODAL_TYPE.ALERT);
-      setAlertOpen(true);
-    }
-  }, [selectedBases, bases, setSelectedBases, handleReset]);
-
-  // 검색 핸들러
-  const handleSearch = useCallback(async () => {
+  // 검색 로직을 별도 함수로 분리
+  const performSearch = useCallback(async () => {
     if (!selectedFactory) {
-      setAlertTitle('알림');
-      setAlertContent('공장을 선택해주세요.');
-      setAlertType(MODAL_TYPE.ALERT);
-      setAlertOpen(true);
       return;
     }
 
     try {
-      // 검색 시에만 기초코드 목록 조회
       const data = await getBasesAPI(selectedFactory);
       const fetchedBases = Array.isArray(data) ? data : [];
       setBases(fetchedBases);
@@ -192,7 +168,41 @@ export const useBasicList = (navigate: any) => {
       setBases([]);
       setFilteredBases([]);
     }
-  }, [selectedFactory, searchKeyword, startDate, endDate, setAlertTitle, setAlertContent, setAlertType, setAlertOpen]);
+  }, [selectedFactory, searchKeyword, startDate, endDate]);
+
+  // 삭제 확인 핸들러
+  const handleConfirmDelete = useCallback(async () => {
+    try {
+      await deleteBasesAPI(selectedBases);
+      setBases(bases.filter((base) => !selectedBases.includes(base.ab_idx)));
+      setSelectedBases([]);
+      setAlertTitle('알림');
+      setAlertContent('선택한 항목이 삭제되었습니다.');
+      setAlertType(MODAL_TYPE.ALERT);
+      setAlertOpen(true);
+
+      // 검색 상태를 유지하면서 현재 검색 조건으로 다시 검색
+      await performSearch();
+    } catch (err: any) {
+      setAlertTitle('오류');
+      setAlertContent('삭제 중 오류가 발생했습니다.');
+      setAlertType(MODAL_TYPE.ALERT);
+      setAlertOpen(true);
+    }
+  }, [selectedBases, bases, setSelectedBases, performSearch]);
+
+  // 검색 핸들러
+  const handleSearch = useCallback(async () => {
+    if (!selectedFactory) {
+      setAlertTitle('알림');
+      setAlertContent('공장을 선택해주세요.');
+      setAlertType(MODAL_TYPE.ALERT);
+      setAlertOpen(true);
+      return;
+    }
+
+    await performSearch();
+  }, [selectedFactory, performSearch, setAlertTitle, setAlertContent, setAlertType, setAlertOpen]);
 
   // 날짜 변경 핸들러
   const handleDateChange = useCallback((newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
