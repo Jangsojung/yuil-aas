@@ -16,6 +16,7 @@ import {
   syncFactoriesToAasxData,
   getBaseByIdFromDB,
   getBaseFCIdxFromDB,
+  getSensorValuesFromDB,
 } from '../../service/basic_code/BasicCodeService.js';
 
 export const getBaseById = async (ab_idx, res) => {
@@ -178,5 +179,14 @@ export const syncFactories = async (res) => {
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ success: false, message: '공장 동기화 중 오류가 발생했습니다.' });
+  }
+};
+
+export const getSensorValues = async (sensorIds, res) => {
+  try {
+    const result = await getSensorValuesFromDB(sensorIds);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ err: 'Internal Server Error' });
   }
 };

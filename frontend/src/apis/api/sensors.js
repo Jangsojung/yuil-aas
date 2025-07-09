@@ -19,3 +19,13 @@ export const getSensorsForTableAPI = async (fa_idx) => {
     return [];
   }
 };
+
+// 센서 값 데이터 조회
+export const getSensorValuesAPI = async (sensorIds) => {
+  try {
+    const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.SENSOR_VALUES, { sensorIds });
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    return [];
+  }
+};

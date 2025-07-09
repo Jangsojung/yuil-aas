@@ -36,11 +36,11 @@ export default function CustomPagination({
       sx={{
         '& .MuiTablePagination-selectLabel': {
           display: 'block !important',
-          marginRight: '8px',
         },
         '& .MuiTablePagination-select': {
           display: 'block !important',
           minWidth: '80px',
+          paddingLeft: '24px',
         },
         '& .MuiTablePagination-toolbar': {
           display: 'flex',

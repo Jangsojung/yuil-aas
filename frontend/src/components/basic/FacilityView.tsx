@@ -5,6 +5,7 @@ import { TextField } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import Checkbox from '@mui/material/Checkbox';
+import Tooltip from '@mui/material/Tooltip';
 import LoadingOverlay from '../loading/LodingOverlay';
 import ProgressOverlay from '../loading/ProgressOverlay';
 import FacilityGroupSelect from '../select/facility_group';
@@ -405,49 +406,44 @@ export const FacilityView: React.FC<
                                 sx={{ mr: 1 }}
                               />
                             )}
-                            <span>{fa.fa_name}</span>
+                            <Tooltip title={fa.fa_name} placement='top'>
+                              <span>{fa.fa_name}</span>
+                            </Tooltip>
                           </div>
                         }
                       >
-                        <div style={{padding: '20px 0'}}>
+                        <div style={{ padding: '20px 0' }}>
                           <Grid container spacing={1} className='facility-item'>
-                            <Grid size={2}>
-                              온조기 현재온도 온조기 현재온도 온조기 현재온도
-                            </Grid>
-                            <Grid size={2}>
-                              2
-                            </Grid>
-                            <Grid size={2}>
-                              3
-                            </Grid>
-                            <Grid size={2}>
-                              4
-                            </Grid>
-                            <Grid size={2}>
-                              5
-                            </Grid>
-                            <Grid size={2}>
-                              6
-                            </Grid>
-                            <Grid size={2}>
-                              6
-                            </Grid>
-                            <Grid size={2}>
-                              6
-                            </Grid>
-                            <Grid size={2}>
-                              6
-                            </Grid>
+                            {fa.sensors && fa.sensors.length > 0 ? (
+                              fa.sensors.map((sensor, sensorIdx) => (
+                                <Grid key={sensor.sn_idx} size={2}>
+                                  <div className='flex-center'>
+                                    {sensor.origin_check !== 1 && (
+                                      <Checkbox
+                                        checked={selectedSensors.includes(sensor.sn_idx)}
+                                        onChange={() => {
+                                          const isSelected = selectedSensors.includes(sensor.sn_idx);
+                                          if (isSelected) {
+                                            setSelectedSensors((prev) => prev.filter((id) => id !== sensor.sn_idx));
+                                          } else {
+                                            setSelectedSensors((prev) => [...prev, sensor.sn_idx]);
+                                          }
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                        size='small'
+                                        sx={{ mr: 1 }}
+                                      />
+                                    )}
+                                    <Tooltip title={sensor.sn_name} placement='top'>
+                                      <span>{sensor.sn_name}</span>
+                                    </Tooltip>
+                                  </div>
+                                </Grid>
+                              ))
+                            ) : (
+                              <Grid size={12}>등록된 센서가 없습니다.</Grid>
+                            )}
                           </Grid>
-                          {/* <BasicTable
-                            sm_idx={`${factoryIdx + 1}.${fgIdx + 1}.${faIdx + 1}`}
-                            fa_idx={fa.fa_idx}
-                            sensors={fa.sensors}
-                            showCheckboxes={true}
-                            selectedSensors={selectedSensors}
-                            setSelectedSensors={setSelectedSensors}
-                            useOriginCheck={true}
-                          /> */}
                         </div>
                       </CustomTreeItem>
                     ))}

@@ -17,6 +17,7 @@ import {
   syncFactories,
   getBaseById,
   getBaseFCIdx,
+  getSensorValues,
 } from '../../controller/basic_code/BasicCodeController.js';
 
 const router = express.Router();
@@ -62,6 +63,11 @@ export default () => {
   router.post('/sensors', (req, res) => {
     const { fa_idx } = req.body;
     getSensors(fa_idx, res);
+  });
+
+  router.post('/sensorValues', (req, res) => {
+    const { sensorIds } = req.body;
+    getSensorValues(sensorIds, res);
   });
 
   router.post('/', (req, res) => {

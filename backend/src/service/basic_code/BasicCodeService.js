@@ -488,41 +488,42 @@ export const insertSensorToDB = async (fa_idx, sn_name) => {
 
 // 기존 공장들을 tb_aasx_data에 동기화
 export const syncFactoriesToAasxData = async () => {
-  return new Promise(async (resolve, reject) => {
-    const connection = await pool.promise().getConnection();
-    try {
-      await connection.beginTransaction();
+  try {
+    const query = `
+      INSERT INTO tb_aasx_data (fc_idx, fc_name)
+      SELECT DISTINCT fc_idx, fc_name
+      FROM tb_aasx_data_aas
+      WHERE fc_idx NOT IN (SELECT fc_idx FROM tb_aasx_data)
+    `;
 
-      // tb_factory_info에 있는 공장들을 조회
-      const factoryQuery = 'SELECT fc_idx, fc_name FROM tb_factory_info';
-      const [factoryResult] = await connection.query(factoryQuery);
+    const [result] = await pool.promise().query(query);
 
-      let syncedCount = 0;
-      for (const factory of factoryResult) {
-        // tb_aasx_data에 이미 있는지 확인
-        const checkQuery = 'SELECT fc_idx FROM tb_aasx_data WHERE fc_idx = ?';
-        const [checkResult] = await connection.query(checkQuery, [factory.fc_idx]);
+    return {
+      success: true,
+      message: '공장 동기화가 완료되었습니다.',
+      insertedCount: result.affectedRows,
+    };
+  } catch (err) {
+    throw err;
+  }
+};
 
-        if (checkResult.length === 0) {
-          // 없으면 추가
-          const insertQuery = 'INSERT INTO tb_aasx_data (fc_idx, fc_name) VALUES (?, ?)';
-          await connection.query(insertQuery, [factory.fc_idx, factory.fc_name]);
-          syncedCount++;
-        }
-      }
-
-      await connection.commit();
-
-      resolve({
-        success: true,
-        syncedCount: syncedCount,
-        message: `${syncedCount}개의 공장이 tb_aasx_data에 동기화되었습니다.`,
-      });
-    } catch (err) {
-      await connection.rollback();
-      reject(err);
-    } finally {
-      connection.release();
+export const getSensorValuesFromDB = async (sensorIds) => {
+  return new Promise((resolve, reject) => {
+    if (!sensorIds || sensorIds.length === 0) {
+      resolve([]);
+      return;
     }
+
+    // 임시로 더미 데이터 반환
+    const dummyValues = sensorIds.map((sn_idx, index) => ({
+      sn_idx: sn_idx,
+      sn_name: `센서${sn_idx}`,
+      sn_value: Math.floor(Math.random() * 100) + 20, // 20-120 사이의 랜덤 값
+      sn_unit: index % 3 === 0 ? '°C' : index % 3 === 1 ? 'Pa' : 'rpm',
+      sn_timestamp: new Date().toISOString(),
+    }));
+
+    resolve(dummyValues);
   });
 };

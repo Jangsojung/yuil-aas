@@ -82,6 +82,9 @@ export interface Sensor {
   sn_idx: number;
   sn_name: string;
   origin_check?: number;
+  sn_value?: string | number;
+  sn_unit?: string;
+  sn_timestamp?: string;
 }
 
 export interface ApiResponseData<T = any> {
