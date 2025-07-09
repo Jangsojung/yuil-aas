@@ -27,12 +27,12 @@ export const pool = mysql.createPool({
   port: process.env.DB_PORT,
 });
 
-app.use('/api/base_code', BaseCodeRouter());
-app.use('/api/edge_gateway', EdgeGatewayRouter());
-app.use('/api/convert', ConvertRouter());
-app.use('/api/file', FileRouter());
-app.use('/api/signin', SignInRouter());
-app.use('/api/facility', FacilityRouter());
+app.use('/api/base_code', BaseCodeRouter);
+app.use('/api/edge_gateway', EdgeGatewayRouter);
+app.use('/api/convert', ConvertRouter);
+app.use('/api/file', FileRouter);
+app.use('/api/signin', SignInRouter);
+app.use('/api/facility', FacilityRouter);
 
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });

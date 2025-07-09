@@ -10,37 +10,35 @@ import {
 
 const router = express.Router();
 
-export default () => {
-  router.post('/', (req, res) => {
-    getEdgeGateways(res);
-  });
+router.post('/', (req, res) => {
+  getEdgeGateways(res);
+});
 
-  router.post('/status', (req, res) => {
-    getEdgeGatewaysWithStatus(res);
-  });
+router.post('/status', (req, res) => {
+  getEdgeGatewaysWithStatus(res);
+});
 
-  router.post('/insert', (req, res) => {
-    const { user_idx } = req.body;
-    const { pcName, pcIp, pcPort } = req.body;
-    insertEdgeGateways(pcName, pcIp, pcPort, user_idx, res);
-  });
+router.post('/insert', (req, res) => {
+  const { user_idx } = req.body;
+  const { pcName, pcIp, pcPort } = req.body;
+  insertEdgeGateways(pcName, pcIp, pcPort, user_idx, res);
+});
 
-  router.put('/', (req, res) => {
-    const { eg_idx, user_idx } = req.body;
-    const { pcName, pcIp, pcPort } = req.body;
+router.put('/', (req, res) => {
+  const { eg_idx, user_idx } = req.body;
+  const { pcName, pcIp, pcPort } = req.body;
 
-    updateEdgeGateway(eg_idx, pcName, pcIp, pcPort, user_idx, res);
-  });
+  updateEdgeGateway(eg_idx, pcName, pcIp, pcPort, user_idx, res);
+});
 
-  router.delete('/', (req, res) => {
-    const { ids } = req.body;
-    deleteEdgeGateways(ids, res);
-  });
+router.delete('/', (req, res) => {
+  const { ids } = req.body;
+  deleteEdgeGateways(ids, res);
+});
 
-  router.post('/ping', (req, res) => {
-    const { ip, port } = req.body;
-    checkEdgeGatewayPing(ip, port, res);
-  });
+router.post('/ping', (req, res) => {
+  const { ip, port } = req.body;
+  checkEdgeGatewayPing(ip, port, res);
+});
 
-  return router;
-};
+export default router;

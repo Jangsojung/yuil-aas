@@ -10,7 +10,6 @@ import LoadingOverlay from '../loading/LodingOverlay';
 import ProgressOverlay from '../loading/ProgressOverlay';
 import FacilityGroupSelect from '../select/facility_group';
 import FactorySelect from '../select/factory_select';
-import BasicTable from '../table/basic_code';
 import { SearchBox, ActionBox } from '../common';
 import FacilityAddModal from '../modal/FacilityAddModal';
 import { FactoryTree } from '../../types/api';
