@@ -57,8 +57,8 @@ export default function DashboardPage() {
   const [aasxFiles, setAasxFiles] = useState<AASXFile[]>([]);
   const [selectedJson, setSelectedJson] = useState<JsonFileRow | null>(null);
   const [selectedJsonData, setSelectedJsonData] = useState<any>(null);
-  const [latestAasx, setLatestAasx] = useState<AASXFile | null>(null);
-  const [latestAasxData, setLatestAasxData] = useState<AASXData | null>(null);
+  const [selectedAasx, setSelectedAasx] = useState<AASXFile | null>(null);
+  const [selectedAasxData, setSelectedAasxData] = useState<AASXData | null>(null);
   const [jsonLoading, setJsonLoading] = useState(false);
   const [aasxLoading, setAasxLoading] = useState(false);
   const navigate = useNavigate();
@@ -73,7 +73,7 @@ export default function DashboardPage() {
     getFilesAPI('', '', -1, undefined, null).then((files) => {
       setAasxFiles(files);
       if (files && files.length > 0) {
-        setLatestAasx(files[0]);
+        setSelectedAasx(files[0]); // 최신 파일을 초기 선택
       }
     });
   }, []);
@@ -92,20 +92,24 @@ export default function DashboardPage() {
   }, [selectedJson]);
 
   useEffect(() => {
-    if (latestAasx && latestAasx.af_idx) {
+    if (selectedAasx && selectedAasx.af_idx) {
       setAasxLoading(true);
-      handleVerifyAPI(latestAasx)
+      handleVerifyAPI(selectedAasx)
         .then((data) => {
-          setLatestAasxData(data?.aasData || data);
+          setSelectedAasxData(data?.aasData || data);
         })
         .finally(() => {
           setAasxLoading(false);
         });
     }
-  }, [latestAasx]);
+  }, [selectedAasx]);
 
   const handleJsonRowClick = (file: JsonFileRow) => {
     setSelectedJson(file);
+  };
+
+  const handleAasxRowClick = (file: AASXFile) => {
+    setSelectedAasx(file);
   };
 
   return (
@@ -179,7 +183,7 @@ export default function DashboardPage() {
                   </TableHead>
                   <TableBody>
                     {aasxFiles.map((file) => (
-                      <TableRow key={file.af_idx}>
+                      <TableRow key={file.af_idx} onClick={() => handleAasxRowClick(file)} sx={{ cursor: 'pointer' }}>
                         <TableCell>{file.fc_name || '-'}</TableCell>
                         <TableCell>{file.af_name}</TableCell>
                         <TableCell>{formatDate(file.createdAt)}</TableCell>
@@ -243,20 +247,20 @@ export default function DashboardPage() {
           <Box sx={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <Box sx={{ ...dashboardPanelStyle, position: 'relative' }}>
               <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}>
-                최신 AASX 파일 미리보기
+                {selectedAasx ? `AASX 파일 - ${selectedAasx.af_name}` : 'AASX 파일 미리보기'}
               </Typography>
-              {latestAasx && (
+              {selectedAasx && (
                 <Button
                   onClick={() =>
                     navigate('/aas/transmit', {
                       state: {
-                        fc_idx: latestAasx.fc_idx,
-                        af_idx: latestAasx.af_idx,
+                        fc_idx: selectedAasx.fc_idx,
+                        af_idx: selectedAasx.af_idx,
                       },
                     })
                   }
                   sx={detailButtonStyle}
-                  disabled={!latestAasx}
+                  disabled={!selectedAasx}
                   variant='outlined'
                   size='small'
                 >
@@ -277,9 +281,9 @@ export default function DashboardPage() {
                   <CircularProgress size={40} />
                   <Typography color='textSecondary'>AASX 파일 로딩 중...</Typography>
                 </Box>
-              ) : latestAasxData ? (
+              ) : selectedAasxData ? (
                 <div style={{ marginTop: 15 }}>
-                  <TreeView data={transformAASXData(latestAasxData)} />
+                  <TreeView data={transformAASXData(selectedAasxData)} />
                 </div>
               ) : (
                 <Typography color='textSecondary'>데이터 없음</Typography>
