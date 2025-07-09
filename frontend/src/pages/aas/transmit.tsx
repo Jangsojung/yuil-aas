@@ -108,12 +108,16 @@ export default function TransmitPage() {
       try {
         // 공장별 AASX 파일 가져오기
         const files = await getAASXFilesAPI(null, null, factoryId);
-        setAasxFiles(Array.isArray(files) ? files : []);
+        const fileArray = Array.isArray(files) ? files : [];
+        setAasxFiles(fileArray);
+        return fileArray; // 파일 목록을 반환
       } catch (error) {
         setAasxFiles([]);
+        return [];
       }
     } else {
       setAasxFiles([]);
+      return [];
     }
   };
 
@@ -134,19 +138,22 @@ export default function TransmitPage() {
   // location.state로 전달된 fc_idx, af_idx가 있으면 자동 선택
   useEffect(() => {
     if (location.state && (location.state as any).fc_idx !== undefined) {
-      setSelectedFactory((location.state as any).fc_idx);
+      const fc_idx = (location.state as any).fc_idx;
+      const af_idx = (location.state as any).af_idx;
+
+      // 공장 선택 및 파일 목록 로드
+      handleFactoryChange(fc_idx).then((files) => {
+        // 파일 목록 로드 완료 후 af_idx로 자동 선택
+        if (af_idx !== undefined && files.length > 0) {
+          const found = files.find((file) => file.af_idx === af_idx);
+          if (found) {
+            setSelectedFile(found);
+            setCurrentFile(af_idx); // currentFile 상태도 함께 업데이트
+          }
+        }
+      });
     }
   }, [location.state]);
-
-  // aasxFiles가 로드된 후 af_idx로 자동 선택
-  useEffect(() => {
-    if (location.state && (location.state as any).af_idx !== undefined && aasxFiles.length > 0) {
-      const found = aasxFiles.find((file) => file.af_idx === (location.state as any).af_idx);
-      if (found) {
-        setSelectedFile(found);
-      }
-    }
-  }, [location.state, aasxFiles]);
 
   // 현재 파일 변경 시 검증 상태 리셋
   useEffect(() => {

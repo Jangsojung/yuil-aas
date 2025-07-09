@@ -245,7 +245,14 @@ export default function DashboardPage() {
               </Typography>
               {latestAasx && (
                 <Button
-                  onClick={() => navigate('/aas/transmit')}
+                  onClick={() =>
+                    navigate('/aas/transmit', {
+                      state: {
+                        fc_idx: latestAasx.fc_idx,
+                        af_idx: latestAasx.af_idx,
+                      },
+                    })
+                  }
                   sx={detailButtonStyle}
                   disabled={!latestAasx}
                   variant='outlined'
