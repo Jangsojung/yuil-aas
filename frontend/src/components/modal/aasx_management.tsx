@@ -290,6 +290,7 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
                 setSelectedFile(file);
               }}
               selectedFileName={selectedFile?.name}
+              showPathInfo={true}
             />
           </Box>
         </DialogContent>

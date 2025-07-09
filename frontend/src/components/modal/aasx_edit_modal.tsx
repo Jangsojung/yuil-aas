@@ -90,6 +90,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     },
     selectedFileName: uploadFile?.name || '',
     accept: '.json',
+    showPathInfo: true,
   };
 
   // 프로그래스 업데이트 함수

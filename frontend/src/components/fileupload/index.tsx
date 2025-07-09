@@ -20,6 +20,7 @@ export type FileUploadProps = {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onDrop: (event: DragEvent<HTMLElement>) => void;
   selectedFileName?: string;
+  showPathInfo?: boolean;
 };
 
 export const FileUpload: FC<FileUploadProps> = ({
@@ -33,6 +34,7 @@ export const FileUpload: FC<FileUploadProps> = ({
   width = '100%',
   height = '60px',
   backgroundColor = '#f5f5f5',
+  showPathInfo = false,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [labelText, setLabelText] = useState(hoverLabel);
@@ -118,6 +120,18 @@ export const FileUpload: FC<FileUploadProps> = ({
           {selectedFileName ? selectedFileName : labelText}
         </label>
       </div>
+      {showPathInfo && (
+        <div
+          style={{
+            marginTop: '8px',
+            fontSize: '12px',
+            color: '#666',
+            fontStyle: 'italic',
+          }}
+        >
+          💡 권장 경로: files/front 디렉토리의 JSON 파일을 선택해주세요.
+        </div>
+      )}
       <AlertModal
         open={alertModal.open}
         handleClose={() => setAlertModal({ ...alertModal, open: false })}
