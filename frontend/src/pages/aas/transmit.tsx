@@ -149,6 +149,22 @@ export default function TransmitPage() {
           if (found) {
             setSelectedFile(found);
             setCurrentFile(af_idx); // currentFile 상태도 함께 업데이트
+
+            // 자동으로 검증 실행 (상태 업데이트 후 실행)
+            setTimeout(async () => {
+              try {
+                const rawData = await handleVerifyAPI(found);
+                if (rawData && rawData.aasData) {
+                  const transformedData = transformAASXData(rawData.aasData);
+                  if (transformedData) {
+                    setAasxData(transformedData);
+                    setIsVerified(true);
+                  }
+                }
+              } catch (error) {
+                console.error('자동 검증 중 오류:', error);
+              }
+            }, 200); // 상태 업데이트를 위한 충분한 지연
           }
         }
       });
