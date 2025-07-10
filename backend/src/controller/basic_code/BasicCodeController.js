@@ -20,7 +20,7 @@ import {
 } from '../../service/basic_code/BasicCodeService.js';
 import {
   successResponse,
-  internalServerError,
+  errorResponse,
   factoryAddError,
   facilityGroupAddError,
   facilityAddError,
@@ -33,7 +33,8 @@ export const getBaseById = async (ab_idx, res) => {
     const result = await getBaseByIdFromDB(ab_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getBaseById error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -42,7 +43,8 @@ export const getBaseFCIdx = async (ab_idx, res) => {
     const result = await getBaseFCIdxFromDB(ab_idx);
     successResponse(res, { fc_idx: result });
   } catch (err) {
-    internalServerError(res);
+    console.error('getBaseFCIdx error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -51,7 +53,8 @@ export const getBases = async (fc_idx, res) => {
     const result = await getBasesFromDB(fc_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getBases error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -60,7 +63,8 @@ export const insertBases = async (name, note, ids, user_idx, fc_idx, res) => {
     const result = await insertBasesToDB(name, note, ids, user_idx, fc_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('insertBases error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -69,7 +73,8 @@ export const updateBase = async (ab_idx, name, note, ids, user_idx, res) => {
     const result = await updateBaseToDB(ab_idx, name, note, ids, user_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('updateBase error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -78,7 +83,8 @@ export const deleteBases = async (ids, res) => {
     const result = await deleteBasesFromDB(ids);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('deleteBases error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -87,7 +93,8 @@ export const getSelectedSensors = async (ab_idx, res) => {
     const result = await getSelectedSensorsFromDB(ab_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getSelectedSensors error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -96,7 +103,8 @@ export const getFacilityGroups = async (fc_idx, order, res) => {
     const result = await getFacilityGroupsFromDB(fc_idx, order);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getFacilityGroups error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -105,7 +113,8 @@ export const getSensors = async (fa_idx, res) => {
     const result = await getSensorsFromDB(fa_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getSensors error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -114,7 +123,8 @@ export const getBaseCode = async (fg_idx, res) => {
     const result = await getBaseCodeFromDB(fg_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getBaseCode error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -123,7 +133,8 @@ export const getAllSensorsInGroup = async (fg_idx, res) => {
     const result = await getAllSensorsInGroupFromDB(fg_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getAllSensorsInGroup error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -132,7 +143,8 @@ export const getFactoriesByCmIdx = async (cm_idx, res) => {
     const result = await getFactoriesByCmIdxFromDB(cm_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getFactoriesByCmIdx error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -186,6 +198,7 @@ export const getSensorValues = async (sensorIds, res) => {
     const result = await getSensorValuesFromDB(sensorIds);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getSensorValues error:', err);
+    errorResponse(res, err.message);
   }
 };

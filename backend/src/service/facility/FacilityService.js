@@ -1,217 +1,200 @@
-import { pool } from '../../config/database.js';
+import { validateValue } from '../../utils/validation.js';
+import { querySingle, queryMultiple, queryInsert, withTransaction } from '../../utils/dbHelper.js';
 
 export const insertFacilityGroup = async (name) => {
-  try {
-    // 파라미터 검증
-    const validatedName = name && name !== null && name !== undefined ? name : null;
+  const validatedName = validateValue(name);
 
-    // 가장 마지막 fg_idx 조회
-    const [maxResult] = await pool.promise().query('SELECT MAX(fg_idx) as max_idx FROM tb_aasx_data_aas');
-    const nextFgIdx = (maxResult[0].max_idx || 0) + 1;
+  // 가장 마지막 fg_idx 조회
+  const maxResult = await querySingle('SELECT MAX(fg_idx) as max_idx FROM tb_aasx_data_aas');
+  const nextFgIdx = (maxResult?.max_idx || 0) + 1;
 
-    const query = 'INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx, origin_check) VALUES (?, ?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextFgIdx, validatedName, 3, 0]);
-    return nextFgIdx;
-  } catch (err) {
-    throw err;
-  }
+  await queryInsert('INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx, origin_check) VALUES (?, ?, ?, ?)', [
+    nextFgIdx,
+    validatedName,
+    3,
+    0,
+  ]);
+  return nextFgIdx;
 };
 
 export const insertFacility = async (fg_idx, name) => {
-  try {
-    // 파라미터 검증
-    const validatedFgIdx = fg_idx && fg_idx !== null && fg_idx !== undefined ? fg_idx : null;
-    const validatedName = name && name !== null && name !== undefined ? name : null;
+  const validatedFgIdx = validateValue(fg_idx);
+  const validatedName = validateValue(name);
 
-    // 가장 마지막 fa_idx 조회
-    const [maxResult] = await pool.promise().query('SELECT MAX(fa_idx) as max_idx FROM tb_aasx_data_sm');
-    const nextFaIdx = (maxResult[0].max_idx || 0) + 1;
+  // 가장 마지막 fa_idx 조회
+  const maxResult = await querySingle('SELECT MAX(fa_idx) as max_idx FROM tb_aasx_data_sm');
+  const nextFaIdx = (maxResult?.max_idx || 0) + 1;
 
-    const query = 'INSERT INTO tb_aasx_data_sm (fa_idx, fg_idx, fa_name, origin_check) VALUES (?, ?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextFaIdx, validatedFgIdx, validatedName, 0]);
-    return nextFaIdx;
-  } catch (err) {
-    throw err;
-  }
+  await queryInsert('INSERT INTO tb_aasx_data_sm (fa_idx, fg_idx, fa_name, origin_check) VALUES (?, ?, ?, ?)', [
+    nextFaIdx,
+    validatedFgIdx,
+    validatedName,
+    0,
+  ]);
+  return nextFaIdx;
 };
 
 export const insertSensor = async (fa_idx, name) => {
-  try {
-    // 파라미터 검증
-    const validatedFaIdx = fa_idx && fa_idx !== null && fa_idx !== undefined ? fa_idx : null;
-    const validatedName = name && name !== null && name !== undefined ? name : null;
+  const validatedFaIdx = validateValue(fa_idx);
+  const validatedName = validateValue(name);
 
-    // 가장 마지막 sn_idx 조회
-    const [maxResult] = await pool.promise().query('SELECT MAX(sn_idx) as max_idx FROM tb_aasx_data_prop');
-    const nextSnIdx = (maxResult[0].max_idx || 0) + 1;
+  // 가장 마지막 sn_idx 조회
+  const maxResult = await querySingle('SELECT MAX(sn_idx) as max_idx FROM tb_aasx_data_prop');
+  const nextSnIdx = (maxResult?.max_idx || 0) + 1;
 
-    const query = 'INSERT INTO tb_aasx_data_prop (sn_idx, fa_idx, sn_name, origin_check) VALUES (?, ?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextSnIdx, validatedFaIdx, validatedName, 0]);
-    return nextSnIdx;
-  } catch (err) {
-    throw err;
-  }
+  await queryInsert('INSERT INTO tb_aasx_data_prop (sn_idx, fa_idx, sn_name, origin_check) VALUES (?, ?, ?, ?)', [
+    nextSnIdx,
+    validatedFaIdx,
+    validatedName,
+    0,
+  ]);
+  return nextSnIdx;
 };
 
 export const deleteSensors = async (sensorIds) => {
-  try {
-    // 파라미터 검증
-    const validatedSensorIds = sensorIds && Array.isArray(sensorIds) && sensorIds.length > 0 ? sensorIds : [];
+  const validatedSensorIds = sensorIds && Array.isArray(sensorIds) && sensorIds.length > 0 ? sensorIds : [];
 
-    const query = 'SELECT sn_idx, sn_name, fa_idx, origin_check FROM tb_aasx_data_prop WHERE sn_idx IN (?)';
-    const [results] = await pool.promise().query(query, [validatedSensorIds]);
+  const results = await queryMultiple(
+    'SELECT sn_idx, sn_name, fa_idx, origin_check FROM tb_aasx_data_prop WHERE sn_idx IN (?)',
+    [validatedSensorIds]
+  );
 
-    if (results.length === 0) {
-      return {
-        success: true,
-        message: '삭제할 센서가 없습니다.',
-        deletedCount: 0,
-      };
-    }
+  if (results.length === 0) {
+    return {
+      success: true,
+      message: '삭제할 센서가 없습니다.',
+      deletedCount: 0,
+    };
+  }
 
-    const protectedSensors = results.filter((sensor) => sensor.origin_check === 1);
-    if (protectedSensors.length > 0) {
-      return {
-        success: false,
-        message: `다음 센서들은 삭제할 수 없습니다: ${protectedSensors.map((s) => s.sn_name).join(', ')}`,
-        protectedCount: protectedSensors.length,
-      };
-    }
+  const protectedSensors = results.filter((sensor) => sensor.origin_check === 1);
+  if (protectedSensors.length > 0) {
+    return {
+      success: false,
+      message: `다음 센서들은 삭제할 수 없습니다: ${protectedSensors.map((s) => s.sn_name).join(', ')}`,
+      protectedCount: protectedSensors.length,
+    };
+  }
 
-    const deletableSensors = results.filter((sensor) => sensor.origin_check === 0);
-    if (deletableSensors.length === 0) {
-      return {
-        success: true,
-        message: '삭제할 수 있는 센서가 없습니다.',
-        deletedCount: 0,
-      };
-    }
+  const deletableSensors = results.filter((sensor) => sensor.origin_check === 0);
+  if (deletableSensors.length === 0) {
+    return {
+      success: true,
+      message: '삭제할 수 있는 센서가 없습니다.',
+      deletedCount: 0,
+    };
+  }
 
-    const deletableSensorIds = deletableSensors.map((sensor) => sensor.sn_idx);
-    const affectedFacilityIds = [...new Set(deletableSensors.map((sensor) => sensor.fa_idx))];
+  const deletableSensorIds = deletableSensors.map((sensor) => sensor.sn_idx);
+  const affectedFacilityIds = [...new Set(deletableSensors.map((sensor) => sensor.fa_idx))];
 
-    const connection = await pool.promise().getConnection();
-    try {
-      await connection.beginTransaction();
+  return await withTransaction(async (connection) => {
+    // 1. 센서 삭제
+    await connection.query('DELETE FROM tb_aasx_data_prop WHERE sn_idx IN (?)', [deletableSensorIds]);
 
-      // 1. 센서 삭제
-      const deleteQuery = 'DELETE FROM tb_aasx_data_prop WHERE sn_idx IN (?)';
-      const [deleteResult] = await connection.query(deleteQuery, [deletableSensorIds]);
+    // 2. 센서가 없는 설비들 찾기
+    const emptyFacilities = [];
+    for (const faIdx of affectedFacilityIds) {
+      const [remainingSensors] = await connection.query(
+        'SELECT COUNT(*) as count FROM tb_aasx_data_prop WHERE fa_idx = ?',
+        [faIdx]
+      );
 
-      // 2. 센서가 없는 설비들 찾기
-      const emptyFacilities = [];
-      for (const faIdx of affectedFacilityIds) {
-        const [remainingSensors] = await connection.query(
-          'SELECT COUNT(*) as count FROM tb_aasx_data_prop WHERE fa_idx = ?',
+      if (remainingSensors[0].count === 0) {
+        // 센서가 없는 설비 정보 조회
+        const [facilityInfo] = await connection.query(
+          'SELECT fa_idx, fa_name, fg_idx, origin_check FROM tb_aasx_data_sm WHERE fa_idx = ?',
           [faIdx]
         );
 
-        if (remainingSensors[0].count === 0) {
-          // 센서가 없는 설비 정보 조회
-          const [facilityInfo] = await connection.query(
-            'SELECT fa_idx, fa_name, fg_idx, origin_check FROM tb_aasx_data_sm WHERE fa_idx = ?',
-            [faIdx]
-          );
-
-          if (facilityInfo.length > 0 && facilityInfo[0].origin_check === 0) {
-            emptyFacilities.push(facilityInfo[0]);
-          }
+        if (facilityInfo.length > 0 && facilityInfo[0].origin_check === 0) {
+          emptyFacilities.push(facilityInfo[0]);
         }
       }
+    }
 
-      // 3. 센서가 없는 설비들 자동 삭제
-      let autoDeletedFacilities = [];
-      let autoDeletedGroups = [];
-      let autoDeletedFactories = [];
+    // 3. 센서가 없는 설비들 자동 삭제
+    let autoDeletedFacilities = [];
+    let autoDeletedGroups = [];
+    let autoDeletedFactories = [];
 
-      if (emptyFacilities.length > 0) {
-        const emptyFacilityIds = emptyFacilities.map((facility) => facility.fa_idx);
-        const affectedGroupIds = [...new Set(emptyFacilities.map((facility) => facility.fg_idx))];
+    if (emptyFacilities.length > 0) {
+      const emptyFacilityIds = emptyFacilities.map((facility) => facility.fa_idx);
+      const affectedGroupIds = [...new Set(emptyFacilities.map((facility) => facility.fg_idx))];
 
-        // 설비 삭제
-        const deleteEmptyFacilitiesQuery = 'DELETE FROM tb_aasx_data_sm WHERE fa_idx IN (?)';
-        await connection.query(deleteEmptyFacilitiesQuery, [emptyFacilityIds]);
-        autoDeletedFacilities = emptyFacilities.map((facility) => facility.fa_name);
+      // 설비 삭제
+      await connection.query('DELETE FROM tb_aasx_data_sm WHERE fa_idx IN (?)', [emptyFacilityIds]);
+      autoDeletedFacilities = emptyFacilities.map((facility) => facility.fa_name);
 
-        // 4. 설비가 없는 설비그룹들 찾기 및 삭제
-        for (const fgIdx of affectedGroupIds) {
-          const [remainingFacilities] = await connection.query(
-            'SELECT COUNT(*) as count FROM tb_aasx_data_sm WHERE fg_idx = ?',
+      // 4. 설비가 없는 설비그룹들 찾기 및 삭제
+      for (const fgIdx of affectedGroupIds) {
+        const [remainingFacilities] = await connection.query(
+          'SELECT COUNT(*) as count FROM tb_aasx_data_sm WHERE fg_idx = ?',
+          [fgIdx]
+        );
+
+        if (remainingFacilities[0].count === 0) {
+          const [groupInfo] = await connection.query(
+            'SELECT fg_idx, fg_name, fc_idx, origin_check FROM tb_aasx_data_aas WHERE fg_idx = ?',
             [fgIdx]
           );
 
-          if (remainingFacilities[0].count === 0) {
-            const [groupInfo] = await connection.query(
-              'SELECT fg_idx, fg_name, fc_idx, origin_check FROM tb_aasx_data_aas WHERE fg_idx = ?',
-              [fgIdx]
+          if (groupInfo.length > 0 && groupInfo[0].origin_check === 0) {
+            // 설비그룹 삭제
+            await connection.query('DELETE FROM tb_aasx_data_aas WHERE fg_idx = ?', [fgIdx]);
+            autoDeletedGroups.push(groupInfo[0].fg_name);
+
+            // 5. 설비그룹이 없는 공장 찾기 및 삭제
+            const fcIdx = groupInfo[0].fc_idx;
+            const [remainingGroups] = await connection.query(
+              'SELECT COUNT(*) as count FROM tb_aasx_data_aas WHERE fc_idx = ?',
+              [fcIdx]
             );
 
-            if (groupInfo.length > 0 && groupInfo[0].origin_check === 0) {
-              // 설비그룹 삭제
-              await connection.query('DELETE FROM tb_aasx_data_aas WHERE fg_idx = ?', [fgIdx]);
-              autoDeletedGroups.push(groupInfo[0].fg_name);
-
-              // 5. 설비그룹이 없는 공장 찾기 및 삭제
-              const fcIdx = groupInfo[0].fc_idx;
-              const [remainingGroups] = await connection.query(
-                'SELECT COUNT(*) as count FROM tb_aasx_data_aas WHERE fc_idx = ?',
+            if (remainingGroups[0].count === 0) {
+              const [factoryInfo] = await connection.query(
+                'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx = ?',
                 [fcIdx]
               );
 
-              if (remainingGroups[0].count === 0) {
-                const [factoryInfo] = await connection.query(
-                  'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx = ?',
-                  [fcIdx]
-                );
-
-                if (factoryInfo.length > 0 && factoryInfo[0].origin_check === 0) {
-                  // 공장 삭제
-                  await connection.query('DELETE FROM tb_aasx_data WHERE fc_idx = ?', [fcIdx]);
-                  autoDeletedFactories.push(factoryInfo[0].fc_name);
-                }
+              if (factoryInfo.length > 0 && factoryInfo[0].origin_check === 0) {
+                // 공장 삭제
+                await connection.query('DELETE FROM tb_aasx_data WHERE fc_idx = ?', [fcIdx]);
+                autoDeletedFactories.push(factoryInfo[0].fc_name);
               }
             }
           }
         }
       }
-
-      await connection.commit();
-
-      let message = `${deletableSensors.length}개의 센서가 성공적으로 삭제되었습니다.`;
-      if (autoDeletedFacilities.length > 0) {
-        message += `\n센서가 없는 설비 ${
-          autoDeletedFacilities.length
-        }개가 자동으로 삭제되었습니다: ${autoDeletedFacilities.join(', ')}`;
-      }
-      if (autoDeletedGroups.length > 0) {
-        message += `\n설비가 없는 설비그룹 ${
-          autoDeletedGroups.length
-        }개가 자동으로 삭제되었습니다: ${autoDeletedGroups.join(', ')}`;
-      }
-      if (autoDeletedFactories.length > 0) {
-        message += `\n설비그룹이 없는 공장 ${
-          autoDeletedFactories.length
-        }개가 자동으로 삭제되었습니다: ${autoDeletedFactories.join(', ')}`;
-      }
-
-      return {
-        success: true,
-        message: message,
-        deletedCount: deletableSensors.length,
-        deletedSensors: deletableSensors.map((sensor) => sensor.sn_name),
-        autoDeletedFacilities: autoDeletedFacilities,
-        autoDeletedGroups: autoDeletedGroups,
-        autoDeletedFactories: autoDeletedFactories,
-      };
-    } catch (err) {
-      await connection.rollback();
-      throw err;
-    } finally {
-      connection.release();
     }
-  } catch (err) {
-    throw err;
-  }
+
+    let message = `${deletableSensors.length}개의 센서가 성공적으로 삭제되었습니다.`;
+    if (autoDeletedFacilities.length > 0) {
+      message += `\n센서가 없는 설비 ${
+        autoDeletedFacilities.length
+      }개가 자동으로 삭제되었습니다: ${autoDeletedFacilities.join(', ')}`;
+    }
+    if (autoDeletedGroups.length > 0) {
+      message += `\n설비가 없는 설비그룹 ${
+        autoDeletedGroups.length
+      }개가 자동으로 삭제되었습니다: ${autoDeletedGroups.join(', ')}`;
+    }
+    if (autoDeletedFactories.length > 0) {
+      message += `\n설비그룹이 없는 공장 ${
+        autoDeletedFactories.length
+      }개가 자동으로 삭제되었습니다: ${autoDeletedFactories.join(', ')}`;
+    }
+
+    return {
+      success: true,
+      message: message,
+      deletedCount: deletableSensors.length,
+      deletedSensors: deletableSensors.map((sensor) => sensor.sn_name),
+      autoDeletedFacilities: autoDeletedFacilities,
+      autoDeletedGroups: autoDeletedGroups,
+      autoDeletedFactories: autoDeletedFactories,
+    };
+  });
 };
 
 export const synchronizeFacilityData = async (progressCallback) => {
@@ -490,180 +473,77 @@ export const synchronizeFacilityData = async (progressCallback) => {
 
 // 설비 삭제
 export const deleteFacilities = async (facilityIds) => {
-  try {
-    const query = 'SELECT fa_idx, fa_name, fg_idx, origin_check FROM tb_aasx_data_sm WHERE fa_idx IN (?)';
-    const [results] = await pool.promise().query(query, [facilityIds]);
+  const results = await queryMultiple(
+    'SELECT fa_idx, fa_name, fg_idx, origin_check FROM tb_aasx_data_sm WHERE fa_idx IN (?)',
+    [facilityIds]
+  );
 
-    if (results.length === 0) {
-      return {
-        success: true,
-        message: '삭제할 설비가 없습니다.',
-        deletedCount: 0,
-      };
-    }
+  if (results.length === 0) {
+    return {
+      success: true,
+      message: '삭제할 설비가 없습니다.',
+      deletedCount: 0,
+    };
+  }
 
-    const protectedFacilities = results.filter((facility) => facility.origin_check === 1);
-    if (protectedFacilities.length > 0) {
-      return {
-        success: false,
-        message: `다음 설비들은 삭제할 수 없습니다: ${protectedFacilities.map((f) => f.fa_name).join(', ')}`,
-        protectedCount: protectedFacilities.length,
-      };
-    }
+  const protectedFacilities = results.filter((facility) => facility.origin_check === 1);
+  if (protectedFacilities.length > 0) {
+    return {
+      success: false,
+      message: `다음 설비들은 삭제할 수 없습니다: ${protectedFacilities.map((f) => f.fa_name).join(', ')}`,
+      protectedCount: protectedFacilities.length,
+    };
+  }
 
-    const deletableFacilities = results.filter((facility) => facility.origin_check === 0);
-    if (deletableFacilities.length === 0) {
-      return {
-        success: true,
-        message: '삭제할 수 있는 설비가 없습니다.',
-        deletedCount: 0,
-      };
-    }
+  const deletableFacilities = results.filter((facility) => facility.origin_check === 0);
+  if (deletableFacilities.length === 0) {
+    return {
+      success: true,
+      message: '삭제할 수 있는 설비가 없습니다.',
+      deletedCount: 0,
+    };
+  }
 
-    const deletableFacilityIds = deletableFacilities.map((facility) => facility.fa_idx);
-    const affectedGroupIds = [...new Set(deletableFacilities.map((facility) => facility.fg_idx))];
+  const deletableFacilityIds = deletableFacilities.map((facility) => facility.fa_idx);
+  const affectedGroupIds = [...new Set(deletableFacilities.map((facility) => facility.fg_idx))];
 
-    const connection = await pool.promise().getConnection();
-    try {
-      await connection.beginTransaction();
+  return await withTransaction(async (connection) => {
+    // 1. 설비 삭제
+    await connection.query('DELETE FROM tb_aasx_data_sm WHERE fa_idx IN (?)', [deletableFacilityIds]);
 
-      // 1. 설비 삭제
-      const deleteFacilitiesQuery = 'DELETE FROM tb_aasx_data_sm WHERE fa_idx IN (?)';
-      const [deleteResult] = await connection.query(deleteFacilitiesQuery, [deletableFacilityIds]);
+    // 2. 설비가 없는 설비그룹들 찾기
+    const emptyGroups = [];
+    for (const fgIdx of affectedGroupIds) {
+      const [remainingFacilities] = await connection.query(
+        'SELECT COUNT(*) as count FROM tb_aasx_data_sm WHERE fg_idx = ?',
+        [fgIdx]
+      );
 
-      // 2. 설비가 없는 설비그룹들 찾기
-      const emptyGroups = [];
-      for (const fgIdx of affectedGroupIds) {
-        const [remainingFacilities] = await connection.query(
-          'SELECT COUNT(*) as count FROM tb_aasx_data_sm WHERE fg_idx = ?',
+      if (remainingFacilities[0].count === 0) {
+        // 설비가 없는 설비그룹 정보 조회
+        const [groupInfo] = await connection.query(
+          'SELECT fg_idx, fg_name, fc_idx, origin_check FROM tb_aasx_data_aas WHERE fg_idx = ?',
           [fgIdx]
         );
 
-        if (remainingFacilities[0].count === 0) {
-          // 설비가 없는 설비그룹 정보 조회
-          const [groupInfo] = await connection.query(
-            'SELECT fg_idx, fg_name, fc_idx, origin_check FROM tb_aasx_data_aas WHERE fg_idx = ?',
-            [fgIdx]
-          );
-
-          if (groupInfo.length > 0 && groupInfo[0].origin_check === 0) {
-            emptyGroups.push(groupInfo[0]);
-          }
+        if (groupInfo.length > 0 && groupInfo[0].origin_check === 0) {
+          emptyGroups.push(groupInfo[0]);
         }
       }
-
-      // 3. 설비가 없는 설비그룹들 자동 삭제
-      let autoDeletedGroups = [];
-      let autoDeletedFactories = [];
-      if (emptyGroups.length > 0) {
-        const emptyGroupIds = emptyGroups.map((group) => group.fg_idx);
-        const affectedFactoryIds = [...new Set(emptyGroups.map((group) => group.fc_idx))];
-
-        // 설비그룹 삭제
-        const deleteEmptyGroupsQuery = 'DELETE FROM tb_aasx_data_aas WHERE fg_idx IN (?)';
-        await connection.query(deleteEmptyGroupsQuery, [emptyGroupIds]);
-        autoDeletedGroups = emptyGroups.map((group) => group.fg_name);
-
-        // 4. 설비그룹이 없는 공장들 찾기 및 삭제
-        for (const fcIdx of affectedFactoryIds) {
-          const [remainingGroups] = await connection.query(
-            'SELECT COUNT(*) as count FROM tb_aasx_data_aas WHERE fc_idx = ?',
-            [fcIdx]
-          );
-
-          if (remainingGroups[0].count === 0) {
-            const [factoryInfo] = await connection.query(
-              'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx = ?',
-              [fcIdx]
-            );
-
-            if (factoryInfo.length > 0 && factoryInfo[0].origin_check === 0) {
-              // 공장 삭제
-              await connection.query('DELETE FROM tb_aasx_data WHERE fc_idx = ?', [fcIdx]);
-              autoDeletedFactories.push(factoryInfo[0].fc_name);
-            }
-          }
-        }
-      }
-
-      await connection.commit();
-
-      let message = `${deletableFacilities.length}개의 설비가 성공적으로 삭제되었습니다.`;
-      if (autoDeletedGroups.length > 0) {
-        message += `\n설비가 없는 설비그룹 ${
-          autoDeletedGroups.length
-        }개가 자동으로 삭제되었습니다: ${autoDeletedGroups.join(', ')}`;
-      }
-      if (autoDeletedFactories.length > 0) {
-        message += `\n설비그룹이 없는 공장 ${
-          autoDeletedFactories.length
-        }개가 자동으로 삭제되었습니다: ${autoDeletedFactories.join(', ')}`;
-      }
-
-      return {
-        success: true,
-        message: message,
-        deletedCount: deletableFacilities.length,
-        deletedFacilities: deletableFacilities.map((facility) => facility.fa_name),
-        autoDeletedGroups: autoDeletedGroups,
-        autoDeletedFactories: autoDeletedFactories,
-      };
-    } catch (err) {
-      await connection.rollback();
-      throw err;
-    } finally {
-      connection.release();
-    }
-  } catch (err) {
-    throw err;
-  }
-};
-
-// 설비그룹 삭제
-export const deleteFacilityGroups = async (facilityGroupIds) => {
-  try {
-    const query = 'SELECT fg_idx, fg_name, fc_idx, origin_check FROM tb_aasx_data_aas WHERE fg_idx IN (?)';
-    const [results] = await pool.promise().query(query, [facilityGroupIds]);
-
-    if (results.length === 0) {
-      return {
-        success: true,
-        message: '삭제할 설비그룹이 없습니다.',
-        deletedCount: 0,
-      };
     }
 
-    const protectedGroups = results.filter((group) => group.origin_check === 1);
-    if (protectedGroups.length > 0) {
-      return {
-        success: false,
-        message: `다음 설비그룹들은 삭제할 수 없습니다: ${protectedGroups.map((g) => g.fg_name).join(', ')}`,
-        protectedCount: protectedGroups.length,
-      };
-    }
+    // 3. 설비가 없는 설비그룹들 자동 삭제
+    let autoDeletedGroups = [];
+    let autoDeletedFactories = [];
+    if (emptyGroups.length > 0) {
+      const emptyGroupIds = emptyGroups.map((group) => group.fg_idx);
+      const affectedFactoryIds = [...new Set(emptyGroups.map((group) => group.fc_idx))];
 
-    const deletableGroups = results.filter((group) => group.origin_check === 0);
-    if (deletableGroups.length === 0) {
-      return {
-        success: true,
-        message: '삭제할 수 있는 설비그룹이 없습니다.',
-        deletedCount: 0,
-      };
-    }
+      // 설비그룹 삭제
+      await connection.query('DELETE FROM tb_aasx_data_aas WHERE fg_idx IN (?)', [emptyGroupIds]);
+      autoDeletedGroups = emptyGroups.map((group) => group.fg_name);
 
-    const deletableGroupIds = deletableGroups.map((group) => group.fg_idx);
-    const affectedFactoryIds = [...new Set(deletableGroups.map((group) => group.fc_idx))];
-
-    const connection = await pool.promise().getConnection();
-    try {
-      await connection.beginTransaction();
-
-      // 1. 설비그룹 삭제
-      const deleteGroupsQuery = 'DELETE FROM tb_aasx_data_aas WHERE fg_idx IN (?)';
-      const [deleteResult] = await connection.query(deleteGroupsQuery, [deletableGroupIds]);
-
-      // 2. 설비그룹이 없는 공장들 찾기
-      const emptyFactories = [];
+      // 4. 설비그룹이 없는 공장들 찾기 및 삭제
       for (const fcIdx of affectedFactoryIds) {
         const [remainingGroups] = await connection.query(
           'SELECT COUNT(*) as count FROM tb_aasx_data_aas WHERE fc_idx = ?',
@@ -671,110 +551,171 @@ export const deleteFacilityGroups = async (facilityGroupIds) => {
         );
 
         if (remainingGroups[0].count === 0) {
-          // 설비그룹이 없는 공장 정보 조회
           const [factoryInfo] = await connection.query(
             'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx = ?',
             [fcIdx]
           );
 
           if (factoryInfo.length > 0 && factoryInfo[0].origin_check === 0) {
-            emptyFactories.push(factoryInfo[0]);
+            // 공장 삭제
+            await connection.query('DELETE FROM tb_aasx_data WHERE fc_idx = ?', [fcIdx]);
+            autoDeletedFactories.push(factoryInfo[0].fc_name);
           }
         }
       }
-
-      // 3. 설비그룹이 없는 공장들 자동 삭제
-      let autoDeletedFactories = [];
-      if (emptyFactories.length > 0) {
-        const emptyFactoryIds = emptyFactories.map((factory) => factory.fc_idx);
-        const deleteEmptyFactoriesQuery = 'DELETE FROM tb_aasx_data WHERE fc_idx IN (?)';
-        await connection.query(deleteEmptyFactoriesQuery, [emptyFactoryIds]);
-        autoDeletedFactories = emptyFactories.map((factory) => factory.fc_name);
-      }
-
-      await connection.commit();
-
-      let message = `${deletableGroups.length}개의 설비그룹이 성공적으로 삭제되었습니다.`;
-      if (autoDeletedFactories.length > 0) {
-        message += `\n설비그룹이 없는 공장 ${
-          autoDeletedFactories.length
-        }개가 자동으로 삭제되었습니다: ${autoDeletedFactories.join(', ')}`;
-      }
-
-      return {
-        success: true,
-        message: message,
-        deletedCount: deletableGroups.length,
-        deletedGroups: deletableGroups.map((group) => group.fg_name),
-        autoDeletedFactories: autoDeletedFactories,
-      };
-    } catch (err) {
-      await connection.rollback();
-      throw err;
-    } finally {
-      connection.release();
     }
-  } catch (err) {
-    throw err;
+
+    let message = `${deletableFacilities.length}개의 설비가 성공적으로 삭제되었습니다.`;
+    if (autoDeletedGroups.length > 0) {
+      message += `\n설비가 없는 설비그룹 ${
+        autoDeletedGroups.length
+      }개가 자동으로 삭제되었습니다: ${autoDeletedGroups.join(', ')}`;
+    }
+    if (autoDeletedFactories.length > 0) {
+      message += `\n설비그룹이 없는 공장 ${
+        autoDeletedFactories.length
+      }개가 자동으로 삭제되었습니다: ${autoDeletedFactories.join(', ')}`;
+    }
+
+    return {
+      success: true,
+      message: message,
+      deletedCount: deletableFacilities.length,
+      deletedFacilities: deletableFacilities.map((facility) => facility.fa_name),
+      autoDeletedGroups: autoDeletedGroups,
+      autoDeletedFactories: autoDeletedFactories,
+    };
+  });
+};
+
+// 설비그룹 삭제
+export const deleteFacilityGroups = async (facilityGroupIds) => {
+  const results = await queryMultiple(
+    'SELECT fg_idx, fg_name, fc_idx, origin_check FROM tb_aasx_data_aas WHERE fg_idx IN (?)',
+    [facilityGroupIds]
+  );
+
+  if (results.length === 0) {
+    return {
+      success: true,
+      message: '삭제할 설비그룹이 없습니다.',
+      deletedCount: 0,
+    };
   }
+
+  const protectedGroups = results.filter((group) => group.origin_check === 1);
+  if (protectedGroups.length > 0) {
+    return {
+      success: false,
+      message: `다음 설비그룹들은 삭제할 수 없습니다: ${protectedGroups.map((g) => g.fg_name).join(', ')}`,
+      protectedCount: protectedGroups.length,
+    };
+  }
+
+  const deletableGroups = results.filter((group) => group.origin_check === 0);
+  if (deletableGroups.length === 0) {
+    return {
+      success: true,
+      message: '삭제할 수 있는 설비그룹이 없습니다.',
+      deletedCount: 0,
+    };
+  }
+
+  const deletableGroupIds = deletableGroups.map((group) => group.fg_idx);
+  const affectedFactoryIds = [...new Set(deletableGroups.map((group) => group.fc_idx))];
+
+  return await withTransaction(async (connection) => {
+    // 1. 설비그룹 삭제
+    await connection.query('DELETE FROM tb_aasx_data_aas WHERE fg_idx IN (?)', [deletableGroupIds]);
+
+    // 2. 설비그룹이 없는 공장들 찾기
+    const emptyFactories = [];
+    for (const fcIdx of affectedFactoryIds) {
+      const [remainingGroups] = await connection.query(
+        'SELECT COUNT(*) as count FROM tb_aasx_data_aas WHERE fc_idx = ?',
+        [fcIdx]
+      );
+
+      if (remainingGroups[0].count === 0) {
+        // 설비그룹이 없는 공장 정보 조회
+        const [factoryInfo] = await connection.query(
+          'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx = ?',
+          [fcIdx]
+        );
+
+        if (factoryInfo.length > 0 && factoryInfo[0].origin_check === 0) {
+          emptyFactories.push(factoryInfo[0]);
+        }
+      }
+    }
+
+    // 3. 설비그룹이 없는 공장들 자동 삭제
+    let autoDeletedFactories = [];
+    if (emptyFactories.length > 0) {
+      const emptyFactoryIds = emptyFactories.map((factory) => factory.fc_idx);
+      await connection.query('DELETE FROM tb_aasx_data WHERE fc_idx IN (?)', [emptyFactoryIds]);
+      autoDeletedFactories = emptyFactories.map((factory) => factory.fc_name);
+    }
+
+    let message = `${deletableGroups.length}개의 설비그룹이 성공적으로 삭제되었습니다.`;
+    if (autoDeletedFactories.length > 0) {
+      message += `\n설비그룹이 없는 공장 ${
+        autoDeletedFactories.length
+      }개가 자동으로 삭제되었습니다: ${autoDeletedFactories.join(', ')}`;
+    }
+
+    return {
+      success: true,
+      message: message,
+      deletedCount: deletableGroups.length,
+      deletedGroups: deletableGroups.map((group) => group.fg_name),
+      autoDeletedFactories: autoDeletedFactories,
+    };
+  });
 };
 
 // 공장 삭제
 export const deleteFactories = async (factoryIds) => {
-  try {
-    const query = 'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx IN (?)';
-    const [results] = await pool.promise().query(query, [factoryIds]);
+  const results = await queryMultiple('SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx IN (?)', [
+    factoryIds,
+  ]);
 
-    if (results.length === 0) {
-      return {
-        success: true,
-        message: '삭제할 공장이 없습니다.',
-        deletedCount: 0,
-      };
-    }
-
-    const protectedFactories = results.filter((factory) => factory.origin_check === 1);
-    if (protectedFactories.length > 0) {
-      return {
-        success: false,
-        message: `다음 공장들은 삭제할 수 없습니다: ${protectedFactories.map((f) => f.fc_name).join(', ')}`,
-        protectedCount: protectedFactories.length,
-      };
-    }
-
-    const deletableFactories = results.filter((factory) => factory.origin_check === 0);
-    if (deletableFactories.length === 0) {
-      return {
-        success: true,
-        message: '삭제할 수 있는 공장이 없습니다.',
-        deletedCount: 0,
-      };
-    }
-
-    const deletableFactoryIds = deletableFactories.map((factory) => factory.fc_idx);
-
-    const connection = await pool.promise().getConnection();
-    try {
-      await connection.beginTransaction();
-
-      const deleteFactoriesQuery = 'DELETE FROM tb_aasx_data WHERE fc_idx IN (?)';
-      const [deleteResult] = await connection.query(deleteFactoriesQuery, [deletableFactoryIds]);
-
-      await connection.commit();
-
-      return {
-        success: true,
-        message: `${deletableFactories.length}개의 공장이 성공적으로 삭제되었습니다.`,
-        deletedCount: deletableFactories.length,
-        deletedFactories: deletableFactories.map((factory) => factory.fc_name),
-      };
-    } catch (err) {
-      await connection.rollback();
-      throw err;
-    } finally {
-      connection.release();
-    }
-  } catch (err) {
-    throw err;
+  if (results.length === 0) {
+    return {
+      success: true,
+      message: '삭제할 공장이 없습니다.',
+      deletedCount: 0,
+    };
   }
+
+  const protectedFactories = results.filter((factory) => factory.origin_check === 1);
+  if (protectedFactories.length > 0) {
+    return {
+      success: false,
+      message: `다음 공장들은 삭제할 수 없습니다: ${protectedFactories.map((f) => f.fc_name).join(', ')}`,
+      protectedCount: protectedFactories.length,
+    };
+  }
+
+  const deletableFactories = results.filter((factory) => factory.origin_check === 0);
+  if (deletableFactories.length === 0) {
+    return {
+      success: true,
+      message: '삭제할 수 있는 공장이 없습니다.',
+      deletedCount: 0,
+    };
+  }
+
+  const deletableFactoryIds = deletableFactories.map((factory) => factory.fc_idx);
+
+  return await withTransaction(async (connection) => {
+    await connection.query('DELETE FROM tb_aasx_data WHERE fc_idx IN (?)', [deletableFactoryIds]);
+
+    return {
+      success: true,
+      message: `${deletableFactories.length}개의 공장이 성공적으로 삭제되었습니다.`,
+      deletedCount: deletableFactories.length,
+      deletedFactories: deletableFactories.map((factory) => factory.fc_name),
+    };
+  });
 };

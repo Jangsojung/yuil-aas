@@ -103,7 +103,7 @@ export default function FacilityGroupSelect({
                 {!selectedFactory
                   ? '공장을 먼저 선택해주세요'
                   : facilityGroups.length === 0
-                    ? '사용 가능한 설비 그룹이 없습니다'
+                    ? '설비그룹 정보 없음'
                     : placeholder}
               </MenuItem>
               {facilityGroups.map((group) => (
@@ -134,7 +134,7 @@ export default function FacilityGroupSelect({
     <FormControl fullWidth size='small'>
       <Select value={value} onChange={handleChange} displayEmpty disabled={disabled || facilityGroups.length === 0}>
         <MenuItem disabled value=''>
-          {facilityGroups.length === 0 ? '사용 가능한 설비 그룹이 없습니다' : placeholder}
+          {facilityGroups.length === 0 ? '설비그룹 정보 없음' : placeholder}
         </MenuItem>
         {facilityGroups.map((group) => (
           <MenuItem key={group.fg_idx} value={group.fg_idx}>

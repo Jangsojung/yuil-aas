@@ -6,14 +6,15 @@ import {
   deleteEdgeGatewaysFromDB,
   checkNetworkStatus,
 } from '../../service/edge_gateway/EdgeGatewayService.js';
-import { successResponse, internalServerError, pingCheckError } from '../../utils/responseHandler.js';
+import { successResponse, pingCheckError } from '../../utils/responseHandler.js';
 
 export const getEdgeGateways = async (res) => {
   try {
     const result = await getEdgeGatewaysFromDB();
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getEdgeGateways error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -22,7 +23,8 @@ export const getEdgeGatewaysWithStatus = async (res) => {
     const result = await getEdgeGatewaysWithRealTimeStatus();
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getEdgeGatewaysWithStatus error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -38,7 +40,8 @@ export const insertEdgeGateways = async (pcName, pcIp, pcPort, user_idx, res) =>
 
     successResponse(res, newEdgeGateway);
   } catch (err) {
-    internalServerError(res);
+    console.error('insertEdgeGateways error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -47,7 +50,8 @@ export const updateEdgeGateway = async (eg_idx, pcName, pcIp, pcPort, user_idx, 
     await updateEdgeGatewayToDB(eg_idx, pcName, pcIp, pcPort, user_idx);
     successResponse(res, { success: true });
   } catch (err) {
-    internalServerError(res);
+    console.error('updateEdgeGateway error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -56,7 +60,8 @@ export const deleteEdgeGateways = async (ids, res) => {
     const result = await deleteEdgeGatewaysFromDB(ids);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('deleteEdgeGateways error:', err);
+    errorResponse(res, err.message);
   }
 };
 

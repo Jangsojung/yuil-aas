@@ -15,7 +15,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import {
   successResponse,
-  internalServerError,
+  errorResponse,
   fileRequiredError,
   fileNotUploadedError,
   fileInfoRequiredError,
@@ -31,7 +31,8 @@ export const getFiles = async (af_kind, fc_idx, startDate, endDate, limit, res) 
     const result = await getFilesFromDB(af_kind, fc_idx, startDate, endDate, null, limit);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getFiles error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -43,7 +44,8 @@ export const insertAASXFile = async (fc_idx, fileName, user_idx, res) => {
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
       return res.status(400).json({ error: err.message });
     }
-    internalServerError(res);
+    console.error('insertAASXFile error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -75,7 +77,8 @@ export const uploadAASXFile = async (req, res) => {
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
       return res.status(400).json({ error: err.message });
     }
-    internalServerError(res);
+    console.error('uploadAASXFile error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -87,7 +90,8 @@ export const updateAASXFile = async (af_idx, fileName, user_idx, fc_idx, res) =>
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
       return res.status(400).json({ error: err.message });
     }
-    internalServerError(res);
+    console.error('updateAASXFile error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -96,7 +100,8 @@ export const deleteFiles = async (ids, res) => {
     const result = await deleteFilesFromDB(ids);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('deleteFiles error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -106,7 +111,8 @@ export const checkFileSize = async (file, res) => {
     successResponse(res, result);
   } catch (err) {
     if (res) {
-      internalServerError(res);
+      console.error('checkFileSize error:', err);
+      errorResponse(res, err.message);
     }
   }
 };
@@ -117,15 +123,14 @@ export const getVerify = async (file, res) => {
     if (!result) {
       return fileInfoRequiredError(res);
     }
-
     successResponse(res, result);
   } catch (err) {
     if (res) {
-      // 특별한 에러 코드 처리
       if (err.message === 'FILE_TOO_LARGE' || err.message === 'AAS_FILE_TOO_LARGE') {
         return fileTooLargeError(res);
       }
-      internalServerError(res);
+      console.error('getVerify error:', err);
+      errorResponse(res, err.message);
     }
   }
 };
@@ -135,7 +140,8 @@ export const getWords = async (fc_idx, res) => {
     const result = await getWordsFromDB(fc_idx);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getWords error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -144,7 +150,8 @@ export const getSearch = async (fc_idx, type, text, res) => {
     const result = await getSearchFromDB(fc_idx, type, text);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('getSearch error:', err);
+    errorResponse(res, err.message);
   }
 };
 
@@ -153,35 +160,33 @@ export const updateWords = async (updates, res) => {
     const result = await updateWordsToDB(updates);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('updateWords error:', err);
+    errorResponse(res, err.message);
   }
 };
 
 export const getFileFCIdx = async (req, res) => {
   try {
     const { fileName, af_kind } = req.body;
-
     if (!fileName) {
       return res.status(400).json({
         success: false,
         message: '파일명이 필요합니다.',
       });
     }
-
     if (!af_kind) {
       return res.status(400).json({
         success: false,
         message: '파일 타입(af_kind)이 필요합니다.',
       });
     }
-
     const fc_idx = await getFileFCIdxFromDB(fileName, af_kind);
-
     res.json({
       success: true,
       data: { fc_idx },
     });
   } catch (error) {
-    internalServerError(res);
+    console.error('getFileFCIdx error:', error);
+    errorResponse(res, error.message);
   }
 };

@@ -1,29 +1,20 @@
-import { pool } from '../../config/database.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { FILE_KINDS, FILE } from '../../constants/index.js';
-import { validatePythonServerURL } from '../../config/validation.js';
-
-const PYTHON_SERVER_URL = validatePythonServerURL();
+import { validateValue, validateFcIdx, validateDate, validateNumber } from '../../utils/validation.js';
+import { querySingle, queryMultiple, queryInsert, queryUpdate, withTransaction } from '../../utils/dbHelper.js';
+import { createAasFile, createAasxFile, deleteFiles as deletePythonFiles } from '../../utils/pythonApi.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const getFileFCIdxFromDB = async (fileName, af_kind) => {
-  try {
-    const query = `SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ? LIMIT 1`;
-
-    const [results] = await pool.promise().query(query, [fileName, af_kind]);
-
-    if (results.length === 0) {
-      return null;
-    }
-
-    return results[0].fc_idx;
-  } catch (err) {
-    throw err;
-  }
+  const result = await querySingle('SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ? LIMIT 1', [
+    fileName,
+    af_kind,
+  ]);
+  return result ? result.fc_idx : null;
 };
 
 export const getFilesFromDB = async (
@@ -34,35 +25,33 @@ export const getFilesFromDB = async (
   user_idx = null,
   limit = null
 ) => {
-  try {
-    let query = '';
-    const queryParams = [];
+  // 파라미터 검증 및 변환
+  const validatedAfKind = validateValue(af_kind);
+  const validatedFcIdx = validateFcIdx(fc_idx);
+  const validatedStartDate = validateDate(startDate);
+  const validatedEndDate = validateDate(endDate);
+  const validatedLimit = validateNumber(limit);
 
-    // 파라미터 검증 및 변환
-    const validatedAfKind = af_kind !== null && af_kind !== undefined ? af_kind : null;
-    const validatedFcIdx = fc_idx !== null && fc_idx !== undefined && fc_idx !== -1 ? fc_idx : null;
-    const validatedStartDate = startDate && startDate !== null && startDate !== undefined ? startDate : null;
-    const validatedEndDate = endDate && endDate !== null && endDate !== undefined ? endDate : null;
-    const validatedLimit =
-      limit && limit !== null && limit !== undefined && !isNaN(Number(limit)) ? Number(limit) : null;
+  let query = '';
+  const queryParams = [];
 
-    let baseWhereClause = `f.af_kind = ?`;
-    queryParams.push(validatedAfKind);
-    if (validatedFcIdx !== null) {
-      baseWhereClause += ` AND f.fc_idx = ?`;
-      queryParams.push(validatedFcIdx);
-    }
+  let baseWhereClause = `f.af_kind = ?`;
+  queryParams.push(validatedAfKind);
+  if (validatedFcIdx !== null) {
+    baseWhereClause += ` AND f.fc_idx = ?`;
+    queryParams.push(validatedFcIdx);
+  }
 
-    let dateClause = '';
-    if (validatedStartDate && validatedEndDate) {
-      dateClause = ` AND f.createdAt BETWEEN ? AND ?`;
-      const startDateTime = `${validatedStartDate} 00:00:00`;
-      const endDateTime = `${validatedEndDate} 23:59:59`;
-      queryParams.push(startDateTime, endDateTime);
-    }
+  let dateClause = '';
+  if (validatedStartDate && validatedEndDate) {
+    dateClause = ` AND f.createdAt BETWEEN ? AND ?`;
+    const startDateTime = `${validatedStartDate} 00:00:00`;
+    const endDateTime = `${validatedEndDate} 23:59:59`;
+    queryParams.push(startDateTime, endDateTime);
+  }
 
-    if (validatedAfKind === FILE_KINDS.JSON_KIND) {
-      query = `
+  if (validatedAfKind === FILE_KINDS.JSON_KIND) {
+    query = `
         SELECT 
           f.af_idx, 
           f.af_name, 
@@ -83,9 +72,9 @@ export const getFilesFromDB = async (
         ${dateClause}
         GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name, b.ab_name
         ORDER BY f.af_idx DESC`;
-      if (validatedLimit) query += ` LIMIT ?`;
-    } else if (validatedAfKind === FILE_KINDS.AASX_KIND) {
-      query = `
+    if (validatedLimit) query += ` LIMIT ?`;
+  } else if (validatedAfKind === FILE_KINDS.AASX_KIND) {
+    query = `
         SELECT 
           f.af_idx, 
           f.af_name, 
@@ -100,100 +89,77 @@ export const getFilesFromDB = async (
         ${dateClause}
         GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name
         ORDER BY f.af_idx DESC`;
-      if (validatedLimit) query += ` LIMIT ?`;
-    } else {
-      query = `
+    if (validatedLimit) query += ` LIMIT ?`;
+  } else {
+    query = `
         SELECT f.af_idx, f.af_name, f.createdAt, f.updatedAt
         FROM tb_aasx_file f
         WHERE ${baseWhereClause}
         ${dateClause}
         ORDER BY f.af_idx DESC`;
-      if (validatedLimit) query += ` LIMIT ?`;
-    }
-
-    if (validatedLimit) queryParams.push(validatedLimit);
-
-    const [results] = await pool.promise().query(query, queryParams);
-
-    if (results.length === 0) {
-      return null;
-    }
-
-    const files = results.map((file) => {
-      if (af_kind === FILE_KINDS.JSON_KIND) {
-        return {
-          af_idx: file.af_idx,
-          af_name: file.af_name,
-          createdAt: file.createdAt,
-          updatedAt: file.updatedAt,
-          fc_idx: file.fc_idx,
-          fc_name: file.fc_name || '-',
-          base_name: file.base_name || '삭제된 기초코드',
-          sn_length: Number(file.sn_length) || 0,
-        };
-      } else if (af_kind === FILE_KINDS.AASX_KIND) {
-        return {
-          af_idx: file.af_idx,
-          af_name: file.af_name,
-          createdAt: file.createdAt,
-          updatedAt: file.updatedAt,
-          fc_idx: file.fc_idx,
-          fc_name: file.fc_name || '-',
-        };
-      } else {
-        return {
-          af_idx: file.af_idx,
-          af_name: file.af_name,
-          createdAt: file.createdAt,
-          updatedAt: file.updatedAt,
-        };
-      }
-    });
-
-    return files;
-  } catch (err) {
-    throw err;
+    if (validatedLimit) query += ` LIMIT ?`;
   }
+
+  if (validatedLimit) queryParams.push(validatedLimit);
+
+  const results = await queryMultiple(query, queryParams);
+
+  if (results.length === 0) {
+    return null;
+  }
+
+  const files = results.map((file) => {
+    if (af_kind === FILE_KINDS.JSON_KIND) {
+      return {
+        af_idx: file.af_idx,
+        af_name: file.af_name,
+        createdAt: file.createdAt,
+        updatedAt: file.updatedAt,
+        fc_idx: file.fc_idx,
+        fc_name: file.fc_name || '-',
+        base_name: file.base_name || '삭제된 기초코드',
+        sn_length: Number(file.sn_length) || 0,
+      };
+    } else if (af_kind === FILE_KINDS.AASX_KIND) {
+      return {
+        af_idx: file.af_idx,
+        af_name: file.af_name,
+        createdAt: file.createdAt,
+        updatedAt: file.updatedAt,
+        fc_idx: file.fc_idx,
+        fc_name: file.fc_name || '-',
+      };
+    } else {
+      return {
+        af_idx: file.af_idx,
+        af_name: file.af_name,
+        createdAt: file.createdAt,
+        updatedAt: file.updatedAt,
+      };
+    }
+  });
+
+  return files;
 };
 
 export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
-  let aasInsertId = null;
-  let aasxInsertId = null;
-  let createdFiles = [];
-  let connection = null;
-
-  try {
-    // 트랜잭션 시작
-    connection = await pool.promise().getConnection();
-    await connection.beginTransaction();
-
-    const [existing] = await connection.query(
+  return await withTransaction(async (connection) => {
+    // 기존 파일 확인
+    const existing = await connection.query(
       'SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = ? OR af_kind = ?)',
       [fileName, FILE_KINDS.AAS_KIND, FILE_KINDS.AASX_KIND]
     );
-    if (existing.length > 0) {
+    if (existing[0].length > 0) {
       throw new Error('이미 생성되어있는 파일입니다.');
     }
 
     const frontFilePath = `../files/front/${fileName}`;
+    let aasInsertId = null;
+    let aasxInsertId = null;
 
+    // AAS 파일 생성
     try {
-      const aasResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: frontFilePath,
-        }),
-      });
-
-      if (!aasResponse.ok) {
-        const errorText = await aasResponse.text();
-        throw new Error(`AAS 파일 생성 중 오류가 발생했습니다. (${aasResponse.status})`);
-      }
-
-      const responseText = await aasResponse.text();
+      await createAasFile(frontFilePath);
     } catch (error) {
       const fs = await import('fs');
       const aasFilePath = `../files/aas/${fileName}`;
@@ -201,6 +167,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       if (fs.existsSync(aasFilePath)) {
         const stats = fs.statSync(aasFilePath);
         if (stats.size > 0) {
+          // 파일이 존재하고 크기가 0보다 크면 성공으로 간주
         } else {
           throw new Error('AAS 파일 생성에 실패했습니다.');
         }
@@ -219,27 +186,11 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       user_idx,
     ]);
     aasInsertId = aasResult.insertId;
-    createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: aasInsertId });
 
     const aasFilePath = `../files/aas/${fileName}`;
 
     try {
-      const aasxResponse = await fetch(`${PYTHON_SERVER_URL}/api/aasx`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: aasFilePath,
-        }),
-      });
-
-      if (!aasxResponse.ok) {
-        const errorText = await aasxResponse.text();
-        throw new Error(`AASX 파일 생성 중 오류가 발생했습니다. (${aasxResponse.status})`);
-      }
-
-      const responseText = await aasxResponse.text();
+      await createAasxFile(aasFilePath);
     } catch (error) {
       const fs = await import('fs');
       const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
@@ -266,10 +217,6 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       user_idx,
     ]);
     aasxInsertId = aasxResult.insertId;
-    createdFiles.push({ type: 'aasx', path: `../files/aasx/${aasxFileName}`, insertId: aasxInsertId });
-
-    // 트랜잭션 커밋
-    await connection.commit();
 
     return {
       success: true,
@@ -278,19 +225,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
       af_idx: aasxInsertId,
       message: '변환 완료: AAS JSON, AASX 파일이 모두 생성되었습니다.',
     };
-  } catch (err) {
-    // 트랜잭션 롤백
-    if (connection) {
-      await connection.rollback();
-    }
-
-    await cleanupCreatedFiles(createdFiles);
-    throw err;
-  } finally {
-    if (connection) {
-      connection.release();
-    }
-  }
+  });
 };
 
 // 생성된 파일들을 정리하는 함수
@@ -492,8 +427,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
 
 export const deleteFilesFromDB = async (ids) => {
   try {
-    const query = `select af_idx, af_name, af_kind from tb_aasx_file where af_idx in (?)`;
-    const [results] = await pool.promise().query(query, [ids]);
+    const results = await queryMultiple(`select af_idx, af_name, af_kind from tb_aasx_file where af_idx in (?)`, [ids]);
 
     if (results.length === 0) {
       return {
@@ -518,8 +452,10 @@ export const deleteFilesFromDB = async (ids) => {
         deletePaths.push(`../files/aas/${aasFileName}`);
       });
 
-      const deleteAasQuery = `delete from tb_aasx_file where af_name in (?) and af_kind = ?`;
-      await pool.promise().query(deleteAasQuery, [aasFileNames, FILE_KINDS.AAS_KIND]);
+      await queryUpdate(`delete from tb_aasx_file where af_name in (?) and af_kind = ?`, [
+        aasFileNames,
+        FILE_KINDS.AAS_KIND,
+      ]);
     }
 
     if (jsonFiles.length > 0) {
@@ -529,23 +465,10 @@ export const deleteFilesFromDB = async (ids) => {
       });
     }
 
-    const deleteQuery = `delete from tb_aasx_file where af_idx in (?)`;
-    await pool.promise().query(deleteQuery, [ids]);
+    await queryUpdate(`delete from tb_aasx_file where af_idx in (?)`, [ids]);
 
     if (deletePaths.length > 0) {
-      const pythonResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          paths: deletePaths,
-        }),
-      });
-
-      if (!pythonResponse.ok) {
-        throw new Error(`Python 서버에서 파일 삭제 중 오류 발생`);
-      }
+      await deletePythonFiles(deletePaths);
     }
 
     return {
@@ -560,317 +483,213 @@ export const deleteFilesFromDB = async (ids) => {
 };
 
 export const checkFileSizeFromDB = async (file) => {
-  return new Promise((resolve, reject) => {
-    try {
-      let af_path = file.af_path;
-      let af_name = file.af_name;
-      let af_kind = file.af_kind;
+  try {
+    let af_path = file.af_path;
+    let af_name = file.af_name;
+    let af_kind = file.af_kind;
 
-      if (!af_path || !af_name || !af_kind) {
-        pool.query(
-          'SELECT af_path, af_name, af_kind FROM tb_aasx_file WHERE af_idx = ?',
-          [file.af_idx],
-          (err, rows) => {
-            if (err || !rows || rows.length === 0) {
-              reject(new Error('DB에서 파일 정보를 찾을 수 없습니다.'));
-              return;
-            }
-            af_path = rows[0].af_path;
-            af_name = rows[0].af_name;
-            af_kind = rows[0].af_kind;
-            let filePath;
-            let fileName;
-
-            if (af_kind === FILE_KINDS.JSON_KIND) {
-              fileName = af_name;
-              filePath = path.join(__dirname, '../../../../files/front', fileName);
-            } else {
-              fileName = af_name.replace(/\.aasx$/i, '.json');
-              filePath = path.join(__dirname, '../../../../files/aas', fileName);
-            }
-
-            if (!fs.existsSync(filePath)) {
-              reject(new Error('해당하는 파일이 존재하지 않습니다.'));
-              return;
-            }
-
-            const fileStats = fs.statSync(filePath);
-
-            const result = {
-              size: fileStats.size,
-              fileName: fileName,
-              filePath: filePath,
-              isLargeFile: fileStats.size > FILE.MAX_SIZE,
-            };
-            resolve(result);
-          }
-        );
-      } else {
-        let filePath;
-        let fileName;
-
-        if (af_kind === FILE_KINDS.JSON_KIND) {
-          fileName = af_name;
-          filePath = path.join(__dirname, '../../../../files/front', fileName);
-        } else {
-          fileName = af_name.replace(/\.aasx$/i, '.json');
-          filePath = path.join(__dirname, '../../../../files/aas', fileName);
-        }
-
-        if (!fs.existsSync(filePath)) {
-          reject(new Error('해당하는 파일이 존재하지 않습니다.'));
-          return;
-        }
-
-        const fileStats = fs.statSync(filePath);
-
-        const result = {
-          size: fileStats.size,
-          fileName: fileName,
-          filePath: filePath,
-          isLargeFile: fileStats.size > FILE.MAX_SIZE,
-        };
-        resolve(result);
+    if (!af_path || !af_name || !af_kind) {
+      const rows = await queryMultiple('SELECT af_path, af_name, af_kind FROM tb_aasx_file WHERE af_idx = ?', [
+        file.af_idx,
+      ]);
+      if (!rows || rows.length === 0) {
+        throw new Error('DB에서 파일 정보를 찾을 수 없습니다.');
       }
-    } catch (error) {
-      reject(new Error('파일 크기 확인 실패'));
+      af_path = rows[0].af_path;
+      af_name = rows[0].af_name;
+      af_kind = rows[0].af_kind;
     }
-  });
+
+    let filePath;
+    let fileName;
+
+    if (af_kind === FILE_KINDS.JSON_KIND) {
+      fileName = af_name;
+      filePath = path.join(__dirname, '../../../../files/front', fileName);
+    } else {
+      fileName = af_name.replace(/\.aasx$/i, '.json');
+      filePath = path.join(__dirname, '../../../../files/aas', fileName);
+    }
+
+    if (!fs.existsSync(filePath)) {
+      throw new Error('해당하는 파일이 존재하지 않습니다.');
+    }
+
+    const fileStats = fs.statSync(filePath);
+
+    return {
+      size: fileStats.size,
+      fileName: fileName,
+      filePath: filePath,
+      isLargeFile: fileStats.size > FILE.MAX_SIZE,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getVerifyFromDB = async (file) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let af_path = file.af_path;
-      let af_name = file.af_name;
-      let af_kind = file.af_kind;
+  try {
+    let af_path = file.af_path;
+    let af_name = file.af_name;
+    let af_kind = file.af_kind;
 
-      if (!af_path || !af_name || !af_kind) {
-        const [rows] = await pool
-          .promise()
-          .query('SELECT af_path, af_name, af_kind FROM tb_aasx_file WHERE af_idx = ?', [file.af_idx]);
-        if (!rows || rows.length === 0) {
-          reject(new Error('DB에서 파일 정보를 찾을 수 없습니다.'));
-          return;
-        }
-        af_path = rows[0].af_path;
-        af_name = rows[0].af_name;
-        af_kind = rows[0].af_kind;
+    if (!af_path || !af_name || !af_kind) {
+      const rows = await queryMultiple('SELECT af_path, af_name, af_kind FROM tb_aasx_file WHERE af_idx = ?', [
+        file.af_idx,
+      ]);
+      if (!rows || rows.length === 0) {
+        throw new Error('DB에서 파일 정보를 찾을 수 없습니다.');
       }
-
-      let filePath;
-      let fileName;
-
-      if (af_kind === FILE_KINDS.JSON_KIND) {
-        fileName = af_name;
-        filePath = path.join(__dirname, '../../../../files/front', fileName);
-      } else {
-        const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
-
-        fileName = af_name.replace(/\.aasx$/i, '.json');
-        filePath = path.join(__dirname, '../../../../files/aas', fileName);
-
-        if (!fs.existsSync(aasxFilePath)) {
-          reject(new Error('AASX 파일이 존재하지 않습니다.'));
-          return;
-        }
-      }
-
-      if (!fs.existsSync(filePath)) {
-        reject(new Error('해당하는 파일이 존재하지 않습니다.'));
-        return;
-      }
-
-      const fileStats = fs.statSync(filePath);
-
-      if (fileStats.size > FILE.MAX_SIZE) {
-        reject(new Error('FILE_TOO_LARGE'));
-        return;
-      }
-
-      const readStream = fs.createReadStream(filePath, { encoding: 'utf8' });
-      let fileData = '';
-      let isJsonStart = false;
-
-      readStream.on('data', (chunk) => {
-        fileData += chunk;
-
-        if (!isJsonStart && fileData.length > 0) {
-          const trimmedStart = fileData.trim();
-          if (!trimmedStart.startsWith('{') && !trimmedStart.startsWith('[')) {
-            readStream.destroy();
-            reject(new Error('유효하지 않은 JSON 파일입니다.'));
-            return;
-          }
-          isJsonStart = true;
-        }
-      });
-
-      readStream.on('end', () => {
-        if (!fileData || fileData.trim() === '') {
-          reject(new Error('파일이 비어있습니다.'));
-          return;
-        }
-
-        try {
-          const jsonData = JSON.parse(fileData);
-
-          if (af_kind === FILE_KINDS.JSON_KIND) {
-            resolve({
-              aasData: jsonData,
-              jsonFile: {
-                name: fileName,
-                path: '/files/front',
-              },
-              fileSize: fileStats.size,
-            });
-          } else {
-            const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
-            fs.readFile(aasxFilePath, (err, aasxFileData) => {
-              if (err) {
-                reject(new Error('AASX 파일 읽기 실패'));
-                return;
-              }
-
-              if (!aasxFileData || aasxFileData.length === 0) {
-                reject(new Error('AASX 파일이 비어있습니다.'));
-                return;
-              }
-
-              resolve({
-                aasData: jsonData,
-                aasxFile: {
-                  name: af_name,
-                  size: aasxFileData.length,
-                  path: af_path,
-                },
-                aasFile: {
-                  name: fileName,
-                  path: '/files/aas',
-                },
-                fileSize: fileStats.size,
-              });
-            });
-          }
-        } catch (parseError) {
-          reject(new Error('JSON 파싱 실패'));
-        }
-      });
-
-      readStream.on('error', (err) => {
-        reject(new Error('파일 읽기 실패'));
-      });
-    } catch (error) {
-      reject(new Error('파일 처리 실패'));
+      af_path = rows[0].af_path;
+      af_name = rows[0].af_name;
+      af_kind = rows[0].af_kind;
     }
-  });
+
+    let filePath;
+    let fileName;
+
+    if (af_kind === FILE_KINDS.JSON_KIND) {
+      fileName = af_name;
+      filePath = path.join(__dirname, '../../../../files/front', fileName);
+    } else {
+      const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
+
+      fileName = af_name.replace(/\.aasx$/i, '.json');
+      filePath = path.join(__dirname, '../../../../files/aas', fileName);
+
+      if (!fs.existsSync(aasxFilePath)) {
+        throw new Error('AASX 파일이 존재하지 않습니다.');
+      }
+    }
+
+    if (!fs.existsSync(filePath)) {
+      throw new Error('해당하는 파일이 존재하지 않습니다.');
+    }
+
+    const fileStats = fs.statSync(filePath);
+
+    if (fileStats.size > FILE.MAX_SIZE) {
+      throw new Error('FILE_TOO_LARGE');
+    }
+
+    const fileData = fs.readFileSync(filePath, 'utf8');
+
+    if (!fileData || fileData.trim() === '') {
+      throw new Error('파일이 비어있습니다.');
+    }
+
+    const trimmedStart = fileData.trim();
+    if (!trimmedStart.startsWith('{') && !trimmedStart.startsWith('[')) {
+      throw new Error('유효하지 않은 JSON 파일입니다.');
+    }
+
+    const jsonData = JSON.parse(fileData);
+
+    if (af_kind === FILE_KINDS.JSON_KIND) {
+      return {
+        aasData: jsonData,
+        jsonFile: {
+          name: fileName,
+          path: '/files/front',
+        },
+        fileSize: fileStats.size,
+      };
+    } else {
+      const aasxFilePath = path.join(__dirname, '../../../../', af_path, af_name);
+      const aasxFileData = fs.readFileSync(aasxFilePath);
+
+      if (!aasxFileData || aasxFileData.length === 0) {
+        throw new Error('AASX 파일이 비어있습니다.');
+      }
+
+      return {
+        aasData: jsonData,
+        aasxFile: {
+          name: af_name,
+          size: aasxFileData.length,
+          path: af_path,
+        },
+        aasFile: {
+          name: fileName,
+          path: '/files/aas',
+        },
+        fileSize: fileStats.size,
+      };
+    }
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getWordsFromDB = async (fc_idx) => {
-  return new Promise((resolve, reject) => {
-    const query = 'select as_kr, as_en, createdAt, updatedAt from tb_aasx_alias order by as_idx desc';
+  const results = await queryMultiple(
+    'select as_kr, as_en, createdAt, updatedAt from tb_aasx_alias order by as_idx desc'
+  );
 
-    pool.query(query, (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+  if (results.length === 0) {
+    return null;
+  }
 
-        const words = results.map((word) => {
-          return {
-            as_kr: word.as_kr,
-            as_en: word.as_en,
-            createdAt: word.createdAt,
-            updatedAt: word.updatedAt,
-          };
-        });
-
-        resolve(words);
-      }
-    });
-  });
+  return results.map((word) => ({
+    as_kr: word.as_kr,
+    as_en: word.as_en,
+    createdAt: word.createdAt,
+    updatedAt: word.updatedAt,
+  }));
 };
 
 export const getSearchFromDB = async (fc_idx, type, text) => {
-  return new Promise((resolve, reject) => {
-    let column;
-    if (type === 'kr') column = 'as_kr';
-    else if (type === 'en') column = 'as_en';
-    else return reject(new Error('Invalid type'));
+  let column;
+  if (type === 'kr') column = 'as_kr';
+  else if (type === 'en') column = 'as_en';
+  else throw new Error('Invalid type');
 
-    const query = `SELECT as_kr, as_en FROM tb_aasx_alias WHERE ${column} LIKE ? order by as_idx desc`;
-    const searchText = `%${text}%`;
+  const query = `SELECT as_kr, as_en FROM tb_aasx_alias WHERE ${column} LIKE ? order by as_idx desc`;
+  const searchText = `%${text}%`;
 
-    pool.query(query, [searchText], (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+  const results = await queryMultiple(query, [searchText]);
 
-        const words = results.map((word) => {
-          return {
-            as_kr: word.as_kr,
-            as_en: word.as_en,
-          };
-        });
+  if (results.length === 0) {
+    return null;
+  }
 
-        resolve(words);
-      }
-    });
-  });
+  return results.map((word) => ({
+    as_kr: word.as_kr,
+    as_en: word.as_en,
+  }));
 };
 
 export const updateWordsToDB = async (updates) => {
-  return new Promise((resolve, reject) => {
-    if (!updates || !Array.isArray(updates) || updates.length === 0) {
-      reject(new Error('업데이트할 데이터가 없습니다.'));
-      return;
+  if (!updates || !Array.isArray(updates) || updates.length === 0) {
+    throw new Error('업데이트할 데이터가 없습니다.');
+  }
+
+  const updatePromises = updates.map(async (update) => {
+    const { as_kr, original_as_en, new_as_en } = update;
+
+    if (!as_kr) {
+      throw new Error('필수 필드가 누락되었습니다.');
     }
 
-    const updatePromises = updates.map((update) => {
-      return new Promise((resolveUpdate, rejectUpdate) => {
-        const { as_kr, original_as_en, new_as_en } = update;
+    let query, params;
+    if (original_as_en === null) {
+      query = `UPDATE tb_aasx_alias SET as_en = ? WHERE as_kr = ? AND as_en IS NULL`;
+      params = [new_as_en || null, as_kr];
+    } else {
+      query = `UPDATE tb_aasx_alias SET as_en = ? WHERE as_kr = ? AND as_en = ?`;
+      params = [new_as_en || null, as_kr, original_as_en];
+    }
 
-        if (!as_kr) {
-          rejectUpdate(new Error('필수 필드가 누락되었습니다.'));
-          return;
-        }
-
-        let query, params;
-        if (original_as_en === null) {
-          query = `UPDATE tb_aasx_alias SET as_en = ? WHERE as_kr = ? AND as_en IS NULL`;
-          params = [new_as_en || null, as_kr];
-        } else {
-          query = `UPDATE tb_aasx_alias SET as_en = ? WHERE as_kr = ? AND as_en = ?`;
-          params = [new_as_en || null, as_kr, original_as_en];
-        }
-
-        pool.query(query, params, (err, result) => {
-          if (err) {
-            rejectUpdate(err);
-          } else {
-            resolveUpdate({ as_kr, original_as_en, new_as_en, affectedRows: result.affectedRows });
-          }
-        });
-      });
-    });
-
-    Promise.all(updatePromises)
-      .then((results) => {
-        resolve({
-          success: true,
-          updatedCount: results.length,
-          results: results,
-        });
-      })
-      .catch((error) => {
-        reject(error);
-      });
+    const result = await queryUpdate(query, params);
+    return { as_kr, original_as_en, new_as_en, affectedRows: result.affectedRows };
   });
+
+  const results = await Promise.all(updatePromises);
+
+  return {
+    success: true,
+    updatedCount: results.length,
+    results: results,
+  };
 };

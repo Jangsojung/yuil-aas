@@ -1,11 +1,13 @@
 import { insertConvertsToDB } from '../../service/convert/ConvertService.js';
-import { successResponse, internalServerError } from '../../utils/responseHandler.js';
+import { successResponse, errorResponse } from '../../utils/responseHandler.js';
 
-export const insertConverts = async (fc_idx, startDate, endDate, selectedConvert, user_idx, af_kind, res) => {
+export const insertConverts = async (fc_idx, user_idx, startDate, endDate, selectedConvert, af_kind, res) => {
+  console.log('convert params:', { fc_idx, user_idx, startDate, endDate, selectedConvert, af_kind });
   try {
-    const result = await insertConvertsToDB(null, startDate, endDate, selectedConvert, user_idx, af_kind);
+    const result = await insertConvertsToDB(fc_idx, startDate, endDate, selectedConvert, user_idx, af_kind);
     successResponse(res, result);
   } catch (err) {
-    internalServerError(res);
+    console.error('ConvertService error:', err);
+    errorResponse(res, err.message);
   }
 };

@@ -66,7 +66,7 @@ export default function FactorySelect({
     <FormControl fullWidth size='small'>
       <Select value={value} onChange={handleChange} displayEmpty disabled={disabled || factories.length === 0}>
         <MenuItem disabled value=''>
-          {factories.length === 0 ? '사용 가능한 공장이 없습니다' : placeholder}
+          {factories.length === 0 ? '공장 정보 없음' : placeholder}
         </MenuItem>
         {showAllOption && <MenuItem value={-1}>전체</MenuItem>}
         {factories.map((factory) => (
