@@ -12,6 +12,7 @@ import BasicModal from '../modal/basicmodal';
 import AlertModal from '../modal/alert';
 import { useAlertModal } from '../../hooks/useAlertModal';
 import FactorySelect from '../select/factory_select';
+import CustomBreadcrumb from '../common/CustomBreadcrumb';
 
 interface EditViewProps {
   treeData: FacilityGroupTree[];
@@ -81,7 +82,18 @@ export const EditView: React.FC<EditViewProps> = ({
   };
 
   return (
-    <div className='table-outer'>
+    <div className='table-outer' style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
+        <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
+        <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
+      </div>
       <SearchBox
         buttons={[
           {
@@ -99,10 +111,9 @@ export const EditView: React.FC<EditViewProps> = ({
                 <div>공장</div>
               </Grid>
               <Grid>
-                <FormControl sx={{ minWidth: '200px',width: '100%' }} size='small'>
+                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
                   <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
                 </FormControl>
-                
               </Grid>
             </Grid>
           )}
@@ -114,7 +125,7 @@ export const EditView: React.FC<EditViewProps> = ({
               <div>설비그룹</div>
             </Grid>
             <Grid>
-              <FormControl sx={{ minWidth: '200px',width: '100%' }} size='small'>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
                 <FacilityGroupSelect
                   selectedFacilityGroups={selectedFacilityGroups}
                   setSelectedFacilityGroups={setSelectedFacilityGroups}

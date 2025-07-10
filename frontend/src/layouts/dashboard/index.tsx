@@ -96,6 +96,15 @@ export default function Layout() {
 
   // 브레드크럼 링크 비활성화 (홈 제외) 및 홈 아이콘 추가
   React.useEffect(() => {
+    // JSON 상세 페이지에서는 브레드크럼 관련 JavaScript 실행하지 않음
+    if (
+      location.pathname.includes('/jsonManager/detail/') ||
+      location.pathname.includes('/basic/add') ||
+      location.pathname.includes('/basic/edit')
+    ) {
+      return;
+    }
+
     const handleBreadcrumb = () => {
       const breadcrumbOl = document.querySelector('.MuiBreadcrumbs-ol');
       if (breadcrumbOl) {
@@ -165,7 +174,10 @@ export default function Layout() {
       }}
     >
       <Container>
-        {location.pathname !== '/dashboard/dashboard' && <PageHeader />}
+        {location.pathname !== '/dashboard/dashboard' &&
+          !location.pathname.includes('/jsonManager/detail/') &&
+          !location.pathname.includes('/basic/add') &&
+          !location.pathname.includes('/basic/edit') && <PageHeader />}
         <Outlet />
       </Container>
     </DashboardLayout>

@@ -8,6 +8,7 @@ import AlertModal from '../../../components/modal/alert';
 import { Box } from '@mui/material';
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
+import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
 
 export default function JsonDetail() {
   const { id } = useParams();
@@ -200,6 +201,22 @@ export default function JsonDetail() {
 
   return (
     <div className='table-outer' style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
+        <CustomBreadcrumb
+          items={[
+            { label: '데이터 관리', path: '/data', clickable: true },
+            { label: 'JSON 파일 관리', path: '/data/jsonManager', clickable: true },
+          ]}
+        />
+        <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>JSON 파일 관리</span>
+      </div>
       <div style={{ flexShrink: 0 }}>
         <ActionBox
           buttons={

@@ -32,8 +32,9 @@ main {
     }
 
     //pageHeader 영역
-    div:has(nav) {
+    div:has(nav):not(.no-flex-header) {
       display: flex;
+      flex-direction: row-reverse;
       flex-direction: row-reverse;
       justify-content: space-between;
       margin-bottom: 16px;

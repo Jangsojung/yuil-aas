@@ -71,7 +71,7 @@ export default function BasiccodeAddPage() {
   };
 
   return (
-    <div className='table-outer'>
+    <div className='no-flex-header'>
       <EditView
         treeData={treeData}
         treeLoading={treeLoading}
