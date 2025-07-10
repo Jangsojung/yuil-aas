@@ -164,7 +164,7 @@ export const ListView: React.FC<ListViewProps> = ({
             {
               text: '기초코드 등록',
               onClick: onAdd,
-              color: 'success',
+              color: 'primary',
             },
             {
               text: '삭제',

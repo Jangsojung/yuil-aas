@@ -2,6 +2,8 @@ import React from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { Checkbox } from '@mui/material';
+import Grid from '@mui/system/Grid';
+import Tooltip from '@mui/material/Tooltip';
 import { FacilityGroupTree } from '../../types/api';
 import BasicTable from '../table/basic_code';
 
@@ -81,9 +83,18 @@ export const FacilityTreeView: React.FC<FacilityTreeViewProps> = ({
                 </div>
               }
             >
-              <div className='padding-y'>
-                <BasicTable sm_idx={`${fgIdx + 1}.${faIdx + 1}`} fa_idx={fa.fa_idx} sensors={fa.sensors} />
+              <div style={{ padding: '15px 0' }}>
+                <Grid container className='facility-item'>
+                  <Grid size={2}>
+                    <div className='flex-center'>
+                      온조기1
+                    </div>
+                  </Grid>
+                </Grid>
               </div>
+              {/* <div className='padding-y'>
+                <BasicTable sm_idx={`${fgIdx + 1}.${faIdx + 1}`} fa_idx={fa.fa_idx} sensors={fa.sensors} />
+              </div> */}
             </CustomTreeItem>
           ))}
         </CustomTreeItem>

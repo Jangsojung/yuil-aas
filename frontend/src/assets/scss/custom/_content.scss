@@ -58,6 +58,7 @@ main {
       padding: 10px 15px;
       flex-grow: 1;
       margin-bottom: 16px;
+      align-items: center;
 
       .sort-title {
         color: #37474f;
@@ -76,10 +77,6 @@ main {
       border: 0;
     }
     .MuiFormControl-root {
-      .MuiInputBase-root.MuiOutlinedInput-root {
-        border-radius: 0;
-      }
-
       //셀렉트
       .MuiSelect-select {
         padding: 6px 14px;

@@ -265,7 +265,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
                     size='small'
                     value={pcName}
                     onChange={(e) => setPcName(e.target.value)}
-                    placeholder='PC명을 입력하세요'
                   />
                 </FormControl>
               </Grid>
@@ -282,7 +281,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
                     size='small'
                     value={ipAddress}
                     onChange={(e) => setIpAddress(e.target.value)}
-                    placeholder='IP 주소를 입력하세요'
                   />
                 </FormControl>
               </Grid>

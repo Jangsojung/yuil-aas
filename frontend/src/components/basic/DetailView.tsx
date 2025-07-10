@@ -1,15 +1,30 @@
 import React from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
-import Paper from '@mui/material/Paper';
+import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import Grid from '@mui/system/Grid';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip';
 import { FacilityGroupTree, Base } from '../../types/api';
 import { ActionBox } from '../common';
 import LoadingOverlay from '../loading/LodingOverlay';
+
+import { styled, alpha } from '@mui/material/styles';
+
+const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
+  [`& .${treeItemClasses.content}`]: {
+    padding: theme.spacing(0.5, 1),
+    margin: theme.spacing(0.2, 0),
+  },
+  [`& .${treeItemClasses.iconContainer}`]: {
+    '& .close': {
+      opacity: 0.3,
+    },
+  },
+  [`& .${treeItemClasses.groupTransition}`]: {
+    marginLeft: 15,
+    paddingLeft: 18,
+    borderLeft: `1px dashed ${alpha(theme.palette.text.primary, 0.4)}`,
+  },
+}));
 
 interface DetailViewProps {
   detailTreeData: FacilityGroupTree[];
@@ -59,10 +74,19 @@ export const DetailView: React.FC<DetailViewProps> = ({
             ])}
           >
             {detailTreeData.map((fg, fgIdx) => (
-              <TreeItem key={fg.fg_idx} itemId={`detail-${fgIdx}`} label={<span>{fg.fg_name}</span>}>
+              <CustomTreeItem key={fg.fg_idx} itemId={`detail-${fgIdx}`} label={<span>{fg.fg_name}</span>}>
                 {fg.facilities.map((fa, faIdx) => (
-                  <TreeItem key={fa.fa_idx} itemId={`detail-sub-${fgIdx}-${faIdx}`} label={<span>{fa.fa_name}</span>}>
-                    <div className='padding-y'>
+                  <CustomTreeItem key={fa.fa_idx} itemId={`detail-sub-${fgIdx}-${faIdx}`} label={<span>{fa.fa_name}</span>}>
+                    <div style={{ padding: '15px 0' }}>
+                      <Grid container className='facility-item'>
+                        <Grid size={2}>
+                          <div className='flex-center'>
+                            온조기1
+                          </div>
+                        </Grid>
+                      </Grid>
+                    </div>
+                    {/* <div className='padding-y'>
                       <TableContainer component={Paper}>
                         <Table size='small'>
                           <TableBody>
@@ -112,10 +136,10 @@ export const DetailView: React.FC<DetailViewProps> = ({
                           </TableBody>
                         </Table>
                       </TableContainer>
-                    </div>
-                  </TreeItem>
+                    </div> */}
+                  </CustomTreeItem>
                 ))}
-              </TreeItem>
+              </CustomTreeItem>
             ))}
           </SimpleTreeView>
         )}

@@ -67,14 +67,14 @@ export default function EdgeTableRow({
         <TableCell>
           {networkStatus === 1 ? '연결 됨' : '연결 안 됨'}
           <Button
-            variant='contained'
+            variant='outlined'
             color='info'
             size='small'
             style={{ marginLeft: 8 }}
             onClick={handleCheckStatus}
             disabled={checking}
           >
-            {checking ? '검사 중...' : '상태 체크'}
+            {checking ? '검사 중...' : '점검'}
           </Button>
         </TableCell>
         <TableCell>{edgeGateway.createdAt ? formatDate(edgeGateway.createdAt) : ''}</TableCell>
