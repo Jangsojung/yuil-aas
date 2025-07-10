@@ -131,7 +131,7 @@ export default function DashboardPage() {
     <Grid container spacing={1} className='dashboard-wrap'>
       {/* 윗줄 */}
       {/* 왼쪽 위: JSON 파일 */}
-      <Grid size={6} sx={{height:'30%'}}>
+      <Grid size={6} sx={{ height: '30%' }}>
         <Box sx={dashboardPanelStyle}>
           <Typography variant='h6' gutterBottom className='dashboard-title'>
             JSON 파일
@@ -163,9 +163,9 @@ export default function DashboardPage() {
         </Box>
       </Grid>
       {/* 오른쪽 위: AASX 파일 */}
-      <Grid size={6} sx={{height:'30%'}}>
+      <Grid size={6} sx={{ height: '30%' }}>
         <Box sx={dashboardPanelStyle}>
-          <Typography variant='h6' gutterBottom  className='dashboard-title'>
+          <Typography variant='h6' gutterBottom className='dashboard-title'>
             AASX 파일
           </Typography>
           <TableContainer component={Paper}>
@@ -194,13 +194,13 @@ export default function DashboardPage() {
       </Grid>
 
       {/* 아랫줄 (왼쪽: 최신 JSON 파일 뷰어) */}
-      <Grid size={6} sx={{flexGrow:1, height:'68%'}}>
-        <Box sx={{ ...dashboardPanelStyle}}>
+      <Grid size={6} sx={{ flexGrow: 1, height: '68%' }}>
+        <Box sx={{ ...dashboardPanelStyle }}>
           <Typography variant='h6' gutterBottom className='dashboard-title'>
             {selectedJson ? `JSON 파일 - ${selectedJson.af_name}` : 'JSON 파일 미리보기'}
             {selectedJson && (
               <Button
-                onClick={() => navigate(`/aasx/json/detail/${selectedJson.af_idx}`)}
+                onClick={() => navigate(`/data/jsonManager/detail/${selectedJson.af_idx}`)}
                 disabled={!selectedJson}
                 variant='outlined'
                 size='small'
@@ -209,7 +209,7 @@ export default function DashboardPage() {
               </Button>
             )}
           </Typography>
-          
+
           {jsonLoading ? (
             <Box
               sx={{
@@ -252,9 +252,9 @@ export default function DashboardPage() {
           )}
         </Box>
       </Grid>
-      <Grid size={6} sx={{flexGrow:1, height:'68%'}}>
+      <Grid size={6} sx={{ flexGrow: 1, height: '68%' }}>
         <Box sx={{ ...dashboardPanelStyle }}>
-          <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }}  className='dashboard-title'>
+          <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }} className='dashboard-title'>
             {selectedAasx ? `AASX 파일 - ${selectedAasx.af_name}` : 'AASX 파일 미리보기'}
 
             {selectedAasx && (
@@ -275,7 +275,7 @@ export default function DashboardPage() {
               </Button>
             )}
           </Typography>
-          
+
           {aasxLoading ? (
             <Box
               sx={{

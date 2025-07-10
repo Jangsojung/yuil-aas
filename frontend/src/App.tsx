@@ -7,10 +7,10 @@ import Layout from './layouts/dashboard';
 import AuthLayout from './layouts/auth';
 import DashboardPage from './pages/dashboard/dashboard';
 import ConvertPage from './pages/aas/convert';
-import TransmitPage from './pages/aas/transmit';
-import AasxManagerPage from './pages/aasx';
-import DataManagerPage from './pages/aasx/data';
-import JSONManagerPage from './pages/aasx/json';
+import TransmitPage from './pages/aasx/transmit';
+import AasxManagerPage from './pages/aasx/aasx';
+import DataManagerPage from './pages/data/data';
+import JSONManagerPage from './pages/data/json';
 import EdgePage from './pages/edge';
 import SignInPage from './pages/signIn/sign';
 import ProtectedRoute from './components/route/ProtectedRoute';
@@ -19,7 +19,7 @@ import FacilityPage from './pages/aas/facility';
 import BasicCodeIndex from './pages/aas/basic';
 import BasicCodeAdd from './pages/aas/basic/add';
 import BasicCodeEdit from './pages/aas/basic/edit';
-import JsonDetail from './pages/aasx/json/detail';
+import JsonDetail from './pages/data/json/detail';
 
 function App() {
   return (
@@ -93,10 +93,6 @@ export default function ReactRouter() {
                   path: 'convert',
                   element: <ConvertPage />,
                 },
-                {
-                  path: 'transmit',
-                  element: <TransmitPage />,
-                },
               ],
             },
             {
@@ -115,6 +111,10 @@ export default function ReactRouter() {
                   path: 'jsonManager',
                   element: <JSONManagerPage />,
                 },
+                {
+                  path: 'jsonManager/detail/:id',
+                  element: <JsonDetail />,
+                },
               ],
             },
             {
@@ -132,10 +132,6 @@ export default function ReactRouter() {
                 {
                   path: 'transmit',
                   element: <TransmitPage />,
-                },
-                {
-                  path: 'json/detail/:id',
-                  element: <JsonDetail />,
                 },
               ],
             },

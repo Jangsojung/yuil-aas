@@ -1,37 +1,33 @@
-import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
-import Grid from '@mui/system/Grid';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import Paper from '@mui/material/Paper';
-import dayjs, { Dayjs } from 'dayjs';
-import BasicDatePicker from '../../components/datepicker';
-import { FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox } from '@mui/material';
-import Pagination from '../../components/pagination';
-import { deleteAASXAPI, getFilesAPI } from '../../apis/api/aasx_manage';
-import { useTablePagination } from '../../hooks/useTablePagination';
-import AASXTableRow from '../../components/tableRow/AASXTableRow';
+import { Table, TableBody, TableContainer, TableHead, TableRow, TableCell, Checkbox } from '@mui/material';
+import Grid from '@mui/system/Grid';
+import Pagination from '../../../components/pagination';
+import JSONTableRow from '../../../components/tableRow/JSONTableRow';
+import { SearchBox, ActionBox, SortableTableHeader, TableEmptyRow } from '../../../components/common';
+import AlertModal from '../../../components/modal/alert';
+import { usePagination } from '../../../hooks/usePagination';
+import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
+import FactorySelect from '../../../components/select/factory_select';
+import { getJSONFilesAPI, deleteJSONAPI } from '../../../apis/api/json_manage';
 import { useRecoilValue } from 'recoil';
-import { navigationResetState } from '../../recoil/atoms';
-import { SearchBox, ActionBox, SortableTableHeader, TableEmptyRow } from '../../components/common';
-import AlertModal from '../../components/modal/alert';
-import { useSortableData, SortableColumn } from '../../hooks/useSortableData';
-import FactorySelect from '../../components/select/factory_select';
-import { AASXFile, AlertModalState } from '../../types';
-import { KINDS } from '../../constants';
+import { navigationResetState } from '../../../recoil/atoms';
+import { useLocation, useNavigate } from 'react-router-dom';
+import dayjs, { Dayjs } from 'dayjs';
+import BasicDatePicker from '../../../components/datepicker';
+import FormControl from '@mui/material/FormControl';
 
 interface File {
   af_idx: number;
   af_name: string;
   createdAt: string;
-  updatedAt?: string;
+  base_name?: string;
+  sn_length?: number;
   fc_idx?: number;
   fc_name?: string;
 }
 
-interface AASXListProps {
-  onEditClick: (file: AASXFile) => void;
-  onAddClick: () => void;
-}
-
-export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXListProps, ref) {
+export default function JSONList() {
   const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -39,20 +35,15 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   const [selectAll, setSelectAll] = useState(false);
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
   const navigationReset = useRecoilValue(navigationResetState);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // refresh 메서드를 ref로 노출
-  useImperativeHandle(ref, () => ({
-    refresh: () => {
-      getFiles();
-    },
-  }));
-
-  const [alertModal, setAlertModal] = useState<AlertModalState>({
+  const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
     content: '',
-    type: 'alert',
-    onConfirm: undefined,
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
   });
 
   // 정렬 기능
@@ -67,13 +58,16 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   const sortableColumns: SortableColumn<File>[] = [
     { field: 'fc_name', label: '공장명' },
     { field: 'af_name', label: '파일명' },
+    { field: 'base_name', label: '기초코드명' },
+    { field: 'sn_length', label: '센서 개수' },
     { field: 'createdAt', label: '생성 일자' },
-    { field: 'updatedAt', label: '수정 일자' },
   ];
 
-  const { currentPage, rowsPerPage, handlePageChange, handleRowsPerPageChange, paginatedData } = useTablePagination({
-    totalCount: sortedFiles?.length || 0,
-  });
+  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+    sortedFiles?.length || 0
+  );
+
+  const pagedData = paginatedData(sortedFiles || []);
 
   const handleDelete = async () => {
     if (selectedFiles.length === 0) {
@@ -94,7 +88,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
       type: 'confirm',
       onConfirm: async () => {
         try {
-          await deleteAASXAPI(selectedFiles);
+          await deleteJSONAPI(selectedFiles);
 
           setAlertModal({
             open: true,
@@ -127,6 +121,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   const handleFactoryChange = (factoryId: number) => {
     setSelectedFactory(factoryId);
     setSelectedFiles([]);
+    // 공장 변경 시 파일 목록은 그대로 유지 (검색 버튼을 눌러야만 새로 조회)
   };
 
   const handleSearch = () => {
@@ -168,9 +163,8 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   const getFiles = async (start = startDate, end = endDate) => {
     const startDateStr = start ? dayjs(start).format('YYYY-MM-DD') : '';
     const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
-    const af_kind = KINDS.AASX_KIND;
 
-    const data: File[] = await getFilesAPI(startDateStr, endDateStr, selectedFactory, af_kind);
+    const data: File[] = await getJSONFilesAPI(startDateStr, endDateStr, selectedFactory);
     setFiles(Array.isArray(data) ? data : []);
   };
 
@@ -197,51 +191,56 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     });
   };
 
-  const handleDoubleClick = (file: File) => {
-    const aasxFile: AASXFile = {
-      af_idx: file.af_idx,
-      af_name: file.af_name,
-      createdAt: file.createdAt,
-    };
-    onEditClick(aasxFile);
-  };
-
   const handleCloseAlert = () => {
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   const handleNavigationReset = () => {
-    setSelectedFiles([]);
-    setSelectAll(false);
-    handlePageChange(null, 0);
-    // 초기화 시에는 날짜만 설정하고 파일 조회는 하지 않음
-    const defaultStart = dayjs().subtract(1, 'month');
-    const defaultEnd = dayjs();
-    setStartDate(defaultStart);
-    setEndDate(defaultEnd);
-    setSelectedFactory('');
-    setFiles([]);
+    handleReset();
   };
 
   useEffect(() => {
-    handleNavigationReset();
+    if (navigationReset) {
+      handleNavigationReset();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigationReset]);
 
   useEffect(() => {
-    if (selectedFiles.length === 0) {
-      setSelectAll(false);
-    } else if (selectedFiles.length === files.length) {
-      setSelectAll(true);
+    const defaultStart = dayjs().subtract(1, 'month');
+    const defaultEnd = dayjs();
+    setStartDate(defaultStart);
+    setEndDate(defaultEnd);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // location.state에서 alert 정보 확인
+  useEffect(() => {
+    if (location.state?.showAlert) {
+      setAlertModal({
+        open: true,
+        title: location.state.alertTitle || '알림',
+        content: location.state.alertContent || '',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      // state 초기화
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate, location.pathname]);
+
+  useEffect(() => {
+    if (files && files.length > 0) {
+      const allSelected = files.every((file) => selectedFiles.includes(file.af_idx));
+      setSelectAll(allSelected);
     } else {
       setSelectAll(false);
     }
   }, [selectedFiles, files]);
 
-  // getFiles를 ref로 노출
-  useImperativeHandle(ref, () => ({
-    refresh: getFiles,
-  }));
+  const handleRowClick = (af_idx: number) => {
+    navigate(`/data/jsonManager/detail/${af_idx}`);
+  };
 
   return (
     <div className='table-outer'>
@@ -282,7 +281,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                 <div className='sort-title'>생성일</div>
               </Grid>
               <Grid>
-                <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
+                <BasicDatePicker startDate={startDate} endDate={endDate} onDateChange={handleDateChange} />
               </Grid>
             </Grid>
           </Grid>
@@ -291,11 +290,6 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
 
       <ActionBox
         buttons={[
-          {
-            text: '파일등록',
-            onClick: onAddClick,
-            color: 'success',
-          },
           {
             text: '파일삭제',
             onClick: handleDelete,
@@ -323,32 +317,32 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
-                <TableCell align='center'>수정</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedData(sortedFiles || []).length > 0 ? (
-                paginatedData(sortedFiles || []).map((file: File, idx: number) => (
-                  <AASXTableRow
+              {pagedData && pagedData.length > 0 ? (
+                pagedData?.map((file, idx) => (
+                  <JSONTableRow
                     file={file}
                     key={idx}
                     onCheckboxChange={handleCheckboxChange}
                     checked={selectedFiles.includes(file.af_idx)}
-                    onEditClick={handleDoubleClick}
                     totalCount={files.length}
+                    onRowClick={handleRowClick}
                   />
                 ))
               ) : (
-                <TableEmptyRow colSpan={sortableColumns.length + 3} />
+                <TableEmptyRow colSpan={sortableColumns.length + 1} />
               )}
             </TableBody>
           </Table>
         </TableContainer>
+
         <Pagination
           count={files ? files.length : 0}
           page={currentPage}
           rowsPerPage={rowsPerPage}
-          onPageChange={handlePageChange}
+          onPageChange={(event, page) => goToPage(page)}
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </div>
@@ -363,4 +357,4 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
       />
     </div>
   );
-});
+}

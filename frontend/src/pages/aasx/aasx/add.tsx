@@ -1,6 +1,6 @@
 import React from 'react';
-import CustomizedDialogs from '../../components/modal/aasx_edit_modal';
-import { AASXFile } from '../../types/api';
+import CustomizedDialogs from '../../../components/modal/aasx_edit_modal';
+import { AASXFile } from '../../../types/api';
 
 interface AASXAddProps {
   open: boolean;

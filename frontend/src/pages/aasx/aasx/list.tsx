@@ -1,33 +1,37 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import Paper from '@mui/material/Paper';
-import { Table, TableBody, TableContainer, TableHead, TableRow, TableCell, Checkbox } from '@mui/material';
+import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import Grid from '@mui/system/Grid';
-import Pagination from '../../../components/pagination';
-import JSONTableRow from '../../../components/tableRow/JSONTableRow';
-import { SearchBox, ActionBox, SortableTableHeader, TableEmptyRow } from '../../../components/common';
-import AlertModal from '../../../components/modal/alert';
-import { usePagination } from '../../../hooks/usePagination';
-import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
-import FactorySelect from '../../../components/select/factory_select';
-import { getJSONFilesAPI, deleteJSONAPI } from '../../../apis/api/json_manage';
-import { useRecoilValue } from 'recoil';
-import { navigationResetState } from '../../../recoil/atoms';
-import { useLocation, useNavigate } from 'react-router-dom';
+import Paper from '@mui/material/Paper';
 import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../../components/datepicker';
-import FormControl from '@mui/material/FormControl';
+import { FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox } from '@mui/material';
+import Pagination from '../../../components/pagination';
+import { deleteAASXAPI, getFilesAPI } from '../../../apis/api/aasx_manage';
+import { useTablePagination } from '../../../hooks/useTablePagination';
+import AASXTableRow from '../../../components/tableRow/AASXTableRow';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../../recoil/atoms';
+import { SearchBox, ActionBox, SortableTableHeader, TableEmptyRow } from '../../../components/common';
+import AlertModal from '../../../components/modal/alert';
+import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
+import FactorySelect from '../../../components/select/factory_select';
+import { AASXFile, AlertModalState } from '../../../types';
+import { KINDS } from '../../../constants';
 
 interface File {
   af_idx: number;
   af_name: string;
   createdAt: string;
-  base_name?: string;
-  sn_length?: number;
+  updatedAt?: string;
   fc_idx?: number;
   fc_name?: string;
 }
 
-export default function JSONList() {
+interface AASXListProps {
+  onEditClick: (file: AASXFile) => void;
+  onAddClick: () => void;
+}
+
+export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXListProps, ref) {
   const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -35,15 +39,20 @@ export default function JSONList() {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
   const navigationReset = useRecoilValue(navigationResetState);
-  const navigate = useNavigate();
-  const location = useLocation();
 
-  const [alertModal, setAlertModal] = useState({
+  // refresh 메서드를 ref로 노출
+  useImperativeHandle(ref, () => ({
+    refresh: () => {
+      getFiles();
+    },
+  }));
+
+  const [alertModal, setAlertModal] = useState<AlertModalState>({
     open: false,
     title: '',
     content: '',
-    type: 'alert' as 'alert' | 'confirm',
-    onConfirm: undefined as (() => void) | undefined,
+    type: 'alert',
+    onConfirm: undefined,
   });
 
   // 정렬 기능
@@ -58,16 +67,13 @@ export default function JSONList() {
   const sortableColumns: SortableColumn<File>[] = [
     { field: 'fc_name', label: '공장명' },
     { field: 'af_name', label: '파일명' },
-    { field: 'base_name', label: '기초코드명' },
-    { field: 'sn_length', label: '센서 개수' },
     { field: 'createdAt', label: '생성 일자' },
+    { field: 'updatedAt', label: '수정 일자' },
   ];
 
-  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
-    sortedFiles?.length || 0
-  );
-
-  const pagedData = paginatedData(sortedFiles || []);
+  const { currentPage, rowsPerPage, handlePageChange, handleRowsPerPageChange, paginatedData } = useTablePagination({
+    totalCount: sortedFiles?.length || 0,
+  });
 
   const handleDelete = async () => {
     if (selectedFiles.length === 0) {
@@ -88,7 +94,7 @@ export default function JSONList() {
       type: 'confirm',
       onConfirm: async () => {
         try {
-          await deleteJSONAPI(selectedFiles);
+          await deleteAASXAPI(selectedFiles);
 
           setAlertModal({
             open: true,
@@ -121,7 +127,6 @@ export default function JSONList() {
   const handleFactoryChange = (factoryId: number) => {
     setSelectedFactory(factoryId);
     setSelectedFiles([]);
-    // 공장 변경 시 파일 목록은 그대로 유지 (검색 버튼을 눌러야만 새로 조회)
   };
 
   const handleSearch = () => {
@@ -163,8 +168,9 @@ export default function JSONList() {
   const getFiles = async (start = startDate, end = endDate) => {
     const startDateStr = start ? dayjs(start).format('YYYY-MM-DD') : '';
     const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
+    const af_kind = KINDS.AASX_KIND;
 
-    const data: File[] = await getJSONFilesAPI(startDateStr, endDateStr, selectedFactory);
+    const data: File[] = await getFilesAPI(startDateStr, endDateStr, selectedFactory, af_kind);
     setFiles(Array.isArray(data) ? data : []);
   };
 
@@ -191,56 +197,51 @@ export default function JSONList() {
     });
   };
 
+  const handleDoubleClick = (file: File) => {
+    const aasxFile: AASXFile = {
+      af_idx: file.af_idx,
+      af_name: file.af_name,
+      createdAt: file.createdAt,
+    };
+    onEditClick(aasxFile);
+  };
+
   const handleCloseAlert = () => {
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
   const handleNavigationReset = () => {
-    handleReset();
-  };
-
-  useEffect(() => {
-    if (navigationReset) {
-      handleNavigationReset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigationReset]);
-
-  useEffect(() => {
+    setSelectedFiles([]);
+    setSelectAll(false);
+    handlePageChange(null, 0);
+    // 초기화 시에는 날짜만 설정하고 파일 조회는 하지 않음
     const defaultStart = dayjs().subtract(1, 'month');
     const defaultEnd = dayjs();
     setStartDate(defaultStart);
     setEndDate(defaultEnd);
+    setSelectedFactory('');
+    setFiles([]);
+  };
+
+  useEffect(() => {
+    handleNavigationReset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // location.state에서 alert 정보 확인
-  useEffect(() => {
-    if (location.state?.showAlert) {
-      setAlertModal({
-        open: true,
-        title: location.state.alertTitle || '알림',
-        content: location.state.alertContent || '',
-        type: 'alert',
-        onConfirm: undefined,
-      });
-      // state 초기화
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.state, navigate, location.pathname]);
+  }, [navigationReset]);
 
   useEffect(() => {
-    if (files && files.length > 0) {
-      const allSelected = files.every((file) => selectedFiles.includes(file.af_idx));
-      setSelectAll(allSelected);
+    if (selectedFiles.length === 0) {
+      setSelectAll(false);
+    } else if (selectedFiles.length === files.length) {
+      setSelectAll(true);
     } else {
       setSelectAll(false);
     }
   }, [selectedFiles, files]);
 
-  const handleRowClick = (af_idx: number) => {
-    navigate(`/aasx/json/detail/${af_idx}`);
-  };
+  // getFiles를 ref로 노출
+  useImperativeHandle(ref, () => ({
+    refresh: getFiles,
+  }));
 
   return (
     <div className='table-outer'>
@@ -281,7 +282,7 @@ export default function JSONList() {
                 <div className='sort-title'>생성일</div>
               </Grid>
               <Grid>
-                <BasicDatePicker startDate={startDate} endDate={endDate} onDateChange={handleDateChange} />
+                <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
               </Grid>
             </Grid>
           </Grid>
@@ -290,6 +291,11 @@ export default function JSONList() {
 
       <ActionBox
         buttons={[
+          {
+            text: '파일등록',
+            onClick: onAddClick,
+            color: 'success',
+          },
           {
             text: '파일삭제',
             onClick: handleDelete,
@@ -317,32 +323,32 @@ export default function JSONList() {
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
+                <TableCell align='center'>수정</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {pagedData && pagedData.length > 0 ? (
-                pagedData?.map((file, idx) => (
-                  <JSONTableRow
+              {paginatedData(sortedFiles || []).length > 0 ? (
+                paginatedData(sortedFiles || []).map((file: File, idx: number) => (
+                  <AASXTableRow
                     file={file}
                     key={idx}
                     onCheckboxChange={handleCheckboxChange}
                     checked={selectedFiles.includes(file.af_idx)}
+                    onEditClick={handleDoubleClick}
                     totalCount={files.length}
-                    onRowClick={handleRowClick}
                   />
                 ))
               ) : (
-                <TableEmptyRow colSpan={sortableColumns.length + 1} />
+                <TableEmptyRow colSpan={sortableColumns.length + 3} />
               )}
             </TableBody>
           </Table>
         </TableContainer>
-
         <Pagination
           count={files ? files.length : 0}
           page={currentPage}
           rowsPerPage={rowsPerPage}
-          onPageChange={(event, page) => goToPage(page)}
+          onPageChange={handlePageChange}
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </div>
@@ -357,4 +363,4 @@ export default function JSONList() {
       />
     </div>
   );
-}
+});
