@@ -234,7 +234,6 @@ export default function CustomizedDialogs({
                         size='small'
                         value={pcIp}
                         onChange={(e) => setPcIp(e.target.value)}
-                        placeholder='예: 192.168.0.1'
                         className='width-120'
                       />
                       <span>:</span>
