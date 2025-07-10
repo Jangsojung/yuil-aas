@@ -26,7 +26,7 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const getFiles = async (af_kind, fc_idx, startDate, endDate, res, limit = null) => {
+export const getFiles = async (af_kind, fc_idx, startDate, endDate, limit, res) => {
   try {
     const result = await getFilesFromDB(af_kind, fc_idx, startDate, endDate, null, limit);
     successResponse(res, result);

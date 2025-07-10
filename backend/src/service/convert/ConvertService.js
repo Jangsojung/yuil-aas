@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { pool } from '../../index.js';
+import { pool } from '../../config/database.js';
 import { fileURLToPath } from 'url';
 import { getBaseFCIdxFromDB } from '../basic_code/BasicCodeService.js';
 
@@ -8,13 +8,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedConvert, user_idx, af_kind) => {
-  const formattedStart = startDate.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
-  const formattedEnd = endDate.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
-  const startDateTime = `${formattedStart} 00:00:00`;
-  const endDateTime = `${formattedEnd} 23:59:59`;
-
   try {
-    const baseFCIdx = await getBaseFCIdxFromDB(selectedConvert);
+    // 파라미터 검증
+    const validatedFcIdx = fc_idx && fc_idx !== null && fc_idx !== undefined ? fc_idx : null;
+    const validatedStartDate = startDate && startDate !== null && startDate !== undefined ? startDate : null;
+    const validatedEndDate = endDate && endDate !== null && endDate !== undefined ? endDate : null;
+    const validatedSelectedConvert =
+      selectedConvert && selectedConvert !== null && selectedConvert !== undefined ? selectedConvert : null;
+    const validatedUserIdx = user_idx && user_idx !== null && user_idx !== undefined ? user_idx : null;
+    const validatedAfKind = af_kind && af_kind !== null && af_kind !== undefined ? af_kind : null;
+
+    if (!validatedStartDate || !validatedEndDate || !validatedSelectedConvert) {
+      throw new Error('필수 파라미터가 누락되었습니다.');
+    }
+
+    const formattedStart = validatedStartDate.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
+    const formattedEnd = validatedEndDate.replace(/(\d{2})(\d{2})(\d{2})/, '20$1-$2-$3');
+    const startDateTime = `${formattedStart} 00:00:00`;
+    const endDateTime = `${formattedEnd} 23:59:59`;
+
+    const baseFCIdx = await getBaseFCIdxFromDB(validatedSelectedConvert);
     if (!baseFCIdx) {
       throw new Error('선택된 기초코드의 공장 정보를 찾을 수 없습니다.');
     }

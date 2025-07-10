@@ -1,11 +1,13 @@
-import express from 'express';
+import { createRouter, extractors } from '../../utils/routerHelper.js';
 import { insertConverts } from '../../controller/convert/ConvertController.js';
 
-const router = express.Router();
+const routes = [
+  {
+    method: 'post',
+    path: '/',
+    controller: insertConverts,
+    extractor: extractors.fromBody(['fc_idx', 'user_idx', 'startDate', 'endDate', 'selectedConvert', 'af_kind']),
+  },
+];
 
-router.post('/', (req, res) => {
-  const { fc_idx, user_idx, startDate, endDate, selectedConvert, af_kind } = req.body;
-  insertConverts(fc_idx, startDate, endDate, selectedConvert, user_idx, af_kind, res);
-});
-
-export default router;
+export default createRouter(routes);

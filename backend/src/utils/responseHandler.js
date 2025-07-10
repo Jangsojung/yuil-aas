@@ -2,12 +2,16 @@ import { ERROR_MESSAGES, HTTP_STATUS } from '../constants/errors.js';
 
 // 성공 응답 유틸리티
 export const successResponse = (res, data, status = HTTP_STATUS.OK) => {
-  res.status(status).json(data);
+  if (res && typeof res.status === 'function') {
+    res.status(status).json(data);
+  }
 };
 
 // 에러 응답 유틸리티
 export const errorResponse = (res, message, status = HTTP_STATUS.INTERNAL_SERVER_ERROR) => {
-  res.status(status).json({ error: message });
+  if (res && typeof res.status === 'function') {
+    res.status(status).json({ error: message });
+  }
 };
 
 // 내부 서버 에러 응답

@@ -1,52 +1,54 @@
-import { pool } from '../../index.js';
+import { pool } from '../../config/database.js';
 
 export const getBaseByIdFromDB = async (ab_idx) => {
-  return new Promise((resolve, reject) => {
+  try {
+    // 파라미터 검증
+    const validatedAbIdx = ab_idx !== null && ab_idx !== undefined ? ab_idx : null;
+
     const query = `
       SELECT b.ab_idx, b.ab_name, b.ab_note, b.fc_idx, b.createdAt, b.updatedAt 
       FROM tb_aasx_base b
       WHERE b.ab_idx = ?
     `;
 
-    pool.query(query, [ab_idx], (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
-        resolve(results[0]);
-      }
-    });
-  });
+    const [results] = await pool.promise().query(query, [validatedAbIdx]);
+
+    if (results.length === 0) {
+      return null;
+    }
+    return results[0];
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getBaseFCIdxFromDB = async (ab_idx) => {
-  return new Promise((resolve, reject) => {
+  try {
+    // 파라미터 검증
+    const validatedAbIdx = ab_idx !== null && ab_idx !== undefined ? ab_idx : null;
+
     const query = 'SELECT fc_idx FROM tb_aasx_base WHERE ab_idx = ? LIMIT 1';
 
-    pool.query(query, [ab_idx], (err, results) => {
-      if (err) {
-        reject(err);
-        return;
-      }
+    const [results] = await pool.promise().query(query, [validatedAbIdx]);
 
-      if (results.length === 0) {
-        resolve(null);
-        return;
-      }
+    if (results.length === 0) {
+      return null;
+    }
 
-      resolve(results[0].fc_idx);
-    });
-  });
+    return results[0].fc_idx;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getBasesFromDB = async (fc_idx) => {
-  return new Promise((resolve, reject) => {
+  try {
+    // 파라미터 검증
+    const validatedFcIdx = fc_idx !== null && fc_idx !== undefined ? fc_idx : null;
+
     let query = '';
     let params = [];
-    if (fc_idx === -1) {
+    if (validatedFcIdx === -1 || validatedFcIdx === null) {
       query = `
         SELECT DISTINCT b.ab_idx, b.ab_name, b.ab_note, COUNT(bs.sn_idx) as sn_length, b.createdAt, b.updatedAt, a.fc_idx, d.fc_name
         FROM tb_aasx_base b
@@ -71,36 +73,33 @@ export const getBasesFromDB = async (fc_idx) => {
         GROUP BY b.ab_idx, b.ab_name, b.ab_note, b.createdAt, b.updatedAt, a.fc_idx, d.fc_name
         ORDER BY b.ab_idx DESC
       `;
-      params.push(fc_idx);
+      params.push(validatedFcIdx);
     }
 
-    pool.query(query, params, async (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve([]);
-          return;
-        }
+    const [results] = await pool.promise().query(query, params);
 
-        // fc_idx, fc_name 정보 추가
-        const bases = results.map((base) => {
-          return {
-            ab_idx: base.ab_idx,
-            ab_name: base.ab_name,
-            ab_note: base.ab_note,
-            fc_idx: base.fc_idx,
-            fc_name: base.fc_name,
-            sn_length: base.sn_length,
-            createdAt: base.createdAt,
-            updatedAt: base.updatedAt,
-          };
-        });
+    if (results.length === 0) {
+      return [];
+    }
 
-        resolve(bases);
-      }
+    // fc_idx, fc_name 정보 추가
+    const bases = results.map((base) => {
+      return {
+        ab_idx: base.ab_idx,
+        ab_name: base.ab_name,
+        ab_note: base.ab_note,
+        fc_idx: base.fc_idx,
+        fc_name: base.fc_name,
+        sn_length: base.sn_length,
+        createdAt: base.createdAt,
+        updatedAt: base.updatedAt,
+      };
     });
-  });
+
+    return bases;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const insertBasesToDB = async (name, note, ids, user_idx, fc_idx) => {
@@ -171,115 +170,115 @@ export const deleteBasesFromDB = async (ids) => {
 };
 
 export const getSelectedSensorsFromDB = async (ab_idx) => {
-  return new Promise((resolve, reject) => {
+  try {
     const query = 'select sn_idx from tb_aasx_base_sensor where ab_idx = ?';
 
-    pool.query(query, [ab_idx], (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+    const [results] = await pool.promise().query(query, [ab_idx]);
 
-        const sensors = results.map((sensor) => {
-          return {
-            sn_idx: sensor.sn_idx,
-          };
-        });
+    if (results.length === 0) {
+      return null;
+    }
 
-        resolve(sensors);
-      }
+    const sensors = results.map((sensor) => {
+      return {
+        sn_idx: sensor.sn_idx,
+      };
     });
-  });
+
+    return sensors;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getFacilityGroupsFromDB = async (fc_idx, order = 'asc') => {
-  return new Promise((resolve, reject) => {
-    const validOrder = order;
+  try {
+    // order 파라미터가 null인 경우 기본값 사용
+    const validOrder = order || 'asc';
 
-    const query = `select fg_idx, fg_name, origin_check from tb_aasx_data_aas where fc_idx = ? order by fg_idx ${validOrder}`;
+    let query;
+    let params = [];
 
-    pool.query(query, [fc_idx], (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+    if (fc_idx === -1 || fc_idx === null) {
+      // 전체 설비그룹 조회
+      query = `select fg_idx, fg_name, fc_idx, origin_check from tb_aasx_data_aas order by fg_idx ${validOrder}`;
+    } else {
+      // 특정 공장의 설비그룹 조회
+      query = `select fg_idx, fg_name, fc_idx, origin_check from tb_aasx_data_aas where fc_idx = ? order by fg_idx ${validOrder}`;
+      params = [fc_idx];
+    }
 
-        const facilityGroups = results.map((facilityGroup) => {
-          return {
-            fg_idx: facilityGroup.fg_idx,
-            fg_name: facilityGroup.fg_name,
-            origin_check: facilityGroup.origin_check || -1,
-          };
-        });
+    const [results] = await pool.promise().query(query, params);
 
-        resolve(facilityGroups);
-      }
+    if (results.length === 0) {
+      return null;
+    }
+
+    const facilityGroups = results.map((facilityGroup) => {
+      return {
+        fg_idx: facilityGroup.fg_idx,
+        fg_name: facilityGroup.fg_name,
+        fc_idx: facilityGroup.fc_idx,
+        origin_check: facilityGroup.origin_check || -1,
+      };
     });
-  });
+
+    return facilityGroups;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getSensorsFromDB = async (fa_idx) => {
-  return new Promise((resolve, reject) => {
+  try {
     const query = 'select sn_idx, sn_name, origin_check from tb_aasx_data_prop where fa_idx = ?';
 
-    pool.query(query, [fa_idx], (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+    const [results] = await pool.promise().query(query, [fa_idx]);
 
-        const sensors = results.map((sensor) => {
-          return {
-            sn_idx: sensor.sn_idx,
-            sn_name: sensor.sn_name,
-            origin_check: sensor.origin_check || -1,
-          };
-        });
+    if (results.length === 0) {
+      return null;
+    }
 
-        resolve(sensors);
-      }
+    const sensors = results.map((sensor) => {
+      return {
+        sn_idx: sensor.sn_idx,
+        sn_name: sensor.sn_name,
+        origin_check: sensor.origin_check || -1,
+      };
     });
-  });
+
+    return sensors;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getBaseCodeFromDB = async (fg_idx) => {
-  return new Promise((resolve, reject) => {
+  try {
     const query = `SELECT fa_idx, fa_name, origin_check from tb_aasx_data_sm where fg_idx =  ?;`;
 
-    pool.query(query, [fg_idx], (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+    const [results] = await pool.promise().query(query, [fg_idx]);
 
-        const basics = results.map((basic) => {
-          return {
-            fa_idx: basic.fa_idx,
-            fa_name: basic.fa_name,
-            origin_check: basic.origin_check || -1,
-          };
-        });
+    if (results.length === 0) {
+      return null;
+    }
 
-        resolve(basics);
-      }
+    const basics = results.map((basic) => {
+      return {
+        fa_idx: basic.fa_idx,
+        fa_name: basic.fa_name,
+        origin_check: basic.origin_check || -1,
+      };
     });
-  });
+
+    return basics;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getAllSensorsInGroupFromDB = async (fg_idx) => {
-  return new Promise((resolve, reject) => {
+  try {
     const query = `
       SELECT p.sn_idx, p.sn_name, p.origin_check 
       FROM tb_aasx_data_prop p
@@ -287,31 +286,28 @@ export const getAllSensorsInGroupFromDB = async (fg_idx) => {
       WHERE s.fg_idx = ?
     `;
 
-    pool.query(query, [fg_idx], (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+    const [results] = await pool.promise().query(query, [fg_idx]);
 
-        const sensors = results.map((sensor) => {
-          return {
-            sn_idx: sensor.sn_idx,
-            sn_name: sensor.sn_name,
-            origin_check: sensor.origin_check || -1,
-          };
-        });
+    if (results.length === 0) {
+      return null;
+    }
 
-        resolve(sensors);
-      }
+    const sensors = results.map((sensor) => {
+      return {
+        sn_idx: sensor.sn_idx,
+        sn_name: sensor.sn_name,
+        origin_check: sensor.origin_check || -1,
+      };
     });
-  });
+
+    return sensors;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getFactoriesByCmIdxFromDB = async (cm_idx) => {
-  return new Promise((resolve, reject) => {
+  try {
     // tb_aasx_data에서 공장 목록 조회 (외래키 제약 조건을 만족하기 위해)
     const query = `
       SELECT DISTINCT a.fc_idx, a.fc_name, a.origin_check
@@ -321,27 +317,24 @@ export const getFactoriesByCmIdxFromDB = async (cm_idx) => {
       ORDER BY a.fc_idx
     `;
 
-    pool.query(query, [cm_idx], (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+    const [results] = await pool.promise().query(query, [cm_idx]);
 
-        const factories = results.map((factory) => {
-          return {
-            fc_idx: factory.fc_idx,
-            fc_name: factory.fc_name,
-            origin_check: factory.origin_check || -1,
-          };
-        });
+    if (results.length === 0) {
+      return null;
+    }
 
-        resolve(factories);
-      }
+    const factories = results.map((factory) => {
+      return {
+        fc_idx: factory.fc_idx,
+        fc_name: factory.fc_name,
+        origin_check: factory.origin_check || -1,
+      };
     });
-  });
+
+    return factories;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // 공장 추가
@@ -509,10 +502,9 @@ export const syncFactoriesToAasxData = async () => {
 };
 
 export const getSensorValuesFromDB = async (sensorIds) => {
-  return new Promise((resolve, reject) => {
+  try {
     if (!sensorIds || sensorIds.length === 0) {
-      resolve([]);
-      return;
+      return [];
     }
 
     // 임시로 더미 데이터 반환
@@ -524,6 +516,8 @@ export const getSensorValuesFromDB = async (sensorIds) => {
       sn_timestamp: new Date().toISOString(),
     }));
 
-    resolve(dummyValues);
-  });
+    return dummyValues;
+  } catch (err) {
+    throw err;
+  }
 };

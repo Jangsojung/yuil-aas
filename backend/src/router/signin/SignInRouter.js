@@ -1,12 +1,13 @@
-import express from 'express';
+import { createRouter, extractors } from '../../utils/routerHelper.js';
 import { getUser } from '../../controller/signin/SignInController.js';
 
-const router = express.Router();
+const routes = [
+  {
+    method: 'post',
+    path: '/',
+    controller: getUser,
+    extractor: extractors.fromBody(['email', 'password']),
+  },
+];
 
-router.post('/', (req, res) => {
-  const { email, password } = req.body;
-
-  getUser(email, password, res);
-});
-
-export default router;
+export default createRouter(routes);

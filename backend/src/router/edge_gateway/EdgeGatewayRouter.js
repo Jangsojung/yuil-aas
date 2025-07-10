@@ -1,4 +1,4 @@
-import express from 'express';
+import { createRouter, extractors } from '../../utils/routerHelper.js';
 import {
   getEdgeGateways,
   getEdgeGatewaysWithStatus,
@@ -8,37 +8,43 @@ import {
   checkEdgeGatewayPing,
 } from '../../controller/edge_gateway/EdgeGatewayController.js';
 
-const router = express.Router();
+const routes = [
+  {
+    method: 'post',
+    path: '/',
+    controller: getEdgeGateways,
+    extractor: () => [],
+  },
+  {
+    method: 'post',
+    path: '/status',
+    controller: getEdgeGatewaysWithStatus,
+    extractor: () => [],
+  },
+  {
+    method: 'post',
+    path: '/insert',
+    controller: insertEdgeGateways,
+    extractor: extractors.fromBody(['pcName', 'pcIp', 'pcPort', 'user_idx']),
+  },
+  {
+    method: 'put',
+    path: '/',
+    controller: updateEdgeGateway,
+    extractor: extractors.fromBody(['eg_idx', 'pcName', 'pcIp', 'pcPort', 'user_idx']),
+  },
+  {
+    method: 'delete',
+    path: '/',
+    controller: deleteEdgeGateways,
+    extractor: extractors.fromBody(['ids']),
+  },
+  {
+    method: 'post',
+    path: '/ping',
+    controller: checkEdgeGatewayPing,
+    extractor: extractors.fromBody(['ip', 'port']),
+  },
+];
 
-router.post('/', (req, res) => {
-  getEdgeGateways(res);
-});
-
-router.post('/status', (req, res) => {
-  getEdgeGatewaysWithStatus(res);
-});
-
-router.post('/insert', (req, res) => {
-  const { user_idx } = req.body;
-  const { pcName, pcIp, pcPort } = req.body;
-  insertEdgeGateways(pcName, pcIp, pcPort, user_idx, res);
-});
-
-router.put('/', (req, res) => {
-  const { eg_idx, user_idx } = req.body;
-  const { pcName, pcIp, pcPort } = req.body;
-
-  updateEdgeGateway(eg_idx, pcName, pcIp, pcPort, user_idx, res);
-});
-
-router.delete('/', (req, res) => {
-  const { ids } = req.body;
-  deleteEdgeGateways(ids, res);
-});
-
-router.post('/ping', (req, res) => {
-  const { ip, port } = req.body;
-  checkEdgeGatewayPing(ip, port, res);
-});
-
-export default router;
+export default createRouter(routes);

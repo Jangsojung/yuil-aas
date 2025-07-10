@@ -1,13 +1,16 @@
-import { pool } from '../../index.js';
+import { pool } from '../../config/database.js';
 
 export const insertFacilityGroup = async (name) => {
   try {
+    // 파라미터 검증
+    const validatedName = name && name !== null && name !== undefined ? name : null;
+
     // 가장 마지막 fg_idx 조회
     const [maxResult] = await pool.promise().query('SELECT MAX(fg_idx) as max_idx FROM tb_aasx_data_aas');
     const nextFgIdx = (maxResult[0].max_idx || 0) + 1;
 
     const query = 'INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx, origin_check) VALUES (?, ?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextFgIdx, name, 3, 0]);
+    const [result] = await pool.promise().query(query, [nextFgIdx, validatedName, 3, 0]);
     return nextFgIdx;
   } catch (err) {
     throw err;
@@ -16,12 +19,16 @@ export const insertFacilityGroup = async (name) => {
 
 export const insertFacility = async (fg_idx, name) => {
   try {
+    // 파라미터 검증
+    const validatedFgIdx = fg_idx && fg_idx !== null && fg_idx !== undefined ? fg_idx : null;
+    const validatedName = name && name !== null && name !== undefined ? name : null;
+
     // 가장 마지막 fa_idx 조회
     const [maxResult] = await pool.promise().query('SELECT MAX(fa_idx) as max_idx FROM tb_aasx_data_sm');
     const nextFaIdx = (maxResult[0].max_idx || 0) + 1;
 
     const query = 'INSERT INTO tb_aasx_data_sm (fa_idx, fg_idx, fa_name, origin_check) VALUES (?, ?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextFaIdx, fg_idx, name, 0]);
+    const [result] = await pool.promise().query(query, [nextFaIdx, validatedFgIdx, validatedName, 0]);
     return nextFaIdx;
   } catch (err) {
     throw err;
@@ -30,12 +37,16 @@ export const insertFacility = async (fg_idx, name) => {
 
 export const insertSensor = async (fa_idx, name) => {
   try {
+    // 파라미터 검증
+    const validatedFaIdx = fa_idx && fa_idx !== null && fa_idx !== undefined ? fa_idx : null;
+    const validatedName = name && name !== null && name !== undefined ? name : null;
+
     // 가장 마지막 sn_idx 조회
     const [maxResult] = await pool.promise().query('SELECT MAX(sn_idx) as max_idx FROM tb_aasx_data_prop');
     const nextSnIdx = (maxResult[0].max_idx || 0) + 1;
 
     const query = 'INSERT INTO tb_aasx_data_prop (sn_idx, fa_idx, sn_name, origin_check) VALUES (?, ?, ?, ?)';
-    const [result] = await pool.promise().query(query, [nextSnIdx, fa_idx, name, 0]);
+    const [result] = await pool.promise().query(query, [nextSnIdx, validatedFaIdx, validatedName, 0]);
     return nextSnIdx;
   } catch (err) {
     throw err;
@@ -44,8 +55,11 @@ export const insertSensor = async (fa_idx, name) => {
 
 export const deleteSensors = async (sensorIds) => {
   try {
+    // 파라미터 검증
+    const validatedSensorIds = sensorIds && Array.isArray(sensorIds) && sensorIds.length > 0 ? sensorIds : [];
+
     const query = 'SELECT sn_idx, sn_name, fa_idx, origin_check FROM tb_aasx_data_prop WHERE sn_idx IN (?)';
-    const [results] = await pool.promise().query(query, [sensorIds]);
+    const [results] = await pool.promise().query(query, [validatedSensorIds]);
 
     if (results.length === 0) {
       return {

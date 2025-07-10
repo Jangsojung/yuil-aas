@@ -1,30 +1,29 @@
-import { pool } from '../../index.js';
+import { pool } from '../../config/database.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { FILE_KINDS, FILE } from '../../constants/index.js';
+import { validatePythonServerURL } from '../../config/validation.js';
+
+const PYTHON_SERVER_URL = validatePythonServerURL();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const getFileFCIdxFromDB = async (fileName, af_kind) => {
-  return new Promise((resolve, reject) => {
+  try {
     const query = `SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ? LIMIT 1`;
 
-    pool.query(query, [fileName, af_kind], (err, results) => {
-      if (err) {
-        reject(err);
-        return;
-      }
+    const [results] = await pool.promise().query(query, [fileName, af_kind]);
 
-      if (results.length === 0) {
-        resolve(null);
-        return;
-      }
+    if (results.length === 0) {
+      return null;
+    }
 
-      resolve(results[0].fc_idx);
-    });
-  });
+    return results[0].fc_idx;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const getFilesFromDB = async (
@@ -35,26 +34,34 @@ export const getFilesFromDB = async (
   user_idx = null,
   limit = null
 ) => {
-  return new Promise((resolve, reject) => {
+  try {
     let query = '';
     const queryParams = [];
 
+    // 파라미터 검증 및 변환
+    const validatedAfKind = af_kind !== null && af_kind !== undefined ? af_kind : null;
+    const validatedFcIdx = fc_idx !== null && fc_idx !== undefined && fc_idx !== -1 ? fc_idx : null;
+    const validatedStartDate = startDate && startDate !== null && startDate !== undefined ? startDate : null;
+    const validatedEndDate = endDate && endDate !== null && endDate !== undefined ? endDate : null;
+    const validatedLimit =
+      limit && limit !== null && limit !== undefined && !isNaN(Number(limit)) ? Number(limit) : null;
+
     let baseWhereClause = `f.af_kind = ?`;
-    queryParams.push(af_kind);
-    if (fc_idx !== -1) {
+    queryParams.push(validatedAfKind);
+    if (validatedFcIdx !== null) {
       baseWhereClause += ` AND f.fc_idx = ?`;
-      queryParams.push(fc_idx);
+      queryParams.push(validatedFcIdx);
     }
 
     let dateClause = '';
-    if (startDate && endDate) {
+    if (validatedStartDate && validatedEndDate) {
       dateClause = ` AND f.createdAt BETWEEN ? AND ?`;
-      const startDateTime = `${startDate} 00:00:00`;
-      const endDateTime = `${endDate} 23:59:59`;
+      const startDateTime = `${validatedStartDate} 00:00:00`;
+      const endDateTime = `${validatedEndDate} 23:59:59`;
       queryParams.push(startDateTime, endDateTime);
     }
 
-    if (af_kind === FILE_KINDS.JSON_KIND) {
+    if (validatedAfKind === FILE_KINDS.JSON_KIND) {
       query = `
         SELECT 
           f.af_idx, 
@@ -76,8 +83,8 @@ export const getFilesFromDB = async (
         ${dateClause}
         GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name, b.ab_name
         ORDER BY f.af_idx DESC`;
-      if (limit) query += ` LIMIT ?`;
-    } else if (af_kind === FILE_KINDS.AASX_KIND) {
+      if (validatedLimit) query += ` LIMIT ?`;
+    } else if (validatedAfKind === FILE_KINDS.AASX_KIND) {
       query = `
         SELECT 
           f.af_idx, 
@@ -93,7 +100,7 @@ export const getFilesFromDB = async (
         ${dateClause}
         GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name
         ORDER BY f.af_idx DESC`;
-      if (limit) query += ` LIMIT ?`;
+      if (validatedLimit) query += ` LIMIT ?`;
     } else {
       query = `
         SELECT f.af_idx, f.af_name, f.createdAt, f.updatedAt
@@ -101,56 +108,52 @@ export const getFilesFromDB = async (
         WHERE ${baseWhereClause}
         ${dateClause}
         ORDER BY f.af_idx DESC`;
-      if (limit) query += ` LIMIT ?`;
+      if (validatedLimit) query += ` LIMIT ?`;
     }
 
-    if (limit) queryParams.push(limit);
+    if (validatedLimit) queryParams.push(validatedLimit);
 
-    pool.query(query, queryParams, (err, results) => {
-      if (err) {
-        reject(err);
-        return;
+    const [results] = await pool.promise().query(query, queryParams);
+
+    if (results.length === 0) {
+      return null;
+    }
+
+    const files = results.map((file) => {
+      if (af_kind === FILE_KINDS.JSON_KIND) {
+        return {
+          af_idx: file.af_idx,
+          af_name: file.af_name,
+          createdAt: file.createdAt,
+          updatedAt: file.updatedAt,
+          fc_idx: file.fc_idx,
+          fc_name: file.fc_name || '-',
+          base_name: file.base_name || '삭제된 기초코드',
+          sn_length: Number(file.sn_length) || 0,
+        };
+      } else if (af_kind === FILE_KINDS.AASX_KIND) {
+        return {
+          af_idx: file.af_idx,
+          af_name: file.af_name,
+          createdAt: file.createdAt,
+          updatedAt: file.updatedAt,
+          fc_idx: file.fc_idx,
+          fc_name: file.fc_name || '-',
+        };
+      } else {
+        return {
+          af_idx: file.af_idx,
+          af_name: file.af_name,
+          createdAt: file.createdAt,
+          updatedAt: file.updatedAt,
+        };
       }
-
-      if (results.length === 0) {
-        resolve(null);
-        return;
-      }
-
-      const files = results.map((file) => {
-        if (af_kind === FILE_KINDS.JSON_KIND) {
-          return {
-            af_idx: file.af_idx,
-            af_name: file.af_name,
-            createdAt: file.createdAt,
-            updatedAt: file.updatedAt,
-            fc_idx: file.fc_idx,
-            fc_name: file.fc_name || '-',
-            base_name: file.base_name || '삭제된 기초코드',
-            sn_length: Number(file.sn_length) || 0,
-          };
-        } else if (af_kind === FILE_KINDS.AASX_KIND) {
-          return {
-            af_idx: file.af_idx,
-            af_name: file.af_name,
-            createdAt: file.createdAt,
-            updatedAt: file.updatedAt,
-            fc_idx: file.fc_idx,
-            fc_name: file.fc_name || '-',
-          };
-        } else {
-          return {
-            af_idx: file.af_idx,
-            af_name: file.af_name,
-            createdAt: file.createdAt,
-            updatedAt: file.updatedAt,
-          };
-        }
-      });
-
-      resolve(files);
     });
-  });
+
+    return files;
+  } catch (err) {
+    throw err;
+  }
 };
 
 export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
@@ -175,7 +178,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
     const frontFilePath = `../files/front/${fileName}`;
 
     try {
-      const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+      const aasResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -221,7 +224,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
     const aasFilePath = `../files/aas/${fileName}`;
 
     try {
-      const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
+      const aasxResponse = await fetch(`${PYTHON_SERVER_URL}/api/aasx`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -304,7 +307,7 @@ const cleanupCreatedFiles = async (createdFiles) => {
     // 실제 파일 삭제
     const deletePaths = createdFiles.map((file) => file.path);
     if (deletePaths.length > 0) {
-      const deleteResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+      const deleteResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -367,7 +370,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
     const frontFilePath = `../files/front/${fileName}`;
 
     try {
-      const aasResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+      const aasResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -411,7 +414,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
     const aasFilePath = `../files/aas/${fileName}`;
 
     try {
-      const aasxResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aasx`, {
+      const aasxResponse = await fetch(`${PYTHON_SERVER_URL}/api/aasx`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -442,7 +445,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
     newAasxInsertId = aasxResult.insertId;
     createdFiles.push({ type: 'aasx', path: `../files/aasx/${newAasxFileName}`, insertId: newAasxInsertId });
 
-    const deleteResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+    const deleteResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -530,7 +533,7 @@ export const deleteFilesFromDB = async (ids) => {
     await pool.promise().query(deleteQuery, [ids]);
 
     if (deletePaths.length > 0) {
-      const pythonResponse = await fetch(`${process.env.PYTHON_SERVER_URL || 'http://localhost:5000'}/api/aas`, {
+      const pythonResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

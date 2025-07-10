@@ -1,37 +1,34 @@
-import { pool } from '../../index.js';
+import { pool } from '../../config/database.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
 export const getEdgeGatewaysFromDB = async () => {
-  return new Promise((resolve, reject) => {
+  try {
     const query =
       'select eg_idx, eg_pc_name, eg_ip_port, createdAt, updatedAt from tb_aasx_edge_gateway order by eg_idx desc';
 
-    pool.query(query, (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        if (results.length === 0) {
-          resolve(null);
-          return;
-        }
+    const [results] = await pool.promise().query(query);
 
-        const edgeGateways = results.map((eg) => {
-          return {
-            eg_idx: eg.eg_idx,
-            eg_pc_name: eg.eg_pc_name,
-            eg_ip_port: eg.eg_ip_port,
-            createdAt: eg.createdAt,
-            updatedAt: eg.updatedAt,
-          };
-        });
+    if (results.length === 0) {
+      return null;
+    }
 
-        resolve(edgeGateways);
-      }
+    const edgeGateways = results.map((eg) => {
+      return {
+        eg_idx: eg.eg_idx,
+        eg_pc_name: eg.eg_pc_name,
+        eg_ip_port: eg.eg_ip_port,
+        createdAt: eg.createdAt,
+        updatedAt: eg.updatedAt,
+      };
     });
-  });
+
+    return edgeGateways;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Ping을 통한 네트워크 상태 확인
@@ -107,10 +104,16 @@ export const getEdgeGatewaysWithRealTimeStatus = async () => {
 
 export const insertEdgeGatewaysToDB = async (pcName, pcIp, pcPort, user_idx) => {
   try {
-    const ipPort = `${pcIp}:${pcPort}`;
+    // 파라미터 검증
+    const validatedPcName = pcName && pcName !== null && pcName !== undefined ? pcName : null;
+    const validatedPcIp = pcIp && pcIp !== null && pcIp !== undefined ? pcIp : null;
+    const validatedPcPort = pcPort && pcPort !== null && pcPort !== undefined ? pcPort : null;
+    const validatedUserIdx = user_idx && user_idx !== null && user_idx !== undefined ? user_idx : null;
+
+    const ipPort = `${validatedPcIp}:${validatedPcPort}`;
 
     const query = `insert into tb_aasx_edge_gateway (eg_pc_name, eg_ip_port, creator, updater) values (?, ?, ?, ?)`;
-    const [result] = await pool.promise().query(query, [pcName, ipPort, user_idx, user_idx]);
+    const [result] = await pool.promise().query(query, [validatedPcName, ipPort, validatedUserIdx, validatedUserIdx]);
 
     return result.insertId;
   } catch (err) {
@@ -120,10 +123,17 @@ export const insertEdgeGatewaysToDB = async (pcName, pcIp, pcPort, user_idx) => 
 
 export const updateEdgeGatewayToDB = async (eg_idx, pcName, pcIp, pcPort, user_idx) => {
   try {
-    const ipPort = `${pcIp}:${pcPort}`;
+    // 파라미터 검증
+    const validatedEgIdx = eg_idx && eg_idx !== null && eg_idx !== undefined ? eg_idx : null;
+    const validatedPcName = pcName && pcName !== null && pcName !== undefined ? pcName : null;
+    const validatedPcIp = pcIp && pcIp !== null && pcIp !== undefined ? pcIp : null;
+    const validatedPcPort = pcPort && pcPort !== null && pcPort !== undefined ? pcPort : null;
+    const validatedUserIdx = user_idx && user_idx !== null && user_idx !== undefined ? user_idx : null;
+
+    const ipPort = `${validatedPcIp}:${validatedPcPort}`;
 
     const query = `update tb_aasx_edge_gateway set eg_pc_name = ?, eg_ip_port = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP where eg_idx = ?`;
-    await pool.promise().query(query, [pcName, ipPort, user_idx, eg_idx]);
+    await pool.promise().query(query, [validatedPcName, ipPort, validatedUserIdx, validatedEgIdx]);
   } catch (err) {
     throw err;
   }

@@ -1,6 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import { FILE } from '../../constants/index.js';
+import { createRouter, extractors } from '../../utils/routerHelper.js';
 import {
   getFiles,
   insertAASXFile,
@@ -16,8 +17,6 @@ import {
 } from '../../controller/file/FileController.js';
 import { fileRequiredError, afIdxRequiredError } from '../../utils/responseHandler.js';
 
-const router = express.Router();
-
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -25,76 +24,105 @@ const upload = multer({
   },
 });
 
-// AASX 파일 업로드 (파일 포함)
-router.post('/aasx', upload.single('file'), (req, res) => {
+// 파일 업로드 미들웨어
+const fileUploadMiddleware = (req, res, next) => {
   if (req.file) {
-    uploadAASXFile(req, res);
+    next();
   } else {
     fileRequiredError(res);
   }
-});
+};
 
-// AASX 파일 수정 (파일 없음)
-router.post('/aasx/update', (req, res) => {
-  const { fileName } = req.body;
-  const { af_idx, user_idx, fc_idx } = req.query;
-  if (af_idx) {
-    updateAASXFile(af_idx, fileName, user_idx, fc_idx, res);
+// af_idx 검증 미들웨어
+const afIdxValidationMiddleware = (req, res, next) => {
+  if (req.query.af_idx) {
+    next();
   } else {
     afIdxRequiredError(res);
   }
-});
+};
 
-router.delete('/aasx', (req, res) => {
-  const { ids } = req.body;
-  deleteFiles(ids, res);
-});
+const routes = [
+  {
+    method: 'post',
+    path: '/aasx',
+    controller: uploadAASXFile,
+    extractor: extractors.fullRequest(),
+    middleware: [upload.single('file'), fileUploadMiddleware],
+  },
+  {
+    method: 'post',
+    path: '/aasx/update',
+    controller: updateAASXFile,
+    extractor: (req) => [req.body.fileName, req.query.af_idx, req.query.user_idx, req.query.fc_idx],
+    middleware: [afIdxValidationMiddleware],
+  },
+  {
+    method: 'delete',
+    path: '/aasx',
+    controller: deleteFiles,
+    extractor: extractors.fromBody(['ids']),
+  },
+  {
+    method: 'delete',
+    path: '/files',
+    controller: deleteFiles,
+    extractor: extractors.fromBody(['ids']),
+  },
+  {
+    method: 'post',
+    path: '/aasxFiles',
+    controller: getFiles,
+    extractor: extractors.fromBody(['af_kind', 'fc_idx', 'startDate', 'endDate', 'limit']),
+  },
+  {
+    method: 'post',
+    path: '/jsonFiles',
+    controller: getFiles,
+    extractor: extractors.fromBody(['af_kind', 'fc_idx', 'startDate', 'endDate', 'limit']),
+  },
+  {
+    method: 'post',
+    path: '/checkFileSize',
+    controller: checkFileSize,
+    extractor: extractors.fromBody(['file']),
+  },
+  {
+    method: 'post',
+    path: '/verify',
+    controller: getVerify,
+    extractor: extractors.fromBody(['file']),
+  },
+  {
+    method: 'post',
+    path: '/words',
+    controller: getWords,
+    extractor: extractors.fromBody(['fc_idx']),
+  },
+  {
+    method: 'put',
+    path: '/words',
+    controller: updateWords,
+    extractor: extractors.fromBody(['updates']),
+  },
+  {
+    method: 'post',
+    path: '/search',
+    controller: getSearch,
+    extractor: extractors.fromBody(['fc_idx', 'type', 'text']),
+  },
+  {
+    method: 'post',
+    path: '/getFileFCIdx',
+    controller: getFileFCIdx,
+    extractor: extractors.fullRequest(),
+  },
+  {
+    method: 'post',
+    path: '/files',
+    controller: deleteFiles,
+    extractor: extractors.fromBody(['ids']),
+  },
+];
 
-router.delete('/files', (req, res) => {
-  const { ids } = req.body;
-  deleteFiles(ids, res);
-});
-
-router.post('/aasxFiles', (req, res) => {
-  const { af_kind, fc_idx, startDate, endDate, limit } = req.body;
-  getFiles(af_kind, fc_idx, startDate, endDate, res, limit);
-});
-
-router.post('/jsonFiles', (req, res) => {
-  const { af_kind, fc_idx, startDate, endDate, limit } = req.body;
-  getFiles(af_kind, fc_idx, startDate, endDate, res, limit);
-});
-
-router.post('/checkFileSize', (req, res) => {
-  const { file } = req.body;
-  checkFileSize(file, res);
-});
-
-router.post('/verify', (req, res) => {
-  const { file } = req.body;
-  getVerify(file, res);
-});
-
-router.post('/words', (req, res) => {
-  const { fc_idx } = req.body;
-  getWords(fc_idx, res);
-});
-
-router.put('/words', (req, res) => {
-  const { updates } = req.body;
-  updateWords(updates, res);
-});
-
-router.post('/search', (req, res) => {
-  const { fc_idx, type, text } = req.body;
-  getSearch(fc_idx, type, text, res);
-});
-
-router.post('/getFileFCIdx', getFileFCIdx);
-
-router.post('/files', (req, res) => {
-  const { ids } = req.body;
-  deleteFiles(ids, res);
-});
-
-export default router;
+export default createRouter(routes);

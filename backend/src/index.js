@@ -1,5 +1,4 @@
 import express from 'express';
-import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import http from 'http';
@@ -10,22 +9,15 @@ import ConvertRouter from './router/convert/ConvertRouter.js';
 import FileRouter from './router/file/FileRouter.js';
 import SignInRouter from './router/signin/SignInRouter.js';
 import FacilityRouter from './router/facility/FacilityRouter.js';
+import { testConnection } from './config/database.js';
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3001;
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
-
-export const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-});
 
 app.use('/api/base_code', BaseCodeRouter);
 app.use('/api/edge_gateway', EdgeGatewayRouter);
@@ -43,7 +35,17 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {});
 });
 
-server.listen(port, () => {});
+// 서버 시작 시 데이터베이스 연결 테스트
+testConnection().then((isConnected) => {
+  if (isConnected) {
+    server.listen(port, () => {
+      console.log(`서버가 포트 ${port}에서 실행 중입니다.`);
+    });
+  } else {
+    console.error('데이터베이스 연결 실패로 서버를 시작할 수 없습니다.');
+    process.exit(1);
+  }
+});
 
 const closeServer = () => {
   wss.clients.forEach((client) => {
