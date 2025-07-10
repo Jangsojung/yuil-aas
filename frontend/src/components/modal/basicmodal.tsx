@@ -123,8 +123,7 @@ export default function BasicModal({
                 multiline
                 minRows={3}
                 maxRows={5}
-                inputProps={{ maxLength: 500 }}
-                helperText={`${desc.length}/500`}
+                inputProps={{ maxLength: 50 }}
                 placeholder='비고'
               />
             </Grid>
