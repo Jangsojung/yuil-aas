@@ -2,8 +2,8 @@ import React from 'react';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import Checkbox from '@mui/material/Checkbox';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { SortDirection, SortableColumn } from '../../hooks/useSortableData';
 
 interface SortableTableHeaderProps<T> {
@@ -44,7 +44,15 @@ export const SortableTableHeader = <T extends Record<string, any>>({
           },
         }}
       >
-        {isActive ? isAsc ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
+        {isActive ? (
+          isAsc ? (
+            <ArrowUpwardIcon fontSize='small' />
+          ) : (
+            <ArrowDownwardIcon fontSize='small' />
+          )
+        ) : (
+          <ArrowUpwardIcon fontSize='small' />
+        )}
       </IconButton>
     );
   };
