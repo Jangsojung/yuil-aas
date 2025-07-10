@@ -2,9 +2,10 @@ import React from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import Grid from '@mui/system/Grid';
+import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import { FacilityGroupTree, Base } from '../../types/api';
-import { ActionBox } from '../common';
+import { ActionBox, SearchBox } from '../common';
 import LoadingOverlay from '../loading/LodingOverlay';
 
 import { styled, alpha } from '@mui/material/styles';
@@ -43,7 +44,15 @@ export const DetailView: React.FC<DetailViewProps> = ({
 }) => {
   return (
     <div className='table-outer'>
-      <div>
+      <SearchBox>
+      
+      </SearchBox>
+
+      <div className='list-header'>
+        <Typography variant='h6' gutterBottom>
+          제1공장 온조기
+        </Typography>
+
         <ActionBox
           buttons={[
             {

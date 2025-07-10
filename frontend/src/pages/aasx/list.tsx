@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import Grid from '@mui/system/Grid';
 import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../components/datepicker';
 import { FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox } from '@mui/material';
@@ -260,7 +261,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
           },
         ]}
       >
-        <Grid container spacing={1} className='flex-center-gap-lg'>
+        <Grid container spacing={4} className='flex-center-gap-lg'>
           <Grid container spacing={2}>
             <Grid className='sort-title'>
               <div>공장</div>
@@ -277,7 +278,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
             </Grid>
           </Grid>
           <Grid>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
               <Grid className='d-flex gap-5'>
                 <div className='sort-title'>생성일</div>
               </Grid>
@@ -289,20 +290,26 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
         </Grid>
       </SearchBox>
 
-      <ActionBox
-        buttons={[
-          {
-            text: '파일등록',
-            onClick: onAddClick,
-            color: 'success',
-          },
-          {
-            text: '파일삭제',
-            onClick: handleDelete,
-            color: 'error',
-          },
-        ]}
-      />
+      <div className='list-header'>
+        <Typography variant='h6' gutterBottom>
+          AASX 파일 목록
+        </Typography>
+
+        <ActionBox
+          buttons={[
+            {
+              text: '파일등록',
+              onClick: onAddClick,
+              color: 'primary',
+            },
+            {
+              text: '파일삭제',
+              onClick: handleDelete,
+              color: 'error',
+            },
+          ]}
+        />
+      </div>
 
       <div className='table-wrap'>
         <TableContainer component={Paper}>

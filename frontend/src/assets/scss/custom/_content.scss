@@ -72,6 +72,10 @@ main {
       .w-100 .MuiFormControl-root {
         width: 100%;
       }
+
+      .MuiInputBase-input.MuiOutlinedInput-input {
+        color: #637381;
+      }
     }
     .sort-box + .sort-box {
       border: 0;
@@ -154,6 +158,13 @@ main {
     .list-header {
       display: flex;
       justify-content: space-between;
+      padding-left: 15px;
+
+      .label {
+        font-size: 0.875rem;
+        display: inline-block;
+        padding-left: 3px;
+      }
     }
     .MuiTableContainer-root {
       border-radius: 0;
@@ -163,11 +174,11 @@ main {
       // display: flex;
       // flex-direction: column;
       // flex-grow: 1;
-      height: 100%;
+      height: calc(100% - 55px);
       // border: 1px solid #E5E8EB;
     }
     .table-wrap {
-      height: calc(100% - 180px);
+      height: calc(100% - 100px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -213,6 +224,21 @@ main {
         border-right: 1px solid #e5e8eb;
         border-bottom: 1px solid #e5e8eb;
         font-family: 'Public Sans', sans-serif;
+
+        .MuiOutlinedInput-root {
+          font-size: 0.875rem;
+        }
+        .MuiInputLabel-root {
+          display: none;
+          width: 0;
+          height: 0;
+        }
+        legend {
+          display: none;
+        }
+        .MuiOutlinedInput-notchedOutline {
+          top: 0;
+        }
       }
       td:last-child {
         border-right: 0;
@@ -232,6 +258,9 @@ main {
 
     //데이트피커
     .datepicker-wrap {
+      .MuiInputBase-root {
+        min-width: 165px;
+      }
       .MuiInputLabel-formControl {
         transform: translate(14px, 7px) scale(1);
         color: #90a4ae;

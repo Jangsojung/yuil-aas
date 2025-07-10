@@ -368,8 +368,7 @@ export default function ConvertPage() {
   return (
     <>
       <ProgressOverlay open={progressOpen} progress={progress} label='변환 중...' />
-      <div className='position-relative height-100'>
-        <div className={`table-outer ${isLoading ? 'pointer-events-none' : 'pointer-events-auto'}`}>
+      <div className={`table-outer ${isLoading ? 'pointer-events-none' : 'pointer-events-auto'}`}>
           <SearchBox
             buttons={[
               {
@@ -443,7 +442,7 @@ export default function ConvertPage() {
                 {
                   text: '변환',
                   onClick: handleConvert,
-                  color: 'success',
+                  color: 'primary',
                 },
               ]}
             />
@@ -505,7 +504,6 @@ export default function ConvertPage() {
           type={alertModal.type}
           onConfirm={alertModal.onConfirm}
         />
-      </div>
     </>
   );
 }

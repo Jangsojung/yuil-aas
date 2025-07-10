@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../../recoil/atoms';
 import { TextField } from '@mui/material';
+import Grid from '@mui/system/Grid';
 import Paper from '@mui/material/Paper';
-import { Checkbox, Table, TableBody, TableContainer, TableHead, TableRow, Grid } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import { Checkbox, Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../../components/pagination';
 import DataTableRow from '../../../components/tableRow/DataTableRow';
 import { SearchBox, FilterBox, SortableTableHeader } from '../../../components/common';
@@ -109,12 +111,12 @@ export default function DataList() {
         ]}
       >
         <Grid container spacing={2}>
-          <Grid item xs={3}>
+          <Grid size={3}>
             <Grid container spacing={1}>
-              <Grid item>
+              <Grid>
                 <div className='sort-title'>검색어</div>
               </Grid>
-              <Grid item xs={9}>
+              <Grid size={9}>
                 <TextField
                   size='small'
                   value={searchKeyword}
@@ -126,27 +128,27 @@ export default function DataList() {
         </Grid>
       </SearchBox>
 
-      <FilterBox
-        leftContent={
-          <Grid container spacing={1} className='flex-center-gap-lg'>
-            <Grid item>
-              <Grid container spacing={1}>
-                <Grid item className='d-flex gap-5'>
-                  <Checkbox checked={showUnmatchedOnly} onChange={(e) => handleUnmatchedOnlyChange(e.target.checked)} />
-                  매칭되지 않은 항목만 보기
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        }
-        buttons={[
-          {
-            text: '저장',
-            onClick: handleSaveClick,
-            color: 'primary',
-          },
-        ]}
-      />
+      <div className='list-header'>
+        <Typography variant='h6' gutterBottom>
+          식별 ID 목록
+        </Typography>
+        <FilterBox
+          leftContent={
+            <div>
+              <Checkbox checked={showUnmatchedOnly} onChange={(e) => handleUnmatchedOnlyChange(e.target.checked)} />
+              <p className='label'>매칭되지 않은 항목만 보기</p>
+            </div>
+            
+          }
+          buttons={[
+            {
+              text: '저장',
+              onClick: handleSaveClick,
+              color: 'primary',
+            },
+          ]}
+        />
+      </div>
 
       <div className='table-wrap'>
         <TableContainer component={Paper}>

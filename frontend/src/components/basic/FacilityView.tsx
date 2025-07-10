@@ -238,82 +238,80 @@ export const FacilityView: React.FC<
   };
 
   return (
-    <>
-      <div>
-        <SearchBox
-          buttons={[
-            {
-              text: '검색',
-              onClick: handleSearch,
-              color: 'primary',
-            },
-          ]}
-        >
-          <Grid container spacing={4}>
-            {/* 공장 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>공장</div>
-              </Grid>
-              <Grid sx={{ flexGrow: 1 }}>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                  <FactorySelect
-                    value={selectedFactory}
-                    onChange={handleFactoryChange}
-                    placeholder='선택'
-                    refreshKey={factoryRefreshKey}
-                  />
-                </FormControl>
-              </Grid>
+    <div className='table-outer'>
+      <SearchBox
+        buttons={[
+          {
+            text: '검색',
+            onClick: handleSearch,
+            color: 'primary',
+          },
+        ]}
+      >
+        <Grid container spacing={4}>
+          {/* 공장 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>공장</div>
             </Grid>
-            {/* 공장 */}
-
-            {/* 설비그룹 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>설비그룹</div>
-              </Grid>
-              <Grid sx={{ flexGrow: 1 }}>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                  <FacilityGroupSelect
-                    selectedFacilityGroups={selectedFacilityGroups}
-                    setSelectedFacilityGroups={setSelectedFacilityGroups}
-                    selectedFactory={selectedFactory}
-                    refreshKey={facilityGroupRefreshKey}
-                  />
-                </FormControl>
-              </Grid>
+            <Grid sx={{ flexGrow: 1 }}>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <FactorySelect
+                  value={selectedFactory}
+                  onChange={handleFactoryChange}
+                  placeholder='선택'
+                  refreshKey={factoryRefreshKey}
+                />
+              </FormControl>
             </Grid>
-            {/* 설비그룹 */}
-
-            {/* 설비명 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>설비명</div>
-              </Grid>
-              <Grid sx={{ flexGrow: 1 }}>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                  <TextField size='small' value={facilityName} onChange={(e) => setFacilityName(e.target.value)} />
-                </FormControl>
-              </Grid>
-            </Grid>
-            {/* 설비명 */}
-
-            {/* 센서명 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>센서명</div>
-              </Grid>
-              <Grid sx={{ flexGrow: 1 }}>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                  <TextField size='small' value={sensorName} onChange={(e) => setSensorName(e.target.value)} />
-                </FormControl>
-              </Grid>
-            </Grid>
-            {/* 센서명 */}
           </Grid>
-        </SearchBox>
-      </div>
+          {/* 공장 */}
+
+          {/* 설비그룹 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>설비그룹</div>
+            </Grid>
+            <Grid sx={{ flexGrow: 1 }}>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <FacilityGroupSelect
+                  selectedFacilityGroups={selectedFacilityGroups}
+                  setSelectedFacilityGroups={setSelectedFacilityGroups}
+                  selectedFactory={selectedFactory}
+                  refreshKey={facilityGroupRefreshKey}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+          {/* 설비그룹 */}
+
+          {/* 설비명 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>설비명</div>
+            </Grid>
+            <Grid sx={{ flexGrow: 1 }}>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <TextField size='small' value={facilityName} onChange={(e) => setFacilityName(e.target.value)} />
+              </FormControl>
+            </Grid>
+          </Grid>
+          {/* 설비명 */}
+
+          {/* 센서명 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>센서명</div>
+            </Grid>
+            <Grid sx={{ flexGrow: 1 }}>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <TextField size='small' value={sensorName} onChange={(e) => setSensorName(e.target.value)} />
+              </FormControl>
+            </Grid>
+          </Grid>
+          {/* 센서명 */}
+        </Grid>
+      </SearchBox>
 
       <div className='list-header'>
         <Typography variant='h6' gutterBottom>
@@ -460,6 +458,6 @@ export const FacilityView: React.FC<
       />
 
       <ProgressOverlay open={progressOpen} progress={progress} label={progressLabel} />
-    </>
+    </div>
   );
 };

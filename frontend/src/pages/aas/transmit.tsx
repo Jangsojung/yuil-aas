@@ -5,6 +5,7 @@ import { handleVerifyAPI } from '../../apis/api/transmit';
 import SelectAASXFile from '../../components/select/aasx_files';
 import TransmitView from '../../section/aas/transmit/view';
 import Grid from '@mui/system/Grid';
+import Typography from '@mui/material/Typography';
 import { SearchBox } from '../../components/common';
 import AlertModal from '../../components/modal/alert';
 import { AASXFile } from '../../types/api';
@@ -219,6 +220,12 @@ export default function TransmitPage() {
           {/* AASX 파일 선택 */}
         </Grid>
       </SearchBox>
+
+      <div className='list-header'>
+        <Typography variant='h6' gutterBottom>
+          AASX 파일 뷰어
+        </Typography>
+      </div>
 
       <TransmitView />
 

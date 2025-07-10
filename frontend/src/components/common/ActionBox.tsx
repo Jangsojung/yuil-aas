@@ -39,6 +39,7 @@ export default function ActionBox({ buttons, align = 'right', leftContent }: Act
           display: 'grid',
           gridTemplateColumns: leftContent ? '2fr 1fr' : '1fr',
           gap: 1,
+          marginRight: 2
         }}
       >
         {leftContent && <Grid>{leftContent}</Grid>}

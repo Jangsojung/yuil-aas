@@ -30,7 +30,7 @@ export default function FilterBox({ leftContent, buttons = [], buttonAlign = 'ri
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }} className='sort-box'>
+    <Box sx={{ flexGrow: 1, mx: 2 }}>
       <Grid
         container
         spacing={1}

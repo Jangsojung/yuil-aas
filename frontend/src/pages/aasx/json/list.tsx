@@ -259,7 +259,7 @@ export default function JSONList() {
           },
         ]}
       >
-        <Grid container spacing={1} className='flex-center-gap-lg'>
+        <Grid container spacing={4}>
           <Grid container spacing={2}>
             <Grid className='sort-title'>
               <div>공장</div>
@@ -276,7 +276,7 @@ export default function JSONList() {
             </Grid>
           </Grid>
           <Grid>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
               <Grid className='d-flex gap-5'>
                 <div className='sort-title'>생성일</div>
               </Grid>

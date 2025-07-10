@@ -2,6 +2,7 @@ import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRe
 import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI } from '../../apis/api/edge';
 import { Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import Pagination from '../../components/pagination';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
@@ -237,82 +238,86 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       {loading && <LoadingOverlay />}
 
       {/* 검색 박스 */}
-      <div>
-        <SearchBox
-          buttons={[
-            {
-              text: '검색',
-              onClick: handleSearch,
-              color: 'success',
-            },
-            {
-              text: '초기화',
-              onClick: handleReset,
-              color: 'inherit',
-              variant: 'outlined',
-            },
-          ]}
-        >
-          <Grid container spacing={4} className='flex-center-gap-lg'>
-            {/* PC명 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>PC명</div>
-              </Grid>
-              <Grid>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                  <TextField
-                    size='small'
-                    value={pcName}
-                    onChange={(e) => setPcName(e.target.value)}
-                  />
-                </FormControl>
-              </Grid>
-            </Grid>
-
-            {/* IP 주소 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>IP 주소</div>
-              </Grid>
-              <Grid>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                  <TextField
-                    size='small'
-                    value={ipAddress}
-                    onChange={(e) => setIpAddress(e.target.value)}
-                  />
-                </FormControl>
-              </Grid>
-            </Grid>
-
-            {/* 생성일 */}
-            <Grid container spacing={2}>
-              <Grid className='sort-title'>
-                <div>생성일</div>
-              </Grid>
-              <Grid>
-                <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
-              </Grid>
-            </Grid>
-          </Grid>
-        </SearchBox>
-      </div>
-
-      <ActionBox
+      <SearchBox
         buttons={[
           {
-            text: '등록',
-            onClick: onAddClick,
-            color: 'success',
+            text: '검색',
+            onClick: handleSearch,
+            color: 'primary',
           },
           {
-            text: '삭제',
-            onClick: handleDelete,
-            color: 'error',
+            text: '초기화',
+            onClick: handleReset,
+            color: 'inherit',
+            variant: 'outlined',
           },
         ]}
-      />
+      >
+        <Grid container spacing={4} className='flex-center-gap-lg'>
+          {/* PC명 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>PC명</div>
+            </Grid>
+            <Grid>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <TextField
+                  size='small'
+                  value={pcName}
+                  onChange={(e) => setPcName(e.target.value)}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+
+          {/* IP 주소 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>IP 주소</div>
+            </Grid>
+            <Grid>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <TextField
+                  size='small'
+                  value={ipAddress}
+                  onChange={(e) => setIpAddress(e.target.value)}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+
+          {/* 생성일 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>생성일</div>
+            </Grid>
+            <Grid>
+              <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
+            </Grid>
+          </Grid>
+        </Grid>
+      </SearchBox>
+
+      <div className='list-header'>
+        <Typography variant='h6' gutterBottom>
+          서버 목록
+        </Typography>
+
+        <ActionBox
+          buttons={[
+            {
+              text: '등록',
+              onClick: onAddClick,
+              color: 'primary',
+            },
+            {
+              text: '삭제',
+              onClick: handleDelete,
+              color: 'error',
+            },
+          ]}
+        />
+      </div>
 
       <div className='table-wrap'>
         <TableContainer component={Paper}>
@@ -348,15 +353,14 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
             </TableBody>
           </Table>
         </TableContainer>
+        <Pagination
+          count={sortedEdgeGateways?.length || 0}
+          page={currentPage}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
       </div>
-
-      <Pagination
-        count={sortedEdgeGateways?.length || 0}
-        page={currentPage}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-      />
 
       <AlertModal
         open={alertModal.open}
