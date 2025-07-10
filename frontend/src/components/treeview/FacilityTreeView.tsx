@@ -85,11 +85,24 @@ export const FacilityTreeView: React.FC<FacilityTreeViewProps> = ({
             >
               <div style={{ padding: '15px 0' }}>
                 <Grid container className='facility-item'>
-                  <Grid size={2}>
-                    <div className='flex-center'>
-                      온조기1
-                    </div>
-                  </Grid>
+                  {fa.sensors && fa.sensors.length > 0 ? (
+                    fa.sensors.map((sensor) => (
+                      <Grid key={sensor.sn_idx} size={2}>
+                        <div className='flex-center'>
+                          <Checkbox
+                            checked={selectedSensors.includes(sensor.sn_idx)}
+                            onChange={(e) => onSensorSelect(sensor.sn_idx, e.target.checked)}
+                            onClick={(e) => e.stopPropagation()}
+                            size='small'
+                            sx={{ mr: 1 }}
+                          />
+                          {sensor.sn_name}
+                        </div>
+                      </Grid>
+                    ))
+                  ) : (
+                    <Grid size={12}>센서 없음</Grid>
+                  )}
                 </Grid>
               </div>
               {/* <div className='padding-y'>

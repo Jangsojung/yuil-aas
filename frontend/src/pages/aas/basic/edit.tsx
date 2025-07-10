@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedSensorsState, userState } from '../../../recoil/atoms';
@@ -43,6 +43,52 @@ export default function BasiccodeEditPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
 
+  // DetailView용 검색 상태 추가
+  const [detailFactoryName, setDetailFactoryName] = useState('');
+  const [detailFacilityName, setDetailFacilityName] = useState('');
+  const [detailSensorName, setDetailSensorName] = useState('');
+  const [detailSelectedFactory, setDetailSelectedFactory] = useState<number | ''>('');
+  const [detailSelectedFacilityGroups, setDetailSelectedFacilityGroups] = useState<number[]>([]);
+  const detailHideFactorySelect = true;
+
+  const [originalDetailTreeData, setOriginalDetailTreeData] = useState<FacilityGroupTree[]>([]);
+
+  const handleDetailTreeSearch = useCallback(async () => {
+    // 검색 조건이 모두 비어있으면 원본 트리 복원
+    if (!detailFacilityName.trim() && !detailSensorName.trim() && detailSelectedFacilityGroups.length === 0) {
+      setDetailTreeData(originalDetailTreeData);
+      return { success: true };
+    }
+
+    // 현재 트리에서만 필터링
+    const filtered = originalDetailTreeData
+      .map((fg) => {
+        // 설비그룹 필터
+        if (detailSelectedFacilityGroups.length > 0 && !detailSelectedFacilityGroups.includes(fg.fg_idx)) {
+          return null;
+        }
+        // 설비 필터
+        const filteredFacilities = fg.facilities.filter(
+          (fa) => !detailFacilityName.trim() || fa.fa_name.includes(detailFacilityName.trim())
+        );
+        // 센서 필터
+        const facilitiesWithFilteredSensors = filteredFacilities
+          .map((fa) => ({
+            ...fa,
+            sensors: fa.sensors.filter(
+              (sensor) => !detailSensorName.trim() || sensor.sn_name.includes(detailSensorName.trim())
+            ),
+          }))
+          .filter((fa) => fa.sensors.length > 0);
+        if (facilitiesWithFilteredSensors.length === 0) return null;
+        return { ...fg, facilities: facilitiesWithFilteredSensors };
+      })
+      .filter(Boolean);
+
+    setDetailTreeData(filtered as FacilityGroupTree[]);
+    return { success: true };
+  }, [detailFacilityName, detailSensorName, detailSelectedFacilityGroups, originalDetailTreeData]);
+
   const handleModeChange = () => {
     if (id) {
       const baseId = parseInt(id);
@@ -77,6 +123,9 @@ export default function BasiccodeEditPage() {
 
       setSelectedBaseForDetail(targetBase);
 
+      // 공장 자동 선택
+      setDetailSelectedFactory(targetBase.fc_idx);
+
       const sensorIds = await getBaseSensorsAPI(baseId);
       const sensorIdList = Array.isArray(sensorIds)
         ? sensorIds.map((item) => (typeof item === 'object' ? item.sn_idx : item))
@@ -85,8 +134,23 @@ export default function BasiccodeEditPage() {
       // fc_idx를 전달하여 트리 데이터 구축
       const treeData = await buildTreeFromSensorIdsAPI(sensorIdList, targetBase.fc_idx);
       setDetailTreeData(treeData);
+      setOriginalDetailTreeData(treeData); // 원본 저장
+
+      // 설비그룹 자동 선택
+      const relevantFacilityGroups = new Set<number>();
+      treeData.forEach((fg) => {
+        fg.facilities.forEach((fa: any) => {
+          fa.sensors.forEach((sensor: any) => {
+            if (sensorIdList.includes(sensor.sn_idx)) {
+              relevantFacilityGroups.add(fg.fg_idx);
+            }
+          });
+        });
+      });
+      setDetailSelectedFacilityGroups(Array.from(relevantFacilityGroups));
     } catch (err: any) {
       setDetailTreeData([]);
+      setOriginalDetailTreeData([]);
     } finally {
       setDetailLoading(false);
     }
@@ -224,6 +288,18 @@ export default function BasiccodeEditPage() {
         selectedBaseForDetail={selectedBaseForDetail}
         onEdit={handleEdit}
         onBackToList={handleBackToList}
+        factoryName={detailFactoryName}
+        setFactoryName={setDetailFactoryName}
+        facilityName={detailFacilityName}
+        setFacilityName={setDetailFacilityName}
+        sensorName={detailSensorName}
+        setSensorName={setDetailSensorName}
+        selectedFactory={detailSelectedFactory}
+        setSelectedFactory={setDetailSelectedFactory}
+        selectedFacilityGroups={detailSelectedFacilityGroups}
+        setSelectedFacilityGroups={setDetailSelectedFacilityGroups}
+        hideFactorySelect={detailHideFactorySelect}
+        onTreeSearch={handleDetailTreeSearch}
       />
     );
   }

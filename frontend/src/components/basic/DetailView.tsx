@@ -7,8 +7,10 @@ import Tooltip from '@mui/material/Tooltip';
 import { FacilityGroupTree, Base } from '../../types/api';
 import { ActionBox, SearchBox } from '../common';
 import LoadingOverlay from '../loading/LodingOverlay';
-
+import { FormControl, TextField } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
+import { FactorySelect } from '../select';
+import FacilityGroupSelect from '../select/facility_group';
 
 const CustomTreeItem = styled(TreeItem)(({ theme }) => ({
   [`& .${treeItemClasses.content}`]: {
@@ -33,6 +35,18 @@ interface DetailViewProps {
   selectedBaseForDetail: Base | null;
   onEdit: () => void;
   onBackToList: () => void;
+  factoryName: string;
+  setFactoryName: (name: string) => void;
+  facilityName: string;
+  setFacilityName: (name: string) => void;
+  sensorName: string;
+  setSensorName: (name: string) => void;
+  selectedFactory: number | '';
+  setSelectedFactory: (fc: number | '') => void;
+  selectedFacilityGroups: number[];
+  setSelectedFacilityGroups: React.Dispatch<React.SetStateAction<number[]>>;
+  hideFactorySelect?: boolean;
+  onTreeSearch: () => void;
 }
 
 export const DetailView: React.FC<DetailViewProps> = ({
@@ -41,11 +55,89 @@ export const DetailView: React.FC<DetailViewProps> = ({
   selectedBaseForDetail,
   onEdit,
   onBackToList,
+  factoryName,
+  setFactoryName,
+  facilityName,
+  setFacilityName,
+  sensorName,
+  setSensorName,
+  selectedFactory,
+  setSelectedFactory,
+  selectedFacilityGroups,
+  setSelectedFacilityGroups,
+  hideFactorySelect = false,
+  onTreeSearch,
 }) => {
   return (
     <div className='table-outer'>
-      <SearchBox>
-      
+      <SearchBox
+        buttons={[
+          {
+            text: '검색',
+            onClick: onTreeSearch,
+            color: 'primary',
+          },
+        ]}
+      >
+        <Grid container spacing={4}>
+          {/* 공장 */}
+          {!hideFactorySelect && (
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>공장</div>
+              </Grid>
+              <Grid>
+                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                  <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
+                </FormControl>
+              </Grid>
+            </Grid>
+          )}
+          {/* 공장 */}
+
+          {/* 설비그룹 */}
+          <Grid container spacing={2}>
+            <Grid className='sort-title'>
+              <div>설비그룹</div>
+            </Grid>
+            <Grid>
+              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <FacilityGroupSelect
+                  selectedFacilityGroups={selectedFacilityGroups}
+                  setSelectedFacilityGroups={setSelectedFacilityGroups}
+                  selectedFactory={selectedFactory}
+                />
+              </FormControl>
+            </Grid>
+          </Grid>
+          {/* 설비그룹 */}
+
+          {/* 설비명 */}
+          <Grid container>
+            <Grid className='sort-title'>
+              <div>설비명</div>
+            </Grid>
+            <Grid>
+              <FormControl sx={{ width: '100%' }} size='small'>
+                <TextField size='small' value={facilityName} onChange={(e) => setFacilityName(e.target.value)} />
+              </FormControl>
+            </Grid>
+          </Grid>
+          {/* 설비명 */}
+
+          {/* 센서명 */}
+          <Grid container>
+            <Grid className='sort-title'>
+              <div>센서명</div>
+            </Grid>
+            <Grid>
+              <FormControl sx={{ width: '100%' }} size='small'>
+                <TextField size='small' value={sensorName} onChange={(e) => setSensorName(e.target.value)} />
+              </FormControl>
+            </Grid>
+          </Grid>
+          {/* 센서명 */}
+        </Grid>
       </SearchBox>
 
       <div className='list-header'>
@@ -85,67 +177,24 @@ export const DetailView: React.FC<DetailViewProps> = ({
             {detailTreeData.map((fg, fgIdx) => (
               <CustomTreeItem key={fg.fg_idx} itemId={`detail-${fgIdx}`} label={<span>{fg.fg_name}</span>}>
                 {fg.facilities.map((fa, faIdx) => (
-                  <CustomTreeItem key={fa.fa_idx} itemId={`detail-sub-${fgIdx}-${faIdx}`} label={<span>{fa.fa_name}</span>}>
+                  <CustomTreeItem
+                    key={fa.fa_idx}
+                    itemId={`detail-sub-${fgIdx}-${faIdx}`}
+                    label={<span>{fa.fa_name}</span>}
+                  >
                     <div style={{ padding: '15px 0' }}>
                       <Grid container className='facility-item'>
-                        <Grid size={2}>
-                          <div className='flex-center'>
-                            온조기1
-                          </div>
-                        </Grid>
+                        {fa.sensors && fa.sensors.length > 0 ? (
+                          fa.sensors.map((sensor) => (
+                            <Grid key={sensor.sn_idx} size={2}>
+                              <div className='flex-center'>{sensor.sn_name}</div>
+                            </Grid>
+                          ))
+                        ) : (
+                          <Grid size={12}>센서 없음</Grid>
+                        )}
                       </Grid>
                     </div>
-                    {/* <div className='padding-y'>
-                      <TableContainer component={Paper}>
-                        <Table size='small'>
-                          <TableBody>
-                            {(() => {
-                              const sensors = fa.sensors || [];
-                              const rows: (typeof sensors)[] = [];
-                              for (let i = 0; i < sensors.length; i += 6) {
-                                const rowSensors = sensors.slice(i, i + 6);
-                                rows.push(rowSensors);
-                              }
-                              return rows.map((rowSensors, rowIndex) => (
-                                <TableRow key={rowIndex}>
-                                  <TableCell colSpan={3}>
-                                    <Grid
-                                      container
-                                      spacing={1}
-                                      sx={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(6, minmax(120px, 1fr))',
-                                        gap: 1,
-                                      }}
-                                    >
-                                      {rowSensors.map((sensor, idx) => (
-                                        <Grid key={sensor.sn_idx}>
-                                          <List
-                                            sx={{
-                                              width: '100%',
-                                              bgcolor: 'background.paper',
-                                              border: '1px solid #e0e0e0',
-                                              borderRadius: 1,
-                                            }}
-                                            className='basic-checkbox'
-                                          >
-                                            <div>
-                                              <ListItem>
-                                                <ListItemText secondary={sensor.sn_name} />
-                                              </ListItem>
-                                            </div>
-                                          </List>
-                                        </Grid>
-                                      ))}
-                                    </Grid>
-                                  </TableCell>
-                                </TableRow>
-                              ));
-                            })()}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </div> */}
                   </CustomTreeItem>
                 ))}
               </CustomTreeItem>
