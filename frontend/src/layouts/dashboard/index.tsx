@@ -94,47 +94,66 @@ export default function Layout() {
     };
   }, [location.pathname, setNavigationReset]);
 
-  // 기존 브레드크럼에 홈 아이콘 추가
+  // 브레드크럼 링크 비활성화 (홈 제외) 및 홈 아이콘 추가
   React.useEffect(() => {
-    const addHomeIconToBreadcrumb = () => {
+    const handleBreadcrumb = () => {
       const breadcrumbOl = document.querySelector('.MuiBreadcrumbs-ol');
-      if (breadcrumbOl && !breadcrumbOl.querySelector('.home-icon-added')) {
-        const firstLi = breadcrumbOl.querySelector('li');
-        if (firstLi) {
-          // 홈 아이콘 생성
-          const homeIcon = document.createElement('a');
-          homeIcon.href = '/dashboard/dashboard';
-          homeIcon.className =
-            'MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineHover home-icon-added';
-          homeIcon.style.display = 'flex';
-          homeIcon.style.alignItems = 'center';
-          homeIcon.innerHTML = `
-            <svg style="width: 1.2rem; height: 1.2rem; margin-right: 4px;" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-            </svg>
-          `;
+      if (breadcrumbOl) {
+        // 홈 아이콘 추가 (이미 있는지 확인)
+        if (!breadcrumbOl.querySelector('.home-icon-added')) {
+          const firstLi = breadcrumbOl.querySelector('li');
+          if (firstLi) {
+            // 홈 아이콘 생성
+            const homeIcon = document.createElement('a');
+            homeIcon.href = '/dashboard/dashboard';
+            homeIcon.className =
+              'MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineHover home-icon-added';
+            homeIcon.style.display = 'flex';
+            homeIcon.style.alignItems = 'center';
+            homeIcon.innerHTML = `
+              <svg style="width: 1.2rem; height: 1.2rem; margin-right: 4px;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              </svg>
+            `;
 
-          // 첫 번째 아이템 앞에 홈 아이콘 추가
-          const homeLi = document.createElement('li');
-          homeLi.className = 'MuiBreadcrumbs-li';
-          homeLi.appendChild(homeIcon);
+            // 첫 번째 아이템 앞에 홈 아이콘 추가
+            const homeLi = document.createElement('li');
+            homeLi.className = 'MuiBreadcrumbs-li';
+            homeLi.appendChild(homeIcon);
 
-          // 구분자 추가
-          const separator = document.createElement('li');
-          separator.className = 'MuiBreadcrumbs-separator';
-          separator.setAttribute('aria-hidden', 'true');
-          separator.style.margin = '0 8px';
-          separator.innerHTML = '/';
+            // 구분자 추가
+            const separator = document.createElement('li');
+            separator.className = 'MuiBreadcrumbs-separator';
+            separator.setAttribute('aria-hidden', 'true');
+            separator.style.margin = '0 8px';
+            separator.innerHTML = '/';
 
-          breadcrumbOl.insertBefore(separator, firstLi);
-          breadcrumbOl.insertBefore(homeLi, separator);
+            breadcrumbOl.insertBefore(separator, firstLi);
+            breadcrumbOl.insertBefore(homeLi, separator);
+          }
         }
+
+        // 홈 아이콘을 제외한 모든 브레드크럼 링크 비활성화
+        const allLinks = breadcrumbOl.querySelectorAll('a:not(.home-icon-added)');
+        allLinks.forEach((link) => {
+          const linkElement = link as HTMLElement;
+          linkElement.removeAttribute('href');
+          linkElement.style.pointerEvents = 'none';
+          linkElement.style.cursor = 'default';
+          linkElement.style.color = '#666';
+          linkElement.style.textDecoration = 'none';
+        });
       }
     };
 
-    // DOM이 업데이트된 후 실행
-    const timer = setTimeout(addHomeIconToBreadcrumb, 100);
-    return () => clearTimeout(timer);
+    // 초기 실행
+    handleBreadcrumb();
+
+    // DOM 변화 감지
+    const observer = new MutationObserver(handleBreadcrumb);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
   }, [location.pathname]);
 
   return (
@@ -146,7 +165,7 @@ export default function Layout() {
       }}
     >
       <Container>
-        <PageHeader />
+        {location.pathname !== '/dashboard/dashboard' && <PageHeader />}
         <Outlet />
       </Container>
     </DashboardLayout>

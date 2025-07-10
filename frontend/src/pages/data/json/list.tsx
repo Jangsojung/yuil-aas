@@ -239,7 +239,7 @@ export default function JSONList() {
   }, [selectedFiles, files]);
 
   const handleRowClick = (af_idx: number) => {
-    navigate(`/aasx/json/detail/${af_idx}`);
+    navigate(`/data/jsonManager/detail/${af_idx}`);
   };
 
   return (

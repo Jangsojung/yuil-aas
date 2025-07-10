@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import AASXList from './list';
 import AASXAdd from './add';
 import AASXEdit from './edit';
-import { AASXFile } from '../../types/api';
+import { AASXFile } from '../../../types/api';
 
 export default function AASXManagerPage() {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
