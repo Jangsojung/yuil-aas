@@ -162,7 +162,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
         />
       </div>
 
-      <div className='table-wrap'>
+      <div className='table-wrap tree-scroll-wrap'>
         {detailLoading ? (
           <LoadingOverlay />
         ) : detailTreeData.length === 0 ? (

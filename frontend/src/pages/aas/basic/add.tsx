@@ -72,8 +72,7 @@ export default function BasiccodeAddPage() {
   };
 
   return (
-    <div>
-      {/* <div className='no-flex-header'>
+    <>
        <div
         style={{
           display: 'flex',
@@ -84,7 +83,7 @@ export default function BasiccodeAddPage() {
       >
         <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
         <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
-      </div> */}
+      </div>
       <EditView
         treeData={treeData}
         treeLoading={treeLoading}
@@ -134,6 +133,6 @@ export default function BasiccodeAddPage() {
         type={alertModal.type}
         onConfirm={alertModal.onConfirm}
       />
-    </div>
+    </>
   );
 }
