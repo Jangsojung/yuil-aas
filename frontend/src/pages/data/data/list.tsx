@@ -138,7 +138,6 @@ export default function DataList() {
               <Checkbox checked={showUnmatchedOnly} onChange={(e) => handleUnmatchedOnlyChange(e.target.checked)} />
               <p className='label'>매칭되지 않은 항목만 보기</p>
             </div>
-            
           }
           buttons={[
             {
@@ -151,9 +150,9 @@ export default function DataList() {
       </div>
 
       <div className='table-wrap'>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-            <TableHead>
+            <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
                 <SortableTableHeader
                   columns={sortableColumns}

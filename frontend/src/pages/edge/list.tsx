@@ -308,9 +308,9 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       </div>
 
       <div className='table-wrap'>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-            <TableHead>
+            <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
                 <SortableTableHeader
                   columns={sortableColumns}

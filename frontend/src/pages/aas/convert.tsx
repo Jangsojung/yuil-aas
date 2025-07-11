@@ -434,19 +434,19 @@ export default function ConvertPage() {
         </div>
 
         <div className='table-wrap'>
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
             <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-              <TableHead>
+              <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
                 <TableRow>
-                  <TableCell sx={{ width: '50px' }}></TableCell>
+                  <TableCell sx={{ width: '50px', backgroundColor: 'white' }}></TableCell>
                   <SortableTableHeader
                     columns={sortableColumns}
                     sortField={sortField}
                     sortDirection={sortDirection}
                     onSort={handleSort}
                   />
-                  <TableCell>시작일</TableCell>
-                  <TableCell>종료일</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>시작일</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>종료일</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

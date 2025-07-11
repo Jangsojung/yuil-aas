@@ -304,11 +304,11 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
       </div>
 
       <div className='table-wrap'>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-            <TableHead>
+            <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
-                <TableCell padding='checkbox'>
+                <TableCell padding='checkbox' sx={{ backgroundColor: 'white' }}>
                   <Checkbox
                     checked={selectAll}
                     onChange={handleSelectAllChange}
@@ -321,7 +321,9 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
-                <TableCell align='center'>수정</TableCell>
+                <TableCell align='center' sx={{ backgroundColor: 'white' }}>
+                  수정
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
