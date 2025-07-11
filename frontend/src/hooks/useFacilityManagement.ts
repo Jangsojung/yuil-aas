@@ -28,7 +28,7 @@ export const useFacilityManagement = () => {
   const [selectedFacilities, setSelectedFacilities] = useState<number[]>([]);
   const [selectedFacilityGroupsForDelete, setSelectedFacilityGroupsForDelete] = useState<number[]>([]);
   const [selectedFactoriesForDelete, setSelectedFactoriesForDelete] = useState<number[]>([]);
-  const [syncLoading, setSyncLoading] = useState(false);
+  const [syncLoading] = useState(false);
   const [factoryRefreshKey, setFactoryRefreshKey] = useState(0);
   const [facilityGroupRefreshKey, setFacilityGroupRefreshKey] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -163,22 +163,22 @@ export const useFacilityManagement = () => {
     if (hasSelectedFactories) {
       deleteType = '공장';
       deleteCount = selectedFactoriesForDelete.length;
-      confirmMessage = `선택한 ${deleteCount}개의 공장을 삭제하시겠습니까?\n(해당 공장의 모든 설비그룹, 설비, 센서도 함께 삭제됩니다.)`;
+      confirmMessage = `공장 삭제시 해당 공장의 하위 설비그룹, 설비, 센서도 삭제됩니다.\n선택한 ${deleteCount}개의 공장을 삭제하시겠습니까?`;
     } else if (hasSelectedFacilityGroups) {
       deleteType = '설비그룹';
       deleteCount = selectedFacilityGroupsForDelete.length;
-      confirmMessage = `선택한 ${deleteCount}개의 설비그룹을 삭제하시겠습니까?\n(해당 설비그룹의 모든 설비와 센서도 함께 삭제됩니다.)`;
+      confirmMessage = `설비그룹 삭제시 해당 설비그룹의 하위 설비, 센서도 삭제됩니다.\n선택한 ${deleteCount}개의 설비그룹을 삭제하시겠습니까?`;
     } else if (hasSelectedFacilities) {
       deleteType = '설비';
       deleteCount = selectedFacilities.length;
-      confirmMessage = `선택한 ${deleteCount}개의 설비를 삭제하시겠습니까?\n(해당 설비의 모든 센서도 함께 삭제됩니다.)`;
+      confirmMessage = `설비 삭제시 해당 설비의 하위 센서도 삭제됩니다.\n선택한 ${deleteCount}개의 설비를 삭제하시겠습니까?`;
     } else if (hasSelectedSensors) {
       deleteType = '센서';
       deleteCount = selectedSensors.length;
       confirmMessage = `선택한 ${deleteCount}개의 센서를 삭제하시겠습니까?`;
     }
 
-    showConfirm('삭제 확인', confirmMessage, async () => {
+    showConfirm('알림', confirmMessage, async () => {
       try {
         if (hasSelectedFactories) {
           await deleteFactories(selectedFactoriesForDelete);
