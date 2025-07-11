@@ -260,7 +260,7 @@ export default function DashboardPage() {
             {selectedAasx && (
               <Button
                 onClick={() =>
-                  navigate('/aas/transmit', {
+                  navigate('/aasx/transmit', {
                     state: {
                       fc_idx: selectedAasx.fc_idx,
                       af_idx: selectedAasx.af_idx,
