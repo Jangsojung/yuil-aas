@@ -145,6 +145,9 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
           }))
         );
       }
+    } else if (value === '신규등록') {
+      setFacilityValue('신규등록');
+      setFacilityList([]);
     } else {
       setFacilityList([]);
     }
@@ -393,9 +396,19 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                             if (e.target.value === '신규등록') {
                               setIsNewFactory(true);
                               setSelectedFactory('');
+                              setGroupValue('신규등록');
+                              setFacilityValue('신규등록');
+                              setGroupInput('');
+                              setFacilityInput('');
+                              setFacilityList([]);
                             } else {
                               setIsNewFactory(false);
                               setSelectedFactory(e.target.value as number);
+                              setGroupValue('');
+                              setFacilityValue('');
+                              setGroupInput('');
+                              setFacilityInput('');
+                              setFacilityList([]);
                             }
                           }}
                           displayEmpty
