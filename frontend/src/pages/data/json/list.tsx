@@ -90,14 +90,6 @@ export default function JSONList() {
         try {
           await deleteJSONAPI(selectedFiles);
 
-          setAlertModal({
-            open: true,
-            title: '알림',
-            content: '선택한 항목이 삭제되었습니다.',
-            type: 'alert',
-            onConfirm: undefined,
-          });
-
           setSelectedFiles([]);
           getFiles();
         } catch (error) {

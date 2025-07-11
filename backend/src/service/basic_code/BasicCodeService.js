@@ -1,5 +1,5 @@
 import { validateValue } from '../../utils/validation.js';
-import { querySingle, queryMultiple, queryInsert, withTransaction } from '../../utils/dbHelper.js';
+import { querySingle, queryMultiple, queryInsert, queryUpdate, withTransaction } from '../../utils/dbHelper.js';
 
 export const getBaseByIdFromDB = async (ab_idx) => {
   const validatedAbIdx = validateValue(ab_idx);

@@ -182,11 +182,9 @@ export const useFacilityManagement = () => {
       try {
         if (hasSelectedFactories) {
           await deleteFactories(selectedFactoriesForDelete);
-          showAlert('알림', `${deleteType} 삭제 완료`);
           handleReset();
         } else if (hasSelectedFacilityGroups) {
           await deleteFacilityGroups(selectedFacilityGroupsForDelete);
-          showAlert('알림', `${deleteType} 삭제 완료`);
           // 삭제된 설비그룹만 선택 목록에서 제거
           setSelectedFacilityGroups((prev) => prev.filter((id) => !selectedFacilityGroupsForDelete.includes(id)));
           setSelectedFacilityGroupsForDelete([]);
@@ -198,14 +196,12 @@ export const useFacilityManagement = () => {
           setFacilityGroupRefreshKey((prev) => prev + 1);
         } else if (hasSelectedFacilities) {
           await deleteFacilities(selectedFacilities);
-          showAlert('알림', `${deleteType} 삭제 완료`);
           // 설비 삭제 후 선택 상태 초기화하고 검색
           setSelectedFacilities([]);
           setSelectedSensors([]);
           handleTreeSearch();
         } else if (hasSelectedSensors) {
           await deleteSensors(selectedSensors);
-          showAlert('알림', `${deleteType} 삭제 완료`);
           // 센서 삭제 후 선택 상태 초기화하고 검색
           setSelectedSensors([]);
           handleTreeSearch();

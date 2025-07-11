@@ -136,13 +136,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
         if (result) {
           setSelectedEdgeGateways([]);
           await getEdgeWithStatus();
-          setAlertModal({
-            open: true,
-            title: '알림',
-            content: '선택한 항목이 삭제되었습니다.',
-            type: 'alert',
-            onConfirm: undefined,
-          });
         }
       },
     });
