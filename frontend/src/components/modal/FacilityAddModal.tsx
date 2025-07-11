@@ -390,7 +390,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                     <Grid>
                       <FormControl fullWidth size='small'>
                         <Select
-                          key={`factory-select-${factories.length}`} // 강제 리렌더링을 위한 key
+                          key={`factory-select-${factories.length}`}
                           value={isNewFactory ? '신규등록' : selectedFactory || ''}
                           onChange={(e) => {
                             if (e.target.value === '신규등록') {
