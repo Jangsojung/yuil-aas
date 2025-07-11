@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@types/jsoneditor": "^9.9.5",
+    "jsoneditor": "^10.2.0"
+  }
+}
