@@ -7,6 +7,7 @@ import { EditView } from '../../../components/basic/EditView';
 import BasicModal from '../../../components/modal/basicmodal';
 import AlertModal from '../../../components/modal/alert';
 import { useNavigate } from 'react-router-dom';
+import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
 
 export default function BasiccodeAddPage() {
   const navigationReset = useRecoilValue(navigationResetState);
@@ -71,7 +72,19 @@ export default function BasiccodeAddPage() {
   };
 
   return (
-    <div className='no-flex-header'>
+    <div>
+      {/* <div className='no-flex-header'>
+       <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
+        <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
+        <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
+      </div> */}
       <EditView
         treeData={treeData}
         treeLoading={treeLoading}

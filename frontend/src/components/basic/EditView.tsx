@@ -82,18 +82,7 @@ export const EditView: React.FC<EditViewProps> = ({
   };
 
   return (
-    <div className='table-outer' style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}
-      >
-        <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
-        <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
-      </div>
+    <div className='table-outer'>
       <SearchBox
         buttons={[
           {
