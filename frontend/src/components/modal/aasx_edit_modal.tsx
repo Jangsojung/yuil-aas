@@ -143,6 +143,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
       document.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
 
   // 실제 수정/등록 실행 함수

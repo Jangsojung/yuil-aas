@@ -99,11 +99,7 @@ export default function FacilityGroupSelect({
           },
         }}
       >
-        {!selectedFactory ? (
-          <MenuItem disabled value=''>
-            공장을 먼저 선택해주세요.
-          </MenuItem>
-        ) : facilityGroups && facilityGroups.length > 0 ? (
+        {facilityGroups && facilityGroups.length > 0 ? (
           <>
             {/* 전체선택 체크박스 */}
             <MenuItem

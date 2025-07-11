@@ -100,11 +100,7 @@ export default function FacilityGroupSelect({
               disabled={disabled || !selectedFactory || facilityGroups.length === 0}
             >
               <MenuItem disabled value=''>
-                {!selectedFactory
-                  ? '공장을 먼저 선택해주세요'
-                  : facilityGroups.length === 0
-                    ? '설비그룹 정보 없음'
-                    : placeholder}
+                {facilityGroups.length === 0 ? '설비그룹 정보 없음' : placeholder}
               </MenuItem>
               {facilityGroups.map((group) => (
                 <MenuItem key={group.fg_idx} value={group.fg_idx}>

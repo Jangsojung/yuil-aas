@@ -7,7 +7,7 @@ from datetime import datetime
 
 def create_submodel(line_name, machine_name, machine_data):
     submodel = model.Submodel(
-        id_=f'https://sambo.com/{line_name}/{machine_name}',
+        id_=f'https://samboant.com/{line_name}/{machine_name}',
         id_short=f'{machine_name}'
     )
 
@@ -76,7 +76,7 @@ def transform_aas(path, data):
     basename = os.path.basename(path)
 
     for line_name, line_data in data.items():
-        id_ = f'https://sambo.com/{line_name}'
+        id_ = f'https://samboant.com/{line_name}'
         aas = model.AssetAdministrationShell(
             id_=id_,
             asset_information=model.AssetInformation(global_asset_id=line_name),

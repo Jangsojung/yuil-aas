@@ -57,11 +57,7 @@ export default function SelectSmall({ setSelectedFile, files: externalFiles, dis
         disabled={disabled}
       >
         <MenuItem disabled value='' className='menu-item-disabled'>
-          {disabled
-            ? '공장을 먼저 선택해주세요'
-            : displayFiles && displayFiles.length > 0
-              ? 'aasx 파일을 선택해 주세요.'
-              : 'aasx 파일이 없습니다.'}
+          {displayFiles && displayFiles.length > 0 ? 'aasx 파일을 선택해 주세요.' : 'aasx 파일이 없습니다.'}
         </MenuItem>
         {displayFiles && displayFiles.length > 0
           ? displayFiles.map((file) => (

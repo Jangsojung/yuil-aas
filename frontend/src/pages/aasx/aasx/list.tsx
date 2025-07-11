@@ -313,7 +313,6 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
               <TableRow>
                 <TableCell padding='checkbox'>
                   <Checkbox
-                    indeterminate={selectedFiles.length > 0 && selectedFiles.length < files.length}
                     checked={selectAll}
                     onChange={handleSelectAllChange}
                     inputProps={{ 'aria-label': 'select all files' }}
