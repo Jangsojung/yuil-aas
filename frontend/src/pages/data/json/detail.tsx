@@ -34,24 +34,13 @@ export default function JsonDetail() {
     setProgress(0);
     setProgressLabel('파일 크기를 확인하는 중...');
 
-    // 프로그레스 시뮬레이션
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) return prev;
-        return prev + Math.random() * 15;
-      });
-    }, 100);
-
-    // 먼저 파일 크기 확인
+    // 파일 크기 확인 및 데이터 로딩
     checkJSONFileSizeAPI(id)
       .then((fileSizeData) => {
-        // 파일이 너무 큰 경우
         if (fileSizeData.isLargeFile) {
-          clearInterval(progressInterval);
           setProgress(100);
           setProgressLabel('완료');
-
-          // 바로 목록으로 이동하고 alert 띄우기
+          setLoading(false);
           navigate('/data/jsonManager', {
             state: {
               showAlert: true,
@@ -59,12 +48,9 @@ export default function JsonDetail() {
               alertContent: `파일 크기: ${(fileSizeData.size / (1024 * 1024)).toFixed(1)}MB\n\n500MB 이상의 파일은 상세보기를 할 수 없습니다.\nText Viewer를 통해 확인해주세요.`,
             },
           });
-          return Promise.reject('FILE_TOO_LARGE'); // 체인 중단
+          return Promise.reject('FILE_TOO_LARGE');
         }
-
-        // 파일 크기가 적절한 경우 상세 데이터 가져오기
         setProgressLabel('파일 데이터를 가져오는 중...');
-
         return getJSONFileDetailAPI(id);
       })
       .then((data) => {
@@ -100,10 +86,11 @@ export default function JsonDetail() {
           });
         }
 
-        clearInterval(progressInterval);
         setProgress(100);
         setProgressLabel('완료');
-        setLoading(false);
+        setTimeout(() => {
+          setLoading(false);
+        }, 100);
       })
       .catch((error) => {
         // 파일이 너무 큰 경우는 이미 처리됨
@@ -111,6 +98,9 @@ export default function JsonDetail() {
           return;
         }
 
+        setProgress(100);
+        setProgressLabel('오류 발생');
+        setLoading(false);
         setAlertModal({
           open: true,
           title: '오류',
@@ -118,10 +108,6 @@ export default function JsonDetail() {
           type: 'alert',
           onConfirm: () => navigate('/data/jsonManager'),
         });
-        clearInterval(progressInterval);
-        setProgress(100);
-        setProgressLabel('오류 발생');
-        setLoading(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -140,9 +126,17 @@ export default function JsonDetail() {
       return;
     }
 
+    setLoading(true); // 수정 버튼 누르면 로딩 시작
     setIsEditing(true);
     setJsonError('');
   };
+
+  // JSON 에디터가 렌더링된 후 로딩 종료
+  useEffect(() => {
+    if (isEditing) {
+      setLoading(false);
+    }
+  }, [isEditing]);
 
   const handleCancelEdit = () => {
     setIsEditing(false);

@@ -47,6 +47,8 @@ export default function FacilityManagementPage() {
     closeAlert,
     progress,
     progressOpen,
+    setProgress,
+    setProgressOpen,
   } = useFacilityManagement();
 
   // 네비게이션 리셋 처리
@@ -55,6 +57,15 @@ export default function FacilityManagementPage() {
       handleReset();
     }
   }, [navigationReset, handleReset]);
+
+  useEffect(() => {
+    if (!treeLoading) {
+      setProgress(100);
+      setTimeout(() => {
+        setProgressOpen(false);
+      }, 100);
+    }
+  }, [treeLoading, setProgress, setProgressOpen]);
 
   return (
     <>
