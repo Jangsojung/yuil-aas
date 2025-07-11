@@ -374,6 +374,18 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileData, open]);
 
+  useEffect(() => {
+    if (fileData && fileData.link_name) {
+      setLinkName(fileData.link_name);
+    }
+  }, [fileData]);
+
+  useEffect(() => {
+    if (open && !fileData) {
+      setLinkName('');
+    }
+  }, [open, fileData]);
+
   return (
     <>
       <BootstrapDialog onClose={handleModalClose} aria-labelledby='customized-dialog-title' open={open}>

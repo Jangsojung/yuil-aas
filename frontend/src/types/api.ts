@@ -4,6 +4,7 @@ export interface AASXFile {
   af_kind?: number;
   fc_idx?: number;
   fc_name?: string;
+  link_name?: string;
   user_idx?: number;
   createdAt?: string;
   updatedAt?: string;

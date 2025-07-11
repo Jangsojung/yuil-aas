@@ -5,6 +5,7 @@ import { FILE_KINDS, FILE } from '../../constants/index.js';
 import { validateValue, validateFcIdx, validateDate, validateNumber } from '../../utils/validation.js';
 import { querySingle, queryMultiple, queryInsert, queryUpdate, withTransaction } from '../../utils/dbHelper.js';
 import { createAasFile, createAasxFile, deleteFiles as deletePythonFiles } from '../../utils/pythonApi.js';
+import { pool } from '../../config/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,14 +18,7 @@ export const getFileFCIdxFromDB = async (fileName, af_kind) => {
   return result ? result.fc_idx : null;
 };
 
-export const getFilesFromDB = async (
-  af_kind,
-  fc_idx,
-  startDate = null,
-  endDate = null,
-  user_idx = null,
-  limit = null
-) => {
+export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate = null, limit = null) => {
   // 파라미터 검증 및 변환
   const validatedAfKind = validateValue(af_kind);
   const validatedFcIdx = validateFcIdx(fc_idx);
@@ -177,13 +171,14 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx, linkName = 
     }
 
     const aasFileName = fileName;
-    const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aas', ?, ?)`;
+    const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater, link_name) VALUES (?, ?, ?, '/files/aas', ?, ?, ?)`;
     const [aasResult] = await connection.query(aasQuery, [
       fc_idx,
       FILE_KINDS.AAS_KIND,
       aasFileName,
       user_idx,
       user_idx,
+      linkName,
     ]);
     aasInsertId = aasResult.insertId;
 
@@ -208,13 +203,14 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx, linkName = 
     }
 
     const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
-    const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aasx', ?, ?)`;
+    const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater, link_name) VALUES (?, ?, ?, '/files/aasx', ?, ?, ?)`;
     const [aasxResult] = await connection.query(aasxQuery, [
       fc_idx,
       FILE_KINDS.AASX_KIND,
       aasxFileName,
       user_idx,
       user_idx,
+      linkName,
     ]);
     aasxInsertId = aasxResult.insertId;
 
@@ -332,16 +328,17 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
     );
 
     if (existingAasRows.length > 0) {
-      const updateAasQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_name = ? AND af_kind = ?`;
-      await connection.query(updateAasQuery, [newAasFileName, user_idx, oldAasFileName, FILE_KINDS.AAS_KIND]);
+      const updateAasQuery = `UPDATE tb_aasx_file SET af_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP, link_name = ? WHERE af_name = ? AND af_kind = ?`;
+      await connection.query(updateAasQuery, [newAasFileName, user_idx, linkName, oldAasFileName, FILE_KINDS.AAS_KIND]);
     } else {
-      const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aas', ?, ?)`;
+      const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater, link_name) VALUES (?, ?, ?, '/files/aas', ?, ?, ?)`;
       const [aasResult] = await connection.query(insertAasQuery, [
         fc_idx,
         FILE_KINDS.AAS_KIND,
         newAasFileName,
         user_idx,
         user_idx,
+        linkName,
       ]);
       newAasInsertId = aasResult.insertId;
       createdFiles.push({ type: 'aas', path: `../files/aas/${fileName}`, insertId: newAasInsertId });
@@ -370,13 +367,14 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
       throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
     }
 
-    const insertAasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater) VALUES (?, ?, ?, '/files/aasx', ?, ?)`;
+    const insertAasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater, link_name) VALUES (?, ?, ?, '/files/aasx', ?, ?, ?)`;
     const [aasxResult] = await connection.query(insertAasxQuery, [
       fc_idx,
       FILE_KINDS.AASX_KIND,
       newAasxFileName,
       user_idx,
       user_idx,
+      linkName,
     ]);
     newAasxInsertId = aasxResult.insertId;
     createdFiles.push({ type: 'aasx', path: `../files/aasx/${newAasxFileName}`, insertId: newAasxInsertId });

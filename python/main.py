@@ -13,7 +13,7 @@ app = Flask(__name__)
 def create_aas():
     data = request.get_json()
     path = data['path']
-    link_name = data.get('linkName', 'aasx.com')
+    link_name = data.get('linkName')
     old_path = data.get('old_path')
 
     if old_path and os.path.exists(old_path):

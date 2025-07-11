@@ -25,6 +25,7 @@ interface File {
   updatedAt?: string;
   fc_idx?: number;
   fc_name?: string;
+  link_name?: string;
 }
 
 interface AASXListProps {
@@ -203,6 +204,10 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
       af_idx: file.af_idx,
       af_name: file.af_name,
       createdAt: file.createdAt,
+      updatedAt: file.updatedAt,
+      fc_idx: file.fc_idx,
+      fc_name: file.fc_name,
+      link_name: file.link_name,
     };
     onEditClick(aasxFile);
   };
