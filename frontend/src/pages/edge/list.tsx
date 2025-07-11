@@ -126,23 +126,26 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       return;
     }
 
-    if (!window.confirm(`선택한 ${selectedEdgeGateways.length}개 항목을 삭제하시겠습니까?`)) {
-      return;
-    }
-
-    const result = await deleteEdgeAPI({ ids: selectedEdgeGateways });
-
-    if (result) {
-      setEdgeGateways(edgeGateways.filter((eg) => !selectedEdgeGateways.includes(eg.eg_idx)));
-      setSelectedEdgeGateways([]);
-      setAlertModal({
-        open: true,
-        title: '알림',
-        content: '선택한 항목이 삭제되었습니다.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
-    }
+    setAlertModal({
+      open: true,
+      title: '삭제 확인',
+      content: `선택한 ${selectedEdgeGateways.length}개 항목을 삭제하시겠습니까?`,
+      type: 'confirm',
+      onConfirm: async () => {
+        const result = await deleteEdgeAPI({ ids: selectedEdgeGateways });
+        if (result) {
+          setSelectedEdgeGateways([]);
+          await getEdgeWithStatus();
+          setAlertModal({
+            open: true,
+            title: '알림',
+            content: '선택한 항목이 삭제되었습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
+        }
+      },
+    });
   };
 
   const getEdge = async () => {
@@ -261,11 +264,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
             </Grid>
             <Grid>
               <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                <TextField
-                  size='small'
-                  value={pcName}
-                  onChange={(e) => setPcName(e.target.value)}
-                />
+                <TextField size='small' value={pcName} onChange={(e) => setPcName(e.target.value)} />
               </FormControl>
             </Grid>
           </Grid>
@@ -277,11 +276,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
             </Grid>
             <Grid>
               <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                <TextField
-                  size='small'
-                  value={ipAddress}
-                  onChange={(e) => setIpAddress(e.target.value)}
-                />
+                <TextField size='small' value={ipAddress} onChange={(e) => setIpAddress(e.target.value)} />
               </FormControl>
             </Grid>
           </Grid>
