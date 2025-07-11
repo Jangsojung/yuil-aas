@@ -13,6 +13,7 @@ app = Flask(__name__)
 def create_aas():
     data = request.get_json()
     path = data['path']
+    link_name = data.get('linkName', 'aasx.com')
     old_path = data.get('old_path')
 
     if old_path and os.path.exists(old_path):
@@ -26,7 +27,7 @@ def create_aas():
     with open(path, 'rb') as json_file:
         data = orjson.loads(json_file.read())
 
-    transform_aas(path, data)
+    transform_aas(path, data, link_name)
 
     return 'AAS 변환 성공', 201
 

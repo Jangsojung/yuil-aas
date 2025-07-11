@@ -71,6 +71,7 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
   const [selectedFile, setSelectedFile] = useState<globalThis.File | null>(null);
   const [selectedJSONFile, setSelectedJSONFile] = useState<JSONFile | undefined>(undefined);
   const [selectedFactory, setSelectedFactory] = useState<number | undefined>(undefined);
+  const [linkName, setLinkName] = useState<string>('aasx.com');
   const [progress, setProgress] = useState(0);
   const [progressLabel, setProgressLabel] = useState('');
   const [sizeWarning, setSizeWarning] = useState('');
@@ -92,6 +93,7 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
     setSelectedFile(null);
     setSelectedJSONFile(undefined);
     setSelectedFactory(undefined);
+    setLinkName('aasx.com');
   };
 
   // 공장 변경 핸들러
@@ -119,7 +121,7 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
 
       // 선택된 JSON 파일의 fc_idx 사용
       const fc_idx = selectedJSONFile?.fc_idx || selectedFactory;
-      const result = await uploadAASXFileAPI(selectedFile, userIdx, fc_idx);
+      const result = await uploadAASXFileAPI(selectedFile, userIdx, fc_idx, linkName);
 
       setProgress(80);
       setProgressLabel('AASX 파일 생성 중 ...'); // AASX 파일 생성 시작
@@ -266,6 +268,28 @@ export default function CustomizedDialogs({ handleInsert }: Props) {
               </Grid>
               <Grid>
                 <FactorySelect value={selectedFactory || ''} onChange={handleFactoryChange} placeholder='선택' />
+              </Grid>
+            </Grid>
+
+            {/* 링크명 입력 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>링크명</div>
+              </Grid>
+              <Grid>
+                <input
+                  type='text'
+                  value={linkName}
+                  onChange={(e) => setLinkName(e.target.value)}
+                  placeholder='aasx.com'
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                  }}
+                />
               </Grid>
             </Grid>
 

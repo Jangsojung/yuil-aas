@@ -61,11 +61,12 @@ export const getFileFCIdxAPI = async (fileName, af_kind = KINDS.JSON_KIND) => {
 };
 
 // AASX 파일 업로드
-export const uploadAASXFileAPI = async (fileData, userIdx, fc_idx) => {
+export const uploadAASXFileAPI = async (fileData, userIdx, fc_idx, linkName = 'aasx.com') => {
   try {
     const formData = new FormData();
     formData.append('fc_idx', fc_idx.toString());
     formData.append('user_idx', userIdx.toString());
+    formData.append('linkName', linkName);
     formData.append('file', fileData);
 
     const response = await fetch(API_ENDPOINTS.FILE.AASX, {
@@ -89,12 +90,13 @@ export const uploadAASXFileAPI = async (fileData, userIdx, fc_idx) => {
 };
 
 // AASX 파일 수정
-export const updateAASXFileAPI = async (af_idx, fileName, userIdx, fc_idx) => {
+export const updateAASXFileAPI = async (af_idx, fileName, userIdx, fc_idx, linkName = 'aasx.com') => {
   try {
     const result = await apiHelpers.post(
       `${API_ENDPOINTS.FILE.AASX_UPDATE}?af_idx=${af_idx}&user_idx=${userIdx}&fc_idx=${fc_idx}`,
       {
         fileName,
+        linkName,
       }
     );
     return result;

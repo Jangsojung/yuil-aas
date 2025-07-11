@@ -74,6 +74,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   const [progressLabel, setProgressLabel] = useState('');
   const [, setSizeWarning] = useState('');
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [linkName, setLinkName] = useState<string>('');
 
   const title = fileData ? (selectedFile ? `${selectedFile.af_name} 수정` : '데이터 수정') : '파일 등록';
 
@@ -181,7 +182,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
 
         updateProgress(50, '새 AASX 파일 생성 중...');
         // 새 AASX 파일 생성 작업
-        result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx, fc_idx);
+        result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx, fc_idx, linkName);
 
         updateProgress(70, '기존 파일 삭제 중...');
         // 기존 파일 삭제 작업 (백엔드에서 처리)
@@ -217,7 +218,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         // AAS 파일 생성 작업
 
         updateProgress(60, 'AASX 파일 변환 중...');
-        result = await uploadAASXFileAPI(uploadFile, userIdx, fc_idx);
+        result = await uploadAASXFileAPI(uploadFile, userIdx, fc_idx, linkName);
 
         updateProgress(80, '데이터베이스 저장 중...');
         // DB 저장 작업
@@ -393,6 +394,31 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
           <CloseIcon />
         </IconButton>
         <DialogContent dividers className='file-upload'>
+          <Box sx={{ mb: 2 }}>
+            <div style={{ fontWeight: 500, marginBottom: 4 }}>링크명</div>
+            <input
+              type='text'
+              value={linkName}
+              onChange={(e) => setLinkName(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '14px',
+              }}
+            />
+            <div
+              style={{
+                marginTop: '8px',
+                fontSize: '12px',
+                color: '#666',
+                fontStyle: 'italic',
+              }}
+            >
+              예시: samboant.com 등 회사 URL
+            </div>
+          </Box>
           <Box sx={{ typography: 'subtitle2' }}>json 파일</Box>
           <FileUpload {...fileUploadProp} />
         </DialogContent>

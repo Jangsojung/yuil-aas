@@ -54,7 +54,7 @@ export const uploadAASXFile = async (req, res) => {
     if (!req.file) {
       return fileNotUploadedError(res);
     }
-    const { fc_idx, user_idx } = req.body;
+    const { fc_idx, user_idx, linkName } = req.body;
     const fileName = req.file.originalname;
 
     // files 디렉토리와 front 디렉토리 생성
@@ -71,7 +71,7 @@ export const uploadAASXFile = async (req, res) => {
     const frontFilePath = path.join(frontDir, fileName);
     fs.writeFileSync(frontFilePath, req.file.buffer);
     // AASX 파일 생성 및 DB 저장
-    const result = await insertAASXFileToDB(fc_idx, fileName, user_idx);
+    const result = await insertAASXFileToDB(fc_idx, fileName, user_idx, linkName);
     successResponse(res, result);
   } catch (err) {
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
@@ -84,7 +84,7 @@ export const uploadAASXFile = async (req, res) => {
 
 export const updateAASXFile = async (af_idx, fileName, user_idx, fc_idx, res) => {
   try {
-    const result = await updateAASXFileToDB(af_idx, fileName, user_idx, fc_idx);
+    const result = await updateAASXFileToDB(af_idx, fileName, user_idx, fc_idx, 'aasx.com');
     successResponse(res, result);
   } catch (err) {
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {

@@ -5,9 +5,9 @@ from basyx.aas.adapter import aasx, json as basyx_json
 from datetime import datetime
 
 
-def create_submodel(line_name, machine_name, machine_data):
+def create_submodel(line_name, machine_name, machine_data, link_name='aasx.com'):
     submodel = model.Submodel(
-        id_=f'https://samboant.com/{line_name}/{machine_name}',
+        id_=f'https://{link_name}/{line_name}/{machine_name}',
         id_short=f'{machine_name}'
     )
 
@@ -70,13 +70,13 @@ def create_submodel(line_name, machine_name, machine_data):
     return submodel
 
 
-def transform_aas(path, data):
+def transform_aas(path, data, link_name='aasx.com'):
     aas_ids = []
     obj_store = model.DictObjectStore()
     basename = os.path.basename(path)
 
     for line_name, line_data in data.items():
-        id_ = f'https://samboant.com/{line_name}'
+        id_ = f'https://{link_name}/{line_name}'
         aas = model.AssetAdministrationShell(
             id_=id_,
             asset_information=model.AssetInformation(global_asset_id=line_name),
@@ -84,7 +84,7 @@ def transform_aas(path, data):
         )
 
         for machine_name, machine_data in line_data.items():
-            submodel = create_submodel(line_name, machine_name, machine_data)
+            submodel = create_submodel(line_name, machine_name, machine_data, link_name)
             aas.submodel.add(model.ModelReference.from_referable(submodel))
             obj_store.add(submodel)
 

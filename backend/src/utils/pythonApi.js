@@ -51,10 +51,11 @@ export const deletePythonApi = async (endpoint, data) => {
 /**
  * AAS 파일 생성 API 호출
  * @param {string} filePath - 파일 경로
+ * @param {string} linkName - 링크명 (기본값: 'aasx.com')
  * @returns {Promise<Response>} 응답 객체
  */
-export const createAasFile = async (filePath) => {
-  return await callPythonApi('/api/aas', { path: filePath });
+export const createAasFile = async (filePath, linkName = 'aasx.com') => {
+  return await callPythonApi('/api/aas', { path: filePath, linkName });
 };
 
 /**

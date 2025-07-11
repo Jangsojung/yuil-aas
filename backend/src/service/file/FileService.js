@@ -142,7 +142,7 @@ export const getFilesFromDB = async (
   return files;
 };
 
-export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
+export const insertAASXFileToDB = async (fc_idx, fileName, user_idx, linkName = 'aasx.com') => {
   return await withTransaction(async (connection) => {
     // 기존 파일 확인
     const existing = await connection.query(
@@ -159,7 +159,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx) => {
 
     // AAS 파일 생성
     try {
-      await createAasFile(frontFilePath);
+      await createAasFile(frontFilePath, linkName);
     } catch (error) {
       const fs = await import('fs');
       const aasFilePath = `../files/aas/${fileName}`;
@@ -261,7 +261,7 @@ const cleanupCreatedFiles = async (createdFiles) => {
   }
 };
 
-export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => {
+export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, linkName = 'aasx.com') => {
   let newAasInsertId = null;
   let newAasxInsertId = null;
   let createdFiles = [];
@@ -312,6 +312,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx) => 
         },
         body: JSON.stringify({
           path: frontFilePath,
+          linkName: linkName,
         }),
       });
 
