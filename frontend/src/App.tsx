@@ -19,7 +19,6 @@ import FacilityPage from './pages/aas/facility';
 import BasicCodeIndex from './pages/aas/basic';
 import BasicCodeAdd from './pages/aas/basic/add';
 import BasicCodeEdit from './pages/aas/basic/edit';
-import JsonDetail from './pages/data/json/detail';
 
 function App() {
   return (
@@ -110,10 +109,6 @@ export default function ReactRouter() {
                 {
                   path: 'jsonManager',
                   element: <JSONManagerPage />,
-                },
-                {
-                  path: 'jsonManager/detail/:id',
-                  element: <JsonDetail />,
                 },
               ],
             },
