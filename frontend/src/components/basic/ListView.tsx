@@ -109,7 +109,7 @@ export const ListView: React.FC<ListViewProps> = ({
                 <div>공장</div>
               </Grid>
               <Grid sx={{ flexGrow: 1 }}>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <FormControl sx={{ width: '100%' }} size='small'>
                   <FactorySelect
                     value={selectedFactory}
                     onChange={onFactoryChange}
@@ -127,7 +127,7 @@ export const ListView: React.FC<ListViewProps> = ({
                 <div>기초코드명</div>
               </Grid>
               <Grid>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <FormControl sx={{ width: '100%' }} size='small'>
                   <TextField
                     size='small'
                     value={searchKeyword}

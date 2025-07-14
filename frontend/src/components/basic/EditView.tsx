@@ -100,7 +100,7 @@ export const EditView: React.FC<EditViewProps> = ({
                 <div>공장</div>
               </Grid>
               <Grid>
-                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                <FormControl sx={{ width: '100%' }} size='small'>
                   <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
                 </FormControl>
               </Grid>
@@ -114,7 +114,7 @@ export const EditView: React.FC<EditViewProps> = ({
               <div>설비그룹</div>
             </Grid>
             <Grid>
-              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+              <FormControl sx={{ width: '100%' }} size='small'>
                 <FacilityGroupSelect
                   selectedFacilityGroups={selectedFacilityGroups}
                   setSelectedFacilityGroups={setSelectedFacilityGroups}

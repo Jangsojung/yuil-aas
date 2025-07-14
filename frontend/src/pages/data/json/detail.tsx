@@ -6,6 +6,7 @@ import ActionBox from '../../../components/common/ActionBox';
 import ProgressOverlay from '../../../components/loading/ProgressOverlay';
 import AlertModal from '../../../components/modal/alert';
 import { Box } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
 import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
@@ -200,15 +201,9 @@ export default function JsonDetail() {
   if (!jsonData) return <div>데이터가 없습니다.</div>;
 
   return (
-    <div className='table-outer' style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}
-      >
+    <div className='table-outer no-flex-header'>
+    
+      <div>
         <CustomBreadcrumb
           items={[
             { label: '데이터 관리', path: '/data', clickable: true },
@@ -217,7 +212,13 @@ export default function JsonDetail() {
         />
         <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>JSON 파일 관리</span>
       </div>
-      <div style={{ flexShrink: 0 }}>
+
+      <div className='list-header '>
+        
+        <Typography variant='h6' gutterBottom>
+          JSON 파일 미리보기
+        </Typography>
+
         <ActionBox
           buttons={
             isEditing
@@ -250,7 +251,7 @@ export default function JsonDetail() {
           }
         />
       </div>
-      <div style={{ flex: 1, marginTop: 16, overflow: 'auto' }}>
+      <div className='json-viewer'>
         {isEditing ? (
           <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <JSONInput
@@ -280,7 +281,7 @@ export default function JsonDetail() {
             enableClipboard={true}
             displayDataTypes={false}
             displayObjectSize={true}
-            style={{ fontSize: 18 }}
+            
           />
         )}
       </div>

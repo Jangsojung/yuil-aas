@@ -237,7 +237,7 @@ export default function DashboardPage() {
               </Typography>
             </Box>
           ) : selectedJsonData ? (
-            <div style={{ marginTop: 15 }}>
+            <div style={{paddingTop: 15, paddingLeft: 15,overflowY: 'auto' }}>
               <JSONViewer
                 value={selectedJsonData}
                 collapsed={3}
@@ -303,7 +303,7 @@ export default function DashboardPage() {
               </Typography>
             </Box>
           ) : selectedAasxData ? (
-            <div style={{ marginTop: 15 }}>
+            <div style={{paddingTop: 15, overflowY: 'auto' }}>
               <TreeView data={transformAASXData(selectedAasxData)} />
             </div>
           ) : (

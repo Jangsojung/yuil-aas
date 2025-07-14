@@ -84,6 +84,7 @@ main {
       border: 0;
     }
     .MuiFormControl-root {
+      width: 200px;
       //셀렉트
       .MuiSelect-select {
         padding: 6px 14px;
@@ -175,12 +176,17 @@ main {
       box-shadow: none;
     }
     .table-outer {
-      // display: flex;
-      // flex-direction: column;
-      // flex-grow: 1;
+      display: block;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
       height: calc(100% - 55px);
-      // border: 1px solid #E5E8EB;
     }
+    .no-flex-header.table-outer {
+      display: block;
+      height: calc(100% - 55px);
+    }
+    
     .table-wrap {
       height: calc(100% - 100px);
       display: flex;
@@ -259,11 +265,17 @@ main {
     .MuiTablePagination-select {
       display: none;
     }
+    .MuiTablePagination-selectLabel {
+      font-family: 'Public Sans' ,sans-serif !important;
+    }
 
     //데이트피커
     .datepicker-wrap {
       .MuiInputBase-root {
-        min-width: 165px;
+        width: 100%;
+      }
+      .MuiFormControl-root {
+        width: 165px;
       }
       .MuiInputLabel-formControl {
         transform: translate(14px, 7px) scale(1);
@@ -305,6 +317,16 @@ main {
     .MuiTreeItem-content .MuiTreeItem-label {
       font-family: 'Public Sans', sans-serif !important;
       color: #000;
+    }
+
+    //json viewer
+    .json-viewer {
+      height: calc(100% - 40px);
+      border: 1px solid rgba(145, 158, 171, 0.24);
+      margin-top:8px ;
+      padding-left: 10px;
+      padding-top: 10px;
+      margin-right: 0px;
     }
 
     //대시보드

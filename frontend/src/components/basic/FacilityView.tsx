@@ -255,7 +255,7 @@ export const FacilityView: React.FC<
               <div>공장</div>
             </Grid>
             <Grid sx={{ flexGrow: 1 }}>
-              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+              <FormControl sx={{ width: '100%' }} size='small'>
                 <FactorySelect
                   value={selectedFactory}
                   onChange={handleFactoryChange}
@@ -273,7 +273,7 @@ export const FacilityView: React.FC<
               <div>설비그룹</div>
             </Grid>
             <Grid sx={{ flexGrow: 1 }}>
-              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+              <FormControl sx={{ width: '100%' }} size='small'>
                 <FacilityGroupSelect
                   selectedFacilityGroups={selectedFacilityGroups}
                   setSelectedFacilityGroups={setSelectedFacilityGroups}
@@ -291,7 +291,7 @@ export const FacilityView: React.FC<
               <div>설비명</div>
             </Grid>
             <Grid sx={{ flexGrow: 1 }}>
-              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+              <FormControl sx={{ width: '100%' }} size='small'>
                 <TextField size='small' value={facilityName} onChange={(e) => setFacilityName(e.target.value)} />
               </FormControl>
             </Grid>
@@ -304,7 +304,7 @@ export const FacilityView: React.FC<
               <div>센서명</div>
             </Grid>
             <Grid sx={{ flexGrow: 1 }}>
-              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+              <FormControl sx={{ width: '100%' }} size='small'>
                 <TextField size='small' value={sensorName} onChange={(e) => setSensorName(e.target.value)} />
               </FormControl>
             </Grid>
