@@ -1,5 +1,6 @@
 import React from 'react';
 import TablePagination from '@mui/material/TablePagination';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { PAGINATION } from '../../constants';
 
 interface PaginationProps {
@@ -33,6 +34,9 @@ export default function CustomPagination({
       labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count !== -1 ? count : `${to}개 이상`}`}
       showFirstButton
       showLastButton
+      SelectProps={{
+        IconComponent: ExpandMoreIcon,
+      }}
       sx={{
         '& .MuiTablePagination-selectLabel': {
           display: 'block !important',
