@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import Paper from '@mui/material/Paper';
 import { Table, TableBody, TableContainer, TableHead, TableRow, TableCell, Checkbox } from '@mui/material';
 import Grid from '@mui/system/Grid';
@@ -10,8 +10,6 @@ import { usePagination } from '../../../hooks/usePagination';
 import { useSortableData, SortableColumn } from '../../../hooks/useSortableData';
 import FactorySelect from '../../../components/select/factory_select';
 import { getJSONFilesAPI, deleteJSONAPI } from '../../../apis/api/json_manage';
-import { useRecoilValue } from 'recoil';
-import { navigationResetState } from '../../../recoil/atoms';
 import { useLocation, useNavigate } from 'react-router-dom';
 import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../../components/datepicker';
@@ -27,17 +25,31 @@ interface File {
   fc_name?: string;
 }
 
-export default function JSONList() {
+interface JSONListProps {
+  onDetailClick?: (fileId: number) => void;
+  searchCondition: {
+    selectedFactory: number | '';
+    startDate: any;
+    endDate: any;
+  };
+  setSearchCondition: React.Dispatch<
+    React.SetStateAction<{
+      selectedFactory: number | '';
+      startDate: any;
+      endDate: any;
+    }>
+  >;
+  isSearchActive: boolean;
+  setIsSearchActive: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSONList(
+  { onDetailClick, searchCondition, setSearchCondition, isSearchActive, setIsSearchActive },
+  ref
+) {
   const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [selectAll, setSelectAll] = useState(false);
-  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
-  const navigationReset = useRecoilValue(navigationResetState);
-  const navigate = useNavigate();
-  const location = useLocation();
-
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -45,6 +57,11 @@ export default function JSONList() {
     type: 'alert' as 'alert' | 'confirm',
     onConfirm: undefined as (() => void) | undefined,
   });
+  const [startDate, setStartDate] = useState<any>(searchCondition.startDate);
+  const [endDate, setEndDate] = useState<any>(searchCondition.endDate);
+  const [selectedFactory, setSelectedFactory] = useState<number | ''>(searchCondition.selectedFactory);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // 정렬 기능
   const {
@@ -116,7 +133,31 @@ export default function JSONList() {
     // 공장 변경 시 파일 목록은 그대로 유지 (검색 버튼을 눌러야만 새로 조회)
   };
 
-  const handleSearch = () => {
+  const handleReset = () => {
+    const defaultStart = dayjs().subtract(1, 'month');
+    const defaultEnd = dayjs();
+    setStartDate(defaultStart);
+    setEndDate(defaultEnd);
+    setSelectedFactory('');
+    setSelectedFiles([]);
+    setFiles([]); // 파일 목록 초기화
+    setIsSearchActive(false);
+  };
+
+  const getFiles = useCallback(
+    async (start = startDate, end = endDate) => {
+      const startDateStr = start ? dayjs(start).format('YYYY-MM-DD') : '';
+      const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
+
+      const data: File[] = await getJSONFilesAPI(startDateStr, endDateStr, selectedFactory);
+      setFiles(Array.isArray(data) ? data : []);
+      setIsSearchActive(true);
+    },
+    [startDate, endDate, selectedFactory]
+  );
+
+  // 검색 버튼 클릭 시
+  const handleSearch = useCallback(() => {
     if (!startDate || !endDate || startDate > endDate) {
       setAlertModal({
         open: true,
@@ -140,25 +181,15 @@ export default function JSONList() {
     }
 
     getFiles();
-  };
+    setIsSearchActive(true);
+  }, [startDate, endDate, selectedFactory, getFiles]);
 
-  const handleReset = () => {
-    const defaultStart = dayjs().subtract(1, 'month');
-    const defaultEnd = dayjs();
-    setStartDate(defaultStart);
-    setEndDate(defaultEnd);
-    setSelectedFactory('');
-    setSelectedFiles([]);
-    setFiles([]); // 파일 목록 초기화
-  };
-
-  const getFiles = async (start = startDate, end = endDate) => {
-    const startDateStr = start ? dayjs(start).format('YYYY-MM-DD') : '';
-    const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
-
-    const data: File[] = await getJSONFilesAPI(startDateStr, endDateStr, selectedFactory);
-    setFiles(Array.isArray(data) ? data : []);
-  };
+  // isSearchActive가 true일 때 자동 검색 실행
+  useEffect(() => {
+    if (isSearchActive) {
+      handleSearch();
+    }
+  }, [isSearchActive, handleSearch]);
 
   const handleSelectAllChange = (event: ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;
@@ -191,12 +222,14 @@ export default function JSONList() {
     handleReset();
   };
 
+  // 검색 조건이 바뀌면 부모에도 반영
   useEffect(() => {
-    if (navigationReset) {
-      handleNavigationReset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigationReset]);
+    setSearchCondition({
+      selectedFactory,
+      startDate,
+      endDate,
+    });
+  }, [selectedFactory, startDate, endDate, setSearchCondition]);
 
   useEffect(() => {
     const defaultStart = dayjs().subtract(1, 'month');
@@ -230,8 +263,19 @@ export default function JSONList() {
     }
   }, [selectedFiles, files]);
 
+  // refresh 메서드를 ref로 노출
+  useImperativeHandle(ref, () => ({
+    refresh: () => {
+      getFiles();
+    },
+  }));
+
   const handleRowClick = (af_idx: number) => {
-    navigate(`/data/jsonManager/detail/${af_idx}`);
+    if (onDetailClick) {
+      onDetailClick(af_idx);
+    } else {
+      navigate(`/data/jsonManager/detail/${af_idx}`);
+    }
   };
 
   return (
@@ -242,6 +286,7 @@ export default function JSONList() {
             text: '검색',
             onClick: handleSearch,
             color: 'primary',
+            variant: 'contained',
           },
           {
             text: '초기화',
@@ -348,4 +393,6 @@ export default function JSONList() {
       />
     </div>
   );
-}
+});
+
+export default JSONList;

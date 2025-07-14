@@ -1,21 +1,20 @@
-import { useParams, useNavigate } from 'react-router-dom';
 import ReactJson from '@uiw/react-json-view';
 import React, { useRef, useEffect, useState } from 'react';
 import { getJSONFileDetailAPI, checkJSONFileSizeAPI } from '../../../apis/api/json_manage';
 import ActionBox from '../../../components/common/ActionBox';
 import AlertModal from '../../../components/modal/alert';
 import { Box, Typography } from '@mui/material';
-import JSONInput from 'react-json-editor-ajrm';
-import locale from 'react-json-editor-ajrm/locale/en';
-import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
 import JSONEditor from 'jsoneditor';
 import 'jsoneditor/dist/jsoneditor.css';
 import LodingOverlay from '../../../components/loading/LodingOverlay';
 
-export default function JsonDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [jsonData, setJsonData] = useState(null);
+interface JSONDetailProps {
+  fileId: number | null;
+  onBackToList: () => void;
+}
+
+export default function JSONDetail({ fileId, onBackToList }: JSONDetailProps) {
+  const [jsonData, setJsonData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [, setProgress] = useState(0);
   const [, setProgressLabel] = useState('');
@@ -33,41 +32,40 @@ export default function JsonDetail() {
   const jsonEditorInstance = useRef<any>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!fileId) return;
     setLoading(true);
     setProgress(0);
     setProgressLabel('파일 크기를 확인하는 중...');
 
     // 파일 크기 확인 및 데이터 로딩
-    checkJSONFileSizeAPI(id)
+    checkJSONFileSizeAPI(fileId)
       .then((fileSizeData) => {
         if (fileSizeData.isLargeFile) {
           setProgress(100);
           setProgressLabel('완료');
           setLoading(false);
-          navigate('/data/jsonManager', {
-            state: {
-              showAlert: true,
-              alertTitle: '파일 크기 초과',
-              alertContent: `파일 크기: ${(fileSizeData.size / (1024 * 1024)).toFixed(1)}MB\n\n500MB 이상의 파일은 상세보기를 할 수 없습니다.\nText Viewer를 통해 확인해주세요.`,
-            },
+          setAlertModal({
+            open: true,
+            title: '파일 크기 초과',
+            content: `파일 크기: ${(fileSizeData.size / (1024 * 1024)).toFixed(1)}MB\n\n500MB 이상의 파일은 상세보기를 할 수 없습니다.\nText Viewer를 통해 확인해주세요.`,
+            type: 'alert',
+            onConfirm: () => onBackToList(),
           });
           return Promise.reject('FILE_TOO_LARGE');
         }
         setProgressLabel('파일 데이터를 가져오는 중...');
-        return getJSONFileDetailAPI(id);
+        return getJSONFileDetailAPI(fileId);
       })
       .then((data) => {
         if (data && data.aasData) {
           // 큰 파일인 경우 특별 처리
           if (data.isLargeFile) {
-            // 바로 목록으로 이동하고 alert 띄우기
-            navigate('/data/jsonManager', {
-              state: {
-                showAlert: true,
-                alertTitle: '큰 파일 감지',
-                alertContent: `파일 크기: ${(data.totalSize / (1024 * 1024)).toFixed(1)}MB\n\n${data.aasData._message}`,
-              },
+            setAlertModal({
+              open: true,
+              title: '큰 파일 감지',
+              content: `파일 크기: ${(data.totalSize / (1024 * 1024)).toFixed(1)}MB\n\n${data.aasData._message}`,
+              type: 'alert',
+              onConfirm: () => onBackToList(),
             });
             return;
           } else {
@@ -86,7 +84,7 @@ export default function JsonDetail() {
             title: '데이터 없음',
             content: '파일 데이터를 찾을 수 없습니다.',
             type: 'alert',
-            onConfirm: () => navigate(-1),
+            onConfirm: () => onBackToList(),
           });
         }
 
@@ -110,11 +108,10 @@ export default function JsonDetail() {
           title: '오류',
           content: '파일 처리 중 오류가 발생했습니다.',
           type: 'alert',
-          onConfirm: () => navigate('/data/jsonManager'),
+          onConfirm: () => onBackToList(),
         });
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [fileId, onBackToList]);
 
   const handleEditClick = () => {
     // 파일 크기가 50MB 이상인 경우 수정 불가
@@ -201,22 +198,10 @@ export default function JsonDetail() {
   if (!jsonData) return <LodingOverlay />;
 
   return (
-    <div className='table-outer no-flex-header'>
-    
-      <div>
-        <CustomBreadcrumb
-          items={[
-            { label: '데이터 관리', path: '/data', clickable: true },
-            { label: 'JSON 파일 관리', path: '/data/jsonManager', clickable: true },
-          ]}
-        />
-        <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>JSON 파일 관리</span>
-      </div>
-
-      <div className='list-header '>
-        
+    <div className='table-outer'>
+      <div className='list-header'>
         <Typography variant='h6' gutterBottom>
-          JSON 파일 미리보기
+          {isEditing ? 'JSON 파일 수정' : 'JSON 파일 미리보기'}
         </Typography>
 
         <ActionBox
@@ -243,7 +228,7 @@ export default function JsonDetail() {
                   },
                   {
                     text: '목록',
-                    onClick: () => navigate('/data/jsonManager'),
+                    onClick: onBackToList,
                     color: 'inherit',
                     variant: 'outlined',
                   },
@@ -251,18 +236,21 @@ export default function JsonDetail() {
           }
         />
       </div>
+
       <div className='json-viewer'>
         {isEditing ? (
           <div ref={setEditorRef} style={{ height: '500px', width: '100%' }} />
         ) : (
-          <ReactJson
-            value={jsonData}
-            collapsed={3}
-            enableClipboard={true}
-            displayDataTypes={false}
-            displayObjectSize={true}
-            
-          />
+          jsonData && (
+            <ReactJson
+              value={jsonData}
+              collapsed={3}
+              enableClipboard={true}
+              displayDataTypes={false}
+              displayObjectSize={true}
+              style={{ fontSize: 16 }}
+            />
+          )
         )}
         {jsonError && (
           <Box sx={{ color: 'error.main', fontSize: '12px', mt: 1, p: 1, bgcolor: 'error.light' }}>{jsonError}</Box>

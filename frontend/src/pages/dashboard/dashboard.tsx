@@ -198,16 +198,6 @@ export default function DashboardPage() {
         <Box sx={{ ...dashboardPanelStyle }}>
           <Typography variant='h6' gutterBottom className='dashboard-title'>
             {selectedJson ? `JSON 파일 - ${selectedJson.af_name}` : 'JSON 파일 미리보기'}
-            {selectedJson && (
-              <Button
-                onClick={() => navigate(`/data/jsonManager/detail/${selectedJson.af_idx}`)}
-                disabled={!selectedJson}
-                variant='outlined'
-                size='small'
-              >
-                상세보기
-              </Button>
-            )}
           </Typography>
 
           {jsonLoading ? (
@@ -237,7 +227,7 @@ export default function DashboardPage() {
               </Typography>
             </Box>
           ) : selectedJsonData ? (
-            <div style={{paddingTop: 15, paddingLeft: 15,overflowY: 'auto' }}>
+            <div style={{ paddingTop: 15, paddingLeft: 15, overflowY: 'auto' }}>
               <JSONViewer
                 value={selectedJsonData}
                 collapsed={3}
@@ -303,7 +293,7 @@ export default function DashboardPage() {
               </Typography>
             </Box>
           ) : selectedAasxData ? (
-            <div style={{paddingTop: 15, overflowY: 'auto' }}>
+            <div style={{ paddingTop: 15, overflowY: 'auto' }}>
               <TreeView data={transformAASXData(selectedAasxData)} />
             </div>
           ) : (
