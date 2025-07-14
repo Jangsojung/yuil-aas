@@ -176,10 +176,6 @@ export const useBasicList = (navigate: any) => {
       await deleteBasesAPI(selectedBases);
       setBases(bases.filter((base) => !selectedBases.includes(base.ab_idx)));
       setSelectedBases([]);
-      setAlertTitle('알림');
-      setAlertContent('선택한 항목이 삭제되었습니다.');
-      setAlertType(MODAL_TYPE.ALERT);
-      setAlertOpen(true);
 
       // 검색 상태를 유지하면서 현재 검색 조건으로 다시 검색
       await performSearch();

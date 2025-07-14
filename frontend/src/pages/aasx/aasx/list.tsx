@@ -25,6 +25,7 @@ interface File {
   updatedAt?: string;
   fc_idx?: number;
   fc_name?: string;
+  link_name?: string;
 }
 
 interface AASXListProps {
@@ -96,14 +97,6 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
       onConfirm: async () => {
         try {
           await deleteAASXAPI(selectedFiles);
-
-          setAlertModal({
-            open: true,
-            title: '알림',
-            content: '선택한 항목이 삭제되었습니다.',
-            type: 'alert',
-            onConfirm: undefined,
-          });
 
           setSelectedFiles([]);
           getFiles();
@@ -203,6 +196,10 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
       af_idx: file.af_idx,
       af_name: file.af_name,
       createdAt: file.createdAt,
+      updatedAt: file.updatedAt,
+      fc_idx: file.fc_idx,
+      fc_name: file.fc_name,
+      link_name: file.link_name,
     };
     onEditClick(aasxFile);
   };
@@ -307,11 +304,11 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
       </div>
 
       <div className='table-wrap'>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-            <TableHead>
+            <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
-                <TableCell padding='checkbox'>
+                <TableCell padding='checkbox' sx={{ backgroundColor: 'white' }}>
                   <Checkbox
                     checked={selectAll}
                     onChange={handleSelectAllChange}
@@ -324,7 +321,9 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                   sortDirection={sortDirection}
                   onSort={handleSort}
                 />
-                <TableCell align='center'>수정</TableCell>
+                <TableCell align='center' sx={{ backgroundColor: 'white' }}>
+                  수정
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

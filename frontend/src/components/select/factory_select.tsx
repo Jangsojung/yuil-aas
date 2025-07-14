@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import { getFactoriesByCmIdxAPI } from '../../apis/api/basic';
@@ -64,7 +65,13 @@ export default function FactorySelect({
 
   return (
     <FormControl fullWidth size='small'>
-      <Select value={value} onChange={handleChange} displayEmpty disabled={disabled || factories.length === 0}>
+      <Select
+        value={value}
+        onChange={handleChange}
+        displayEmpty
+        disabled={disabled || factories.length === 0}
+        IconComponent={ExpandMoreIcon}
+      >
         <MenuItem disabled value=''>
           {factories.length === 0 ? '공장 정보 없음' : placeholder}
         </MenuItem>

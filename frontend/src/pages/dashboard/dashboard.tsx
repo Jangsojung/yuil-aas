@@ -138,13 +138,13 @@ export default function DashboardPage() {
           </Typography>
           <TableContainer component={Paper}>
             <Table size='small'>
-              <TableHead>
+              <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
                 <TableRow>
-                  <TableCell>공장명</TableCell>
-                  <TableCell>파일명</TableCell>
-                  <TableCell>기초코드명</TableCell>
-                  <TableCell>센서 개수</TableCell>
-                  <TableCell>생성일</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>공장명</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>파일명</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>기초코드명</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>센서 개수</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>생성일</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -170,12 +170,12 @@ export default function DashboardPage() {
           </Typography>
           <TableContainer component={Paper}>
             <Table size='small'>
-              <TableHead>
+              <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
                 <TableRow>
-                  <TableCell>공장명</TableCell>
-                  <TableCell>파일명</TableCell>
-                  <TableCell>생성일</TableCell>
-                  <TableCell>수정일</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>공장명</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>파일명</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>생성일</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>수정일</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -260,7 +260,7 @@ export default function DashboardPage() {
             {selectedAasx && (
               <Button
                 onClick={() =>
-                  navigate('/aas/transmit', {
+                  navigate('/aasx/transmit', {
                     state: {
                       fc_idx: selectedAasx.fc_idx,
                       af_idx: selectedAasx.af_idx,

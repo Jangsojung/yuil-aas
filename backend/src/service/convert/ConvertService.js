@@ -8,7 +8,7 @@ import { getBaseFCIdxFromDB } from '../basic_code/BasicCodeService.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const insertConvertsToDB = async (fc_idx, startDate, endDate, selectedConvert, user_idx, af_kind) => {
+export const insertConvertsToDB = async (fc_idx, user_idx, startDate, endDate, selectedConvert, af_kind) => {
   try {
     // 파라미터 검증
     const validatedFcIdx = validateFcIdx(fc_idx);

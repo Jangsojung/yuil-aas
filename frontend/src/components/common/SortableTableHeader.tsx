@@ -60,12 +60,12 @@ export const SortableTableHeader = <T extends Record<string, any>>({
   return (
     <>
       {showCheckbox && (
-        <TableCell>
+        <TableCell sx={{ backgroundColor: 'white' }}>
           <Checkbox checked={selectAll} onChange={onSelectAllChange} />
         </TableCell>
       )}
       {columns.map((column, idx) => (
-        <TableCell key={idx}>
+        <TableCell key={idx} sx={{ backgroundColor: 'white' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
             <span>{column.label}</span>
             {renderSortButton(column.field, column.sortable)}

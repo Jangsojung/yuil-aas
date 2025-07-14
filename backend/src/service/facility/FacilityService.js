@@ -1,5 +1,6 @@
 import { validateValue } from '../../utils/validation.js';
 import { querySingle, queryMultiple, queryInsert, withTransaction } from '../../utils/dbHelper.js';
+import { pool } from '../../config/database.js';
 
 export const insertFacilityGroup = async (name) => {
   const validatedName = validateValue(name);

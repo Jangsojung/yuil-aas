@@ -14,6 +14,7 @@ import {
   buildTreeFromSensorIdsAPI,
   buildTreeDataForBasicAPI,
 } from '../../../apis/api/basic';
+import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
 
 export default function BasiccodeEditPage() {
   const { id, mode } = useParams<{ id: string; mode?: string }>();
@@ -282,58 +283,84 @@ export default function BasiccodeEditPage() {
   // 렌더링
   if (detailMode) {
     return (
-      <DetailView
-        detailTreeData={detailTreeData}
-        detailLoading={detailLoading}
-        selectedBaseForDetail={selectedBaseForDetail}
-        onEdit={handleEdit}
-        onBackToList={handleBackToList}
-        factoryName={detailFactoryName}
-        setFactoryName={setDetailFactoryName}
-        facilityName={detailFacilityName}
-        setFacilityName={setDetailFacilityName}
-        sensorName={detailSensorName}
-        setSensorName={setDetailSensorName}
-        selectedFactory={detailSelectedFactory}
-        setSelectedFactory={setDetailSelectedFactory}
-        selectedFacilityGroups={detailSelectedFacilityGroups}
-        setSelectedFacilityGroups={setDetailSelectedFacilityGroups}
-        hideFactorySelect={detailHideFactorySelect}
-        onTreeSearch={handleDetailTreeSearch}
-      />
+      <>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 16,
+          }}
+        >
+          <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
+          <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
+        </div>
+        <DetailView
+          detailTreeData={detailTreeData}
+          detailLoading={detailLoading}
+          selectedBaseForDetail={selectedBaseForDetail}
+          onEdit={handleEdit}
+          onBackToList={handleBackToList}
+          factoryName={detailFactoryName}
+          setFactoryName={setDetailFactoryName}
+          facilityName={detailFacilityName}
+          setFacilityName={setDetailFacilityName}
+          sensorName={detailSensorName}
+          setSensorName={setDetailSensorName}
+          selectedFactory={detailSelectedFactory}
+          setSelectedFactory={setDetailSelectedFactory}
+          selectedFacilityGroups={detailSelectedFacilityGroups}
+          setSelectedFacilityGroups={setDetailSelectedFacilityGroups}
+          hideFactorySelect={detailHideFactorySelect}
+          onTreeSearch={handleDetailTreeSearch}
+        />
+      </>
     );
   }
 
   if (editMode) {
     return (
-      <EditView
-        treeData={treeData}
-        treeLoading={treeLoading}
-        selectedFacilityGroups={selectedFacilityGroups}
-        setSelectedFacilityGroups={setSelectedFacilityGroups}
-        facilityName={facilityName}
-        setFacilityName={setFacilityName}
-        sensorName={sensorName}
-        setSensorName={setSensorName}
-        basicModalOpen={basicModalOpen}
-        setBasicModalOpen={setBasicModalOpen}
-        basicName={basicName}
-        setBasicName={setBasicName}
-        basicDesc={basicDesc}
-        setBasicDesc={setBasicDesc}
-        selectedSensors={selectedSensors}
-        selectedFactory={selectedFactory}
-        setSelectedFactory={setSelectedFactory}
-        onTreeSearch={handleTreeSearch}
-        onGroupSelectAll={handleGroupSelectAllWrapper}
-        onFacilitySelectAll={handleFacilitySelectAllWrapper}
-        isAllSensorsSelectedInGroup={isAllSensorsSelectedInGroupWrapper}
-        isAllSensorsSelectedInFacility={isAllSensorsSelectedInFacilityWrapper}
-        onBasicModalAdd={handleBasicModalAdd}
-        onBasicModalReset={handleBasicModalReset}
-        onBackToList={handleBackToList}
-        hideFactorySelect={true}
-      />
+      <>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 16,
+          }}
+        >
+          <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
+          <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
+        </div>
+        <EditView
+          treeData={treeData}
+          treeLoading={treeLoading}
+          selectedFacilityGroups={selectedFacilityGroups}
+          setSelectedFacilityGroups={setSelectedFacilityGroups}
+          facilityName={facilityName}
+          setFacilityName={setFacilityName}
+          sensorName={sensorName}
+          setSensorName={setSensorName}
+          basicModalOpen={basicModalOpen}
+          setBasicModalOpen={setBasicModalOpen}
+          basicName={basicName}
+          setBasicName={setBasicName}
+          basicDesc={basicDesc}
+          setBasicDesc={setBasicDesc}
+          selectedSensors={selectedSensors}
+          selectedFactory={selectedFactory}
+          setSelectedFactory={setSelectedFactory}
+          onTreeSearch={handleTreeSearch}
+          onGroupSelectAll={handleGroupSelectAllWrapper}
+          onFacilitySelectAll={handleFacilitySelectAllWrapper}
+          isAllSensorsSelectedInGroup={isAllSensorsSelectedInGroupWrapper}
+          isAllSensorsSelectedInFacility={isAllSensorsSelectedInFacilityWrapper}
+          onBasicModalAdd={handleBasicModalAdd}
+          onBasicModalReset={handleBasicModalReset}
+          onBackToList={handleBackToList}
+          hideFactorySelect={true}
+        />
+      </>
     );
   }
 

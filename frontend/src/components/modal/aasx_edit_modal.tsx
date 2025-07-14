@@ -229,8 +229,11 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         updateProgress(100, '등록 완료!');
       }
 
-      // 성공 시 잠시 완료 상태 유지
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      setProgress(100);
+      setProgressLabel('완료');
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 100);
 
       const newFile = {
         af_idx: result.af_idx || fileData?.af_idx || af_idx,
@@ -373,6 +376,18 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
     handleFileDataChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileData, open]);
+
+  useEffect(() => {
+    if (fileData && fileData.link_name) {
+      setLinkName(fileData.link_name);
+    }
+  }, [fileData]);
+
+  useEffect(() => {
+    if (open && !fileData) {
+      setLinkName('');
+    }
+  }, [open, fileData]);
 
   return (
     <>

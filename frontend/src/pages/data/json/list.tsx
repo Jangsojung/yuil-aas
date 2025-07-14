@@ -90,14 +90,6 @@ export default function JSONList() {
         try {
           await deleteJSONAPI(selectedFiles);
 
-          setAlertModal({
-            open: true,
-            title: '알림',
-            content: '선택한 항목이 삭제되었습니다.',
-            type: 'alert',
-            onConfirm: undefined,
-          });
-
           setSelectedFiles([]);
           getFiles();
         } catch (error) {
@@ -299,11 +291,11 @@ export default function JSONList() {
       />
 
       <div className='table-wrap'>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
           <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-            <TableHead>
+            <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
-                <TableCell padding='checkbox'>
+                <TableCell padding='checkbox' sx={{ backgroundColor: 'white' }}>
                   <Checkbox
                     checked={selectAll}
                     onChange={handleSelectAllChange}

@@ -1,23 +1,24 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import JSONViewer from '@uiw/react-json-view';
-import { useEffect, useState, useCallback } from 'react';
+import ReactJson from '@uiw/react-json-view';
+import React, { useRef, useEffect, useState } from 'react';
 import { getJSONFileDetailAPI, checkJSONFileSizeAPI } from '../../../apis/api/json_manage';
 import ActionBox from '../../../components/common/ActionBox';
-import ProgressOverlay from '../../../components/loading/ProgressOverlay';
 import AlertModal from '../../../components/modal/alert';
 import { Box } from '@mui/material';
-import Typography from '@mui/material/Typography';
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
 import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
+import JSONEditor from 'jsoneditor';
+import 'jsoneditor/dist/jsoneditor.css';
+import LodingOverlay from '../../../components/loading/LodingOverlay';
 
 export default function JsonDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [jsonData, setJsonData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const [progressLabel, setProgressLabel] = useState('');
+  const [, setProgress] = useState(0);
+  const [, setProgressLabel] = useState('');
   const [alertModal, setAlertModal] = useState({
     open: false,
     title: '',
@@ -26,8 +27,10 @@ export default function JsonDetail() {
     onConfirm: undefined as (() => void) | undefined,
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [editedJsonText, setEditedJsonText] = useState('');
+  const [, setEditedJsonText] = useState('');
   const [jsonError, setJsonError] = useState('');
+  const [editorRef, setEditorRef] = useState<HTMLDivElement | null>(null);
+  const jsonEditorInstance = useRef<any>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -35,24 +38,13 @@ export default function JsonDetail() {
     setProgress(0);
     setProgressLabel('파일 크기를 확인하는 중...');
 
-    // 프로그레스 시뮬레이션
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) return prev;
-        return prev + Math.random() * 15;
-      });
-    }, 100);
-
-    // 먼저 파일 크기 확인
+    // 파일 크기 확인 및 데이터 로딩
     checkJSONFileSizeAPI(id)
       .then((fileSizeData) => {
-        // 파일이 너무 큰 경우
         if (fileSizeData.isLargeFile) {
-          clearInterval(progressInterval);
           setProgress(100);
           setProgressLabel('완료');
-
-          // 바로 목록으로 이동하고 alert 띄우기
+          setLoading(false);
           navigate('/data/jsonManager', {
             state: {
               showAlert: true,
@@ -60,12 +52,9 @@ export default function JsonDetail() {
               alertContent: `파일 크기: ${(fileSizeData.size / (1024 * 1024)).toFixed(1)}MB\n\n500MB 이상의 파일은 상세보기를 할 수 없습니다.\nText Viewer를 통해 확인해주세요.`,
             },
           });
-          return Promise.reject('FILE_TOO_LARGE'); // 체인 중단
+          return Promise.reject('FILE_TOO_LARGE');
         }
-
-        // 파일 크기가 적절한 경우 상세 데이터 가져오기
         setProgressLabel('파일 데이터를 가져오는 중...');
-
         return getJSONFileDetailAPI(id);
       })
       .then((data) => {
@@ -101,10 +90,11 @@ export default function JsonDetail() {
           });
         }
 
-        clearInterval(progressInterval);
         setProgress(100);
         setProgressLabel('완료');
-        setLoading(false);
+        setTimeout(() => {
+          setLoading(false);
+        }, 100);
       })
       .catch((error) => {
         // 파일이 너무 큰 경우는 이미 처리됨
@@ -112,6 +102,9 @@ export default function JsonDetail() {
           return;
         }
 
+        setProgress(100);
+        setProgressLabel('오류 발생');
+        setLoading(false);
         setAlertModal({
           open: true,
           title: '오류',
@@ -119,10 +112,6 @@ export default function JsonDetail() {
           type: 'alert',
           onConfirm: () => navigate('/data/jsonManager'),
         });
-        clearInterval(progressInterval);
-        setProgress(100);
-        setProgressLabel('오류 발생');
-        setLoading(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -141,9 +130,17 @@ export default function JsonDetail() {
       return;
     }
 
+    setLoading(true); // 수정 버튼 누르면 로딩 시작
     setIsEditing(true);
     setJsonError('');
   };
+
+  // JSON 에디터가 렌더링된 후 로딩 종료
+  useEffect(() => {
+    if (isEditing) {
+      setLoading(false);
+    }
+  }, [isEditing]);
 
   const handleCancelEdit = () => {
     setIsEditing(false);
@@ -151,13 +148,15 @@ export default function JsonDetail() {
     setEditedJsonText(JSON.stringify(jsonData, null, 2));
   };
 
+  // 저장 버튼 클릭 시에만 get() 호출
   const handleSaveEdit = () => {
     try {
-      const parsedJson = JSON.parse(editedJsonText);
-      setJsonData(parsedJson);
+      if (jsonEditorInstance.current) {
+        const updated = jsonEditorInstance.current.get();
+        setJsonData(updated);
+      }
       setIsEditing(false);
       setJsonError('');
-
       setAlertModal({
         open: true,
         title: '저장 완료',
@@ -170,35 +169,36 @@ export default function JsonDetail() {
     }
   };
 
-  const handleJSONChange = useCallback(
-    (data: any) => {
-      // 에러가 있는 경우에만 상태 업데이트
-      if (data.error) {
-        setJsonError(data.error.reason);
-      } else {
-        setJsonError('');
-        // JSON 문자열이 변경된 경우에만 업데이트
-        if (data.json !== editedJsonText) {
-          setEditedJsonText(data.json);
-        }
-      }
-    },
-    [editedJsonText]
-  );
+  // 상세/수정 모드 렌더링
+  useEffect(() => {
+    if (!isEditing) return;
+    if (!editorRef || !jsonData) return;
 
-  const handleJSONBlur = useCallback((data: any) => {
-    // onBlur에서는 최종 상태만 업데이트
-    if (data.error) {
-      setJsonError(data.error.reason);
-    } else {
-      setJsonError('');
-      setEditedJsonText(data.json);
+    // 기존 인스턴스 파괴
+    if (jsonEditorInstance.current) {
+      jsonEditorInstance.current.destroy();
+      jsonEditorInstance.current = null;
     }
-  }, []);
 
-  if (loading) return <ProgressOverlay open={loading} progress={progress} label={progressLabel} />;
+    // editor 생성
+    jsonEditorInstance.current = new JSONEditor(editorRef, {
+      mode: 'tree',
+      mainMenuBar: false,
+      navigationBar: false,
+    });
+    jsonEditorInstance.current.set(jsonData);
+
+    return () => {
+      if (jsonEditorInstance.current) {
+        jsonEditorInstance.current.destroy();
+        jsonEditorInstance.current = null;
+      }
+    };
+  }, [isEditing, jsonData, editorRef]);
+
+  if (loading) return <LodingOverlay />;
   if (!jsonData && !loading) return <div>데이터가 없습니다.</div>;
-  if (!jsonData) return <div>데이터가 없습니다.</div>;
+  if (!jsonData) return <LodingOverlay />;
 
   return (
     <div className='table-outer no-flex-header'>
@@ -253,29 +253,9 @@ export default function JsonDetail() {
       </div>
       <div className='json-viewer'>
         {isEditing ? (
-          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <JSONInput
-              placeholder={jsonData}
-              locale={locale}
-              height='100%'
-              width='100%'
-              onChange={handleJSONChange}
-              onBlur={handleJSONBlur}
-              theme='light_vscode'
-              style={
-                {
-                  body: { fontSize: '14px' },
-                  outerBox: { height: '100%' },
-                  container: { height: '100%' },
-                } as any
-              }
-            />
-            {jsonError && (
-              <Box sx={{ color: 'error.main', fontSize: '12px', mt: 1, p: 1, bgcolor: 'error.light' }}>{jsonError}</Box>
-            )}
-          </Box>
+          <div ref={setEditorRef} style={{ height: '500px', width: '100%' }} />
         ) : (
-          <JSONViewer
+          <ReactJson
             value={jsonData}
             collapsed={3}
             enableClipboard={true}
@@ -283,6 +263,9 @@ export default function JsonDetail() {
             displayObjectSize={true}
             
           />
+        )}
+        {jsonError && (
+          <Box sx={{ color: 'error.main', fontSize: '12px', mt: 1, p: 1, bgcolor: 'error.light' }}>{jsonError}</Box>
         )}
       </div>
 

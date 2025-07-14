@@ -82,9 +82,9 @@ export const uploadAASXFile = async (req, res) => {
   }
 };
 
-export const updateAASXFile = async (af_idx, fileName, user_idx, fc_idx, res) => {
+export const updateAASXFile = async (af_idx, fileName, user_idx, fc_idx, linkName, res) => {
   try {
-    const result = await updateAASXFileToDB(af_idx, fileName, user_idx, fc_idx, 'aasx.com');
+    const result = await updateAASXFileToDB(af_idx, fileName, user_idx, fc_idx, linkName);
     successResponse(res, result);
   } catch (err) {
     if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {

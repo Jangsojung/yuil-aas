@@ -73,6 +73,98 @@ export default function Layout() {
   const location = useLocation();
   const [, setNavigationReset] = useRecoilState(navigationResetState);
 
+  // 네브바 메뉴 활성화 설정
+  React.useEffect(() => {
+    const setActiveMenu = () => {
+      // 모든 메뉴 아이템의 active 상태 제거
+      const allMenuItems = document.querySelectorAll('.MuiListItemButton-root');
+      allMenuItems.forEach((item) => {
+        item.classList.remove('Mui-selected');
+      });
+
+      // 현재 경로에 따라 해당 메뉴 활성화
+      const currentPath = location.pathname;
+
+      if (currentPath.startsWith('/aas/basic')) {
+        // 기초코드 관리 메뉴 활성화
+        const basicMenuItems = document.querySelectorAll('a[href="/aas/basic"]');
+        basicMenuItems.forEach((item) => {
+          const listItem = item.closest('.MuiListItemButton-root');
+          if (listItem) {
+            listItem.classList.add('Mui-selected');
+          }
+        });
+      } else if (currentPath.startsWith('/data/jsonManager')) {
+        // JSON 파일 관리 메뉴 활성화
+        const jsonMenuItems = document.querySelectorAll('a[href="/data/jsonManager"]');
+        jsonMenuItems.forEach((item) => {
+          const listItem = item.closest('.MuiListItemButton-root');
+          if (listItem) {
+            listItem.classList.add('Mui-selected');
+          }
+        });
+      } else if (currentPath.startsWith('/aas/facility')) {
+        // 설비 관리 메뉴 활성화
+        const facilityMenuItems = document.querySelectorAll('a[href="/aas/facility"]');
+        facilityMenuItems.forEach((item) => {
+          const listItem = item.closest('.MuiListItemButton-root');
+          if (listItem) {
+            listItem.classList.add('Mui-selected');
+          }
+        });
+      } else if (currentPath.startsWith('/aas/convert')) {
+        // 기초코드 변환 메뉴 활성화
+        const convertMenuItems = document.querySelectorAll('a[href="/aas/convert"]');
+        convertMenuItems.forEach((item) => {
+          const listItem = item.closest('.MuiListItemButton-root');
+          if (listItem) {
+            listItem.classList.add('Mui-selected');
+          }
+        });
+      } else if (currentPath.startsWith('/data/dataManager')) {
+        // 식별 ID 관리 메뉴 활성화
+        const dataManagerMenuItems = document.querySelectorAll('a[href="/data/dataManager"]');
+        dataManagerMenuItems.forEach((item) => {
+          const listItem = item.closest('.MuiListItemButton-root');
+          if (listItem) {
+            listItem.classList.add('Mui-selected');
+          }
+        });
+      } else if (currentPath.startsWith('/aasx/aasxManager')) {
+        // AASX 관리 메뉴 활성화
+        const aasxManagerMenuItems = document.querySelectorAll('a[href="/aasx/aasxManager"]');
+        aasxManagerMenuItems.forEach((item) => {
+          const listItem = item.closest('.MuiListItemButton-root');
+          if (listItem) {
+            listItem.classList.add('Mui-selected');
+          }
+        });
+      } else if (currentPath.startsWith('/aasx/transmit')) {
+        // AASX 송신 메뉴 활성화
+        const transmitMenuItems = document.querySelectorAll('a[href="/aasx/transmit"]');
+        transmitMenuItems.forEach((item) => {
+          const listItem = item.closest('.MuiListItemButton-root');
+          if (listItem) {
+            listItem.classList.add('Mui-selected');
+          }
+        });
+      } else if (currentPath.startsWith('/edge/edge')) {
+        // Edge Gateway 관리 메뉴 활성화
+        const edgeMenuItems = document.querySelectorAll('a[href="/edge/edge"]');
+        edgeMenuItems.forEach((item) => {
+          const listItem = item.closest('.MuiListItemButton-root');
+          if (listItem) {
+            listItem.classList.add('Mui-selected');
+          }
+        });
+      }
+    };
+
+    // DOM이 완전히 로드된 후 실행
+    const timer = setTimeout(setActiveMenu, 100);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
   React.useEffect(() => {
     const handleNavigationClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;

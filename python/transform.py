@@ -5,7 +5,7 @@ from basyx.aas.adapter import aasx, json as basyx_json
 from datetime import datetime
 
 
-def create_submodel(line_name, machine_name, machine_data, link_name='aasx.com'):
+def create_submodel(line_name, machine_name, machine_data, link_name):
     submodel = model.Submodel(
         id_=f'https://{link_name}/{line_name}/{machine_name}',
         id_short=f'{machine_name}'
@@ -70,7 +70,7 @@ def create_submodel(line_name, machine_name, machine_data, link_name='aasx.com')
     return submodel
 
 
-def transform_aas(path, data, link_name='aasx.com'):
+def transform_aas(path, data, link_name):
     aas_ids = []
     obj_store = model.DictObjectStore()
     basename = os.path.basename(path)

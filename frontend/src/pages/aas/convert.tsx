@@ -219,19 +219,8 @@ export default function ConvertPage() {
       const startDateStr = selectedBaseDates.startDate.format('YYYY-MM-DD');
       const endDateStr = selectedBaseDates.endDate.format('YYYY-MM-DD');
 
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 500);
-
-      // 선택된 기초코드의 fc_idx를 가져옴
+      // 변환 API 호출
       const baseFCIdx = await getBaseFCIdxAPI(selectedConvert);
-
       const result = await insertJSONAPI({
         ab_idx: selectedConvert,
         startDate: startDateStr,
@@ -241,35 +230,32 @@ export default function ConvertPage() {
         af_kind: KINDS.JSON_KIND,
       });
 
-      clearInterval(progressInterval);
       setProgress(100);
-
       setTimeout(() => {
         setProgressOpen(false);
         setProgress(0);
+      }, 100);
 
-        if (result) {
-          setAlertModal({
-            open: true,
-            title: '성공',
-            content: 'JSON 파일 변환이 완료되었습니다.',
-            type: 'alert',
-            onConfirm: undefined,
-          });
-        } else {
-          setAlertModal({
-            open: true,
-            title: '오류',
-            content: 'JSON 파일 변환 중 오류가 발생했습니다.',
-            type: 'alert',
-            onConfirm: undefined,
-          });
-        }
-      }, 1000);
+      if (result) {
+        setAlertModal({
+          open: true,
+          title: '성공',
+          content: 'JSON 파일 변환이 완료되었습니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+      } else {
+        setAlertModal({
+          open: true,
+          title: '오류',
+          content: 'JSON 파일 변환 중 오류가 발생했습니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+      }
     } catch (error) {
       setProgressOpen(false);
       setProgress(0);
-
       let errorMessage = 'JSON 파일 변환 중 오류가 발생했습니다.';
       if (error instanceof Error) {
         errorMessage = error.message;
@@ -278,7 +264,6 @@ export default function ConvertPage() {
       } else if (error && typeof error === 'object' && 'message' in error) {
         errorMessage = String(error.message);
       }
-
       setAlertModal({
         open: true,
         title: '오류',
@@ -369,141 +354,141 @@ export default function ConvertPage() {
     <>
       <ProgressOverlay open={progressOpen} progress={progress} label='변환 중...' />
       <div className={`table-outer ${isLoading ? 'pointer-events-none' : 'pointer-events-auto'}`}>
-          <SearchBox
+        <SearchBox
+          buttons={[
+            {
+              text: '검색',
+              onClick: handleSearch,
+              color: 'primary',
+            },
+            {
+              text: '초기화',
+              onClick: handleReset,
+              color: 'inherit',
+              variant: 'outlined',
+            },
+          ]}
+        >
+          <Grid container spacing={4}>
+            {/* 공장 선택 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>공장</div>
+              </Grid>
+              <Grid sx={{ flexGrow: 1 }}>
+                <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+                  <FactorySelect
+                    value={selectedFactory}
+                    onChange={handleFactoryChange}
+                    placeholder='선택'
+                    showAllOption={true}
+                  />
+                </FormControl>
+              </Grid>
+            </Grid>
+            {/* 공장 선택 */}
+
+            {/* 기초코드명 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>기초코드명</div>
+              </Grid>
+              <Grid>
+                <TextField
+                  size='small'
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  sx={{ flex: 1 }}
+                />
+              </Grid>
+            </Grid>
+            {/* 기초코드명 */}
+
+            {/* 생성 날짜 */}
+            <Grid container spacing={2}>
+              <Grid className='sort-title'>
+                <div>생성일</div>
+              </Grid>
+              <Grid>
+                <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
+              </Grid>
+            </Grid>
+            {/* 생성 날짜 */}
+          </Grid>
+        </SearchBox>
+
+        <div className='list-header'>
+          <Typography variant='h6' gutterBottom>
+            기초코드 목록
+          </Typography>
+
+          <ActionBox
             buttons={[
               {
-                text: '검색',
-                onClick: handleSearch,
+                text: '변환',
+                onClick: handleConvert,
                 color: 'primary',
               },
-              {
-                text: '초기화',
-                onClick: handleReset,
-                color: 'inherit',
-                variant: 'outlined',
-              },
             ]}
-          >
-            <Grid container spacing={4}>
-              {/* 공장 선택 */}
-              <Grid container spacing={2}>
-                <Grid className='sort-title'>
-                  <div>공장</div>
-                </Grid>
-                <Grid sx={{ flexGrow: 1 }}>
-                  <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
-                    <FactorySelect
-                      value={selectedFactory}
-                      onChange={handleFactoryChange}
-                      placeholder='선택'
-                      showAllOption={true}
-                    />
-                  </FormControl>
-                </Grid>
-              </Grid>
-              {/* 공장 선택 */}
-
-              {/* 기초코드명 */}
-              <Grid container spacing={2}>
-                <Grid className='sort-title'>
-                  <div>기초코드명</div>
-                </Grid>
-                <Grid>
-                  <TextField
-                    size='small'
-                    value={searchKeyword}
-                    onChange={(e) => setSearchKeyword(e.target.value)}
-                    sx={{ flex: 1 }}
-                  />
-                </Grid>
-              </Grid>
-              {/* 기초코드명 */}
-
-              {/* 생성 날짜 */}
-              <Grid container spacing={2}>
-                <Grid className='sort-title'>
-                  <div>생성일</div>
-                </Grid>
-                <Grid>
-                  <BasicDatePicker onDateChange={handleDateChange} startDate={startDate} endDate={endDate} />
-                </Grid>
-              </Grid>
-              {/* 생성 날짜 */}
-            </Grid>
-          </SearchBox>
-
-          <div className='list-header'>
-            <Typography variant='h6' gutterBottom>
-              기초코드 목록
-            </Typography>
-
-            <ActionBox
-              buttons={[
-                {
-                  text: '변환',
-                  onClick: handleConvert,
-                  color: 'primary',
-                },
-              ]}
-            />
-          </div>
-
-          <div className='table-wrap'>
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ width: '50px' }}></TableCell>
-                    <SortableTableHeader
-                      columns={sortableColumns}
-                      sortField={sortField}
-                      sortDirection={sortDirection}
-                      onSort={handleSort}
-                    />
-                    <TableCell>시작일</TableCell>
-                    <TableCell>종료일</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedData(sortedBases || []).length > 0 ? (
-                    paginatedData(sortedBases || []).map((base: Base, idx: number) => (
-                      <ConvertTableRow
-                        base={base}
-                        key={idx}
-                        checked={selectedConvert === base.ab_idx}
-                        onCheckboxChange={handleCheckboxChange}
-                        onStartDateChange={handleStartDateChange}
-                        onEndDateChange={handleEndDateChange}
-                        totalCount={filteredBases.length}
-                        startDate={baseDates[base.ab_idx]?.startDate || null}
-                        endDate={baseDates[base.ab_idx]?.endDate || null}
-                        onDatePickerOpen={handleDatePickerOpen}
-                      />
-                    ))
-                  ) : (
-                    <TableEmptyRow colSpan={sortableColumns.length + 3} />
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <Pagination
-              count={filteredBases ? filteredBases.length : 0}
-              page={currentPage}
-              rowsPerPage={rowsPerPage}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-            />
-          </div>
+          />
         </div>
 
-        <AlertModal
-          open={alertModal.open}
-          handleClose={handleCloseAlert}
-          title={alertModal.title}
-          content={alertModal.content}
-          type={alertModal.type}
-          onConfirm={alertModal.onConfirm}
-        />
+        <div className='table-wrap'>
+          <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
+            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+              <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+                <TableRow>
+                  <TableCell sx={{ width: '50px', backgroundColor: 'white' }}></TableCell>
+                  <SortableTableHeader
+                    columns={sortableColumns}
+                    sortField={sortField}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                  />
+                  <TableCell sx={{ backgroundColor: 'white' }}>시작일</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>종료일</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedData(sortedBases || []).length > 0 ? (
+                  paginatedData(sortedBases || []).map((base: Base, idx: number) => (
+                    <ConvertTableRow
+                      base={base}
+                      key={idx}
+                      checked={selectedConvert === base.ab_idx}
+                      onCheckboxChange={handleCheckboxChange}
+                      onStartDateChange={handleStartDateChange}
+                      onEndDateChange={handleEndDateChange}
+                      totalCount={filteredBases.length}
+                      startDate={baseDates[base.ab_idx]?.startDate || null}
+                      endDate={baseDates[base.ab_idx]?.endDate || null}
+                      onDatePickerOpen={handleDatePickerOpen}
+                    />
+                  ))
+                ) : (
+                  <TableEmptyRow colSpan={sortableColumns.length + 3} />
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Pagination
+            count={filteredBases ? filteredBases.length : 0}
+            page={currentPage}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
+        </div>
+      </div>
+
+      <AlertModal
+        open={alertModal.open}
+        handleClose={handleCloseAlert}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
+      />
     </>
   );
 }
