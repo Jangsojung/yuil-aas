@@ -41,18 +41,13 @@ export default function CustomPagination({
           display: 'block !important',
           minWidth: '80px',
           paddingLeft: '24px',
+          textAlignLast: 'left',
         },
         '& .MuiTablePagination-toolbar': {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-        },
-        '& .MuiTablePagination-actions': {
-          marginLeft: '20px',
-        },
-        '& .MuiTablePagination-displayedRows': {
-          marginRight: '16px',
         },
       }}
     />
