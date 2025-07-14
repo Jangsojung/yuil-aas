@@ -301,23 +301,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
     const frontFilePath = `../files/front/${fileName}`;
 
     try {
-      const aasResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: frontFilePath,
-          linkName: linkName,
-        }),
-      });
-
-      if (!aasResponse.ok) {
-        const errorText = await aasResponse.text();
-        throw new Error(`AAS 파일 생성 중 오류가 발생했습니다. (${aasResponse.status})`);
-      }
-
-      const responseText = await aasResponse.text();
+      await createAasFile(frontFilePath, linkName);
     } catch (error) {
       throw new Error('AAS 파일 생성 중 오류가 발생했습니다.');
     }
@@ -347,22 +331,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
     const aasFilePath = `../files/aas/${fileName}`;
 
     try {
-      const aasxResponse = await fetch(`${PYTHON_SERVER_URL}/api/aasx`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          path: aasFilePath,
-        }),
-      });
-
-      if (!aasxResponse.ok) {
-        const errorText = await aasxResponse.text();
-        throw new Error(`AASX 파일 생성 중 오류가 발생했습니다. (${aasxResponse.status})`);
-      }
-
-      const responseText = await aasxResponse.text();
+      await createAasxFile(aasFilePath);
     } catch (error) {
       throw new Error('AASX 파일 생성 중 오류가 발생했습니다.');
     }
@@ -379,18 +348,11 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
     newAasxInsertId = aasxResult.insertId;
     createdFiles.push({ type: 'aasx', path: `../files/aasx/${newAasxFileName}`, insertId: newAasxInsertId });
 
-    const deleteResponse = await fetch(`${PYTHON_SERVER_URL}/api/aas`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        paths: [oldFileInfo.oldAasPath, oldFileInfo.oldAasxPath],
-      }),
-    });
-
-    if (!deleteResponse.ok) {
-      const errorText = await deleteResponse.text();
+    try {
+      await deletePythonFiles([oldFileInfo.oldAasPath, oldFileInfo.oldAasxPath]);
+    } catch (error) {
+      // 삭제 실패는 로그만 남기고 계속 진행
+      console.warn('기존 파일 삭제 실패:', error.message);
     }
 
     await connection.query('DELETE FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?', [
