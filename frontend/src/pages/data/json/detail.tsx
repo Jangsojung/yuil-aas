@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { getJSONFileDetailAPI, checkJSONFileSizeAPI } from '../../../apis/api/json_manage';
 import ActionBox from '../../../components/common/ActionBox';
 import AlertModal from '../../../components/modal/alert';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
 import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
