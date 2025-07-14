@@ -49,7 +49,7 @@ export default function CustomPagination({
           padding: '8px 16px',
         },
         '& .MuiTablePagination-actions': {
-          marginLeft: '16px',
+          marginLeft: '20px',
         },
         '& .MuiTablePagination-displayedRows': {
           marginRight: '16px',
