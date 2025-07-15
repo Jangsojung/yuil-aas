@@ -153,6 +153,7 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
       setFiles(Array.isArray(data) ? data : []);
       setIsSearchActive(true);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [startDate, endDate, selectedFactory]
   );
 
@@ -182,6 +183,7 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
 
     getFiles();
     setIsSearchActive(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate, selectedFactory, getFiles]);
 
   // isSearchActive가 true일 때 자동 검색 실행
@@ -216,10 +218,6 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
 
   const handleCloseAlert = () => {
     setAlertModal((prev) => ({ ...prev, open: false }));
-  };
-
-  const handleNavigationReset = () => {
-    handleReset();
   };
 
   // 검색 조건이 바뀌면 부모에도 반영
