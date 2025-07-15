@@ -256,7 +256,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
               <div>PC명</div>
             </Grid>
             <Grid>
-              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+              <FormControl sx={{ width: '100%' }} size='small'>
                 <TextField size='small' value={pcName} onChange={(e) => setPcName(e.target.value)} />
               </FormControl>
             </Grid>
@@ -268,7 +268,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
               <div>IP 주소</div>
             </Grid>
             <Grid>
-              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+              <FormControl sx={{ width: '100%' }} size='small'>
                 <TextField size='small' value={ipAddress} onChange={(e) => setIpAddress(e.target.value)} />
               </FormControl>
             </Grid>

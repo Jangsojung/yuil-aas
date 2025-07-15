@@ -264,7 +264,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
               <div>공장</div>
             </Grid>
             <Grid sx={{ flexGrow: 1 }}>
-              <FormControl sx={{ minWidth: '200px', width: '100%' }} size='small'>
+              <FormControl sx={{ width: '100%' }} size='small'>
                 <FactorySelect value={selectedFactory} onChange={handleFactoryChange} showAllOption={true} />
               </FormControl>
             </Grid>
