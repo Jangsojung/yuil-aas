@@ -31,7 +31,6 @@ export const getFiles = async (af_kind, fc_idx, startDate, endDate, limit, res) 
     const result = await getFilesFromDB(af_kind, fc_idx, startDate, endDate, null, limit);
     successResponse(res, result);
   } catch (err) {
-    console.error('getFiles error:', err);
     errorResponse(res, err.message);
   }
 };
@@ -41,10 +40,6 @@ export const insertAASXFile = async (fc_idx, fileName, user_idx, res) => {
     const result = await insertAASXFileToDB(fc_idx, fileName, user_idx);
     successResponse(res, result);
   } catch (err) {
-    if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
-      return res.status(400).json({ error: err.message });
-    }
-    console.error('insertAASXFile error:', err);
     errorResponse(res, err.message);
   }
 };
@@ -74,10 +69,6 @@ export const uploadAASXFile = async (req, res) => {
     const result = await insertAASXFileToDB(fc_idx, fileName, user_idx, linkName);
     successResponse(res, result);
   } catch (err) {
-    if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
-      return res.status(400).json({ error: err.message });
-    }
-    console.error('uploadAASXFile error:', err);
     errorResponse(res, err.message);
   }
 };
@@ -87,10 +78,6 @@ export const updateAASXFile = async (af_idx, fileName, user_idx, fc_idx, linkNam
     const result = await updateAASXFileToDB(af_idx, fileName, user_idx, fc_idx, linkName);
     successResponse(res, result);
   } catch (err) {
-    if (err.message && err.message.includes('이미 생성되어있는 파일입니다.')) {
-      return res.status(400).json({ error: err.message });
-    }
-    console.error('updateAASXFile error:', err);
     errorResponse(res, err.message);
   }
 };
@@ -100,7 +87,6 @@ export const deleteFiles = async (ids, res) => {
     const result = await deleteFilesFromDB(ids);
     successResponse(res, result);
   } catch (err) {
-    console.error('deleteFiles error:', err);
     errorResponse(res, err.message);
   }
 };
@@ -110,10 +96,7 @@ export const checkFileSize = async (file, res) => {
     const result = await checkFileSizeFromDB(file);
     successResponse(res, result);
   } catch (err) {
-    if (res) {
-      console.error('checkFileSize error:', err);
-      errorResponse(res, err.message);
-    }
+    errorResponse(res, err.message);
   }
 };
 
@@ -125,13 +108,10 @@ export const getVerify = async (file, res) => {
     }
     successResponse(res, result);
   } catch (err) {
-    if (res) {
-      if (err.message === 'FILE_TOO_LARGE' || err.message === 'AAS_FILE_TOO_LARGE') {
-        return fileTooLargeError(res);
-      }
-      console.error('getVerify error:', err);
-      errorResponse(res, err.message);
+    if (err.message === 'FILE_TOO_LARGE' || err.message === 'AAS_FILE_TOO_LARGE') {
+      return fileTooLargeError(res);
     }
+    errorResponse(res, err.message);
   }
 };
 
@@ -140,7 +120,6 @@ export const getWords = async (fc_idx, res) => {
     const result = await getWordsFromDB(fc_idx);
     successResponse(res, result);
   } catch (err) {
-    console.error('getWords error:', err);
     errorResponse(res, err.message);
   }
 };
@@ -150,7 +129,6 @@ export const getSearch = async (fc_idx, type, text, res) => {
     const result = await getSearchFromDB(fc_idx, type, text);
     successResponse(res, result);
   } catch (err) {
-    console.error('getSearch error:', err);
     errorResponse(res, err.message);
   }
 };
@@ -160,7 +138,6 @@ export const updateWords = async (updates, res) => {
     const result = await updateWordsToDB(updates);
     successResponse(res, result);
   } catch (err) {
-    console.error('updateWords error:', err);
     errorResponse(res, err.message);
   }
 };
@@ -186,7 +163,6 @@ export const getFileFCIdx = async (req, res) => {
       data: { fc_idx },
     });
   } catch (error) {
-    console.error('getFileFCIdx error:', error);
     errorResponse(res, error.message);
   }
 };

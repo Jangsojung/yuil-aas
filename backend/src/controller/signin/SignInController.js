@@ -6,7 +6,6 @@ export const getUser = async (email, password, res) => {
     const result = await getUserFromDB(email, password);
     successResponse(res, result);
   } catch (err) {
-    console.error('SignIn error:', err);
     errorResponse(res, err.message);
   }
 };
