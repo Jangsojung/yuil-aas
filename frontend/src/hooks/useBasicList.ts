@@ -1,13 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { selectedSensorsState, navigationResetState } from '../recoil/atoms';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../recoil/atoms';
 import { getBasesAPI, deleteBasesAPI } from '../apis/api/basic';
 import { useAlertModal } from './useAlertModal';
 import { useSortableData } from './useSortableData';
 import { usePagination } from './usePagination';
 import { Base } from '../types/api';
-import dayjs, { Dayjs } from 'dayjs';
-import { MODAL_TYPE } from '../constants';
+import { Dayjs } from 'dayjs';
 
 interface SearchCondition {
   selectedFactory: number | '';
@@ -23,7 +22,6 @@ export const useBasicList = (
   hasSearched: boolean,
   setHasSearched: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const navigationReset = useRecoilValue(navigationResetState);
   const { alertModal, showAlert, showConfirm, closeAlert } = useAlertModal();
 
@@ -31,7 +29,7 @@ export const useBasicList = (
   const [bases, setBases] = useState<Base[]>([]);
   const [filteredBases, setFilteredBases] = useState<Base[]>([]);
   const [selectedBases, setSelectedBases] = useState<number[]>([]);
-  const [selectedBase, setSelectedBase] = useState<Base | null>(null);
+  const [, setSelectedBase] = useState<Base | null>(null);
   const [selectAll, setSelectAll] = useState(false);
 
   // 검색 조건을 props에서 가져오기

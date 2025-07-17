@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBasicList } from '../../../hooks/useBasicList';
 import { ListView } from '../../../components/basic/ListView';
 import AlertModal from '../../../components/modal/alert';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 
 interface SearchCondition {
   selectedFactory: number | '';

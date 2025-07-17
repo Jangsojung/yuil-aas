@@ -212,7 +212,7 @@ export const ListView: React.FC<ListViewProps> = ({
                     </TableCell>
                     <TableCell>{base.fc_name || '-'}</TableCell>
                     <TableCell>{base.ab_name}</TableCell>
-                    <TableCell>{base.sn_length || 0}</TableCell>
+                    <TableCell>{base.sn_length === 0 ? '-' : base.sn_length}</TableCell>
                     <TableCell>{formatDate(base.createdAt?.toString())}</TableCell>
                     <TableCell>{formatDate(base.updatedAt?.toString())}</TableCell>
                     <TableCell>{base.ab_note}</TableCell>

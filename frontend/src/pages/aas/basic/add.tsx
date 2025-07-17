@@ -7,7 +7,6 @@ import { EditView } from '../../../components/basic/EditView';
 import BasicModal from '../../../components/modal/basicmodal';
 import AlertModal from '../../../components/modal/alert';
 import { useNavigate } from 'react-router-dom';
-import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
 
 export default function BasiccodeAddPage() {
   const navigationReset = useRecoilValue(navigationResetState);

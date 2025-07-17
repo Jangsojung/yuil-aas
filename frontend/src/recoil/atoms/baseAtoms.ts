@@ -1,11 +1,6 @@
 import { atom } from 'recoil';
 import { Base } from '../../types/api';
 
-export const hasBasicsState = atom<boolean>({
-  key: 'base/hasBasicsState',
-  default: false,
-});
-
 export const selectedSensorsState = atom<number[]>({
   key: 'base/selectedSensorsState',
   default: [],
@@ -24,9 +19,4 @@ export const selectedBaseState = atom<Base>({
     ab_note: '',
     sn_length: -1,
   },
-});
-
-export const selectedBasesState = atom<number[]>({
-  key: 'base/selectedBasesState',
-  default: [],
 });

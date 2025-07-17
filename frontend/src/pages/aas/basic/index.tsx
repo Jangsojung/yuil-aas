@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import BasicList from './list';
 import BasicCodeAdd from './add';
 import BasicCodeEdit from './edit';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 
 // 타입 명시
 interface SearchCondition {
@@ -15,9 +15,8 @@ interface SearchCondition {
 
 export default function BasiccodePage() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [mode, setMode] = useState<'list' | 'add' | 'edit'>('list');
-  const [editParams, setEditParams] = useState<{ id?: string; mode?: string }>({});
+  const [, setEditParams] = useState<{ id?: string; mode?: string }>({});
   const [searchCondition, setSearchCondition] = useState<SearchCondition>({
     selectedFactory: '',
     startDate: null,
@@ -39,21 +38,6 @@ export default function BasiccodePage() {
       setMode('list');
     }
   }, [location.search]);
-
-  const handleBackToList = () => {
-    navigate('/aas/basic');
-    setMode('list');
-    // 상세보기에서 목록으로 돌아올 때 검색 상태 유지
-    if (location.state?.preserveSearch) {
-      // 검색 조건이 있으면 검색 상태 유지
-      if (
-        searchCondition.selectedFactory &&
-        (searchCondition.searchKeyword.trim() || searchCondition.startDate || searchCondition.endDate)
-      ) {
-        setHasSearched(true);
-      }
-    }
-  };
 
   if (mode === 'add') {
     return <BasicCodeAdd />;
