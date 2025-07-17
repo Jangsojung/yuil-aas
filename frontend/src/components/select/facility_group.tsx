@@ -103,6 +103,7 @@ export default function FacilityGroupSelect({
           <>
             {/* 전체선택 체크박스 */}
             <MenuItem
+              onClick={handleSelectAll}
               sx={{
                 backgroundColor: '#f5f5f5',
                 '&:hover': {
@@ -110,7 +111,7 @@ export default function FacilityGroupSelect({
                 },
               }}
             >
-              <Checkbox checked={isAllSelected} onChange={handleSelectAll} />
+              <Checkbox checked={isAllSelected} onChange={handleSelectAll} onClick={(e) => e.stopPropagation()} />
               <ListItemText
                 primary='전체 선택'
                 primaryTypographyProps={{
@@ -122,10 +123,11 @@ export default function FacilityGroupSelect({
             <Divider />
             {/* 개별 설비그룹 체크박스들 */}
             {facilityGroups.map((fg) => (
-              <MenuItem key={fg.fg_idx} value={fg.fg_idx}>
+              <MenuItem key={fg.fg_idx} value={fg.fg_idx} onClick={() => handleIndividualSelect(fg.fg_idx)}>
                 <Checkbox
                   checked={selectedFacilityGroups.includes(fg.fg_idx)}
                   onChange={() => handleIndividualSelect(fg.fg_idx)}
+                  onClick={(e) => e.stopPropagation()}
                 />
                 <ListItemText primary={fg.fg_name} />
               </MenuItem>
