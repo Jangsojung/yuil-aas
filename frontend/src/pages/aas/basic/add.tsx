@@ -30,6 +30,7 @@ export default function BasiccodeAddPage() {
     sensorName,
     setSensorName,
     selectedSensors,
+    setSelectedSensors,
     selectedFactory,
     handleTreeSearch,
     handleBasicModalAdd,
@@ -37,6 +38,7 @@ export default function BasiccodeAddPage() {
     handleReset,
     handleFactoryChange,
     alertModal,
+    showAlert,
     closeAlert,
   } = useBasicAdd();
 
@@ -68,22 +70,28 @@ export default function BasiccodeAddPage() {
   };
 
   const handleBackToList = () => {
+    // 취소 시 모든 상태 초기화
+    handleReset();
     navigate('/aas/basic');
+  };
+
+  const handleSensorSelect = (sensorId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedSensors((prev) => [...prev, sensorId]);
+    } else {
+      setSelectedSensors((prev) => prev.filter((id) => id !== sensorId));
+    }
+  };
+
+  const handleTreeSearchWrapper = async () => {
+    const result = await handleTreeSearch();
+    if (!result.success && result.message) {
+      showAlert('알림', result.message);
+    }
   };
 
   return (
     <>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}
-      >
-        <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
-        <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
-      </div>
       <EditView
         treeData={treeData}
         treeLoading={treeLoading}
@@ -102,7 +110,7 @@ export default function BasiccodeAddPage() {
         selectedSensors={selectedSensors}
         selectedFactory={selectedFactory}
         setSelectedFactory={handleFactoryChange}
-        onTreeSearch={handleTreeSearch}
+        onTreeSearch={handleTreeSearchWrapper}
         onGroupSelectAll={handleGroupSelectAllWrapper}
         onFacilitySelectAll={handleFacilitySelectAllWrapper}
         isAllSensorsSelectedInGroup={isAllSensorsSelectedInGroupWrapper}
@@ -110,6 +118,7 @@ export default function BasiccodeAddPage() {
         onBasicModalAdd={() => handleBasicModalAdd(navigate)}
         onBasicModalReset={handleBasicModalReset}
         onBackToList={handleBackToList}
+        onSensorSelect={handleSensorSelect}
       />
 
       <BasicModal

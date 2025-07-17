@@ -14,7 +14,6 @@ import {
   buildTreeFromSensorIdsAPI,
   buildTreeDataForBasicAPI,
 } from '../../../apis/api/basic';
-import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
 
 export default function BasiccodeEditPage() {
   const location = useLocation();
@@ -117,6 +116,7 @@ export default function BasiccodeEditPage() {
   useEffect(() => {
     console.log('useEffect triggered', { id, mode, detailMode, editMode });
     handleModeChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, mode]);
 
   // 데이터 로딩 함수들
@@ -293,6 +293,14 @@ export default function BasiccodeEditPage() {
     return isAllSensorsSelectedInFacility(treeData, fgIdx, faIdx);
   };
 
+  const handleSensorSelect = (sensorId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedSensors((prev) => [...prev, sensorId]);
+    } else {
+      setSelectedSensors((prev) => prev.filter((id) => id !== sensorId));
+    }
+  };
+
   // 렌더링
   if (detailMode) {
     return (
@@ -338,10 +346,7 @@ export default function BasiccodeEditPage() {
             alignItems: 'center',
             marginBottom: 16,
           }}
-        >
-          <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
-          <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
-        </div>
+        ></div>
         <EditView
           treeData={treeData}
           treeLoading={treeLoading}
@@ -368,6 +373,7 @@ export default function BasiccodeEditPage() {
           onBasicModalAdd={handleBasicModalAdd}
           onBasicModalReset={handleBasicModalReset}
           onBackToList={handleBackToList}
+          onSensorSelect={handleSensorSelect}
           hideFactorySelect={true}
         />
       </>

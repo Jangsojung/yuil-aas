@@ -70,6 +70,9 @@ export const useBasicAdd = () => {
     if (!selectedFactory) {
       return { success: false, message: '공장을 선택해주세요.' };
     }
+    if (selectedFacilityGroups.length === 0) {
+      return { success: false, message: '설비그룹을 선택해주세요.' };
+    }
     if (!facilityName.trim() && !sensorName.trim() && selectedFacilityGroups.length === 0) {
       return { success: false, message: '검색 조건을 입력해주세요.' };
     }
@@ -119,6 +122,7 @@ export const useBasicAdd = () => {
     setFacilityName('');
     setSensorName('');
     setSelectedFactory('');
+    setTreeLoading(false);
   }, [setSelectedSensors]);
 
   return {
@@ -137,6 +141,7 @@ export const useBasicAdd = () => {
     sensorName,
     setSensorName,
     selectedSensors,
+    setSelectedSensors,
     selectedFactory,
     setSelectedFactory,
 
@@ -148,6 +153,7 @@ export const useBasicAdd = () => {
     handleFactoryChange,
 
     alertModal,
+    showAlert,
     closeAlert,
   };
 };

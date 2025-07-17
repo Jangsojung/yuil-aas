@@ -12,7 +12,6 @@ import BasicModal from '../modal/basicmodal';
 import AlertModal from '../modal/alert';
 import { useAlertModal } from '../../hooks/useAlertModal';
 import FactorySelect from '../select/factory_select';
-import CustomBreadcrumb from '../common/CustomBreadcrumb';
 
 interface EditViewProps {
   treeData: FacilityGroupTree[];
@@ -40,6 +39,7 @@ interface EditViewProps {
   onBasicModalAdd: () => void;
   onBasicModalReset: () => void;
   onBackToList: () => void;
+  onSensorSelect: (sensorId: number, checked: boolean) => void;
   hideFactorySelect?: boolean;
 }
 
@@ -69,6 +69,7 @@ export const EditView: React.FC<EditViewProps> = ({
   onBasicModalAdd,
   onBasicModalReset,
   onBackToList,
+  onSensorSelect,
   hideFactorySelect = false,
 }) => {
   const { alertModal, showAlert, closeAlert } = useAlertModal();
@@ -82,142 +83,144 @@ export const EditView: React.FC<EditViewProps> = ({
   };
 
   return (
-    <div className='table-outer'>
-      <SearchBox
-        buttons={[
-          {
-            text: '검색',
-            onClick: onTreeSearch,
-            color: 'primary',
-          },
-        ]}
-      >
-        <Grid container spacing={4}>
-          {/* 공장 */}
-          {!hideFactorySelect && (
+    <>
+      <div>
+        <SearchBox
+          buttons={[
+            {
+              text: '검색',
+              onClick: onTreeSearch,
+              color: 'primary',
+            },
+          ]}
+        >
+          <Grid container spacing={4}>
+            {/* 공장 */}
+            {!hideFactorySelect && (
+              <Grid container spacing={2}>
+                <Grid className='sort-title'>
+                  <div>공장</div>
+                </Grid>
+                <Grid>
+                  <FormControl sx={{ width: '100%' }} size='small'>
+                    <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
+                  </FormControl>
+                </Grid>
+              </Grid>
+            )}
+            {/* 공장 */}
+
+            {/* 설비그룹 */}
             <Grid container spacing={2}>
               <Grid className='sort-title'>
-                <div>공장</div>
+                <div>설비그룹</div>
               </Grid>
               <Grid>
                 <FormControl sx={{ width: '100%' }} size='small'>
-                  <FactorySelect value={selectedFactory} onChange={setSelectedFactory} />
+                  <FacilityGroupSelect
+                    selectedFacilityGroups={selectedFacilityGroups}
+                    setSelectedFacilityGroups={setSelectedFacilityGroups}
+                    selectedFactory={selectedFactory}
+                  />
                 </FormControl>
               </Grid>
             </Grid>
+            {/* 설비그룹 */}
+
+            {/* 설비명 */}
+            <Grid container>
+              <Grid className='sort-title'>
+                <div>설비명</div>
+              </Grid>
+              <Grid>
+                <FormControl sx={{ width: '100%' }} size='small'>
+                  <TextField size='small' value={facilityName} onChange={(e) => setFacilityName(e.target.value)} />
+                </FormControl>
+              </Grid>
+            </Grid>
+            {/* 설비명 */}
+
+            {/* 센서명 */}
+            <Grid container>
+              <Grid className='sort-title'>
+                <div>센서명</div>
+              </Grid>
+              <Grid>
+                <FormControl sx={{ width: '100%' }} size='small'>
+                  <TextField size='small' value={sensorName} onChange={(e) => setSensorName(e.target.value)} />
+                </FormControl>
+              </Grid>
+            </Grid>
+            {/* 센서명 */}
+          </Grid>
+        </SearchBox>
+
+        <div className='list-header'>
+          <Typography variant='h6' gutterBottom>
+            설비목록
+          </Typography>
+
+          <ActionBox
+            buttons={[
+              {
+                text: '저장',
+                onClick: handleSave,
+                color: 'primary',
+              },
+              {
+                text: '취소',
+                onClick: onBackToList,
+                color: 'inherit',
+                variant: 'outlined',
+              },
+            ]}
+          />
+        </div>
+
+        <div className='table-wrap tree-scroll-wrap'>
+          {treeLoading ? (
+            <LoadingOverlay />
+          ) : treeData.length === 0 ? (
+            <div className='text-center text-muted padding-lg'>조회 결과 없음</div>
+          ) : (
+            <FacilityTreeView
+              treeData={treeData}
+              selectedSensors={selectedSensors}
+              onSensorSelect={onSensorSelect}
+              onGroupSelectAll={onGroupSelectAll}
+              onFacilitySelectAll={onFacilitySelectAll}
+              isAllSensorsSelectedInGroup={isAllSensorsSelectedInGroup}
+              isAllSensorsSelectedInFacility={isAllSensorsSelectedInFacility}
+              defaultExpandedItems={treeData.flatMap((fg, fgIdx) => [
+                `aas-${fgIdx}`,
+                ...fg.facilities.map((fa, faIdx) => `submodal-${fgIdx}-${faIdx}`),
+              ])}
+            />
           )}
-          {/* 공장 */}
+        </div>
 
-          {/* 설비그룹 */}
-          <Grid container spacing={2}>
-            <Grid className='sort-title'>
-              <div>설비그룹</div>
-            </Grid>
-            <Grid>
-              <FormControl sx={{ width: '100%' }} size='small'>
-                <FacilityGroupSelect
-                  selectedFacilityGroups={selectedFacilityGroups}
-                  setSelectedFacilityGroups={setSelectedFacilityGroups}
-                  selectedFactory={selectedFactory}
-                />
-              </FormControl>
-            </Grid>
-          </Grid>
-          {/* 설비그룹 */}
+        <BasicModal
+          open={basicModalOpen}
+          handleClose={() => setBasicModalOpen(false)}
+          handleAdd={onBasicModalAdd}
+          handleReset={onBasicModalReset}
+          selectedSensorCount={selectedSensors.length}
+          name={basicName}
+          setName={setBasicName}
+          desc={basicDesc}
+          setDesc={setBasicDesc}
+          isEditMode={true}
+        />
 
-          {/* 설비명 */}
-          <Grid container>
-            <Grid className='sort-title'>
-              <div>설비명</div>
-            </Grid>
-            <Grid>
-              <FormControl sx={{ width: '100%' }} size='small'>
-                <TextField size='small' value={facilityName} onChange={(e) => setFacilityName(e.target.value)} />
-              </FormControl>
-            </Grid>
-          </Grid>
-          {/* 설비명 */}
-
-          {/* 센서명 */}
-          <Grid container>
-            <Grid className='sort-title'>
-              <div>센서명</div>
-            </Grid>
-            <Grid>
-              <FormControl sx={{ width: '100%' }} size='small'>
-                <TextField size='small' value={sensorName} onChange={(e) => setSensorName(e.target.value)} />
-              </FormControl>
-            </Grid>
-          </Grid>
-          {/* 센서명 */}
-        </Grid>
-      </SearchBox>
-
-      <div className='list-header'>
-        <Typography variant='h6' gutterBottom>
-          설비목록
-        </Typography>
-
-        <ActionBox
-          buttons={[
-            {
-              text: '저장',
-              onClick: handleSave,
-              color: 'primary',
-            },
-            {
-              text: '취소',
-              onClick: onBackToList,
-              color: 'inherit',
-              variant: 'outlined',
-            },
-          ]}
+        <AlertModal
+          open={alertModal.open}
+          handleClose={closeAlert}
+          title={alertModal.title}
+          content={alertModal.content}
+          type={alertModal.type}
+          onConfirm={alertModal.onConfirm}
         />
       </div>
-
-      <div className='table-wrap tree-scroll-wrap'>
-        {treeLoading ? (
-          <LoadingOverlay />
-        ) : treeData.length === 0 ? (
-          <div className='text-center text-muted padding-lg'>조회 결과 없음</div>
-        ) : (
-          <FacilityTreeView
-            treeData={treeData}
-            selectedSensors={selectedSensors}
-            onSensorSelect={() => {}} // BasicTable에서 직접 처리
-            onGroupSelectAll={onGroupSelectAll}
-            onFacilitySelectAll={onFacilitySelectAll}
-            isAllSensorsSelectedInGroup={isAllSensorsSelectedInGroup}
-            isAllSensorsSelectedInFacility={isAllSensorsSelectedInFacility}
-            defaultExpandedItems={treeData.flatMap((fg, fgIdx) => [
-              `aas-${fgIdx}`,
-              ...fg.facilities.map((fa, faIdx) => `submodal-${fgIdx}-${faIdx}`),
-            ])}
-          />
-        )}
-      </div>
-
-      <BasicModal
-        open={basicModalOpen}
-        handleClose={() => setBasicModalOpen(false)}
-        handleAdd={onBasicModalAdd}
-        handleReset={onBasicModalReset}
-        selectedSensorCount={selectedSensors.length}
-        name={basicName}
-        setName={setBasicName}
-        desc={basicDesc}
-        setDesc={setBasicDesc}
-        isEditMode={true}
-      />
-
-      <AlertModal
-        open={alertModal.open}
-        handleClose={closeAlert}
-        title={alertModal.title}
-        content={alertModal.content}
-        type={alertModal.type}
-        onConfirm={alertModal.onConfirm}
-      />
-    </div>
+    </>
   );
 };
