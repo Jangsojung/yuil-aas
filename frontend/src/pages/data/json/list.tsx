@@ -186,12 +186,13 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startDate, endDate, selectedFactory, getFiles]);
 
-  // isSearchActive가 true일 때 자동 검색 실행
+  // 목록 페이지가 마운트될 때 isSearchActive가 true면 자동 검색 실행
   useEffect(() => {
     if (isSearchActive) {
       handleSearch();
     }
-  }, [isSearchActive, handleSearch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSelectAllChange = (event: ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked;

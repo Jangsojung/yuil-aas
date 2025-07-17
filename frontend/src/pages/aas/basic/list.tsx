@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBasicList } from '../../../hooks/useBasicList';
 import { ListView } from '../../../components/basic/ListView';

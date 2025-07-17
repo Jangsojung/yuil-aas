@@ -282,12 +282,13 @@ export const useBasicList = (
     }
   }, [selectedBases, pagedData]);
 
-  // hasSearched가 true일 때 검색 실행
+  // hasSearched가 true일 때만 검색 실행
   useEffect(() => {
     if (hasSearched) {
       handleSearch();
     }
-  }, [hasSearched, handleSearch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSearched]);
 
   useEffect(() => {
     if (navigationReset) {
