@@ -96,16 +96,13 @@ export default function BasiccodeEditPage() {
   }, [detailFacilityName, detailSensorName, detailSelectedFacilityGroups, originalDetailTreeData]);
 
   const handleModeChange = () => {
-    console.log('handleModeChange called', { id, mode });
     if (id) {
       const baseId = parseInt(id);
       if (mode === 'view') {
-        console.log('Setting detail mode');
         setDetailMode(true);
         setEditMode(false);
         loadBaseForDetail(baseId);
       } else {
-        console.log('Setting edit mode');
         setDetailMode(false);
         setEditMode(true);
         loadBaseForEdit(baseId);
@@ -114,7 +111,6 @@ export default function BasiccodeEditPage() {
   };
 
   useEffect(() => {
-    console.log('useEffect triggered', { id, mode, detailMode, editMode });
     handleModeChange();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, mode]);

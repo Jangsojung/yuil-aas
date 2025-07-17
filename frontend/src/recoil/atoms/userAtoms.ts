@@ -16,7 +16,6 @@ export const userState = atom<User | null>({
         const user = JSON.parse(savedUser);
         return user;
       } catch (error) {
-        console.error('JSON 파싱 오류:', error);
         localStorage.removeItem('user');
         return null;
       }

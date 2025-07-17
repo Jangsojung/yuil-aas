@@ -14,7 +14,6 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
         const user = JSON.parse(storedUser);
         setUser(user);
       } catch (error) {
-        console.error('JSON 파싱 오류:', error);
         localStorage.removeItem('user');
         navigate('/signIn/sign');
       }
