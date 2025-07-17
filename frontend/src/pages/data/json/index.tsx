@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import JSONList from './list';
 import JSONDetail from './detail';
 
@@ -10,6 +11,7 @@ interface SearchCondition {
 }
 
 export default function JSONManagerPage() {
+  const location = useLocation();
   const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
   const [selectedFileId, setSelectedFileId] = useState<number | null>(null);
   const [searchCondition, setSearchCondition] = useState<SearchCondition>({
@@ -19,6 +21,16 @@ export default function JSONManagerPage() {
   });
   const [isSearchActive, setIsSearchActive] = useState(false);
   const listRef = useRef<any>(null);
+
+  // 대시보드에서 전달받은 파일 ID가 있으면 바로 상세보기 모드로 전환
+  useEffect(() => {
+    if (location.state?.selectedFileId && location.state?.showDetail) {
+      setSelectedFileId(location.state.selectedFileId);
+      setViewMode('detail');
+      // state 초기화
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleDetailClick = (fileId: number) => {
     setSelectedFileId(fileId);

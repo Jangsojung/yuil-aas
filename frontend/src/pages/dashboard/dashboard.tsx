@@ -196,8 +196,27 @@ export default function DashboardPage() {
       {/* 아랫줄 (왼쪽: 최신 JSON 파일 뷰어) */}
       <Grid size={6} sx={{ flexGrow: 1, height: '68%' }}>
         <Box sx={{ ...dashboardPanelStyle }}>
-          <Typography variant='h6' gutterBottom className='dashboard-title'>
+          <Typography variant='h6' gutterBottom sx={{ display: 'inline-block' }} className='dashboard-title'>
             {selectedJson ? `JSON 파일 - ${selectedJson.af_name}` : 'JSON 파일 미리보기'}
+
+            {selectedJson && (
+              <Button
+                onClick={() =>
+                  navigate('/data/jsonManager', {
+                    state: {
+                      selectedFileId: selectedJson.af_idx,
+                      showDetail: true,
+                    },
+                  })
+                }
+                disabled={!selectedJson}
+                variant='outlined'
+                size='small'
+                sx={{ ml: 2 }}
+              >
+                상세보기
+              </Button>
+            )}
           </Typography>
 
           {jsonLoading ? (
@@ -223,7 +242,7 @@ export default function DashboardPage() {
                 파일 크기가 {FILE.MAX_SIZE / (1024 * 1024)}MB를 초과하여 미리보기를 제공할 수 없습니다.
               </Typography>
               <Typography color='textSecondary' variant='body2'>
-                상세보기 버튼을 통해 AASX Package Viewer로 확인해주세요.
+                Text Viewer로 확인해주세요.
               </Typography>
             </Box>
           ) : selectedJsonData ? (
@@ -289,7 +308,7 @@ export default function DashboardPage() {
                 파일 크기가 {FILE.MAX_SIZE / (1024 * 1024)}MB를 초과하여 미리보기를 제공할 수 없습니다.
               </Typography>
               <Typography color='textSecondary' variant='body2'>
-                상세보기 버튼을 통해 AASX Package Viewer로 확인해주세요.
+                AASX Package Viewer로 확인해주세요.
               </Typography>
             </Box>
           ) : selectedAasxData ? (
