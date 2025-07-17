@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedSensorsState, userState } from '../../../recoil/atoms';
 import { useAlertModal } from '../../../hooks/useAlertModal';
@@ -17,10 +17,16 @@ import {
 import CustomBreadcrumb from '../../../components/common/CustomBreadcrumb';
 
 export default function BasiccodeEditPage() {
-  const { id, mode } = useParams<{ id: string; mode?: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [detailMode, setDetailMode] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+  // 쿼리스트링 파싱
+  const searchParams = new URLSearchParams(location.search);
+  const id = searchParams.get('id');
+  const mode = searchParams.get('mode');
+
+  // 초기 상태를 URL 파라미터에 따라 설정
+  const [detailMode, setDetailMode] = useState(mode === 'view');
+  const [editMode, setEditMode] = useState(mode === 'edit');
   const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const [facilityName, setFacilityName] = useState('');
   const [sensorName, setSensorName] = useState('');
@@ -91,13 +97,16 @@ export default function BasiccodeEditPage() {
   }, [detailFacilityName, detailSensorName, detailSelectedFacilityGroups, originalDetailTreeData]);
 
   const handleModeChange = () => {
+    console.log('handleModeChange called', { id, mode });
     if (id) {
       const baseId = parseInt(id);
       if (mode === 'view') {
+        console.log('Setting detail mode');
         setDetailMode(true);
         setEditMode(false);
         loadBaseForDetail(baseId);
       } else {
+        console.log('Setting edit mode');
         setDetailMode(false);
         setEditMode(true);
         loadBaseForEdit(baseId);
@@ -106,8 +115,8 @@ export default function BasiccodeEditPage() {
   };
 
   useEffect(() => {
+    console.log('useEffect triggered', { id, mode, detailMode, editMode });
     handleModeChange();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, mode]);
 
   // 데이터 로딩 함수들
@@ -220,7 +229,7 @@ export default function BasiccodeEditPage() {
       });
 
       showAlert('알림', '기초코드가 수정되었습니다.');
-      navigate(-1); // 이전 페이지로 돌아가기
+      navigate('/aas/basic'); // 이전 페이지로 돌아가기
     } catch (error) {
       showAlert('오류', '기초코드 수정 중 오류가 발생했습니다.');
     }
@@ -254,12 +263,16 @@ export default function BasiccodeEditPage() {
   };
 
   const handleBackToList = () => {
-    navigate(-1); // 이전 페이지로 돌아가기
+    navigate('/aas/basic', {
+      state: {
+        preserveSearch: true,
+      },
+    });
   };
 
   const handleEdit = () => {
     if (selectedBaseForDetail) {
-      navigate(`/aas/basic/edit/${selectedBaseForDetail.ab_idx}/edit`);
+      navigate(`/aas/basic?mode=edit&id=${selectedBaseForDetail.ab_idx}`);
     }
   };
 
@@ -291,10 +304,7 @@ export default function BasiccodeEditPage() {
             alignItems: 'center',
             marginBottom: 16,
           }}
-        >
-          <CustomBreadcrumb items={[{ label: 'AASX KAMP DATA I/F' }, { label: '기초코드 관리' }]} />
-          <span style={{ fontWeight: 700, fontSize: '1.25rem', color: '#637381' }}>기초코드 관리</span>
-        </div>
+        ></div>
         <DetailView
           detailTreeData={detailTreeData}
           detailLoading={detailLoading}

@@ -1,124 +1,64 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { navigationResetState, selectedBasesState, selectedBaseState } from '../recoil/atoms';
+import { selectedSensorsState, navigationResetState } from '../recoil/atoms';
 import { getBasesAPI, deleteBasesAPI } from '../apis/api/basic';
+import { useAlertModal } from './useAlertModal';
+import { useSortableData } from './useSortableData';
+import { usePagination } from './usePagination';
 import { Base } from '../types/api';
-import { Dayjs } from 'dayjs';
-import { PAGINATION, MODAL_TYPE } from '../constants';
-import { useSortableData, SortableColumn } from './useSortableData';
+import dayjs, { Dayjs } from 'dayjs';
+import { MODAL_TYPE } from '../constants';
 
-export const useBasicList = (navigate: any) => {
-  const [selectedBases, setSelectedBases] = useRecoilState(selectedBasesState);
-  const [, setSelectedBase] = useRecoilState(selectedBaseState);
+interface SearchCondition {
+  selectedFactory: number | '';
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
+  searchKeyword: string;
+}
+
+export const useBasicList = (
+  navigate: any,
+  searchCondition: SearchCondition,
+  setSearchCondition: React.Dispatch<React.SetStateAction<SearchCondition>>,
+  hasSearched: boolean,
+  setHasSearched: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  const [selectedSensors, setSelectedSensors] = useRecoilState(selectedSensorsState);
   const navigationReset = useRecoilValue(navigationResetState);
+  const { alertModal, showAlert, showConfirm, closeAlert } = useAlertModal();
 
   // 상태 관리
   const [bases, setBases] = useState<Base[]>([]);
   const [filteredBases, setFilteredBases] = useState<Base[]>([]);
+  const [selectedBases, setSelectedBases] = useState<number[]>([]);
+  const [selectedBase, setSelectedBase] = useState<Base | null>(null);
   const [selectAll, setSelectAll] = useState(false);
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
-  const [currentPage, setCurrentPage] = useState(0);
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertContent, setAlertContent] = useState('');
-  const [alertType, setAlertType] = useState<'alert' | 'confirm'>(MODAL_TYPE.ALERT);
 
-  const [rowsPerPage, setRowsPerPage] = useState<number>(PAGINATION.DEFAULT_ROWS_PER_PAGE);
+  // 검색 조건을 props에서 가져오기
+  const { searchKeyword, startDate, endDate, selectedFactory } = searchCondition;
 
-  // 정렬 기능
-  const {
-    sortedData: sortedBases,
-    sortField,
-    sortDirection,
-    handleSort,
-  } = useSortableData<Base>(filteredBases, 'createdAt', 'desc');
-
-  // 페이지네이션 데이터 계산
-  const pagedData = sortedBases?.slice(currentPage * rowsPerPage, (currentPage + 1) * rowsPerPage);
-  const calculatedTotalPages = Math.ceil((filteredBases?.length || 0) / rowsPerPage);
+  // 정렬 및 페이지네이션
+  const { sortedData, sortField, sortDirection, handleSort } = useSortableData<Base>(
+    filteredBases,
+    'createdAt',
+    'desc'
+  );
+  const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
+    sortedData?.length || 0
+  );
+  const pagedData = paginatedData(sortedData || []);
 
   // 정렬 컬럼 정의
-  const sortableColumns: SortableColumn<Base>[] = [
-    { field: 'fc_name', label: '공장명' },
-    { field: 'ab_name', label: '기초코드명' },
-    { field: 'sn_length', label: '센서 개수' },
-    { field: 'createdAt', label: '생성 일자' },
-    { field: 'updatedAt', label: '수정 일자' },
-    { field: 'ab_note', label: '비고' },
+  const sortableColumns = [
+    { field: 'fc_name' as keyof Base, label: '공장명' },
+    { field: 'ab_name' as keyof Base, label: '기초코드명' },
+    { field: 'sn_length' as keyof Base, label: '센서 개수' },
+    { field: 'createdAt' as keyof Base, label: '생성 일자' },
+    { field: 'updatedAt' as keyof Base, label: '수정 일자' },
+    { field: 'ab_note' as keyof Base, label: '비고', sortable: false },
   ];
 
-  // 페이지 변경 핸들러
-  const handlePageChange = useCallback((event: unknown, page: number) => {
-    setCurrentPage(page);
-  }, []);
-
-  // 페이지 크기 변경 핸들러
-  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newPageSize = parseInt(event.target.value, 10);
-    setRowsPerPage(newPageSize);
-    setCurrentPage(0);
-  }, []);
-
-  // 초기화 핸들러
-  const handleReset = useCallback(() => {
-    setSearchKeyword('');
-    setStartDate(null);
-    setEndDate(null);
-    setSelectedFactory('');
-    setBases([]);
-    setFilteredBases([]);
-    setSelectedBases([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setSelectedBases]);
-
-  // 전체 선택 체크박스 핸들러
-  const handleSelectAllChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const checked = event.target.checked;
-      setSelectAll(checked);
-
-      if (!pagedData?.length) return;
-
-      const currentPageIds = pagedData.map((base) => base.ab_idx);
-      setSelectedBases((prevSelected) => {
-        const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
-        return checked
-          ? [...Array.from(new Set([...prevArray, ...currentPageIds]))]
-          : prevArray.filter((id) => !currentPageIds.includes(id));
-      });
-    },
-    [pagedData, setSelectedBases]
-  );
-
-  // 개별 체크박스 핸들러
-  const handleCheckboxChange = useCallback(
-    (baseIdx: number) => {
-      setSelectedBases((prevSelected) => {
-        const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
-        return prevArray.includes(baseIdx) ? prevArray.filter((idx) => idx !== baseIdx) : [...prevArray, baseIdx];
-      });
-    },
-    [setSelectedBases]
-  );
-
-  // 삭제 핸들러
-  const handleDelete = useCallback(() => {
-    if (selectedBases.length === 0) {
-      setAlertTitle('알림');
-      setAlertContent('삭제할 항목을 선택해주세요.');
-      setAlertType(MODAL_TYPE.ALERT);
-      setAlertOpen(true);
-      return;
-    }
-
-    setAlertTitle('확인');
-    setAlertContent(`선택한 ${selectedBases.length}개 항목을 삭제하시겠습니까?`);
-    setAlertType(MODAL_TYPE.CONFIRM);
-    setAlertOpen(true);
-  }, [selectedBases.length]);
+  const calculatedTotalPages = Math.ceil((sortedData?.length || 0) / rowsPerPage);
 
   // 검색 로직을 별도 함수로 분리
   const performSearch = useCallback(async () => {
@@ -163,12 +103,12 @@ export const useBasicList = (navigate: any) => {
       }
 
       setFilteredBases(filtered);
-      setCurrentPage(0);
+      goToPage(0);
     } catch (error) {
       setBases([]);
       setFilteredBases([]);
     }
-  }, [selectedFactory, searchKeyword, startDate, endDate]);
+  }, [selectedFactory, searchKeyword, startDate, endDate, goToPage]);
 
   // 삭제 확인 핸들러
   const handleConfirmDelete = useCallback(async () => {
@@ -180,60 +120,138 @@ export const useBasicList = (navigate: any) => {
       // 검색 상태를 유지하면서 현재 검색 조건으로 다시 검색
       await performSearch();
     } catch (err: any) {
-      setAlertTitle('오류');
-      setAlertContent('삭제 중 오류가 발생했습니다.');
-      setAlertType(MODAL_TYPE.ALERT);
-      setAlertOpen(true);
+      showAlert('오류', '삭제 중 오류가 발생했습니다.');
     }
-  }, [selectedBases, bases, setSelectedBases, performSearch]);
+  }, [selectedBases, bases, setSelectedBases, performSearch, showAlert]);
 
   // 검색 핸들러
   const handleSearch = useCallback(async () => {
     if (!selectedFactory) {
-      setAlertTitle('알림');
-      setAlertContent('공장을 선택해주세요.');
-      setAlertType(MODAL_TYPE.ALERT);
-      setAlertOpen(true);
+      showAlert('알림', '공장을 선택해주세요.');
       return;
     }
 
     await performSearch();
-  }, [selectedFactory, performSearch, setAlertTitle, setAlertContent, setAlertType, setAlertOpen]);
+    setHasSearched(true); // 검색 버튼을 눌렀을 때만 hasSearched를 true로 설정
+  }, [selectedFactory, performSearch, showAlert, setHasSearched]);
+
+  // 리셋 핸들러
+  const handleReset = useCallback(() => {
+    setSearchCondition({
+      selectedFactory: '',
+      startDate: null,
+      endDate: null,
+      searchKeyword: '',
+    });
+    setSelectedBases([]);
+    setBases([]);
+    setFilteredBases([]);
+    setHasSearched(false); // 리셋 시 검색 상태도 초기화
+    navigate('/aas/basic');
+  }, [navigate, setSearchCondition, setHasSearched]);
+
+  // 전체 선택 체크박스 핸들러
+  const handleSelectAllChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const checked = event.target.checked;
+      setSelectAll(checked);
+
+      if (!pagedData?.length) return;
+
+      const currentPageIds = pagedData.map((base) => base.ab_idx);
+      setSelectedBases((prevSelected) => {
+        const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
+        return checked
+          ? [...Array.from(new Set([...prevArray, ...currentPageIds]))]
+          : prevArray.filter((id) => !currentPageIds.includes(id));
+      });
+    },
+    [pagedData, setSelectedBases]
+  );
+
+  // 개별 체크박스 핸들러
+  const handleCheckboxChange = useCallback(
+    (baseIdx: number) => {
+      setSelectedBases((prevSelected) => {
+        const prevArray = Array.isArray(prevSelected) ? prevSelected : [];
+        return prevArray.includes(baseIdx) ? prevArray.filter((idx) => idx !== baseIdx) : [...prevArray, baseIdx];
+      });
+    },
+    [setSelectedBases]
+  );
+
+  // 삭제 핸들러
+  const handleDelete = useCallback(() => {
+    if (selectedBases.length === 0) {
+      showAlert('알림', '삭제할 항목을 선택해주세요.');
+      return;
+    }
+
+    showConfirm('확인', `선택한 ${selectedBases.length}개 항목을 삭제하시겠습니까?`, handleConfirmDelete);
+  }, [selectedBases.length, showAlert, showConfirm, handleConfirmDelete]);
+
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback(
+    (event: unknown, page: number) => {
+      goToPage(page);
+    },
+    [goToPage]
+  );
 
   // 날짜 변경 핸들러
-  const handleDateChange = useCallback((newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
-  }, []);
+  const handleDateChange = useCallback(
+    (newStartDate: Dayjs | null, newEndDate: Dayjs | null) => {
+      setSearchCondition((prev) => ({
+        ...prev,
+        startDate: newStartDate,
+        endDate: newEndDate,
+      }));
+    },
+    [setSearchCondition]
+  );
 
   // 공장 변경 핸들러
   const handleFactoryChange = useCallback(
     (factoryId: number) => {
-      setSelectedFactory(factoryId);
+      setSearchCondition((prev) => ({
+        ...prev,
+        selectedFactory: factoryId,
+      }));
       setSelectedBases([]);
       // 공장 변경 시 기초코드 목록은 그대로 유지 (검색 버튼을 눌러야만 새로 조회)
     },
-    [setSelectedBases]
+    [setSearchCondition, setSelectedBases]
+  );
+
+  // 검색어 변경 핸들러
+  const setSearchKeyword = useCallback(
+    (keyword: string) => {
+      setSearchCondition((prev) => ({
+        ...prev,
+        searchKeyword: keyword,
+      }));
+    },
+    [setSearchCondition]
   );
 
   // 행 클릭 핸들러
   const handleClick = useCallback(
     (base: Base) => {
       setSelectedBase(base);
-      navigate(`/aas/basic/edit/${base.ab_idx}/view`);
+      navigate(`/aas/basic?mode=view&id=${base.ab_idx}`);
     },
     [setSelectedBase, navigate]
   );
 
   // 추가 페이지 이동 핸들러
   const handleAdd = useCallback(() => {
-    navigate('/aas/basic/add');
+    navigate('/aas/basic?mode=add');
   }, [navigate]);
 
   // 알림 모달 닫기 핸들러
   const handleCloseAlert = useCallback(() => {
-    setAlertOpen(false);
-  }, []);
+    closeAlert();
+  }, [closeAlert]);
 
   // 날짜 포맷팅
   const formatDate = useCallback((dateString: string | undefined) => {
@@ -250,9 +268,9 @@ export const useBasicList = (navigate: any) => {
   // Effects
   useEffect(() => {
     if (currentPage >= calculatedTotalPages && calculatedTotalPages > 0) {
-      setCurrentPage(0);
+      goToPage(0);
     }
-  }, [currentPage, calculatedTotalPages]);
+  }, [currentPage, calculatedTotalPages, goToPage]);
 
   useEffect(() => {
     if (selectedBases.length === 0) {
@@ -266,17 +284,27 @@ export const useBasicList = (navigate: any) => {
     }
   }, [selectedBases, pagedData]);
 
+  // hasSearched가 true일 때 검색 실행
+  useEffect(() => {
+    if (hasSearched) {
+      handleSearch();
+    }
+  }, [hasSearched, handleSearch]);
+
   useEffect(() => {
     if (navigationReset) {
-      setSearchKeyword('');
-      setStartDate(null);
-      setEndDate(null);
-      setSelectedFactory('');
+      setSearchCondition({
+        selectedFactory: '',
+        startDate: null,
+        endDate: null,
+        searchKeyword: '',
+      });
       setBases([]);
       setFilteredBases([]);
       setSelectedBases([]);
+      setHasSearched(false);
     }
-  }, [navigationReset, setSelectedBases]);
+  }, [navigationReset, setSearchCondition, setSelectedBases, setHasSearched]);
 
   return {
     // 상태
@@ -292,10 +320,10 @@ export const useBasicList = (navigate: any) => {
     rowsPerPage,
     pagedData,
     calculatedTotalPages,
-    alertOpen,
-    alertTitle,
-    alertContent,
-    alertType,
+    alertOpen: alertModal.open,
+    alertTitle: alertModal.title,
+    alertContent: alertModal.content,
+    alertType: alertModal.type,
     selectedBases,
     sortField,
     sortDirection,

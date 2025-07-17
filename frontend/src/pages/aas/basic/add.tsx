@@ -73,7 +73,7 @@ export default function BasiccodeAddPage() {
 
   return (
     <>
-       <div
+      <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',

@@ -17,8 +17,6 @@ import ProtectedRoute from './components/route/ProtectedRoute';
 
 import FacilityPage from './pages/aas/facility';
 import BasicCodeIndex from './pages/aas/basic';
-import BasicCodeAdd from './pages/aas/basic/add';
-import BasicCodeEdit from './pages/aas/basic/edit';
 
 function App() {
   return (
@@ -79,14 +77,6 @@ export default function ReactRouter() {
                 {
                   path: 'basic',
                   element: <BasicCodeIndex />,
-                },
-                {
-                  path: 'basic/add',
-                  element: <BasicCodeAdd />,
-                },
-                {
-                  path: 'basic/edit/:id/:mode',
-                  element: <BasicCodeEdit />,
                 },
                 {
                   path: 'convert',

@@ -189,7 +189,10 @@ export default function Layout() {
   // 브레드크럼 링크 비활성화 (홈 제외) 및 홈 아이콘 추가
   React.useEffect(() => {
     // JSON 상세 페이지에서는 브레드크럼 관련 JavaScript 실행하지 않음
-    if (location.pathname.includes('/basic/add') || location.pathname.includes('/basic/edit')) {
+    if (
+      location.pathname.includes('/basic') &&
+      (location.search.includes('mode=add') || location.search.includes('mode=edit'))
+    ) {
       return;
     }
 
@@ -263,8 +266,8 @@ export default function Layout() {
     >
       <Container>
         {location.pathname !== '/dashboard/dashboard' &&
-          !location.pathname.includes('/basic/add') &&
-          !location.pathname.includes('/basic/edit') && <PageHeader />}
+          !location.search.includes('mode=add') &&
+          !location.search.includes('mode=edit') && <PageHeader />}
         <Outlet />
       </Container>
     </DashboardLayout>

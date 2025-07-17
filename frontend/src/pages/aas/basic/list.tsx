@@ -3,8 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import { useBasicList } from '../../../hooks/useBasicList';
 import { ListView } from '../../../components/basic/ListView';
 import AlertModal from '../../../components/modal/alert';
+import dayjs, { Dayjs } from 'dayjs';
 
-export default function BasicList() {
+interface SearchCondition {
+  selectedFactory: number | '';
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
+  searchKeyword: string;
+}
+
+interface BasicListProps {
+  searchCondition: SearchCondition;
+  setSearchCondition: React.Dispatch<React.SetStateAction<SearchCondition>>;
+  hasSearched: boolean;
+  setHasSearched: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function BasicList({
+  searchCondition,
+  setSearchCondition,
+  hasSearched,
+  setHasSearched,
+}: BasicListProps) {
   const navigate = useNavigate();
   const {
     // 상태
@@ -43,7 +63,7 @@ export default function BasicList() {
     handleConfirmDelete,
     handleCloseAlert,
     handleSort,
-  } = useBasicList(navigate);
+  } = useBasicList(navigate, searchCondition, setSearchCondition, hasSearched, setHasSearched);
 
   return (
     <div className='table-outer'>
