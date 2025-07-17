@@ -33,9 +33,20 @@ const signIn = async (
         user_name: data.user_name,
         cm_idx: data.cm_idx,
       };
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
-      nav('/dashboard/dashboard');
+      try {
+        localStorage.setItem('user', JSON.stringify(user));
+        setUser(user);
+        nav('/dashboard/dashboard');
+      } catch (storageError) {
+        console.error('localStorage 저장 오류:', storageError);
+        setAlertModal({
+          open: true,
+          title: '저장 오류',
+          content: '사용자 정보 저장 중 오류가 발생했습니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+      }
     } else {
       setAlertModal({
         open: true,

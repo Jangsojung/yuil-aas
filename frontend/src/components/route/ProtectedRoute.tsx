@@ -10,7 +10,14 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const handleUserLoad = () => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        const user = JSON.parse(storedUser);
+        setUser(user);
+      } catch (error) {
+        console.error('JSON 파싱 오류:', error);
+        localStorage.removeItem('user');
+        navigate('/signIn/sign');
+      }
     } else {
       navigate('/signIn/sign');
     }
