@@ -22,6 +22,7 @@ import {
   fileTooLargeError,
   afIdxRequiredError,
 } from '../../utils/responseHandler.js';
+import { HTTP_STATUS } from '../../constants/errors.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -146,19 +147,19 @@ export const getFileFCIdx = async (req, res) => {
   try {
     const { fileName, af_kind } = req.body;
     if (!fileName) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.OK).json({
         success: false,
         message: '파일명이 필요합니다.',
       });
     }
     if (!af_kind) {
-      return res.status(400).json({
+      return res.status(HTTP_STATUS.OK).json({
         success: false,
         message: '파일 타입(af_kind)이 필요합니다.',
       });
     }
     const fc_idx = await getFileFCIdxFromDB(fileName, af_kind);
-    res.json({
+    res.status(HTTP_STATUS.OK).json({
       success: true,
       data: { fc_idx },
     });

@@ -33,7 +33,8 @@ export default function SelectJSONFile({ setSelectedFile, selectedFactory }: Pro
       }
 
       const data = await getJSONFilesAPI('', '', selectedFactory);
-      setFiles(data || []);
+      const responseData = data?.data || (Array.isArray(data) ? data : []);
+      setFiles(responseData);
 
       setCurrentFile('');
       setSelectedFile(undefined);

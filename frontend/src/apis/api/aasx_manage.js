@@ -20,7 +20,7 @@ export const getFilesAPI = async (startDate, endDate, fc_idx, af_kind = KINDS.AA
       endDate,
       limit,
     });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }
@@ -31,7 +31,7 @@ export const getAASXAPI = async (af_kind = KINDS.AASX_KIND) => {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX, {
       af_kind,
     });
-    return data;
+    return data?.data || data;
   } catch (error) {
     throw error;
   }
@@ -45,7 +45,7 @@ export const getAASXFilesAPI = async (start, end, fc_idx, af_kind = KINDS.AASX_K
       startDate: start,
       endDate: end,
     });
-    return data;
+    return data?.data || data;
   } catch (error) {
     throw error;
   }
@@ -54,7 +54,7 @@ export const getAASXFilesAPI = async (start, end, fc_idx, af_kind = KINDS.AASX_K
 export const getFileFCIdxAPI = async (fileName, af_kind = KINDS.JSON_KIND) => {
   try {
     const result = await apiHelpers.post('/api/file/getFileFCIdx', { fileName, af_kind });
-    return result;
+    return result?.data || result;
   } catch (error) {
     return null;
   }
@@ -111,7 +111,7 @@ export const getAASXFilesListAPI = async (af_kind = KINDS.AASX_KIND) => {
     const result = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
       af_kind,
     });
-    return result;
+    return result?.data || result;
   } catch (error) {
     throw error;
   }

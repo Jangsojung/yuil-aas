@@ -11,6 +11,8 @@ import { useSortableData, SortableColumn } from '../../../hooks/useSortableData'
 import FactorySelect from '../../../components/select/factory_select';
 import { getJSONFilesAPI, deleteJSONAPI } from '../../../apis/api/json_manage';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../../recoil/atoms';
 import dayjs, { Dayjs } from 'dayjs';
 import BasicDatePicker from '../../../components/datepicker';
 import FormControl from '@mui/material/FormControl';
@@ -62,6 +64,7 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
   const [selectedFactory, setSelectedFactory] = useState<number | ''>(searchCondition.selectedFactory);
   const navigate = useNavigate();
   const location = useLocation();
+  const navigationReset = useRecoilValue(navigationResetState);
 
   // 정렬 기능
   const {
@@ -105,15 +108,24 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
       type: 'confirm',
       onConfirm: async () => {
         try {
-          await deleteJSONAPI(selectedFiles);
-
+          const result = await deleteJSONAPI(selectedFiles);
+          if (result && result.success === false) {
+            setAlertModal({
+              open: true,
+              title: '오류',
+              content: result.error || '파일 삭제 중 오류가 발생했습니다.',
+              type: 'alert',
+              onConfirm: undefined,
+            });
+            return;
+          }
           setSelectedFiles([]);
           getFiles();
         } catch (error) {
           setAlertModal({
             open: true,
             title: '오류',
-            content: '삭제 중 오류가 발생했습니다.',
+            content: '파일 삭제 중 오류가 발생했습니다.',
             type: 'alert',
             onConfirm: undefined,
           });
@@ -149,7 +161,19 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
       const startDateStr = start ? dayjs(start).format('YYYY-MM-DD') : '';
       const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
 
-      const data: File[] = await getJSONFilesAPI(startDateStr, endDateStr, selectedFactory);
+      const data = await getJSONFilesAPI(startDateStr, endDateStr, selectedFactory);
+      if (!Array.isArray(data) && (data as any)?.success === false) {
+        setAlertModal({
+          open: true,
+          title: '오류',
+          content: (data as any)?.error || '파일 목록 조회 중 오류가 발생했습니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+        setFiles([]);
+        setIsSearchActive(false);
+        return;
+      }
       setFiles(Array.isArray(data) ? data : []);
       setIsSearchActive(true);
     },
@@ -221,6 +245,18 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
     setAlertModal((prev) => ({ ...prev, open: false }));
   };
 
+  const handleNavigationReset = () => {
+    setSelectedFiles([]);
+    setSelectAll(false);
+    const defaultStart = dayjs().subtract(1, 'month');
+    const defaultEnd = dayjs();
+    setStartDate(defaultStart);
+    setEndDate(defaultEnd);
+    setSelectedFactory('');
+    setFiles([]);
+    setIsSearchActive(false);
+  };
+
   // 검색 조건이 바뀌면 부모에도 반영
   useEffect(() => {
     setSearchCondition({
@@ -262,11 +298,17 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
     }
   }, [selectedFiles, files]);
 
+  useEffect(() => {
+    handleNavigationReset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigationReset]);
+
   // refresh 메서드를 ref로 노출
   useImperativeHandle(ref, () => ({
     refresh: () => {
       getFiles();
     },
+    handleReset: handleReset,
   }));
 
   const handleRowClick = (af_idx: number) => {

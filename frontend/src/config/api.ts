@@ -80,7 +80,21 @@ export const apiHelpers = {
         throw error;
       }
 
-      return response.json();
+      const responseData = await response.json();
+
+      if (responseData && responseData.success === false) {
+        const errorMessage = responseData.error || responseData.message || 'Unknown error';
+        const error = new Error(errorMessage);
+        (error as any).response = {
+          status: response.status,
+          data: errorMessage,
+        };
+        (error as any).success = false;
+        (error as any).error = responseData.error;
+        throw error;
+      }
+
+      return responseData;
     } catch (error) {
       throw error;
     }

@@ -12,7 +12,7 @@ export const deleteEdgeAPI = async (data) => {
 export const getEdgeAPI = async () => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.EDGE_GATEWAY.LIST);
-    return Array.isArray(data) ? data : [];
+    return data?.data || (Array.isArray(data) ? data : []);
   } catch (error) {
     return [];
   }
@@ -21,7 +21,7 @@ export const getEdgeAPI = async () => {
 export const getEdgeWithStatusAPI = async () => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.EDGE_GATEWAY.STATUS);
-    return Array.isArray(data) ? data : [];
+    return data?.data || (Array.isArray(data) ? data : []);
   } catch (error) {
     return [];
   }

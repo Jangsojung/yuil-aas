@@ -1,4 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../recoil/atoms';
 import EdgeList from './list';
 import EdgeAdd from './add';
 import EdgeEdit from './edit';
@@ -16,6 +19,8 @@ interface EdgeGateway {
 }
 
 export default function EdgeGatewayPage() {
+  const location = useLocation();
+  const navigationReset = useRecoilValue(navigationResetState);
   const [openModal, setOpenModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedEdgeGateway, setSelectedEdgeGateway] = useState<EdgeGateway | null>(null);
@@ -52,6 +57,17 @@ export default function EdgeGatewayPage() {
     setIsEditMode(false);
     setSelectedEdgeGateway(null);
   };
+
+  // 네비게이션 변경 시 페이지 초기화
+  useEffect(() => {
+    setOpenModal(false);
+    setIsEditMode(false);
+    setSelectedEdgeGateway(null);
+    // 목록 컴포넌트 초기화
+    if (listRef.current && listRef.current.handleReset) {
+      listRef.current.handleReset();
+    }
+  }, [navigationReset]);
 
   return (
     <>

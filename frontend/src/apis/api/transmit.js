@@ -5,7 +5,7 @@ export const handleVerifyAPI = async (selectedFile) => {
     const data = await apiHelpers.post(API_ENDPOINTS.FILE.VERIFY, {
       file: selectedFile,
     });
-    return data;
+    return data?.data || data;
   } catch (error) {
     throw error;
   }
@@ -17,7 +17,7 @@ export const getFacilityGroupsForTransmitAPI = async (factoryId) => {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.FACILITY_GROUPS, {
       fc_idx: factoryId,
     });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }
@@ -27,7 +27,7 @@ export const getFacilityGroupsForTransmitAPI = async (factoryId) => {
 export const getFacilitiesForTransmitAPI = async (fg_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASE_CODE, { fg_idx });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }
@@ -37,7 +37,7 @@ export const getFacilitiesForTransmitAPI = async (fg_idx) => {
 export const getSensorsForTransmitAPI = async (fa_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.SENSORS, { fa_idx });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }

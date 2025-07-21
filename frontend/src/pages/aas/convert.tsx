@@ -236,6 +236,17 @@ export default function ConvertPage() {
         setProgress(0);
       }, 100);
 
+      if (result && result.success === false) {
+        setAlertModal({
+          open: true,
+          title: '오류',
+          content: result.error || 'JSON 파일 변환 중 오류가 발생했습니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+        return;
+      }
+
       if (result) {
         setAlertModal({
           open: true,

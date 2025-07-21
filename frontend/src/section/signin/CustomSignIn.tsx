@@ -38,6 +38,7 @@ const signIn = async (
         setUser(user);
         nav('/dashboard/dashboard');
       } catch (storageError) {
+        console.error('localStorage 저장 오류:', storageError);
         setAlertModal({
           open: true,
           title: '저장 오류',

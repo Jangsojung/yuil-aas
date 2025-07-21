@@ -3,25 +3,20 @@ import { ERROR_MESSAGES, HTTP_STATUS } from '../constants/errors.js';
 // 성공 응답 유틸리티
 export const successResponse = (res, data, status = HTTP_STATUS.OK) => {
   if (res && typeof res.status === 'function') {
-    res.status(status).json(data);
+    res.status(status).json({ success: true, data });
   }
 };
 
 // 에러 응답 유틸리티
-export const errorResponse = (res, message, status = HTTP_STATUS.INTERNAL_SERVER_ERROR) => {
+export const errorResponse = (res, message, status = HTTP_STATUS.OK) => {
   if (res && typeof res.status === 'function') {
-    res.status(status).json({ error: message });
+    res.status(HTTP_STATUS.OK).json({ success: false, error: message });
   }
-};
-
-// 내부 서버 에러 응답
-export const internalServerError = (res) => {
-  errorResponse(res, ERROR_MESSAGES.INTERNAL_SERVER_ERROR);
 };
 
 // 잘못된 요청 에러 응답
 export const badRequestError = (res, message) => {
-  errorResponse(res, message, HTTP_STATUS.BAD_REQUEST);
+  errorResponse(res, message, HTTP_STATUS.OK);
 };
 
 // 파일 관련 에러 응답들

@@ -15,6 +15,7 @@ import FactorySelect from '../../components/select/factory_select';
 import { FormControl } from '@mui/material';
 import { getAASXFilesAPI } from '../../apis/api/aasx_manage';
 import { useLocation } from 'react-router-dom';
+import LoadingOverlay from '../../components/loading/LodingOverlay';
 
 export default function TransmitPage() {
   const location = useLocation();
@@ -25,6 +26,7 @@ export default function TransmitPage() {
   const [selectedFile, setSelectedFile] = useState<AASXFile | undefined>(undefined);
   const [selectedFactory, setSelectedFactory] = useState<number | ''>('');
   const [aasxFiles, setAasxFiles] = useState<AASXFile[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigationReset = useRecoilValue(navigationResetState);
 
   // 커스텀 훅 사용
@@ -43,6 +45,7 @@ export default function TransmitPage() {
       return;
     }
 
+    setIsLoading(true);
     try {
       const rawData = await handleVerifyAPI(selectedFile);
       if (rawData && rawData.aasData) {
@@ -58,7 +61,9 @@ export default function TransmitPage() {
         showAlert('오류', '파일 데이터를 가져올 수 없습니다.');
       }
     } catch (error) {
-      // 파일 크기 초과 에러 처리 - Error 객체의 message에서 확인
+      console.log('Error details:', error); // 디버깅용
+
+      // 파일 크기 초과 에러 처리
       if (error instanceof Error) {
         const errorMessage = error.message;
         if (errorMessage === 'FILE_TOO_LARGE') {
@@ -70,7 +75,7 @@ export default function TransmitPage() {
         }
       }
 
-      // API 응답에서 에러 메시지 확인 (백엔드에서 JSON 형태로 반환하는 경우)
+      // apiHelpers에서 설정한 error 객체 처리
       if (error && typeof error === 'object' && 'error' in error) {
         const apiError = (error as any).error;
         if (apiError === 'FILE_TOO_LARGE') {
@@ -82,21 +87,9 @@ export default function TransmitPage() {
         }
       }
 
-      // 응답 데이터에서 에러 확인 (apiHelpers에서 설정한 response.data)
-      if (error && typeof error === 'object' && 'response' in error) {
-        const response = (error as any).response;
-        if (response && response.data) {
-          if (response.data === 'FILE_TOO_LARGE') {
-            showAlert(
-              '파일 크기 초과',
-              '500MB 이상의 파일은 검증할 수 없습니다.\nAASX Package Viewer를 통해 확인해주세요.'
-            );
-            return;
-          }
-        }
-      }
-
       showAlert('오류', '파일 검증 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -153,13 +146,21 @@ export default function TransmitPage() {
 
             // 자동으로 검증 실행 (상태 업데이트 후 실행)
             setTimeout(async () => {
-              const rawData = await handleVerifyAPI(found);
-              if (rawData && rawData.aasData) {
-                const transformedData = transformAASXData(rawData.aasData);
-                if (transformedData) {
-                  setAasxData(transformedData);
-                  setIsVerified(true);
+              setIsLoading(true);
+              try {
+                const rawData = await handleVerifyAPI(found);
+                if (rawData && rawData.aasData) {
+                  const transformedData = transformAASXData(rawData.aasData);
+                  if (transformedData) {
+                    setAasxData(transformedData);
+                    setIsVerified(true);
+                  }
                 }
+              } catch (error) {
+                // 에러 처리
+                console.error('자동 검증 중 오류:', error);
+              } finally {
+                setIsLoading(false);
               }
             }, 200); // 상태 업데이트를 위한 충분한 지연
           }
@@ -178,6 +179,7 @@ export default function TransmitPage() {
 
   return (
     <div className='table-outer'>
+      {isLoading && <LoadingOverlay />}
       <SearchBox
         buttons={[
           {

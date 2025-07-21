@@ -4,7 +4,7 @@ import { API_ENDPOINTS, apiHelpers } from '../../config/api';
 export const getBaseByIdAPI = async (ab_idx) => {
   try {
     const result = await apiHelpers.post(`${API_ENDPOINTS.BASE_CODE.BASES}/${ab_idx}`, { ab_idx });
-    return result;
+    return result?.data || result;
   } catch (error) {
     return null;
   }
@@ -14,7 +14,7 @@ export const getBaseByIdAPI = async (ab_idx) => {
 export const getBasesAPI = async (fc_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES, { fc_idx });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }
@@ -54,7 +54,7 @@ export const updateBaseAPI = async (data) => {
 export const getBaseSensorsAPI = async (ab_idx) => {
   try {
     const result = await apiHelpers.post(`${API_ENDPOINTS.BASE_CODE.BASES}/${ab_idx}/sensors`);
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }
@@ -64,8 +64,9 @@ export const getBaseSensorsAPI = async (ab_idx) => {
 export const getFacilityGroupsAPI = async (fc_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.FACILITY_GROUPS, { fc_idx });
-    return Array.isArray(result)
-      ? result.map((fg) => ({
+    const responseData = result?.data || (Array.isArray(result) ? result : []);
+    return Array.isArray(responseData)
+      ? responseData.map((fg) => ({
           ...fg,
           origin_check: fg.origin_check || -1,
         }))
@@ -79,8 +80,9 @@ export const getFacilityGroupsAPI = async (fc_idx) => {
 export const getFacilitiesAPI = async (fg_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASE_CODE, { fg_idx });
-    return Array.isArray(result)
-      ? result.map((fa) => ({
+    const responseData = result?.data || (Array.isArray(result) ? result : []);
+    return Array.isArray(responseData)
+      ? responseData.map((fa) => ({
           ...fa,
           origin_check: fa.origin_check || -1,
         }))
@@ -94,8 +96,9 @@ export const getFacilitiesAPI = async (fg_idx) => {
 export const getSensorsAPI = async (fa_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.SENSORS, { fa_idx });
-    return Array.isArray(result)
-      ? result.map((sensor) => ({
+    const responseData = result?.data || (Array.isArray(result) ? result : []);
+    return Array.isArray(responseData)
+      ? responseData.map((sensor) => ({
           ...sensor,
           origin_check: sensor.origin_check || -1,
         }))
@@ -235,7 +238,7 @@ export const buildTreeFromSensorIdsAPI = async (sensorIds, fc_idx) => {
 export const getBaseSensorsForTableAPI = async (ab_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES_SENSORS, { ab_idx });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }
@@ -245,7 +248,7 @@ export const getBaseSensorsForTableAPI = async (ab_idx) => {
 export const getSensorsForTableAPI = async (fa_idx) => {
   try {
     const result = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.SENSORS, { fa_idx });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }
@@ -254,7 +257,7 @@ export const getSensorsForTableAPI = async (fa_idx) => {
 export const getFactoriesByCmIdxAPI = async (cm_idx) => {
   try {
     const result = await apiHelpers.post(`/api/base_code/factories/${cm_idx}`, { cm_idx });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     throw error;
   }

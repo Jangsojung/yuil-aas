@@ -1,4 +1,5 @@
 import express from 'express';
+import { HTTP_STATUS } from '../constants/errors.js';
 
 // 라우터 팩토리 함수
 export const createRoute = (method, path, controller, paramExtractor) => {
@@ -30,7 +31,7 @@ export const createRouter = (routes) => {
       } catch (error) {
         console.error('라우터 핸들러 오류:', error);
         if (res && typeof res.status === 'function') {
-          res.status(500).json({
+          res.status(HTTP_STATUS.OK).json({
             success: false,
             message: '서버 내부 오류가 발생했습니다.',
           });

@@ -183,6 +183,21 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         updateProgress(50, '새 AASX 파일 생성 중...');
         // 새 AASX 파일 생성 작업
         result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx, fc_idx, linkName);
+        if (result && result.success === false) {
+          setAlertModal({
+            open: true,
+            title: '오류',
+            content: result.error || '파일 수정 중 오류가 발생했습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
+          setIsLoading(false);
+          setProgress(0);
+          setProgressLabel('');
+          setSizeWarning('');
+          setAbortController(null);
+          return;
+        }
 
         updateProgress(70, '기존 파일 삭제 중...');
         // 기존 파일 삭제 작업 (백엔드에서 처리)
@@ -219,6 +234,21 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
 
         updateProgress(60, 'AASX 파일 변환 중...');
         result = await uploadAASXFileAPI(uploadFile, userIdx, fc_idx, linkName);
+        if (result && result.success === false) {
+          setAlertModal({
+            open: true,
+            title: '오류',
+            content: result.error || '파일 등록 중 오류가 발생했습니다.',
+            type: 'alert',
+            onConfirm: undefined,
+          });
+          setIsLoading(false);
+          setProgress(0);
+          setProgressLabel('');
+          setSizeWarning('');
+          setAbortController(null);
+          return;
+        }
 
         updateProgress(80, '데이터베이스 저장 중...');
         // DB 저장 작업

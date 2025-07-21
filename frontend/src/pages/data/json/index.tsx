@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../../recoil/atoms';
 import JSONList from './list';
 import JSONDetail from './detail';
 
@@ -12,6 +14,7 @@ interface SearchCondition {
 
 export default function JSONManagerPage() {
   const location = useLocation();
+  const navigationReset = useRecoilValue(navigationResetState);
   const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
   const [selectedFileId, setSelectedFileId] = useState<number | null>(null);
   const [searchCondition, setSearchCondition] = useState<SearchCondition>({
@@ -31,6 +34,27 @@ export default function JSONManagerPage() {
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
+
+  // 네비게이션 변경 시 페이지 초기화
+  useEffect(() => {
+    // 대시보드에서 전달받은 상태가 있으면 초기화하지 않음
+    if (location.state?.selectedFileId && location.state?.showDetail) {
+      return;
+    }
+
+    setViewMode('list');
+    setSelectedFileId(null);
+    setSearchCondition({
+      selectedFactory: '',
+      startDate: null,
+      endDate: null,
+    });
+    setIsSearchActive(false);
+    // 목록 컴포넌트 초기화
+    if (listRef.current && listRef.current.handleReset) {
+      listRef.current.handleReset();
+    }
+  }, [navigationReset, location.state]);
 
   const handleDetailClick = (fileId: number) => {
     setSelectedFileId(fileId);

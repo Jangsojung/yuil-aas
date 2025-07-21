@@ -3,7 +3,7 @@ import { API_ENDPOINTS, apiHelpers } from '../../config/api';
 export const getBasesAPI = async (fc_idx) => {
   try {
     const data = await apiHelpers.post(API_ENDPOINTS.BASE_CODE.BASES, { fc_idx });
-    return Array.isArray(data) ? data : [];
+    return data?.data || (Array.isArray(data) ? data : []);
   } catch (error) {
     return [];
   }
@@ -12,7 +12,8 @@ export const getBasesAPI = async (fc_idx) => {
 export const getBaseFCIdxAPI = async (ab_idx) => {
   try {
     const data = await apiHelpers.post(`${API_ENDPOINTS.BASE_CODE.BASES}/${ab_idx}/fc_idx`);
-    return data.fc_idx;
+    const responseData = data?.data || data;
+    return responseData.fc_idx;
   } catch (error) {
     throw error;
   }
@@ -32,7 +33,7 @@ export const insertJSONAPI = async (params, signal) => {
       },
       signal
     );
-    return data;
+    return data?.data || data;
   } catch (error) {
     throw error;
   }

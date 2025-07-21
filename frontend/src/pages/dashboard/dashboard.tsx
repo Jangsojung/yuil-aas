@@ -24,6 +24,8 @@ import { transformAASXData } from '../../utils/aasxTransform';
 import { formatDate } from '../../utils/dateUtils';
 import { FILE } from '../../constants';
 import type { AASXFile, AASXData, File } from '../../types/api';
+import { useRecoilValue } from 'recoil';
+import { navigationResetState } from '../../recoil/atoms/currentAtoms';
 
 type JsonFileRow = File & { base_name?: string; sn_length?: number };
 
@@ -63,6 +65,7 @@ export default function DashboardPage() {
   const [jsonFileSize, setJsonFileSize] = useState<number | null>(null);
   const [aasxFileSize, setAasxFileSize] = useState<number | null>(null);
   const navigate = useNavigate();
+  const navigationReset = useRecoilValue(navigationResetState);
 
   useEffect(() => {
     getJSONFilesAPI('', '', -1, null).then((files) => {
@@ -79,6 +82,24 @@ export default function DashboardPage() {
     });
   }, []);
 
+  // 네비게이션 리셋 시 대시보드 초기화
+  useEffect(() => {
+    if (navigationReset) {
+      // 선택된 파일들을 첫 번째 파일로 초기화
+      if (jsonFiles.length > 0) {
+        setSelectedJson(jsonFiles[0]);
+      }
+      if (aasxFiles.length > 0) {
+        setSelectedAasx(aasxFiles[0]);
+      }
+      // 로딩 상태와 파일 크기 정보 초기화
+      setJsonLoading(false);
+      setAasxLoading(false);
+      setJsonFileSize(null);
+      setAasxFileSize(null);
+    }
+  }, [navigationReset, jsonFiles, aasxFiles]);
+
   useEffect(() => {
     if (selectedJson && selectedJson.af_idx) {
       setJsonLoading(true);
@@ -91,6 +112,11 @@ export default function DashboardPage() {
           // 파일 크기 초과 에러 처리
           if (error instanceof Error && error.message === 'FILE_TOO_LARGE') {
             setJsonFileSize(FILE.MAX_SIZE);
+          } else if (error && typeof error === 'object' && 'error' in error) {
+            // apiHelpers에서 설정한 error 객체 처리
+            if (error.error === 'FILE_TOO_LARGE') {
+              setJsonFileSize(FILE.MAX_SIZE);
+            }
           }
         })
         .finally(() => {
@@ -111,6 +137,11 @@ export default function DashboardPage() {
           // 파일 크기 초과 에러 처리
           if (error instanceof Error && error.message === 'FILE_TOO_LARGE') {
             setAasxFileSize(FILE.MAX_SIZE);
+          } else if (error && typeof error === 'object' && 'error' in error) {
+            // apiHelpers에서 설정한 error 객체 처리
+            if (error.error === 'FILE_TOO_LARGE') {
+              setAasxFileSize(FILE.MAX_SIZE);
+            }
           }
         })
         .finally(() => {

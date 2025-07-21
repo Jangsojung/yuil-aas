@@ -11,7 +11,7 @@ export const getJSONFilesAPI = async (startDate, endDate, fc_idx, limit = null) 
       endDate,
       limit,
     });
-    return Array.isArray(result) ? result : [];
+    return result?.data || (Array.isArray(result) ? result : []);
   } catch (error) {
     return [];
   }
@@ -41,8 +41,8 @@ export const checkJSONFileSizeAPI = async (af_idx) => {
 export const getJSONFileDetailAPI = async (af_idx) => {
   try {
     const result = await apiHelpers.post('/api/file/verify', { file: { af_idx, af_kind: KINDS.JSON_KIND } });
-    return result;
+    return result?.data || result;
   } catch (error) {
-    throw error; // 에러를 다시 던져서 상위에서 처리할 수 있도록 함
+    throw error;
   }
 };

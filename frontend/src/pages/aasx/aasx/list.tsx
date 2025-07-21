@@ -47,6 +47,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     refresh: () => {
       getFiles();
     },
+    handleReset: handleReset,
   }));
 
   const [alertModal, setAlertModal] = useState<AlertModalState>({
@@ -164,7 +165,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     const endDateStr = end ? dayjs(end).format('YYYY-MM-DD') : '';
     const af_kind = KINDS.AASX_KIND;
 
-    const data: File[] = await getFilesAPI(startDateStr, endDateStr, selectedFactory, af_kind);
+    const data = await getFilesAPI(startDateStr, endDateStr, selectedFactory, af_kind);
     setFiles(Array.isArray(data) ? data : []);
   };
 
@@ -265,7 +266,12 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
             </Grid>
             <Grid sx={{ flexGrow: 1 }}>
               <FormControl sx={{ width: '100%' }} size='small'>
-                <FactorySelect value={selectedFactory} onChange={handleFactoryChange} showAllOption={true} />
+                <FactorySelect
+                  value={selectedFactory}
+                  onChange={handleFactoryChange}
+                  placeholder='선택'
+                  showAllOption={true}
+                />
               </FormControl>
             </Grid>
           </Grid>

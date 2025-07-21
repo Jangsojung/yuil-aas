@@ -203,7 +203,19 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     setSelectedEdgeGateways([]);
     setSelectAll(false);
     handlePageChange(null, 0);
+    // 검색 조건 초기화
+    setPcName('');
+    setIpAddress('');
+    setStartDate(null);
+    setEndDate(null);
+    setFilteredEdgeGateways([]);
   };
+
+  // refresh 메서드를 ref로 노출
+  useImperativeHandle(ref, () => ({
+    refresh: getEdgeWithStatus,
+    handleReset: handleReset,
+  }));
 
   useEffect(() => {
     getEdgeWithStatus();
@@ -224,10 +236,6 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
       setSelectAll(false);
     }
   }, [selectedEdgeGateways, filteredEdgeGateways]);
-
-  useImperativeHandle(ref, () => ({
-    refresh: getEdgeWithStatus,
-  }));
 
   return (
     <div className='table-outer'>
