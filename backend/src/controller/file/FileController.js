@@ -116,18 +116,18 @@ export const getVerify = async (file, res) => {
   }
 };
 
-export const getWords = async (fc_idx, res) => {
+export const getWords = async (res) => {
   try {
-    const result = await getWordsFromDB(fc_idx);
+    const result = await getWordsFromDB();
     successResponse(res, result);
   } catch (err) {
     errorResponse(res, err.message);
   }
 };
 
-export const getSearch = async (fc_idx, type, text, res) => {
+export const getSearch = async (type, text, res) => {
   try {
-    const result = await getSearchFromDB(fc_idx, type, text);
+    const result = await getSearchFromDB(type, text);
     successResponse(res, result);
   } catch (err) {
     errorResponse(res, err.message);

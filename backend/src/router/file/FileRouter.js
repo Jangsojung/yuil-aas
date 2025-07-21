@@ -97,7 +97,7 @@ const routes = [
     method: 'post',
     path: '/words',
     controller: getWords,
-    extractor: extractors.fromBody(['fc_idx']),
+    extractor: extractors.fromBody([]),
   },
   {
     method: 'put',
@@ -109,7 +109,7 @@ const routes = [
     method: 'post',
     path: '/search',
     controller: getSearch,
-    extractor: extractors.fromBody(['fc_idx', 'type', 'text']),
+    extractor: extractors.fromBody(['type', 'text']),
   },
   {
     method: 'post',

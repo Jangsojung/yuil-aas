@@ -12,8 +12,8 @@ export const deleteDataAPI = async (selectedFiles) => {
 
 export const getDataAPI = async () => {
   try {
-    const data = await apiHelpers.post(API_ENDPOINTS.FILE.ROOT);
-    return Array.isArray(data) ? data : [];
+    const response = await apiHelpers.post(API_ENDPOINTS.FILE.ROOT);
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     return [];
   }
@@ -21,37 +21,34 @@ export const getDataAPI = async () => {
 
 export const getAASXFilesAPI = async (start, end, fc_idx) => {
   try {
-    const data = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
+    const response = await apiHelpers.post(API_ENDPOINTS.FILE.AASX_FILES, {
       af_kind: KINDS.AAS_KIND,
       fc_idx: fc_idx,
       startDate: start,
       endDate: end,
     });
-    return Array.isArray(data) ? data : [];
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     return [];
   }
 };
 
-export const getWordsAPI = async (fc_idx) => {
+export const getWordsAPI = async () => {
   try {
-    const data = await apiHelpers.post(API_ENDPOINTS.FILE.WORDS, {
-      fc_idx: fc_idx,
-    });
-    return Array.isArray(data) ? data : [];
+    const response = await apiHelpers.post(API_ENDPOINTS.FILE.WORDS, {});
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     return [];
   }
 };
 
-export const getSearchAPI = async (type, text, fc_idx) => {
+export const getSearchAPI = async (type, text) => {
   try {
-    const data = await apiHelpers.post(API_ENDPOINTS.FILE.SEARCH, {
-      fc_idx: fc_idx,
+    const response = await apiHelpers.post(API_ENDPOINTS.FILE.SEARCH, {
       type: type,
       text: text,
     });
-    return data;
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -59,13 +56,13 @@ export const getSearchAPI = async (type, text, fc_idx) => {
 
 export const updateWordAPI = async (as_kr, original_as_en, new_as_en, fc_idx) => {
   try {
-    const data = await apiHelpers.put(API_ENDPOINTS.FILE.WORDS, {
+    const response = await apiHelpers.put(API_ENDPOINTS.FILE.WORDS, {
       fc_idx: fc_idx,
       as_kr: as_kr,
       original_as_en: original_as_en,
       new_as_en: new_as_en,
     });
-    return data;
+    return response.data;
   } catch (error) {
     throw error;
   }
@@ -73,10 +70,10 @@ export const updateWordAPI = async (as_kr, original_as_en, new_as_en, fc_idx) =>
 
 export const updateWordsAPI = async (updates) => {
   try {
-    const data = await apiHelpers.put(API_ENDPOINTS.FILE.WORDS, {
+    const response = await apiHelpers.put(API_ENDPOINTS.FILE.WORDS, {
       updates: updates,
     });
-    return data;
+    return response.data;
   } catch (error) {
     throw error;
   }

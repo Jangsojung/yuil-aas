@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../../recoil/atoms';
 import AASXList from './list';
@@ -8,7 +7,6 @@ import AASXEdit from './edit';
 import { AASXFile } from '../../../types/api';
 
 export default function AASXManagerPage() {
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [openInsertModal, setOpenInsertModal] = useState(false);

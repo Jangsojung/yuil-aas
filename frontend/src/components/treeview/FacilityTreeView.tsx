@@ -2,10 +2,8 @@ import React from 'react';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import { Checkbox } from '@mui/material';
-import Grid from '@mui/system/Grid';
-import Tooltip from '@mui/material/Tooltip';
+import Grid from '@mui/system/Grid'
 import { FacilityGroupTree } from '../../types/api';
-import BasicTable from '../table/basic_code';
 
 import { styled, alpha } from '@mui/material/styles';
 

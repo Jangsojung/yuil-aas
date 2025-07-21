@@ -583,7 +583,7 @@ export const getVerifyFromDB = async (file) => {
   }
 };
 
-export const getWordsFromDB = async (fc_idx) => {
+export const getWordsFromDB = async () => {
   const results = await queryMultiple(
     'select as_kr, as_en, createdAt, updatedAt from tb_aasx_alias order by as_idx desc'
   );
@@ -600,7 +600,7 @@ export const getWordsFromDB = async (fc_idx) => {
   }));
 };
 
-export const getSearchFromDB = async (fc_idx, type, text) => {
+export const getSearchFromDB = async (type, text) => {
   let column;
   if (type === 'kr') column = 'as_kr';
   else if (type === 'en') column = 'as_en';

@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { navigationResetState } from '../../recoil/atoms';
 import EdgeList from './list';
@@ -19,7 +18,6 @@ interface EdgeGateway {
 }
 
 export default function EdgeGatewayPage() {
-  const location = useLocation();
   const navigationReset = useRecoilValue(navigationResetState);
   const [openModal, setOpenModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
