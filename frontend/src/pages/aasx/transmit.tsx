@@ -61,8 +61,6 @@ export default function TransmitPage() {
         showAlert('오류', '파일 데이터를 가져올 수 없습니다.');
       }
     } catch (error) {
-      console.log('Error details:', error); // 디버깅용
-
       // 파일 크기 초과 에러 처리
       if (error instanceof Error) {
         const errorMessage = error.message;
@@ -158,7 +156,6 @@ export default function TransmitPage() {
                 }
               } catch (error) {
                 // 에러 처리
-                console.error('자동 검증 중 오류:', error);
               } finally {
                 setIsLoading(false);
               }
