@@ -215,13 +215,13 @@ export const synchronizeFacilityData = async (progressCallback) => {
     const [factoryInfos] = await connection.query('SELECT fc_idx, fc_name FROM tb_factory_info');
 
     for (const factory of factoryInfos) {
-      const [existingFactory] = await connection.query('SELECT fc_idx FROM tb_aasx_data WHERE fc_idx = ?', [
+      const [existingFactory] = await connection.query('SELECT fc_idx, origin_check FROM tb_aasx_data WHERE fc_idx = ?', [
         factory.fc_idx,
       ]);
 
       if (existingFactory.length === 0) {
-        // fc_idx가 없으면 새로 추가
-        await connection.query('INSERT INTO tb_aasx_data (fc_idx, fc_name) VALUES (?, ?)', [
+        // fc_idx가 없으면 새로 추가 (origin_check = 1)
+        await connection.query('INSERT INTO tb_aasx_data (fc_idx, fc_name, origin_check) VALUES (?, ?, 1)', [
           factory.fc_idx,
           factory.fc_name,
         ]);
@@ -236,10 +236,15 @@ export const synchronizeFacilityData = async (progressCallback) => {
           // fc_name이 다르면 기존 fc_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxFcIdx] = await connection.query('SELECT MAX(fc_idx) as max_idx FROM tb_aasx_data');
           const newFcIdx = (maxFcIdx[0].max_idx || 0) + 1;
+          const existingOriginCheck = existingFactory[0].origin_check; // 기존 origin_check 유지
 
           try {
-            // 1. 기존 fc_idx를 새로운 값으로 변경
-            await connection.query('UPDATE tb_aasx_data SET fc_idx = ? WHERE fc_idx = ?', [newFcIdx, factory.fc_idx]);
+            // 1. 기존 fc_idx를 새로운 값으로 변경 (origin_check 유지)
+            await connection.query('UPDATE tb_aasx_data SET fc_idx = ?, origin_check = ? WHERE fc_idx = ?', [
+              newFcIdx, 
+              existingOriginCheck, 
+              factory.fc_idx
+            ]);
 
             // 2. tb_aasx_data_aas의 fc_idx 참조 업데이트
             await connection.query('UPDATE tb_aasx_data_aas SET fc_idx = ? WHERE fc_idx = ?', [
@@ -253,8 +258,8 @@ export const synchronizeFacilityData = async (progressCallback) => {
               factory.fc_idx,
             ]);
 
-            // 4. 새로운 (fc_idx, fc_name) 조합으로 저장
-            await connection.query('INSERT INTO tb_aasx_data (fc_idx, fc_name) VALUES (?, ?)', [
+            // 4. 새로운 (fc_idx, fc_name) 조합으로 저장 (origin_check = 1)
+            await connection.query('INSERT INTO tb_aasx_data (fc_idx, fc_name, origin_check) VALUES (?, ?, 1)', [
               factory.fc_idx,
               factory.fc_name,
             ]);
@@ -274,13 +279,13 @@ export const synchronizeFacilityData = async (progressCallback) => {
     const [facilityGroupInfos] = await connection.query('SELECT fg_idx, fg_name, fc_idx FROM tb_facility_group_info');
 
     for (const group of facilityGroupInfos) {
-      const [existingGroup] = await connection.query('SELECT fg_idx FROM tb_aasx_data_aas WHERE fg_idx = ?', [
+      const [existingGroup] = await connection.query('SELECT fg_idx, origin_check FROM tb_aasx_data_aas WHERE fg_idx = ?', [
         group.fg_idx,
       ]);
 
       if (existingGroup.length === 0) {
-        // fg_idx가 없으면 새로 추가
-        await connection.query('INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx) VALUES (?, ?, ?)', [
+        // fg_idx가 없으면 새로 추가 (origin_check = 1)
+        await connection.query('INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx, origin_check) VALUES (?, ?, ?, 1)', [
           group.fg_idx,
           group.fg_name,
           group.fc_idx,
@@ -296,10 +301,15 @@ export const synchronizeFacilityData = async (progressCallback) => {
           // fg_name이 다르면 기존 fg_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxFgIdx] = await connection.query('SELECT MAX(fg_idx) as max_idx FROM tb_aasx_data_aas');
           const newFgIdx = (maxFgIdx[0].max_idx || 0) + 1;
+          const existingOriginCheck = existingGroup[0].origin_check; // 기존 origin_check 유지
 
           try {
-            // 1. 기존 fg_idx를 새로운 값으로 변경
-            await connection.query('UPDATE tb_aasx_data_aas SET fg_idx = ? WHERE fg_idx = ?', [newFgIdx, group.fg_idx]);
+            // 1. 기존 fg_idx를 새로운 값으로 변경 (origin_check 유지)
+            await connection.query('UPDATE tb_aasx_data_aas SET fg_idx = ?, origin_check = ? WHERE fg_idx = ?', [
+              newFgIdx, 
+              existingOriginCheck, 
+              group.fg_idx
+            ]);
 
             // 2. tb_facility_info의 fg_idx 참조 업데이트
             await connection.query('UPDATE tb_facility_info SET fg_idx = ? WHERE fg_idx = ?', [newFgIdx, group.fg_idx]);
@@ -307,8 +317,8 @@ export const synchronizeFacilityData = async (progressCallback) => {
             // 3. tb_aasx_data_sm의 fg_idx 참조 업데이트
             await connection.query('UPDATE tb_aasx_data_sm SET fg_idx = ? WHERE fg_idx = ?', [newFgIdx, group.fg_idx]);
 
-            // 4. 새로운 (fg_idx, fg_name) 조합으로 저장
-            await connection.query('INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx) VALUES (?, ?, ?)', [
+            // 4. 새로운 (fg_idx, fg_name) 조합으로 저장 (origin_check = 1)
+            await connection.query('INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx, origin_check) VALUES (?, ?, ?, 1)', [
               group.fg_idx,
               group.fg_name,
               group.fc_idx,
@@ -338,13 +348,13 @@ export const synchronizeFacilityData = async (progressCallback) => {
         continue; // 해당 설비그룹이 없으면 설비 추가를 건너뜀
       }
 
-      const [existingFacility] = await connection.query('SELECT fa_idx FROM tb_aasx_data_sm WHERE fa_idx = ?', [
+      const [existingFacility] = await connection.query('SELECT fa_idx, origin_check FROM tb_aasx_data_sm WHERE fa_idx = ?', [
         facility.fa_idx,
       ]);
 
       if (existingFacility.length === 0) {
-        // fa_idx가 없으면 새로 추가
-        await connection.query('INSERT INTO tb_aasx_data_sm (fa_idx, fa_name, fg_idx) VALUES (?, ?, ?)', [
+        // fa_idx가 없으면 새로 추가 (origin_check = 1)
+        await connection.query('INSERT INTO tb_aasx_data_sm (fa_idx, fa_name, fg_idx, origin_check) VALUES (?, ?, ?, 1)', [
           facility.fa_idx,
           facility.fa_name,
           facility.fg_idx,
@@ -360,12 +370,14 @@ export const synchronizeFacilityData = async (progressCallback) => {
           // fa_name이 다르면 기존 fa_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxFaIdx] = await connection.query('SELECT MAX(fa_idx) as max_idx FROM tb_aasx_data_sm');
           const newFaIdx = (maxFaIdx[0].max_idx || 0) + 1;
+          const existingOriginCheck = existingFacility[0].origin_check; // 기존 origin_check 유지
 
           try {
-            // 1. 기존 fa_idx를 새로운 값으로 변경
-            await connection.query('UPDATE tb_aasx_data_sm SET fa_idx = ? WHERE fa_idx = ?', [
-              newFaIdx,
-              facility.fa_idx,
+            // 1. 기존 fa_idx를 새로운 값으로 변경 (origin_check 유지)
+            await connection.query('UPDATE tb_aasx_data_sm SET fa_idx = ?, origin_check = ? WHERE fa_idx = ?', [
+              newFaIdx, 
+              existingOriginCheck, 
+              facility.fa_idx
             ]);
 
             // 2. tb_sensor_info의 fa_idx 참조 업데이트
@@ -380,8 +392,8 @@ export const synchronizeFacilityData = async (progressCallback) => {
               facility.fa_idx,
             ]);
 
-            // 4. 새로운 (fa_idx, fa_name) 조합으로 저장
-            await connection.query('INSERT INTO tb_aasx_data_sm (fa_idx, fa_name, fg_idx) VALUES (?, ?, ?)', [
+            // 4. 새로운 (fa_idx, fa_name) 조합으로 저장 (origin_check = 1)
+            await connection.query('INSERT INTO tb_aasx_data_sm (fa_idx, fa_name, fg_idx, origin_check) VALUES (?, ?, ?, 1)', [
               facility.fa_idx,
               facility.fa_name,
               facility.fg_idx,
@@ -411,13 +423,13 @@ export const synchronizeFacilityData = async (progressCallback) => {
         continue; // 해당 설비가 없으면 센서 추가를 건너뜀
       }
 
-      const [existingSensor] = await connection.query('SELECT sn_idx FROM tb_aasx_data_prop WHERE sn_idx = ?', [
+      const [existingSensor] = await connection.query('SELECT sn_idx, origin_check FROM tb_aasx_data_prop WHERE sn_idx = ?', [
         sensor.sn_idx,
       ]);
 
       if (existingSensor.length === 0) {
-        // sn_idx가 없으면 새로 추가
-        await connection.query('INSERT INTO tb_aasx_data_prop (sn_idx, sn_name, fa_idx) VALUES (?, ?, ?)', [
+        // sn_idx가 없으면 새로 추가 (origin_check = 1)
+        await connection.query('INSERT INTO tb_aasx_data_prop (sn_idx, sn_name, fa_idx, origin_check) VALUES (?, ?, ?, 1)', [
           sensor.sn_idx,
           sensor.sn_name,
           sensor.fa_idx,
@@ -433,12 +445,14 @@ export const synchronizeFacilityData = async (progressCallback) => {
           // sn_name이 다르면 기존 sn_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxSnIdx] = await connection.query('SELECT MAX(sn_idx) as max_idx FROM tb_aasx_data_prop');
           const newSnIdx = (maxSnIdx[0].max_idx || 0) + 1;
+          const existingOriginCheck = existingSensor[0].origin_check; // 기존 origin_check 유지
 
           try {
-            // 1. 기존 sn_idx를 새로운 값으로 변경
-            await connection.query('UPDATE tb_aasx_data_prop SET sn_idx = ? WHERE sn_idx = ?', [
-              newSnIdx,
-              sensor.sn_idx,
+            // 1. 기존 sn_idx를 새로운 값으로 변경 (origin_check 유지)
+            await connection.query('UPDATE tb_aasx_data_prop SET sn_idx = ?, origin_check = ? WHERE sn_idx = ?', [
+              newSnIdx, 
+              existingOriginCheck, 
+              sensor.sn_idx
             ]);
 
             // 2. tb_aasx_base_sensor의 sn_idx 참조 업데이트
@@ -447,8 +461,8 @@ export const synchronizeFacilityData = async (progressCallback) => {
               sensor.sn_idx,
             ]);
 
-            // 3. 새로운 (sn_idx, sn_name) 조합으로 저장
-            await connection.query('INSERT INTO tb_aasx_data_prop (sn_idx, sn_name, fa_idx) VALUES (?, ?, ?)', [
+            // 3. 새로운 (sn_idx, sn_name) 조합으로 저장 (origin_check = 1)
+            await connection.query('INSERT INTO tb_aasx_data_prop (sn_idx, sn_name, fa_idx, origin_check) VALUES (?, ?, ?, 1)', [
               sensor.sn_idx,
               sensor.sn_name,
               sensor.fa_idx,
