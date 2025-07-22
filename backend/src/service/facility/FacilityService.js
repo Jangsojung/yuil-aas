@@ -2,7 +2,8 @@ import { validateValue } from '../../utils/validation.js';
 import { querySingle, queryMultiple, queryInsert, withTransaction } from '../../utils/dbHelper.js';
 import { pool } from '../../config/database.js';
 
-export const insertFacilityGroup = async (name) => {
+export const insertFacilityGroup = async (fc_idx, name) => {
+  const validatedFcIdx = validateValue(fc_idx);
   const validatedName = validateValue(name);
 
   // 가장 마지막 fg_idx 조회
@@ -12,7 +13,7 @@ export const insertFacilityGroup = async (name) => {
   await queryInsert('INSERT INTO tb_aasx_data_aas (fg_idx, fg_name, fc_idx, origin_check) VALUES (?, ?, ?, ?)', [
     nextFgIdx,
     validatedName,
-    3,
+    validatedFcIdx,
     0,
   ]);
   return nextFgIdx;
@@ -50,6 +51,24 @@ export const insertSensor = async (fa_idx, name) => {
     0,
   ]);
   return nextSnIdx;
+};
+
+export const insertFactory = async (cm_idx, fc_name) => {
+  const validatedCmIdx = validateValue(cm_idx);
+  const validatedFcName = validateValue(fc_name);
+
+  // 가장 마지막 fc_idx 조회
+  const maxResult = await querySingle('SELECT MAX(fc_idx) as max_idx FROM tb_aasx_data');
+  const nextFcIdx = (maxResult?.max_idx || 0) + 1;
+
+  // 공장 정보 삽입
+  await queryInsert(
+    'INSERT INTO tb_aasx_data (fc_idx, cm_idx, fc_name, origin_check) VALUES (?, ?, ?, ?)',
+    [nextFcIdx, validatedCmIdx, validatedFcName, 0]
+  );
+
+
+  return nextFcIdx;
 };
 
 export const deleteSensors = async (sensorIds) => {
@@ -690,27 +709,15 @@ export const deleteFacilityGroups = async (facilityGroupIds) => {
 };
 
 // 공장 삭제
-export const deleteFactories = async (factoryIds) => {
-  const results = await queryMultiple('SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx IN (?)', [
-    factoryIds,
-  ]);
+export const deleteFactories = async (factoryIds, cm_idx) => {
+  const validatedFactoryIds = Array.isArray(factoryIds) ? factoryIds : [];
+  const validatedCmIdx = validateValue(cm_idx);
 
-  if (results.length === 0) {
-    return {
-      success: true,
-      message: '삭제할 공장이 없습니다.',
-      deletedCount: 0,
-    };
-  }
-
-  const protectedFactories = results.filter((factory) => factory.origin_check === 1);
-  if (protectedFactories.length > 0) {
-    return {
-      success: false,
-      message: `다음 공장들은 삭제할 수 없습니다: ${protectedFactories.map((f) => f.fc_name).join(', ')}`,
-      protectedCount: protectedFactories.length,
-    };
-  }
+  // 삭제 가능한 공장만 조회
+  const results = await queryMultiple(
+    'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE fc_idx IN (?) AND cm_idx = ?',
+    [validatedFactoryIds, validatedCmIdx]
+  );
 
   const deletableFactories = results.filter((factory) => factory.origin_check === 0);
   if (deletableFactories.length === 0) {
@@ -723,14 +730,42 @@ export const deleteFactories = async (factoryIds) => {
 
   const deletableFactoryIds = deletableFactories.map((factory) => factory.fc_idx);
 
-  return await withTransaction(async (connection) => {
-    await connection.query('DELETE FROM tb_aasx_data WHERE fc_idx IN (?)', [deletableFactoryIds]);
+  await queryInsert(
+    'DELETE FROM tb_aasx_data WHERE fc_idx IN (?) AND cm_idx = ? AND origin_check = 0',
+    [deletableFactoryIds, validatedCmIdx]
+  );
 
-    return {
-      success: true,
-      message: `${deletableFactories.length}개의 공장이 성공적으로 삭제되었습니다.`,
-      deletedCount: deletableFactories.length,
-      deletedFactories: deletableFactories.map((factory) => factory.fc_name),
-    };
-  });
+  return {
+    success: true,
+    message: '공장 삭제 완료',
+    deletedCount: deletableFactoryIds.length,
+    deletedFactories: deletableFactories.map((factory) => factory.fc_name),
+  };
+};
+
+export const getFactoriesByCmIdx = async (cm_idx) => {
+  // cm_idx로 공장 목록 조회
+  const factories = await queryMultiple(
+    'SELECT fc_idx, fc_name, origin_check FROM tb_aasx_data WHERE cm_idx = ?',
+    [Number(cm_idx)]
+  );
+  return factories;
+};
+
+export const getFacilityGroupsByFcIdx = async (fc_idx) => {
+  const validatedFcIdx = validateValue(fc_idx);
+  const groups = await queryMultiple(
+    'SELECT fg_idx, fg_name FROM tb_aasx_data_aas WHERE fc_idx = ?',
+    [validatedFcIdx]
+  );
+  return groups;
+};
+
+export const getFacilitiesByFgIdx = async (fg_idx) => {
+  const validatedFgIdx = validateValue(fg_idx);
+  const facilities = await queryMultiple(
+    'SELECT fa_idx, fa_name FROM tb_aasx_data_sm WHERE fg_idx = ?',
+    [validatedFgIdx]
+  );
+  return facilities;
 };

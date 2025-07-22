@@ -263,16 +263,6 @@ export const getFactoriesByCmIdxAPI = async (cm_idx) => {
   }
 };
 
-// 설비 추가 관련 API
-export const insertFactoryAPI = async (cm_idx, fc_name) => {
-  try {
-    const result = await apiHelpers.post('/api/base_code/factory', { cm_idx, fc_name });
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const insertFacilityGroupAPI = async (fc_idx, fg_name) => {
   try {
     const result = await apiHelpers.post('/api/base_code/facilityGroup', { fc_idx, fg_name });

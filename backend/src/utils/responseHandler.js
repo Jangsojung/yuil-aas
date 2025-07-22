@@ -65,6 +65,10 @@ export const facilityGroupDeleteError = (res) => {
   errorResponse(res, ERROR_MESSAGES.FACILITY_GROUP_DELETE_FAILED);
 };
 
+export const factoryRegisterError = (res) => {
+  errorResponse(res, ERROR_MESSAGES.FACTORY_REGISTER_FAILED);
+};
+
 export const factoryDeleteError = (res) => {
   errorResponse(res, ERROR_MESSAGES.FACTORY_DELETE_FAILED);
 };

@@ -8,14 +8,24 @@ import {
   deleteFacilityGroup,
   deleteFactory,
   synchronizeFacility,
+  getFactoriesByCmIdxController,
+  addFactory,
+  getFacilityGroupsController,
+  getFacilitiesController,
 } from '../../controller/facility/FacilityController.js';
 
 const routes = [
   {
     method: 'post',
+    path: '/aasx/factory',
+    controller: addFactory,
+    extractor: extractors.fromBody(['cm_idx', 'fc_name']),
+  },
+  {
+    method: 'post',
     path: '/aasx/group',
     controller: addFacilityGroup,
-    extractor: extractors.fromBody(['name']),
+    extractor: extractors.fromBody(['fc_idx', 'name']),
   },
   {
     method: 'post',
@@ -51,7 +61,25 @@ const routes = [
     method: 'post',
     path: '/aasx/factories',
     controller: deleteFactory,
-    extractor: extractors.fromBody(['factoryIds']),
+    extractor: extractors.fromBody(['factoryIds', 'cm_idx']),
+  },
+  {
+    method: 'post',
+    path: '/aasx/factories/list',
+    controller: getFactoriesByCmIdxController,
+    extractor: (req) => [req.body ? req.body.cm_idx : null],
+  },
+  {
+    method: 'post',
+    path: '/aasx/facility_groups/list',
+    controller: getFacilityGroupsController,
+    extractor: extractors.fromBody(['fc_idx']),
+  },
+  {
+    method: 'post',
+    path: '/aasx/facilities/list',
+    controller: getFacilitiesController,
+    extractor: extractors.fromBody(['fg_idx']),
   },
   {
     method: 'post',

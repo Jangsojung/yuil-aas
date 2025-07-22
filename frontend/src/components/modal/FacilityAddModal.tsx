@@ -20,15 +20,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
-import {
-  getFactoriesByCmIdxAPI,
-  getFacilityGroupsAPI,
-  getFacilitiesAPI,
-  insertFactoryAPI,
-  insertFacilityGroupAPI,
-  insertFacilityAPI,
-  insertSensorAPI,
-} from '../../apis/api/basic';
+import { getFactoriesByCmIdxFacility, postFactory, postFacility, getFacilityGroups, getFacilities, postFacilityGroup, postSensor } from '../../apis/api/facility';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -89,7 +81,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
 
   const fetchFactories = useCallback(async () => {
     try {
-      const data = await getFactoriesByCmIdxAPI(user!.cm_idx);
+      const data = await getFactoriesByCmIdxFacility(user!.cm_idx);
       setFactories(data);
     } catch (error) {
       setError('공장 목록을 불러오는데 실패했습니다.');
@@ -103,7 +95,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       if (!targetFcIdx) return;
 
       try {
-        const data = await getFacilityGroupsAPI(targetFcIdx as number);
+        const data = await getFacilityGroups(targetFcIdx as number);
         setGroupList(data.map((g: any) => ({ fg_idx: g.fg_idx, fg_name: g.fg_name })));
       } catch (error) {
         setError('설비그룹 목록을 불러오는데 실패했습니다.');
@@ -137,7 +129,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
     if (value && value !== '신규등록') {
       const group = groupList.find((g) => g.fg_name === value);
       if (group) {
-        const facilities = await getFacilitiesAPI(group.fg_idx);
+        const facilities = await getFacilities(group.fg_idx);
         setFacilityList(
           facilities.map((f: any) => ({
             fa_idx: f.fa_idx,
@@ -194,85 +186,84 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
     setError(null);
 
     try {
+      // 1. 공장 인덱스
       let currentFcIdx = selectedFactory as number;
-      let currentFgIdx: number;
-      let currentFaIdx: number;
-
-      // 1. 공장 추가 (신규인 경우)
       if (isNewFactory) {
-        const factoryResult = await insertFactoryAPI(user!.cm_idx, newFactoryName);
-        currentFcIdx = factoryResult.fc_idx;
-
-        // 공장 목록을 직접 다시 조회하고 강제로 상태 업데이트
-        const updatedFactories = await getFactoriesByCmIdxAPI(user!.cm_idx);
+        const factoryResult = await postFactory({ cm_idx: user!.cm_idx, fc_name: newFactoryName });
+        currentFcIdx = factoryResult;
+        const updatedFactories = await getFactoriesByCmIdxFacility(user!.cm_idx);
         setFactories([...updatedFactories]);
-
-        // 새로 추가된 공장을 선택하고 신규등록 모드 해제
         setIsNewFactory(false);
-        setNewFactoryName(''); // 입력 필드 초기화
+        setNewFactoryName('');
         setSelectedFactory(currentFcIdx);
-
-        // 추가 대기 시간으로 상태 업데이트 완료 보장
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
 
-      // 2. 설비그룹 처리
+      // 2. 설비그룹 인덱스
+      let currentFgIdx: number | undefined;
       if (groupValue === '신규등록') {
-        const facilityGroupResult = await insertFacilityGroupAPI(currentFcIdx, groupInput);
-        currentFgIdx = facilityGroupResult.fg_idx;
-
-        // 설비그룹 목록을 직접 다시 조회
+        const facilityGroupResult = await postFacilityGroup({ fc_idx: currentFcIdx, name: groupInput });
+        currentFgIdx = facilityGroupResult;
         await fetchFacilityGroups(currentFcIdx);
-
-        // 새로 추가된 설비그룹을 선택
+        setGroupList((prev) => {
+          const updated = !prev.find((g) => g.fg_name === groupInput)
+            ? [...prev, { fg_idx: facilityGroupResult, fg_name: groupInput }]
+            : prev;
+          return updated;
+        });
         setGroupValue(groupInput);
         setGroupInput('');
-
-        // 추가 대기 시간으로 상태 업데이트 완료 보장
         await new Promise((resolve) => setTimeout(resolve, 200));
       } else {
         const selectedGroup = groupList.find((g) => g.fg_name === groupValue);
-        currentFgIdx = selectedGroup!.fg_idx;
+        currentFgIdx = selectedGroup?.fg_idx;
+      }
+      if (!currentFgIdx) {
+        setError('설비그룹 인덱스가 올바르지 않습니다.');
+        console.error('설비 등록 직전 currentFgIdx가 undefined/null입니다!');
+        setLoading(false);
+        return;
       }
 
-      // 3. 설비 처리
+      // 3. 설비 인덱스
+      let currentFaIdx: number | undefined;
       if (facilityValue === '신규등록') {
-        const facilityResult = await insertFacilityAPI(currentFgIdx, facilityInput);
-        currentFaIdx = facilityResult.fa_idx;
-
-        // 설비 목록을 직접 다시 조회
+        const facilityResult = await postFacility({ fg_idx: currentFgIdx, name: facilityInput });
+        currentFaIdx = facilityResult;
         try {
-          const facilities = await getFacilitiesAPI(currentFgIdx);
+          const facilities = await getFacilities(currentFgIdx);
           setFacilityList([
             ...facilities.map((f: any) => ({
               fa_idx: f.fa_idx,
               fa_name: f.fa_name,
             })),
           ]);
-
-          // 새로 추가된 설비를 선택
           setFacilityValue(facilityInput);
           setFacilityInput('');
-
-          // 추가 대기 시간으로 상태 업데이트 완료 보장
           await new Promise((resolve) => setTimeout(resolve, 200));
-        } catch (error) {}
+        } catch (error) {
+          console.error('설비 목록 재조회 에러:', error);
+        }
       } else {
         const selectedFacility = facilityList.find((f) => f.fa_name === facilityValue);
-        currentFaIdx = selectedFacility!.fa_idx;
+        currentFaIdx = selectedFacility?.fa_idx;
+      }
+      if (!currentFaIdx) {
+        setError('설비 인덱스가 올바르지 않습니다.');
+        console.error('센서 등록 직전 currentFaIdx가 undefined/null입니다!');
+        setLoading(false);
+        return;
       }
 
       // 4. 센서 추가
-      await insertSensorAPI(currentFaIdx, sensorName);
+      const sensorResult = await postSensor({ fa_idx: currentFaIdx, name: sensorName });
 
-      // 성공 메시지 표시
       setError(null);
       onSuccess();
-
-      // 모달 닫기
       handleClose();
     } catch (error) {
       setError('설비 추가 중 오류가 발생했습니다.');
+      console.error('설비 추가 중 오류:', error);
     } finally {
       setLoading(false);
     }

@@ -3,8 +3,9 @@ import { FormControl, Select, MenuItem, SelectChangeEvent } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
-import { getFactoriesByCmIdxAPI } from '../../apis/api/basic';
+import { getFactoriesByCmIdxFacility } from '../../apis/api/facility';
 import { Factory } from '../../types/api';
+import { useNavigate } from 'react-router-dom';
 
 interface FactorySelectProps {
   value: number | '';
@@ -26,6 +27,7 @@ export default function FactorySelect({
   const [factories, setFactories] = useState<Factory[]>([]);
   const [error, setError] = useState<string | null>(null);
   const user = useRecoilValue(userState);
+  const navigate = useNavigate();
 
   const handleFetchFactories = async () => {
     if (!user?.cm_idx) {
@@ -34,7 +36,7 @@ export default function FactorySelect({
     }
     setError(null);
     try {
-      const data = await getFactoriesByCmIdxAPI(user.cm_idx);
+      const data = await getFactoriesByCmIdxFacility(user.cm_idx);
       setFactories(data || []);
     } catch (err) {
       setError('공장 정보 없음');
@@ -42,6 +44,10 @@ export default function FactorySelect({
   };
 
   useEffect(() => {
+    if (user === null) {
+      navigate('/'); // 로그인 페이지로 이동
+      return;
+    }
     handleFetchFactories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.cm_idx, refreshKey]);

@@ -21,6 +21,7 @@ export const ERROR_MESSAGES = {
   FACILITY_DELETE_FAILED: '설비 삭제 실패',
   FACILITY_GROUP_DELETE_FAILED: '설비그룹 삭제 실패',
   FACTORY_DELETE_FAILED: '공장 삭제 실패',
+  FACTORY_REGISTER_FAILED: '공장 등록 실패',
   FACILITY_SYNC_FAILED: '설비 동기화 실패',
 
   // 공장 관련 에러 메시지

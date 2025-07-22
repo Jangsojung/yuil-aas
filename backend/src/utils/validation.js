@@ -7,7 +7,7 @@
  * @returns {any} 검증된 값 또는 기본값
  */
 export const validateValue = (value, defaultValue = null) => {
-  return value && value !== null && value !== undefined ? value : defaultValue;
+  return value !== null && value !== undefined ? value : defaultValue;
 };
 
 /**
