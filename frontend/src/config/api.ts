@@ -1,6 +1,23 @@
+// API 설정 검증
+const validateAPIBaseURL = () => {
+  const apiBaseURL = process.env.REACT_APP_API_BASE_URL;
+  if (!apiBaseURL) {
+    throw new Error('REACT_APP_API_BASE_URL 환경변수가 설정되지 않았습니다. .env파일 확인');
+  }
+  return apiBaseURL;
+};
+
+const validateWSURL = () => {
+  const wsURL = process.env.REACT_APP_WS_URL;
+  if (!wsURL) {
+    throw new Error('REACT_APP_WS_URL 환경변수가 설정되지 않았습니다. .env파일 확인');
+  }
+  return wsURL;
+};
+
 // API 설정
-export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001';
-export const WS_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:5001';
+export const API_BASE_URL = validateAPIBaseURL();
+export const WS_URL = validateWSURL();
 
 // API 엔드포인트들
 export const API_ENDPOINTS = {

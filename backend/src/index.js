@@ -13,8 +13,17 @@ import { testConnection } from './config/database.js';
 
 dotenv.config();
 
+// PORT 환경변수 검증
+const validatePort = () => {
+  const port = process.env.PORT;
+  if (!port) {
+    throw new Error('PORT 환경변수가 설정되지 않았습니다. .env파일 확인');
+  }
+  return parseInt(port, 10);
+};
+
 const app = express();
-const port = process.env.PORT || 3001;
+const port = validatePort();
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
