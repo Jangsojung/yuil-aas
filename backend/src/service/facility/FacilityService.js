@@ -50,6 +50,26 @@ export const insertSensor = async (fa_idx, name) => {
     validatedName,
     0,
   ]);
+
+  // tb_aasx_sensor_info에도 추가 (mt_idx = max+1)
+  const mtIdxResult = await querySingle('SELECT MAX(mt_idx) as max_mt_idx FROM tb_aasx_sensor_info');
+  const nextMtIdx = (mtIdxResult?.max_mt_idx || 0) + 1;
+  // 공장/설비그룹/설비/센서명 추출
+  const joinResult = await querySingle(
+    `SELECT fc.fc_name, fg.fg_name, fa.fa_name
+     FROM tb_aasx_data_sm fa
+     JOIN tb_aasx_data_aas fg ON fa.fg_idx = fg.fg_idx
+     JOIN tb_aasx_data fc ON fg.fc_idx = fc.fc_idx
+     WHERE fa.fa_idx = ?`,
+    [validatedFaIdx]
+  );
+  if (joinResult) {
+    await queryInsert(
+      'INSERT INTO tb_aasx_sensor_info (mt_idx, fc_name, fg_name, fa_name, sn_name) VALUES (?, ?, ?, ?, ?)',
+      [nextMtIdx, joinResult.fc_name, joinResult.fg_name, joinResult.fa_name, validatedName]
+    );
+  }
+
   return nextSnIdx;
 };
 
@@ -490,6 +510,90 @@ export const synchronizeFacilityData = async (progressCallback) => {
             console.error('센서 정보 업데이트 중 오류:', updateError);
             // 업데이트 실패 시 기존 데이터 유지
           }
+        }
+      }
+    }
+
+    // 5. tb_sensor_info 기준 tb_aasx_sensor_info 동기화 (insert + 충돌시 밀어내기)
+    currentStep++;
+    if (progressCallback) {
+      progressCallback((currentStep / (totalSteps + 1)) * 100, `센서 매칭 동기화 중... (${currentStep}/${totalSteps + 1})`);
+    }
+    // tb_sensor_info에서 센서 목록 조회
+    const [sensorInfoRows] = await connection.query('SELECT mt_idx, fc_name, fg_name, fa_name, sn_name FROM tb_sensor_info');
+    // max_mt_idx 구하기 (초기값)
+    let maxMtIdx = 0;
+    const [maxMtIdxRow] = await connection.query('SELECT MAX(mt_idx) as max_mt_idx FROM tb_aasx_sensor_info');
+    if (maxMtIdxRow && maxMtIdxRow[0] && maxMtIdxRow[0].max_mt_idx) {
+      maxMtIdx = maxMtIdxRow[0].max_mt_idx;
+    }
+    for (const row of sensorInfoRows) {
+      const { mt_idx, fc_name, fg_name, fa_name, sn_name } = row;
+      // tb_aasx_sensor_info에 이미 있는지 확인
+      const [exists] = await connection.query('SELECT * FROM tb_aasx_sensor_info WHERE mt_idx = ?', [mt_idx]);
+      if (exists.length === 0) {
+        // 없으면 insert
+        await connection.query(
+          'INSERT INTO tb_aasx_sensor_info (mt_idx, fc_name, fg_name, fa_name, sn_name) VALUES (?, ?, ?, ?, ?)',
+          [mt_idx, fc_name, fg_name, fa_name, sn_name]
+        );
+        // tb_sensor_data에서 데이터 긁어서 tb_aasx_sensor_data에 insert
+        await connection.query(
+          `INSERT INTO tb_aasx_sensor_data (mt_idx, sn_data, sn_compute_data, sd_createdAt)
+           SELECT ?, ts.sn_data,
+             CASE
+               WHEN tsi.ad_compute IS NOT NULL AND tsi.ad_compute != '' THEN
+                 CASE 
+                   WHEN LEFT(tsi.ad_compute, 1) = '*' THEN ts.sn_data * CAST(SUBSTRING(tsi.ad_compute, 2) AS DECIMAL(10, 4))
+                   WHEN LEFT(tsi.ad_compute, 1) = '/' THEN ts.sn_data / CAST(SUBSTRING(tsi.ad_compute, 2) AS DECIMAL(10, 4))
+                   ELSE ts.sn_data
+                 END
+               ELSE ts.sn_data
+             END AS sn_compute_data,
+             ts.createdAt AS sd_createdAt
+           FROM tb_sensor_data ts
+           JOIN tb_sensor_info tsi ON ts.mt_idx = tsi.mt_idx
+           WHERE ts.mt_idx = ?`,
+          [mt_idx, mt_idx]
+        );
+      } else {
+        // 이미 있는데 내용이 다르면 기존 row를 max+1로 밀어내고, tb_sensor_info의 내용으로 덮어씀
+        const exist = exists[0];
+        if (
+          exist.fc_name !== fc_name ||
+          exist.fg_name !== fg_name ||
+          exist.fa_name !== fa_name ||
+          exist.sn_name !== sn_name
+        ) {
+          maxMtIdx += 1;
+          // 기존 row의 mt_idx를 max+1로 update
+          await connection.query('UPDATE tb_aasx_sensor_info SET mt_idx = ? WHERE mt_idx = ?', [maxMtIdx, mt_idx]);
+          // tb_aasx_sensor_data의 mt_idx도 같이 update
+          await connection.query('UPDATE tb_aasx_sensor_data SET mt_idx = ? WHERE mt_idx = ?', [maxMtIdx, mt_idx]);
+          // tb_sensor_info의 내용으로 해당 mt_idx에 insert(덮어쓰기)
+          await connection.query(
+            'INSERT INTO tb_aasx_sensor_info (mt_idx, fc_name, fg_name, fa_name, sn_name) VALUES (?, ?, ?, ?, ?)',
+            [mt_idx, fc_name, fg_name, fa_name, sn_name]
+          );
+          // tb_sensor_data에서 데이터 긁어서 tb_aasx_sensor_data에 insert
+          await connection.query(
+            `INSERT INTO tb_aasx_sensor_data (mt_idx, sn_data, sn_compute_data, sd_createdAt)
+             SELECT ?, ts.sn_data,
+               CASE
+                 WHEN tsi.ad_compute IS NOT NULL AND tsi.ad_compute != '' THEN
+                   CASE 
+                     WHEN LEFT(tsi.ad_compute, 1) = '*' THEN ts.sn_data * CAST(SUBSTRING(tsi.ad_compute, 2) AS DECIMAL(10, 4))
+                     WHEN LEFT(tsi.ad_compute, 1) = '/' THEN ts.sn_data / CAST(SUBSTRING(tsi.ad_compute, 2) AS DECIMAL(10, 4))
+                     ELSE ts.sn_data
+                   END
+                 ELSE ts.sn_data
+               END AS sn_compute_data,
+               ts.createdAt AS sd_createdAt
+             FROM tb_sensor_data ts
+             JOIN tb_sensor_info tsi ON ts.mt_idx = tsi.mt_idx
+             WHERE ts.mt_idx = ?`,
+            [mt_idx, mt_idx]
+          );
         }
       }
     }
