@@ -31,7 +31,6 @@ export const API_ENDPOINTS = {
     BASES_SENSORS: `${API_BASE_URL}/api/base_code/bases/sensors`,
     FACILITY_GROUPS: `${API_BASE_URL}/api/base_code/facilityGroups`,
     SENSORS: `${API_BASE_URL}/api/base_code/sensors`,
-    SENSOR_VALUES: `${API_BASE_URL}/api/base_code/sensorValues`,
     BASE_CODE: `${API_BASE_URL}/api/base_code`,
     ALL_SENSORS_IN_GROUP: `${API_BASE_URL}/api/base_code/allSensorsInGroup`,
   },

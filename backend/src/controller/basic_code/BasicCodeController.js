@@ -16,7 +16,6 @@ import {
   syncFactoriesToAasxData,
   getBaseByIdFromDB,
   getBaseFCIdxFromDB,
-  getSensorValuesFromDB,
 } from '../../service/basic_code/BasicCodeService.js';
 import {
   successResponse,
@@ -178,14 +177,5 @@ export const syncFactories = async (res) => {
     successResponse(res, result);
   } catch (err) {
     factorySyncError(res);
-  }
-};
-
-export const getSensorValues = async (sensorIds, res) => {
-  try {
-    const result = await getSensorValuesFromDB(sensorIds);
-    successResponse(res, result);
-  } catch (err) {
-    errorResponse(res, err.message);
   }
 };

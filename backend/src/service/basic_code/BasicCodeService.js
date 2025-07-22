@@ -387,20 +387,3 @@ export const syncFactoriesToAasxData = async () => {
     insertedCount: result.affectedRows,
   };
 };
-
-export const getSensorValuesFromDB = async (sensorIds) => {
-  if (!sensorIds || sensorIds.length === 0) {
-    return [];
-  }
-
-  // 임시로 더미 데이터 반환
-  const dummyValues = sensorIds.map((sn_idx, index) => ({
-    sn_idx: sn_idx,
-    sn_name: `센서${sn_idx}`,
-    sn_value: Math.floor(Math.random() * 100) + 20, // 20-120 사이의 랜덤 값
-    sn_unit: index % 3 === 0 ? '°C' : index % 3 === 1 ? 'Pa' : 'rpm',
-    sn_timestamp: new Date().toISOString(),
-  }));
-
-  return dummyValues;
-};

@@ -17,7 +17,6 @@ import {
   syncFactories,
   getBaseById,
   getBaseFCIdx,
-  getSensorValues,
 } from '../../controller/basic_code/BasicCodeController.js';
 
 const routes = [
@@ -68,12 +67,6 @@ const routes = [
     path: '/sensors',
     controller: getSensors,
     extractor: extractors.fromBody(['fa_idx']),
-  },
-  {
-    method: 'post',
-    path: '/sensorValues',
-    controller: getSensorValues,
-    extractor: extractors.fromBody(['sensorIds']),
   },
   {
     method: 'post',
