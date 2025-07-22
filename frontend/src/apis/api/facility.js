@@ -77,7 +77,9 @@ export const getFactoriesByCmIdxFacility = async (cm_idx) => {
 export const getFacilityGroups = async (fc_idx) => {
   try {
     const result = await apiHelpers.post('/api/facility/aasx/facility_groups/list', { fc_idx });
-    return Array.isArray(result?.data) ? result.data : [];
+    if (Array.isArray(result?.data)) return result.data;
+    if (Array.isArray(result?.data?.data)) return result.data.data;
+    return [];
   } catch (error) {
     throw error;
   }
@@ -86,7 +88,9 @@ export const getFacilityGroups = async (fc_idx) => {
 export const getFacilities = async (fg_idx) => {
   try {
     const result = await apiHelpers.post('/api/facility/aasx/facilities/list', { fg_idx });
-    return Array.isArray(result?.data) ? result.data : [];
+    if (Array.isArray(result?.data)) return result.data;
+    if (Array.isArray(result?.data?.data)) return result.data.data;
+    return [];
   } catch (error) {
     throw error;
   }

@@ -93,7 +93,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
     async (fc_idx?: number) => {
       const targetFcIdx = fc_idx || selectedFactory;
       if (!targetFcIdx) return;
-
+      
       try {
         const data = await getFacilityGroups(targetFcIdx as number);
         setGroupList(data.map((g: any) => ({ fg_idx: g.fg_idx, fg_name: g.fg_name })));
@@ -102,6 +102,20 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       }
     },
     [selectedFactory]
+  );
+
+  const fetchFacilities = useCallback(
+    async (fg_idx?: number) => {
+      const targetFgIdx = fg_idx;
+      if (!targetFgIdx) return;
+      try {
+        const data = await getFacilities(targetFgIdx as number);
+        setFacilityList(data.map((f: any) => ({ fa_idx: f.fa_idx, fa_name: f.fa_name })));
+      } catch (error) {
+        setError('설비 목록을 불러오는데 실패했습니다.');
+      }
+    },
+    []
   );
 
   // 공장 목록 조회
@@ -119,6 +133,15 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       setGroupList([]);
     }
   }, [selectedFactory, isNewFactory, fetchFacilityGroups]);
+
+  // 설비그룹 추가 후 groupList가 바뀌면 groupInput이 있으면 자동 선택
+  useEffect(() => {
+    if (groupInput && groupList.some(g => g.fg_name === groupInput)) {
+      setGroupValue(groupInput);
+      setGroupInput('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupList]);
 
   // 설비그룹 선택 시 설비명 목록 fetch
   const handleGroupValueChange = async (value: string) => {
@@ -205,14 +228,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         const facilityGroupResult = await postFacilityGroup({ fc_idx: currentFcIdx, name: groupInput });
         currentFgIdx = facilityGroupResult;
         await fetchFacilityGroups(currentFcIdx);
-        setGroupList((prev) => {
-          const updated = !prev.find((g) => g.fg_name === groupInput)
-            ? [...prev, { fg_idx: facilityGroupResult, fg_name: groupInput }]
-            : prev;
-          return updated;
-        });
-        setGroupValue(groupInput);
-        setGroupInput('');
+        setGroupInput(groupInput); // setGroupValue는 useEffect에서 처리
         await new Promise((resolve) => setTimeout(resolve, 200));
       } else {
         const selectedGroup = groupList.find((g) => g.fg_name === groupValue);
