@@ -223,7 +223,8 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         // 파일 업로드 준비
 
         updateProgress(30, '공장 정보 조회 중...');
-        const fcIdxResult = await getFileFCIdxAPI(uploadFile.name, KINDS.JSON_KIND);
+        const jsonFileName = uploadFile.name.replace(/\.aasx$/i, '.json');
+        const fcIdxResult = await getFileFCIdxAPI(jsonFileName, KINDS.JSON_KIND);
         const fc_idx = fcIdxResult?.data?.fc_idx || 1;
 
         updateProgress(40, '파일 업로드 중...');
