@@ -151,10 +151,8 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   };
 
   const handleReset = () => {
-    const defaultStart = dayjs().subtract(1, 'month');
-    const defaultEnd = dayjs();
-    setStartDate(defaultStart);
-    setEndDate(defaultEnd);
+    setStartDate(null);
+    setEndDate(null);
     setSelectedFactory('');
     setSelectedFiles([]);
     setFiles([]); // 파일 목록 초기화
@@ -213,11 +211,8 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     setSelectedFiles([]);
     setSelectAll(false);
     handlePageChange(null, 0);
-    // 초기화 시에는 날짜만 설정하고 파일 조회는 하지 않음
-    const defaultStart = dayjs().subtract(1, 'month');
-    const defaultEnd = dayjs();
-    setStartDate(defaultStart);
-    setEndDate(defaultEnd);
+    setStartDate(null);
+    setEndDate(null);
     setSelectedFactory('');
     setFiles([]);
   };

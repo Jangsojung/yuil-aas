@@ -146,10 +146,8 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
   };
 
   const handleReset = () => {
-    const defaultStart = dayjs().subtract(1, 'month');
-    const defaultEnd = dayjs();
-    setStartDate(defaultStart);
-    setEndDate(defaultEnd);
+    setStartDate(null);
+    setEndDate(null);
     setSelectedFactory('');
     setSelectedFiles([]);
     setFiles([]); // 파일 목록 초기화
@@ -248,10 +246,8 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
   const handleNavigationReset = () => {
     setSelectedFiles([]);
     setSelectAll(false);
-    const defaultStart = dayjs().subtract(1, 'month');
-    const defaultEnd = dayjs();
-    setStartDate(defaultStart);
-    setEndDate(defaultEnd);
+    setStartDate(null);
+    setEndDate(null);
     setSelectedFactory('');
     setFiles([]);
     setIsSearchActive(false);
@@ -267,10 +263,8 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
   }, [selectedFactory, startDate, endDate, setSearchCondition]);
 
   useEffect(() => {
-    const defaultStart = dayjs().subtract(1, 'month');
-    const defaultEnd = dayjs();
-    setStartDate(defaultStart);
-    setEndDate(defaultEnd);
+    setStartDate(null);
+    setEndDate(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
