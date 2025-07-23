@@ -114,19 +114,6 @@ export default function JSONDetail({ fileId, onBackToList }: JSONDetailProps) {
   }, [fileId, onBackToList]);
 
   const handleEditClick = () => {
-    // 파일 크기가 500MB 이상인 경우 수정 불가
-    const fileSizeMB = (jsonData as any)._fileSize ? (jsonData as any)._fileSize / (1024 * 1024) : 0;
-    if (fileSizeMB > 500) {
-      setAlertModal({
-        open: true,
-        title: '수정 불가',
-        content: `파일 크기: ${fileSizeMB.toFixed(1)}MB\n\n500MB 이상의 파일은 수정할 수 없습니다.\nText Viewer를 통해 확인해주세요.`,
-        type: 'alert',
-        onConfirm: undefined,
-      });
-      return;
-    }
-
     setLoading(true); // 수정 버튼 누르면 로딩 시작
     setIsEditing(true);
     setJsonError('');
