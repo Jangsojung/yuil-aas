@@ -237,7 +237,7 @@ export const deleteSensors = async (sensorIds) => {
   });
 };
 
-export const synchronizeFacilityData = async (progressCallback) => {
+export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
   const connection = await pool.promise().getConnection();
   try {
     await connection.beginTransaction();
@@ -260,8 +260,9 @@ export const synchronizeFacilityData = async (progressCallback) => {
 
       if (existingFactory.length === 0) {
         // fc_idx가 없으면 새로 추가 (origin_check = 1)
-        await connection.query('INSERT INTO tb_aasx_data (fc_idx, fc_name, origin_check) VALUES (?, ?, 1)', [
+        await connection.query('INSERT INTO tb_aasx_data (fc_idx, cm_idx, fc_name, origin_check) VALUES (?, ?, ?, 1)', [
           factory.fc_idx,
+          cm_idx,
           factory.fc_name,
         ]);
       } else {
@@ -297,9 +298,10 @@ export const synchronizeFacilityData = async (progressCallback) => {
               factory.fc_idx,
             ]);
 
-            // 4. 새로운 (fc_idx, fc_name) 조합으로 저장 (origin_check = 1)
-            await connection.query('INSERT INTO tb_aasx_data (fc_idx, fc_name, origin_check) VALUES (?, ?, 1)', [
+            // 4. 새로운 (fc_idx, cm_idx, fc_name) 조합으로 저장 (origin_check = 1)
+            await connection.query('INSERT INTO tb_aasx_data (fc_idx, cm_idx, fc_name, origin_check) VALUES (?, ?, ?, 1)', [
               factory.fc_idx,
+              cm_idx,
               factory.fc_name,
             ]);
           } catch (updateError) {

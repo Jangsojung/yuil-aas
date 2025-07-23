@@ -56,9 +56,9 @@ export const deleteFactories = async (factoryIds) => {
   }
 };
 
-export const synchronizeFacility = async () => {
+export const synchronizeFacility = async (cm_idx) => {
   try {
-    const result = await apiHelpers.post('/api/facility/aasx/synchronize');
+    const result = await apiHelpers.post('/api/facility/aasx/synchronize', { cm_idx });
     return result;
   } catch (error) {
     throw error;

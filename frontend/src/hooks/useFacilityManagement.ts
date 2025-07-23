@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
-import { userState } from '../recoil/atoms';
+import { userState } from '../recoil/atoms/userAtoms';
 import { useAlertModal } from './useAlertModal';
 import { buildTreeDataAPI } from '../apis/api/basic';
 import {
@@ -14,6 +14,7 @@ import { FactoryTree } from '../types/api';
 
 export const useFacilityManagement = () => {
   const userIdx = useRecoilValue(userState)?.user_idx;
+  const user = useRecoilValue(userState);
   const { alertModal, showAlert, showConfirm, closeAlert } = useAlertModal();
 
   // 상태 관리
@@ -243,7 +244,7 @@ export const useFacilityManagement = () => {
 
         // 마지막 단계에서만 실제 API 호출
         if (i === progressSteps.length - 1) {
-          await synchronizeFacility();
+          await synchronizeFacility(user?.cm_idx);
         } else {
           // 각 단계별로 약간의 지연을 주어 진행상황을 보여줌
           await new Promise((resolve) => setTimeout(resolve, 500));
@@ -264,7 +265,7 @@ export const useFacilityManagement = () => {
       setProgressOpen(false);
       setProgress(0);
     }
-  }, [showAlert, handleTreeSearch]);
+  }, [showAlert, handleTreeSearch, user?.cm_idx]);
 
   return {
     treeData,

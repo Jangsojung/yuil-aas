@@ -96,9 +96,9 @@ export const addFactory = async (cm_idx, fc_name, res) => {
   }
 };
 
-export const synchronizeFacility = async (res) => {
+export const synchronizeFacility = async (cm_idx, res) => {
   try {
-    const result = await synchronizeFacilityData();
+    const result = await synchronizeFacilityData(cm_idx);
     successResponse(res, result);
   } catch (err) {
     facilitySyncError(res);

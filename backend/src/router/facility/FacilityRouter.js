@@ -85,7 +85,7 @@ const routes = [
     method: 'post',
     path: '/aasx/synchronize',
     controller: synchronizeFacility,
-    extractor: () => [],
+    extractor: extractors.fromBody(['cm_idx']),
   },
 ];
 
