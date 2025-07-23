@@ -313,6 +313,12 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
     }
   };
 
+  useEffect(() => {
+    setStartDate(searchCondition.startDate);
+    setEndDate(searchCondition.endDate);
+    setSelectedFactory(searchCondition.selectedFactory);
+  }, [searchCondition]);
+
   return (
     <div className='table-outer'>
       <SearchBox
