@@ -147,6 +147,19 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx, linkName = 
       throw new Error('이미 생성되어있는 파일입니다.');
     }
 
+    // 확장자 제거한 순수 파일명 추출
+    const baseName = fileName.replace(/\.(json|aasx)$/i, '');
+    const jsonFileName = baseName + '.json';
+    // af_kind=1(JSON_KIND) 파일의 fc_idx 사용
+    const [jsonKindRow] = await connection.query(
+      'SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?',
+      [jsonFileName, FILE_KINDS.JSON_KIND]
+    );
+    if (!jsonKindRow.length || jsonKindRow[0].fc_idx == null) {
+      throw new Error('동일한 이름의 JSON_KIND 파일이 존재하지 않습니다.');
+    }
+    const realFcIdx = jsonKindRow[0].fc_idx;
+
     const frontFilePath = `../files/front/${fileName}`;
     let aasInsertId = null;
     let aasxInsertId = null;
@@ -173,7 +186,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx, linkName = 
     const aasFileName = fileName;
     const aasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater, link_name) VALUES (?, ?, ?, '/files/aas', ?, ?, ?)`;
     const [aasResult] = await connection.query(aasQuery, [
-      fc_idx,
+      realFcIdx,
       FILE_KINDS.AAS_KIND,
       aasFileName,
       user_idx,
@@ -205,7 +218,7 @@ export const insertAASXFileToDB = async (fc_idx, fileName, user_idx, linkName = 
     const aasxFileName = fileName.replace(/\.json$/i, '.aasx');
     const aasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater, link_name) VALUES (?, ?, ?, '/files/aasx', ?, ?, ?)`;
     const [aasxResult] = await connection.query(aasxQuery, [
-      fc_idx,
+      realFcIdx,
       FILE_KINDS.AASX_KIND,
       aasxFileName,
       user_idx,
@@ -298,6 +311,18 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
       oldAasxPath: `../files/aasx/${oldAasxFileName}`,
     };
 
+    // 순수 파일명으로 af_kind=1(JSON_KIND) 파일의 fc_idx를 찾아서 사용
+    const baseName = fileName.replace(/\.(json|aasx)$/i, '');
+    const jsonFileName = baseName + '.json';
+    const [jsonKindRow] = await connection.query(
+      'SELECT fc_idx FROM tb_aasx_file WHERE af_name = ? AND af_kind = ?',
+      [jsonFileName, FILE_KINDS.JSON_KIND]
+    );
+    if (!jsonKindRow.length || jsonKindRow[0].fc_idx == null) {
+      throw new Error('동일한 이름의 JSON_KIND 파일이 존재하지 않습니다.');
+    }
+    const realFcIdx = jsonKindRow[0].fc_idx;
+
     const frontFilePath = `../files/front/${fileName}`;
 
     try {
@@ -317,7 +342,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
     } else {
       const insertAasQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater, link_name) VALUES (?, ?, ?, '/files/aas', ?, ?, ?)`;
       const [aasResult] = await connection.query(insertAasQuery, [
-        fc_idx,
+        realFcIdx,
         FILE_KINDS.AAS_KIND,
         newAasFileName,
         user_idx,
@@ -338,7 +363,7 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
 
     const insertAasxQuery = `INSERT INTO tb_aasx_file (fc_idx, af_kind, af_name, af_path, creator, updater, link_name) VALUES (?, ?, ?, '/files/aasx', ?, ?, ?)`;
     const [aasxResult] = await connection.query(insertAasxQuery, [
-      fc_idx,
+      realFcIdx,
       FILE_KINDS.AASX_KIND,
       newAasxFileName,
       user_idx,
