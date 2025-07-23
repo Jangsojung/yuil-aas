@@ -181,7 +181,7 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
 
   // 검색 버튼 클릭 시
   const handleSearch = useCallback(() => {
-    if (!startDate || !endDate || startDate > endDate) {
+    if ((startDate && !endDate) || (!startDate && endDate) || (startDate && endDate && startDate > endDate)) {
       setAlertModal({
         open: true,
         title: '알림',

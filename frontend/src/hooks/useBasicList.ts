@@ -124,6 +124,11 @@ export const useBasicList = (
 
   // 검색 핸들러
   const handleSearch = useCallback(async () => {
+    if ((startDate && !endDate) || (!startDate && endDate) || (startDate && endDate && startDate > endDate)) {
+      showAlert('알림', '올바른 시작, 종료일을 선택해주세요.');
+      return;
+    }
+
     if (!selectedFactory) {
       showAlert('알림', '공장을 선택해주세요.');
       return;
@@ -131,7 +136,7 @@ export const useBasicList = (
 
     await performSearch();
     setHasSearched(true); // 검색 버튼을 눌렀을 때만 hasSearched를 true로 설정
-  }, [selectedFactory, performSearch, showAlert, setHasSearched]);
+  }, [startDate, endDate, selectedFactory, performSearch, showAlert, setHasSearched]);
 
   // 리셋 핸들러
   const handleReset = useCallback(() => {

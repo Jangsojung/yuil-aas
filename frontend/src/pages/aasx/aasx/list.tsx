@@ -125,7 +125,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   };
 
   const handleSearch = () => {
-    if (!startDate || !endDate || startDate > endDate) {
+    if ((startDate && !endDate) || (!startDate && endDate) || (startDate && endDate && startDate > endDate)) {
       setAlertModal({
         open: true,
         title: '알림',

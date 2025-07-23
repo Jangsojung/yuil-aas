@@ -79,6 +79,17 @@ export default function ConvertPage() {
   };
 
   const handleSearch = async () => {
+    if ((startDate && !endDate) || (!startDate && endDate) || (startDate && endDate && startDate > endDate)) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '올바른 시작, 종료일을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
     if (!selectedFactory) {
       setAlertModal({
         open: true,

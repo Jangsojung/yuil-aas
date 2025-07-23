@@ -72,6 +72,17 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
 
   // 검색 기능
   const handleSearch = () => {
+    if ((startDate && !endDate) || (!startDate && endDate) || (startDate && endDate && startDate > endDate)) {
+      setAlertModal({
+        open: true,
+        title: '알림',
+        content: '올바른 시작, 종료일을 선택해주세요.',
+        type: 'alert',
+        onConfirm: undefined,
+      });
+      return;
+    }
+
     // 검색 조건에 따라 필터링
     let filteredData = edgeGateways;
 
