@@ -239,7 +239,7 @@ export default function JSONDetail({ fileId, onBackToList }: JSONDetailProps) {
 
       <div className='json-viewer'>
         {isEditing ? (
-          <div ref={setEditorRef} style={{ height: '500px', width: '100%' }} />
+          <div ref={setEditorRef} style={{ height: 'calc(100% - 10px)', width: 'calc(100% - 10px)' }} />
         ) : (
           jsonData && (
             <ReactJson
