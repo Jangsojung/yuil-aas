@@ -544,17 +544,20 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
           `INSERT INTO tb_aasx_sensor_data (mt_idx, sn_data, sn_compute_data, sd_createdAt)
            SELECT ?, ts.sn_data,
              CASE
-               WHEN tsi.ad_compute IS NOT NULL AND tsi.ad_compute != '' THEN
+               WHEN ad.ad_compute IS NOT NULL AND ad.ad_compute != '' THEN
                  CASE 
-                   WHEN LEFT(tsi.ad_compute, 1) = '*' THEN ts.sn_data * CAST(SUBSTRING(tsi.ad_compute, 2) AS DECIMAL(10, 4))
-                   WHEN LEFT(tsi.ad_compute, 1) = '/' THEN ts.sn_data / CAST(SUBSTRING(tsi.ad_compute, 2) AS DECIMAL(10, 4))
+                   WHEN LEFT(ad.ad_compute, 1) = '*' THEN ts.sn_data * CAST(SUBSTRING(ad.ad_compute, 2) AS DECIMAL(10, 4))
+                   WHEN LEFT(ad.ad_compute, 1) = '/' THEN ts.sn_data / CAST(SUBSTRING(ad.ad_compute, 2) AS DECIMAL(10, 4))
                    ELSE ts.sn_data
                  END
                ELSE ts.sn_data
              END AS sn_compute_data,
              ts.createdAt AS sd_createdAt
            FROM tb_sensor_data ts
-           JOIN tb_sensor_info tsi ON ts.mt_idx = tsi.mt_idx
+           JOIN tb_matching_list ml ON ts.mt_idx = ml.mt_idx
+           LEFT JOIN tb_aasx_data_prop sn ON ml.sn_idx = sn.sn_idx
+           LEFT JOIN tb_address_info ad ON sn.sn_name = ad.ad_name
+           LEFT JOIN tb_sensor_info si ON ml.sn_idx = si.sn_idx
            WHERE ts.mt_idx = ?`,
           [mt_idx, mt_idx]
         );
@@ -582,17 +585,20 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
             `INSERT INTO tb_aasx_sensor_data (mt_idx, sn_data, sn_compute_data, sd_createdAt)
              SELECT ?, ts.sn_data,
                CASE
-                 WHEN tsi.ad_compute IS NOT NULL AND tsi.ad_compute != '' THEN
+                 WHEN ad.ad_compute IS NOT NULL AND ad.ad_compute != '' THEN
                    CASE 
-                     WHEN LEFT(tsi.ad_compute, 1) = '*' THEN ts.sn_data * CAST(SUBSTRING(tsi.ad_compute, 2) AS DECIMAL(10, 4))
-                     WHEN LEFT(tsi.ad_compute, 1) = '/' THEN ts.sn_data / CAST(SUBSTRING(tsi.ad_compute, 2) AS DECIMAL(10, 4))
+                     WHEN LEFT(ad.ad_compute, 1) = '*' THEN ts.sn_data * CAST(SUBSTRING(ad.ad_compute, 2) AS DECIMAL(10, 4))
+                     WHEN LEFT(ad.ad_compute, 1) = '/' THEN ts.sn_data / CAST(SUBSTRING(ad.ad_compute, 2) AS DECIMAL(10, 4))
                      ELSE ts.sn_data
                    END
                  ELSE ts.sn_data
                END AS sn_compute_data,
                ts.createdAt AS sd_createdAt
              FROM tb_sensor_data ts
-             JOIN tb_sensor_info tsi ON ts.mt_idx = tsi.mt_idx
+             JOIN tb_matching_list ml ON ts.mt_idx = ml.mt_idx
+             LEFT JOIN tb_aasx_data_prop sn ON ml.sn_idx = sn.sn_idx
+             LEFT JOIN tb_address_info ad ON sn.sn_name = ad.ad_name
+             LEFT JOIN tb_sensor_info si ON ml.sn_idx = si.sn_idx
              WHERE ts.mt_idx = ?`,
             [mt_idx, mt_idx]
           );
