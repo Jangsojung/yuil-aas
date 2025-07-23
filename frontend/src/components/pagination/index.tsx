@@ -52,7 +52,6 @@ export default function CustomPagination({
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 16px',
-          textAlignLast: 'left',
         },
       }}
     />
