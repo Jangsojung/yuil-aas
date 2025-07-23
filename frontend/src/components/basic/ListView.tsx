@@ -139,16 +139,16 @@ export const ListView: React.FC<ListViewProps> = ({
             </Grid>
             {/* 기초코드명 */}
 
-            {/* 기간 */}
+            {/* 생성일 */}
             <Grid container spacing={2}>
               <Grid className='sort-title'>
-                <div>기간</div>
+                <div>생성일</div>
               </Grid>
               <Grid>
                 <BasicDatePicker onDateChange={onDateChange} startDate={startDate} endDate={endDate} />
               </Grid>
             </Grid>
-            {/* 기간 */}
+            {/* 생성일 */}
           </Grid>
         </SearchBox>
       </div>
