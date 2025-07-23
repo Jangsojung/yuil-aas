@@ -41,7 +41,7 @@ export default function JSONTableRow({ file, onCheckboxChange, checked, totalCou
       <TableCell>{file.fc_name || '-'}</TableCell>
       <TableCell>{file.af_name}</TableCell>
       <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
-      <TableCell>{file.sn_length || 0}</TableCell>
+      <TableCell>{file.sn_length && file.sn_length > 0 ? file.sn_length : '-'}</TableCell>
       <TableCell>{formatDate(file.createdAt)}</TableCell>
     </TableRow>
   );
