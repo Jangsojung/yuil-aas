@@ -378,29 +378,22 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
 
       <div className='table-wrap'>
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-          <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
-            <colgroup>
-              <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
-              <col style={{ maxWidth: '180px' }} />
-              <col style={{ maxWidth: '760.78px' }} />
-              <col style={{ maxWidth: '180px' }} />
-              <col style={{ maxWidth: '180px' }} />
-              <col style={{ maxWidth: '250px' }} />
-            </colgroup>
+          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
-                <TableCell padding='checkbox' sx={{ backgroundColor: 'white', width: 50, minWidth: 50, maxWidth: 50 }}>
+                <TableCell padding='checkbox' sx={{ backgroundColor: 'white' }}>
                   <Checkbox
                     checked={selectAll}
                     onChange={handleSelectAllChange}
                     inputProps={{ 'aria-label': 'select all files' }}
                   />
                 </TableCell>
-                <TableCell sx={{ maxWidth: 180 }}>공장명</TableCell>
-                <TableCell sx={{ maxWidth: 760.78 }}>파일명</TableCell>
-                <TableCell sx={{ maxWidth: 180 }}>기초코드명</TableCell>
-                <TableCell sx={{ maxWidth: 180 }}>센서개수</TableCell>
-                <TableCell sx={{ maxWidth: 250 }}>생성일</TableCell>
+                <SortableTableHeader
+                  columns={sortableColumns}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
               </TableRow>
             </TableHead>
             <TableBody>

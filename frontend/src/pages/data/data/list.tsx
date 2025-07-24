@@ -5,7 +5,7 @@ import { TextField } from '@mui/material';
 import Grid from '@mui/system/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import { Checkbox, Table, TableBody, TableContainer, TableHead, TableRow, TableCell } from '@mui/material';
+import { Checkbox, Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import Pagination from '../../../components/pagination';
 import DataTableRow from '../../../components/tableRow/DataTableRow';
 import { SearchBox, FilterBox, SortableTableHeader } from '../../../components/common';
@@ -151,27 +151,18 @@ export default function DataList() {
 
       <div className='table-wrap'>
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-          <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
-            <colgroup>
-              <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
-              <col style={{ maxWidth: '262.695px' }} />
-              <col style={{ maxWidth: '262.695px' }} />
-              <col style={{ maxWidth: '250px' }} />
-              <col style={{ maxWidth: '250px' }} />
-            </colgroup>
+          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
-                <TableCell padding='checkbox' sx={{ backgroundColor: 'white', width: 50, minWidth: 50, maxWidth: 50 }}>
-                  <Checkbox
-                    checked={pagedData ? checkAllCurrentPageSelected() : false}
-                    onChange={handleSelectAll}
-                    inputProps={{ 'aria-label': 'select all files' }}
-                  />
-                </TableCell>
-                <TableCell sx={{ maxWidth: 262.695 }}>한글명</TableCell>
-                <TableCell sx={{ maxWidth: 262.695 }}>식별 ID</TableCell>
-                <TableCell sx={{ maxWidth: 250 }}>생성일</TableCell>
-                <TableCell sx={{ maxWidth: 250 }}>수정일</TableCell>
+                <SortableTableHeader
+                  columns={sortableColumns}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                  showCheckbox={true}
+                  onSelectAllChange={handleSelectAll}
+                  selectAll={pagedData ? checkAllCurrentPageSelected() : false}
+                />
               </TableRow>
             </TableHead>
             <TableBody>

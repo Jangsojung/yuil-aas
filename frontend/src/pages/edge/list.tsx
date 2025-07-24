@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { deleteEdgeAPI, getEdgeAPI, getEdgeWithStatusAPI } from '../../apis/api/edge';
-import { Table, TableBody, TableContainer, TableHead, TableRow, TableCell } from '@mui/material';
+import { Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Pagination from '../../components/pagination';
@@ -20,7 +20,6 @@ import FormControl from '@mui/material/FormControl';
 import { TextField } from '@mui/material';
 import BasicDatePicker from '../../components/datepicker';
 import { Dayjs } from 'dayjs';
-import Checkbox from '@mui/material/Checkbox';
 
 interface EdgeListProps {
   onAddClick: () => void;
@@ -329,37 +328,18 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
 
       <div className='table-wrap'>
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-          <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
-            <colgroup>
-              <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
-              <col style={{ maxWidth: '180px' }} />
-              <col style={{ maxWidth: '620.78px' }} />
-              <col style={{ maxWidth: '250px' }} />
-              <col style={{ maxWidth: '250px' }} />
-              <col style={{ maxWidth: '250px' }} />
-            </colgroup>
+          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
             <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
-                <TableCell sx={{ backgroundColor: 'white', width: 50, minWidth: 50, maxWidth: 50 }}>
-                  <Checkbox
-                    checked={selectAll}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      setSelectAll(checked);
-                      if (checked) {
-                        setSelectedEdgeGateways(filteredEdgeGateways.map((edge) => edge.eg_idx));
-                      } else {
-                        setSelectedEdgeGateways([]);
-                      }
-                    }}
-                    inputProps={{ 'aria-label': 'select all edge gateways' }}
-                  />
-                </TableCell>
-                <TableCell sx={{ backgroundColor: 'white', maxWidth: 180 }}>PC명</TableCell>
-                <TableCell sx={{ backgroundColor: 'white', maxWidth: 620.78 }}>IP/Port</TableCell>
-                <TableCell sx={{ backgroundColor: 'white', maxWidth: 250 }}>생성일</TableCell>
-                <TableCell sx={{ backgroundColor: 'white', maxWidth: 250 }}>수정일</TableCell>
-                <TableCell sx={{ backgroundColor: 'white', maxWidth: 250 }}>비고</TableCell>
+                <SortableTableHeader
+                  columns={sortableColumns}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                  showCheckbox={true}
+                  selectAll={selectAll}
+                  onSelectAllChange={handleSelectAll}
+                />
               </TableRow>
             </TableHead>
             <TableBody>

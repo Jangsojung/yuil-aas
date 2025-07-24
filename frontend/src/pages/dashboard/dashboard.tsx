@@ -200,23 +200,13 @@ export default function DashboardPage() {
             AASX 파일
           </Typography>
           <TableContainer component={Paper}>
-            <Table size='small' sx={{ tableLayout: 'fixed' }}>
-              <colgroup>
-                <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
-                <col style={{ maxWidth: '180px' }} />
-                <col style={{ maxWidth: '690.78px' }} />
-                <col style={{ maxWidth: '250px' }} />
-                <col style={{ maxWidth: '250px' }} />
-                <col style={{ maxWidth: '180px' }} />
-              </colgroup>
+            <Table size='small'>
               <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
                 <TableRow>
-                  <TableCell sx={{ backgroundColor: 'white', width: 50, minWidth: 50, maxWidth: 50 }}>공장명</TableCell>
-                  <TableCell sx={{ backgroundColor: 'white', maxWidth: 180 }}>파일명</TableCell>
-                  <TableCell sx={{ backgroundColor: 'white', maxWidth: 690.78 }}>비고</TableCell>
-                  <TableCell sx={{ backgroundColor: 'white', maxWidth: 250 }}>생성일</TableCell>
-                  <TableCell sx={{ backgroundColor: 'white', maxWidth: 250 }}>수정일</TableCell>
-                  <TableCell sx={{ backgroundColor: 'white', maxWidth: 180 }}>비고</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>공장명</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>파일명</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>생성일</TableCell>
+                  <TableCell sx={{ backgroundColor: 'white' }}>수정일</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
