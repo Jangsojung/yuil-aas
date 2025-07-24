@@ -457,18 +457,25 @@ export default function ConvertPage() {
 
         <div className='table-wrap'>
           <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+            <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
+              <colgroup>
+                <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
+                <col style={{ maxWidth: '180px' }} />
+                <col style={{ maxWidth: '440.78px' }} />
+                <col style={{ maxWidth: '180px' }} />
+                <col style={{ maxWidth: '250px' }} />
+                <col style={{ maxWidth: '250px' }} />
+                <col style={{ maxWidth: '250px' }} />
+              </colgroup>
               <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
                 <TableRow>
-                  <TableCell sx={{ width: '50px', backgroundColor: 'white' }}></TableCell>
-                  <SortableTableHeader
-                    columns={sortableColumns}
-                    sortField={sortField}
-                    sortDirection={sortDirection}
-                    onSort={handleSort}
-                  />
-                  <TableCell sx={{ backgroundColor: 'white' }}>시작일</TableCell>
-                  <TableCell sx={{ backgroundColor: 'white' }}>종료일</TableCell>
+                  <TableCell sx={{ width: '50px', minWidth: '50px', maxWidth: '50px', backgroundColor: 'white' }}></TableCell>
+                  <TableCell sx={{ maxWidth: '180px', backgroundColor: 'white' }}>공장명</TableCell>
+                  <TableCell sx={{ maxWidth: '440.78px', backgroundColor: 'white' }}>기초코드명</TableCell>
+                  <TableCell sx={{ maxWidth: '180px', backgroundColor: 'white' }}>센서개수</TableCell>
+                  <TableCell sx={{ maxWidth: '250px', backgroundColor: 'white' }}>생성일</TableCell>
+                  <TableCell sx={{ maxWidth: '250px', backgroundColor: 'white' }}>시작일</TableCell>
+                  <TableCell sx={{ maxWidth: '250px', backgroundColor: 'white' }}>종료일</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
