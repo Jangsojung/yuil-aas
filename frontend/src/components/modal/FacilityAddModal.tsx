@@ -93,7 +93,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
     async (fc_idx?: number) => {
       const targetFcIdx = fc_idx || selectedFactory;
       if (!targetFcIdx) return;
-      
+
       try {
         const data = await getFacilityGroups(targetFcIdx as number);
         setGroupList(data.map((g: any) => ({ fg_idx: g.fg_idx, fg_name: g.fg_name })));
@@ -102,20 +102,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       }
     },
     [selectedFactory]
-  );
-
-  const fetchFacilities = useCallback(
-    async (fg_idx?: number) => {
-      const targetFgIdx = fg_idx;
-      if (!targetFgIdx) return;
-      try {
-        const data = await getFacilities(targetFgIdx as number);
-        setFacilityList(data.map((f: any) => ({ fa_idx: f.fa_idx, fa_name: f.fa_name })));
-      } catch (error) {
-        setError('설비 목록을 불러오는데 실패했습니다.');
-      }
-    },
-    []
   );
 
   // 공장 목록 조회
@@ -272,7 +258,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       }
 
       // 4. 센서 추가
-      const sensorResult = await postSensor({ fa_idx: currentFaIdx, name: sensorName });
+      await postSensor({ fa_idx: currentFaIdx, name: sensorName });
 
       setError(null);
       onSuccess();

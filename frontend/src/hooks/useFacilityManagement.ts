@@ -13,7 +13,6 @@ import {
 import { FactoryTree } from '../types/api';
 
 export const useFacilityManagement = () => {
-  const userIdx = useRecoilValue(userState)?.user_idx;
   const user = useRecoilValue(userState);
   const { alertModal, showAlert, showConfirm, closeAlert } = useAlertModal();
 
@@ -268,6 +267,7 @@ export const useFacilityManagement = () => {
         setProgress(0);
       }, 1000);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAlert, handleTreeSearch, user?.cm_idx]);
 
   return {

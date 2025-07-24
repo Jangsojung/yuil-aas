@@ -48,8 +48,6 @@ export default function FacilityManagementPage() {
     progress,
     progressOpen,
     progressLabel,
-    setProgress,
-    setProgressOpen,
   } = useFacilityManagement();
 
   // 네비게이션 리셋 처리
