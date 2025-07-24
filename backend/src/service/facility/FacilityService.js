@@ -237,19 +237,20 @@ export const deleteSensors = async (sensorIds) => {
   });
 };
 
-export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
+export const synchronizeFacilityData = async (cm_idx, progressCallback = null) => {
   const connection = await pool.promise().getConnection();
   try {
     await connection.beginTransaction();
 
-    // 전체 단계 수: 4단계
-    const totalSteps = 4;
+    // 전체 단계 수: 5단계 (센서 동기화를 별도 단계로 분리)
+    const totalSteps = 5;
     let currentStep = 0;
 
-    // 1. tb_factory_info -> tb_aasx_data 동기화 (25%)
+    // 1. tb_factory_info -> tb_aasx_data 동기화 (20%)
     currentStep++;
     if (progressCallback) {
-      progressCallback((currentStep / totalSteps) * 100, `공장 정보 동기화 중... (${currentStep}/${totalSteps})`);
+      const progress = (currentStep / totalSteps) * 100;
+      progressCallback(progress, `공장 정보 동기화 중... (${currentStep}/${totalSteps})`);
     }
     const [factoryInfos] = await connection.query('SELECT fc_idx, fc_name FROM tb_factory_info');
 
@@ -266,13 +267,14 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
           factory.fc_name,
         ]);
       } else {
-        // fc_idx는 있지만 fc_name이 다른 경우
+        // fc_idx는 있지만 fc_name이 다른 경우만 업데이트
         const [existingWithName] = await connection.query(
           'SELECT fc_idx FROM tb_aasx_data WHERE fc_idx = ? AND fc_name = ?',
           [factory.fc_idx, factory.fc_name]
         );
 
         if (existingWithName.length === 0) {
+          // fc_idx와 fc_name이 모두 같으면 건너뛰기 (이미 최적화됨)
           // fc_name이 다르면 기존 fc_idx를 새로운 값으로 변경하고 모든 참조 업데이트
           const [maxFcIdx] = await connection.query('SELECT MAX(fc_idx) as max_idx FROM tb_aasx_data');
           const newFcIdx = (maxFcIdx[0].max_idx || 0) + 1;
@@ -312,10 +314,11 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
       }
     }
 
-    // 2. tb_facility_group_info -> tb_aasx_data_aas 동기화 (50%)
+    // 2. tb_facility_group_info -> tb_aasx_data_aas 동기화 (40%)
     currentStep++;
     if (progressCallback) {
-      progressCallback((currentStep / totalSteps) * 100, `설비그룹 정보 동기화 중... (${currentStep}/${totalSteps})`);
+      const progress = (currentStep / totalSteps) * 100;
+      progressCallback(progress, `설비그룹 정보 동기화 중... (${currentStep}/${totalSteps})`);
     }
     const [facilityGroupInfos] = await connection.query('SELECT fg_idx, fg_name, fc_idx FROM tb_facility_group_info');
 
@@ -372,10 +375,11 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
       }
     }
 
-    // 3. tb_facility_info -> tb_aasx_data_sm 동기화 (75%)
+    // 3. tb_facility_info -> tb_aasx_data_sm 동기화 (60%)
     currentStep++;
     if (progressCallback) {
-      progressCallback((currentStep / totalSteps) * 100, `설비 정보 동기화 중... (${currentStep}/${totalSteps})`);
+      const progress = (currentStep / totalSteps) * 100;
+      progressCallback(progress, `설비 정보 동기화 중... (${currentStep}/${totalSteps})`);
     }
     const [facilityInfos] = await connection.query('SELECT fa_idx, fa_name, fg_idx FROM tb_facility_info');
 
@@ -447,10 +451,11 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
       }
     }
 
-    // 4. tb_sensor_info -> tb_aasx_data_prop 동기화 (100%)
+    // 4. tb_sensor_info -> tb_aasx_data_prop 동기화 (80%)
     currentStep++;
     if (progressCallback) {
-      progressCallback((currentStep / totalSteps) * 100, `센서 정보 동기화 중... (${currentStep}/${totalSteps})`);
+      const progress = (currentStep / totalSteps) * 100;
+      progressCallback(progress, `센서 정보 동기화 중... (${currentStep}/${totalSteps})`);
     }
     const [sensorInfos] = await connection.query('SELECT sn_idx, sn_name, fa_idx FROM tb_sensor_info');
 
@@ -516,94 +521,120 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback) => {
       }
     }
 
-    // 5. tb_sensor_info 기준 tb_aasx_sensor_info 동기화 (insert + 충돌시 밀어내기)
+    // 5. tb_matching_list 기준 tb_aasx_sensor_info 동기화 (100%)
     currentStep++;
     if (progressCallback) {
-      progressCallback((currentStep / (totalSteps + 1)) * 100, `센서 매칭 동기화 중... (${currentStep}/${totalSteps + 1})`);
+      const progress = (currentStep / totalSteps) * 100;
+      progressCallback(progress, `센서 매칭 동기화 준비 중... (${currentStep}/${totalSteps})`);
     }
-    // tb_sensor_info에서 센서 목록 조회
-    const [sensorInfoRows] = await connection.query('SELECT mt_idx, fc_name, fg_name, fa_name, sn_name FROM tb_sensor_info');
+    
+    // tb_matching_list와 관련 테이블들을 조인하여 센서 정보 조회
+    const [sensorInfoRows] = await connection.query(`
+      SELECT 
+        ml.mt_idx,
+        fc.fc_name,
+        fg.fg_name,
+        fa.fa_name,
+        si.sn_name,
+        ai.ad_compute,
+        si.sn_unit,
+        ml.creator,
+        ml.createdAt,
+        ml.updater,
+        ml.updatedAt
+      FROM tb_matching_list ml
+      JOIN tb_sensor_info si ON ml.sn_idx = si.sn_idx
+      JOIN tb_facility_info fa ON si.fa_idx = fa.fa_idx
+      JOIN tb_facility_group_info fg ON fa.fg_idx = fg.fg_idx
+      JOIN tb_factory_info fc ON fg.fc_idx = fc.fc_idx
+      LEFT JOIN tb_address_info ai ON ml.ad_idx = ai.ad_idx
+    `);
+    
+    // 센서 개수에 따른 진행률 계산
+    const sensorCount = sensorInfoRows.length;
+    
+    // 센서 동기화 시작 시 진행률 업데이트
+    if (progressCallback) {
+      progressCallback(80, `센서 매칭 동기화 시작... (0/${sensorCount})`);
+    }
+    
     // max_mt_idx 구하기 (초기값)
     let maxMtIdx = 0;
     const [maxMtIdxRow] = await connection.query('SELECT MAX(mt_idx) as max_mt_idx FROM tb_aasx_sensor_info');
     if (maxMtIdxRow && maxMtIdxRow[0] && maxMtIdxRow[0].max_mt_idx) {
       maxMtIdx = maxMtIdxRow[0].max_mt_idx;
     }
-    for (const row of sensorInfoRows) {
-      const { mt_idx, fc_name, fg_name, fa_name, sn_name } = row;
-      // tb_aasx_sensor_info에 이미 있는지 확인
-      const [exists] = await connection.query('SELECT * FROM tb_aasx_sensor_info WHERE mt_idx = ?', [mt_idx]);
-      if (exists.length === 0) {
-        // 없으면 insert
-        await connection.query(
-          'INSERT INTO tb_aasx_sensor_info (mt_idx, fc_name, fg_name, fa_name, sn_name) VALUES (?, ?, ?, ?, ?)',
-          [mt_idx, fc_name, fg_name, fa_name, sn_name]
-        );
-        // tb_sensor_data에서 데이터 긁어서 tb_aasx_sensor_data에 insert
-        await connection.query(
-          `INSERT INTO tb_aasx_sensor_data (mt_idx, sn_data, sn_compute_data, sd_createdAt)
-           SELECT ?, ts.sn_data,
-             CASE
-               WHEN ad.ad_compute IS NOT NULL AND ad.ad_compute != '' THEN
-                 CASE 
-                   WHEN LEFT(ad.ad_compute, 1) = '*' THEN ts.sn_data * CAST(SUBSTRING(ad.ad_compute, 2) AS DECIMAL(10, 4))
-                   WHEN LEFT(ad.ad_compute, 1) = '/' THEN ts.sn_data / CAST(SUBSTRING(ad.ad_compute, 2) AS DECIMAL(10, 4))
-                   ELSE ts.sn_data
-                 END
-               ELSE ts.sn_data
-             END AS sn_compute_data,
-             ts.createdAt AS sd_createdAt
-           FROM tb_sensor_data ts
-           JOIN tb_matching_list ml ON ts.mt_idx = ml.mt_idx
-           LEFT JOIN tb_aasx_data_prop sn ON ml.sn_idx = sn.sn_idx
-           LEFT JOIN tb_address_info ad ON sn.sn_name = ad.ad_name
-           LEFT JOIN tb_sensor_info si ON ml.sn_idx = si.sn_idx
-           WHERE ts.mt_idx = ?`,
-          [mt_idx, mt_idx]
-        );
-      } else {
-        // 이미 있는데 내용이 다르면 기존 row를 max+1로 밀어내고, tb_sensor_info의 내용으로 덮어씀
-        const exist = exists[0];
-        if (
-          exist.fc_name !== fc_name ||
-          exist.fg_name !== fg_name ||
-          exist.fa_name !== fa_name ||
-          exist.sn_name !== sn_name
-        ) {
-          maxMtIdx += 1;
-          // 기존 row의 mt_idx를 max+1로 update
-          await connection.query('UPDATE tb_aasx_sensor_info SET mt_idx = ? WHERE mt_idx = ?', [maxMtIdx, mt_idx]);
-          // tb_aasx_sensor_data의 mt_idx도 같이 update
-          await connection.query('UPDATE tb_aasx_sensor_data SET mt_idx = ? WHERE mt_idx = ?', [maxMtIdx, mt_idx]);
-          // tb_sensor_info의 내용으로 해당 mt_idx에 insert(덮어쓰기)
-          await connection.query(
-            'INSERT INTO tb_aasx_sensor_info (mt_idx, fc_name, fg_name, fa_name, sn_name) VALUES (?, ?, ?, ?, ?)',
-            [mt_idx, fc_name, fg_name, fa_name, sn_name]
-          );
-          // tb_sensor_data에서 데이터 긁어서 tb_aasx_sensor_data에 insert
-          await connection.query(
-            `INSERT INTO tb_aasx_sensor_data (mt_idx, sn_data, sn_compute_data, sd_createdAt)
-             SELECT ?, ts.sn_data,
-               CASE
-                 WHEN ad.ad_compute IS NOT NULL AND ad.ad_compute != '' THEN
-                   CASE 
-                     WHEN LEFT(ad.ad_compute, 1) = '*' THEN ts.sn_data * CAST(SUBSTRING(ad.ad_compute, 2) AS DECIMAL(10, 4))
-                     WHEN LEFT(ad.ad_compute, 1) = '/' THEN ts.sn_data / CAST(SUBSTRING(ad.ad_compute, 2) AS DECIMAL(10, 4))
-                     ELSE ts.sn_data
-                   END
-                 ELSE ts.sn_data
-               END AS sn_compute_data,
-               ts.createdAt AS sd_createdAt
-             FROM tb_sensor_data ts
-             JOIN tb_matching_list ml ON ts.mt_idx = ml.mt_idx
-             LEFT JOIN tb_aasx_data_prop sn ON ml.sn_idx = sn.sn_idx
-             LEFT JOIN tb_address_info ad ON sn.sn_name = ad.ad_name
-             LEFT JOIN tb_sensor_info si ON ml.sn_idx = si.sn_idx
-             WHERE ts.mt_idx = ?`,
-            [mt_idx, mt_idx]
-          );
+    let processedCount = 0;
+    let skippedCount = 0;
+    
+    for (let i = 0; i < sensorInfoRows.length; i++) {
+      // 진행률 업데이트 (100개마다)
+      if (i % 100 === 0) {
+        const currentProgress = 80 + (i / sensorCount) * 20; // 80%에서 시작해서 100%까지
+        if (progressCallback) {
+          progressCallback(currentProgress, `센서 매칭 동기화 중... (${i + 1}/${sensorCount})`);
+        }
+        if (processedCount > 0) {
         }
       }
+      
+      // 첫 번째 항목 처리 시에도 진행률 업데이트
+      if (i === 0) {
+        const currentProgress = 80 + (1 / sensorCount) * 20;
+        if (progressCallback) {
+          progressCallback(currentProgress, `센서 매칭 동기화 중... (1/${sensorCount})`);
+        }
+      }
+      if (i > 0 && i % 300 === 0) {
+        await connection.commit();
+        await connection.beginTransaction();
+      }
+      const row = sensorInfoRows[i];
+      try {
+        // tb_aasx_sensor_info에 이미 있는지 확인
+        const [exists] = await connection.query('SELECT * FROM tb_aasx_sensor_info WHERE mt_idx = ?', [row.mt_idx]);
+        if (exists.length === 0) {
+          // 없으면 insert
+          await connection.query(
+            'INSERT INTO tb_aasx_sensor_info (mt_idx, fc_name, fg_name, fa_name, sn_name, ad_compute, sn_unit, creator, createdAt, updater, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [row.mt_idx, row.fc_name, row.fg_name, row.fa_name, row.sn_name, row.ad_compute, row.sn_unit, row.creator, row.createdAt, row.updater, row.updatedAt]
+          );
+          processedCount++;
+        } else {
+          // 이미 있는데 내용이 다르면 기존 row를 max+1로 밀어내고, tb_matching_list의 내용으로 덮어씀
+          const exist = exists[0];
+          if (
+            exist.fc_name !== row.fc_name ||
+            exist.fg_name !== row.fg_name ||
+            exist.fa_name !== row.fa_name ||
+            exist.sn_name !== row.sn_name ||
+            exist.ad_compute !== row.ad_compute ||
+            exist.sn_unit !== row.sn_unit
+          ) {
+            maxMtIdx += 1;
+            // 기존 row의 mt_idx를 max+1로 update
+            await connection.query('UPDATE tb_aasx_sensor_info SET mt_idx = ? WHERE mt_idx = ?', [maxMtIdx, row.mt_idx]);
+            // tb_matching_list의 내용으로 해당 mt_idx에 insert(덮어쓰기)
+            await connection.query(
+              'INSERT INTO tb_aasx_sensor_info (mt_idx, fc_name, fg_name, fa_name, sn_name, ad_compute, sn_unit, creator, createdAt, updater, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              [row.mt_idx, row.fc_name, row.fg_name, row.fa_name, row.sn_name, row.ad_compute, row.sn_unit, row.creator, row.createdAt, row.updater, row.updatedAt]
+            );
+            processedCount++;
+          } else {
+            // 내용이 같으면 건너뛰기 (최적화)
+            skippedCount++;
+          }
+        }
+      } catch (err) {
+        console.error(`[동기화][센서][${i}] 에러:`, err, '센서 row:', row);
+      }
+    }
+    // 반복문 종료 후 마지막 커밋
+    await connection.commit();
+
+    // 완료 시 100%로 설정
+    if (progressCallback) {
+      progressCallback(100, '설비 데이터 동기화 완료');
     }
 
     await connection.commit();

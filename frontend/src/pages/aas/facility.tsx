@@ -47,6 +47,7 @@ export default function FacilityManagementPage() {
     closeAlert,
     progress,
     progressOpen,
+    progressLabel,
     setProgress,
     setProgressOpen,
   } = useFacilityManagement();
@@ -58,18 +59,11 @@ export default function FacilityManagementPage() {
     }
   }, [navigationReset, handleReset]);
 
-  useEffect(() => {
-    if (!treeLoading) {
-      setProgress(100);
-      setTimeout(() => {
-        setProgressOpen(false);
-      }, 100);
-    }
-  }, [treeLoading, setProgress, setProgressOpen]);
+  // treeLoading 관련 useEffect 제거 (동기화와 충돌 방지)
 
   return (
     <>
-      <ProgressOverlay open={progressOpen} progress={progress} label='트리 데이터 불러오는 중...' />
+      <ProgressOverlay open={progressOpen} progress={progress} label={progressLabel} />
       <FacilityView
         treeData={treeData}
         treeLoading={treeLoading}
@@ -104,7 +98,6 @@ export default function FacilityManagementPage() {
         showAlert={showAlert}
         showConfirm={showConfirm}
         closeAlert={closeAlert}
-        progressOpen={progressOpen}
       />
 
       <AlertModal

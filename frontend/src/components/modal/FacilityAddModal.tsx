@@ -498,7 +498,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         >
                           <MenuItem value='신규등록'>신규등록</MenuItem>
                           {groupList.map((g) => (
-                            <MenuItem key={g.fg_name} value={g.fg_name}>
+                            <MenuItem key={`group-${g.fg_idx}`} value={g.fg_name}>
                               {g.fg_name}
                             </MenuItem>
                           ))}
@@ -574,7 +574,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                         >
                           <MenuItem value='신규등록'>신규등록</MenuItem>
                           {facilityList.map((f) => (
-                            <MenuItem key={f.fa_name} value={f.fa_name}>
+                            <MenuItem key={`facility-${f.fa_idx}`} value={f.fa_name}>
                               {f.fa_name}
                             </MenuItem>
                           ))}

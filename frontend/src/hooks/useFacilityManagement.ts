@@ -226,34 +226,35 @@ export const useFacilityManagement = () => {
   const handleSynchronize = useCallback(async () => {
     setProgressOpen(true);
     setProgress(0);
+    setProgressLabel('설비 데이터 동기화 중...');
 
     try {
-      // 프로그레스바 시뮬레이션 (실제로는 백엔드에서 단계별 진행상황을 받아야 함)
-      const progressSteps = [
-        { progress: 25, label: '공장 정보 동기화 중... (1/4)' },
-        { progress: 50, label: '설비그룹 정보 동기화 중... (2/4)' },
-        { progress: 75, label: '설비 정보 동기화 중... (3/4)' },
-        { progress: 100, label: '센서 정보 동기화 중... (4/4)' },
+      // 단계별 진행률 시뮬레이션
+      const steps = [
+        { progress: 20, label: '공장 정보 동기화 중...' },
+        { progress: 40, label: '설비그룹 정보 동기화 중...' },
+        { progress: 60, label: '설비 정보 동기화 중...' },
+        { progress: 80, label: '센서 정보 동기화 중...' },
+        { progress: 90, label: '센서 매칭 동기화 중...' },
       ];
 
-      for (let i = 0; i < progressSteps.length; i++) {
-        const step = progressSteps[i];
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
         setProgress(step.progress);
         setProgressLabel(step.label);
-        setProgressOpen(true);
-
+        
         // 마지막 단계에서만 실제 API 호출
-        if (i === progressSteps.length - 1) {
+        if (i === steps.length - 1) {
           await synchronizeFacility(user?.cm_idx);
+          setProgress(100);
+          setProgressLabel('동기화 완료');
         } else {
-          // 각 단계별로 약간의 지연을 주어 진행상황을 보여줌
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          // 각 단계별로 약간의 지연
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
-
+      
       showAlert('알림', '동기화 완료');
-      // 동기화 후 트리 데이터 새로고침
-      handleTreeSearch();
       // 선택 상태 초기화
       setSelectedSensors([]);
       setSelectedFacilities([]);
@@ -262,8 +263,10 @@ export const useFacilityManagement = () => {
     } catch (err) {
       showAlert('에러', '동기화 중 오류가 발생했습니다.');
     } finally {
-      setProgressOpen(false);
-      setProgress(0);
+      setTimeout(() => {
+        setProgressOpen(false);
+        setProgress(0);
+      }, 1000);
     }
   }, [showAlert, handleTreeSearch, user?.cm_idx]);
 

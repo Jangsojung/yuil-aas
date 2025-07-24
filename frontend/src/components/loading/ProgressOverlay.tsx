@@ -9,6 +9,7 @@ interface ProgressOverlayProps {
 }
 
 export default function ProgressOverlay({ open, progress, label, zIndex = 1300 }: ProgressOverlayProps) {
+
   // 라벨과 경고 메시지를 분리
   const lines = label ? label.split('\n') : [];
   const progressLabel = lines[0] || '데이터를 불러오는 중입니다...';
