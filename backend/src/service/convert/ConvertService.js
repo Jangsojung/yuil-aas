@@ -141,10 +141,15 @@ export const insertConvertsToDB = async (fc_idx, user_idx, startDate, endDate, s
       const snNameEn = sn_alias || sensor.sn_name;
 
       const sensorData = await queryMultiple(
-        `SELECT ROUND(sn_compute_data, 2) AS sn_compute_data, sd_createdAt 
-       FROM tb_aasx_sensor_data 
-       WHERE mt_idx = ? AND sd_createdAt BETWEEN ? AND ?
-       ORDER BY sd_createdAt`,
+        `SELECT 
+          ts.sn_data,
+          ts.createdAt as sd_createdAt,
+          tsi.ad_compute,
+          tsi.sn_unit
+         FROM tb_sensor_data ts
+         LEFT JOIN tb_aasx_sensor_info tsi ON ts.mt_idx = tsi.mt_idx
+         WHERE ts.mt_idx = ? AND ts.createdAt BETWEEN ? AND ?
+         ORDER BY ts.createdAt`,
         [sensor.mt_idx, startDateTime, endDateTime]
       );
 
@@ -157,7 +162,35 @@ export const insertConvertsToDB = async (fc_idx, user_idx, startDate, endDate, s
       const snData = sensorData.map((record) => {
         const t = new Date(record.sd_createdAt);
         const timestamp = t.toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '_');
-        return { Value: parseFloat(record.sn_compute_data), Timestamp: timestamp };
+        
+        let computedValue = parseFloat(record.sn_data);
+        
+        // ad_compute 수식 적용
+        if (record.ad_compute && record.ad_compute.trim() !== '') {
+          try {
+            const computeFormula = record.ad_compute.trim();
+            const snDataValue = parseFloat(record.sn_data);
+            
+            if (computeFormula.startsWith('*')) {
+              const multiplier = parseFloat(computeFormula.substring(1));
+              computedValue = snDataValue * multiplier;
+            } else if (computeFormula.startsWith('/')) {
+              const divisor = parseFloat(computeFormula.substring(1));
+              if (divisor === 0) {
+                throw new Error('0으로 나눌 수 없습니다.');
+              }
+              computedValue = snDataValue / divisor;
+            } else {
+              // 알 수 없는 수식 형식인 경우 원본 값 사용
+              computedValue = snDataValue;
+            }
+          } catch (error) {
+            console.error('수식 계산 오류:', error.message, '원본 값 사용');
+            computedValue = parseFloat(record.sn_data);
+          }
+        }
+        
+        return { Value: Math.round(computedValue * 100) / 100, Timestamp: timestamp };
       });
 
       const fgNameFormatted = fgNameEn.replace(/\s+/g, '_');
