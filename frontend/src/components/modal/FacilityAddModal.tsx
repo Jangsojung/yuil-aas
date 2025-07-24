@@ -21,6 +21,7 @@ import TableRow from '@mui/material/TableRow';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/atoms';
 import { getFactoriesByCmIdxFacility, postFactory, postFacility, getFacilityGroups, getFacilities, postFacilityGroup, postSensor } from '../../apis/api/facility';
+import AlertModal from './alert';
 
 const GreyButton = styled(Button)(({ theme }) => ({
   color: '#637381',
@@ -78,6 +79,14 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
   const [facilityValue, setFacilityValue] = useState('');
   const [facilityInput, setFacilityInput] = useState('');
   const [sensorName, setSensorName] = useState('');
+
+  const [alertModal, setAlertModal] = useState({
+    open: false,
+    title: '',
+    content: '',
+    type: 'alert' as 'alert' | 'confirm',
+    onConfirm: undefined as (() => void) | undefined,
+  });
 
   const fetchFactories = useCallback(async () => {
     try {
@@ -263,9 +272,31 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       setError(null);
       onSuccess();
       handleClose();
-    } catch (error) {
-      setError('설비 추가 중 오류가 발생했습니다.');
-      console.error('설비 추가 중 오류:', error);
+    } catch (error: any) {
+      // 중복 에러 메시지 alert 처리 (통합)
+      const msg = error?.message || error?.response?.data?.error || error.toString();
+      if (
+        msg.includes('Duplicate entry') ||
+        msg.includes('설비그룹 등록 실패') ||
+        msg.includes('설비 등록 실패') ||
+        msg.includes('센서 등록 실패')
+      ) {
+        let alertMsg = '이미 같은 이름의 항목이 존재합니다.';
+        if (msg.includes('fc_name') || msg.includes('공장')) alertMsg = '이미 같은 이름의 공장명이 존재합니다.';
+        else if (msg.includes('fg_name') || msg.includes('설비그룹')) alertMsg = '이미 같은 이름의 설비그룹이 존재합니다.';
+        else if (msg.includes('fa_name') || msg.includes('설비')) alertMsg = '이미 같은 이름의 설비명이 존재합니다.';
+        else if (msg.includes('sn_name') || msg.includes('센서')) alertMsg = '이미 같은 이름의 센서가 존재합니다.';
+        setAlertModal({
+          open: true,
+          title: '알림',
+          content: alertMsg,
+          type: 'alert',
+          onConfirm: undefined,
+        });
+      } else {
+        setError('설비 추가 중 오류가 발생했습니다.');
+        console.error('설비 추가 중 오류:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -406,6 +437,13 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                           }}
                           displayEmpty
                           sx={{ background: '#fff', borderRadius: 1 }}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                maxHeight: 300,
+                              },
+                            },
+                          }}
                         >
                           <MenuItem value='신규등록'>신규등록</MenuItem>
                           {factories.map((factory) => (
@@ -479,6 +517,13 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                             '&.Mui-disabled': {
                               backgroundColor: '#f5f5f5',
                               color: '#999',
+                            },
+                          }}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                maxHeight: 300,
+                              },
                             },
                           }}
                         >
@@ -555,6 +600,13 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
                             '&.Mui-disabled': {
                               backgroundColor: '#f5f5f5',
                               color: '#999',
+                            },
+                          }}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                maxHeight: 300,
+                              },
                             },
                           }}
                         >
@@ -644,6 +696,14 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
           취소
         </GreyButton>
       </DialogActions>
+      <AlertModal
+        open={alertModal.open}
+        handleClose={() => setAlertModal((prev) => ({ ...prev, open: false }))}
+        title={alertModal.title}
+        content={alertModal.content}
+        type={alertModal.type}
+        onConfirm={alertModal.onConfirm}
+      />
     </BootstrapDialog>
   );
 }

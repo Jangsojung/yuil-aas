@@ -6,6 +6,12 @@ export const insertFacilityGroup = async (fc_idx, name) => {
   const validatedFcIdx = validateValue(fc_idx);
   const validatedName = validateValue(name);
 
+  // 중복 체크
+  const [exists] = await queryMultiple('SELECT fg_idx FROM tb_aasx_data_aas WHERE fc_idx = ? AND fg_name = ?', [validatedFcIdx, validatedName]);
+  if (exists && (Array.isArray(exists) ? exists.length > 0 : Object.keys(exists).length > 0)) {
+    throw new Error('이미 같은 이름의 설비그룹이 존재합니다.');
+  }
+
   // 가장 마지막 fg_idx 조회
   const maxResult = await querySingle('SELECT MAX(fg_idx) as max_idx FROM tb_aasx_data_aas');
   const nextFgIdx = (maxResult?.max_idx || 0) + 1;
@@ -23,6 +29,12 @@ export const insertFacility = async (fg_idx, name) => {
   const validatedFgIdx = validateValue(fg_idx);
   const validatedName = validateValue(name);
 
+  // 중복 체크
+  const [exists] = await queryMultiple('SELECT fa_idx FROM tb_aasx_data_sm WHERE fg_idx = ? AND fa_name = ?', [validatedFgIdx, validatedName]);
+  if (exists && (Array.isArray(exists) ? exists.length > 0 : Object.keys(exists).length > 0)) {
+    throw new Error('이미 같은 이름의 설비명이 존재합니다.');
+  }
+
   // 가장 마지막 fa_idx 조회
   const maxResult = await querySingle('SELECT MAX(fa_idx) as max_idx FROM tb_aasx_data_sm');
   const nextFaIdx = (maxResult?.max_idx || 0) + 1;
@@ -39,6 +51,12 @@ export const insertFacility = async (fg_idx, name) => {
 export const insertSensor = async (fa_idx, name) => {
   const validatedFaIdx = validateValue(fa_idx);
   const validatedName = validateValue(name);
+
+  // 중복 체크
+  const [exists] = await queryMultiple('SELECT sn_idx FROM tb_aasx_data_prop WHERE fa_idx = ? AND sn_name = ?', [validatedFaIdx, validatedName]);
+  if (exists && (Array.isArray(exists) ? exists.length > 0 : Object.keys(exists).length > 0)) {
+    throw new Error('이미 같은 이름의 센서가 존재합니다.');
+  }
 
   // 가장 마지막 sn_idx 조회
   const maxResult = await querySingle('SELECT MAX(sn_idx) as max_idx FROM tb_aasx_data_prop');
@@ -76,6 +94,12 @@ export const insertSensor = async (fa_idx, name) => {
 export const insertFactory = async (cm_idx, fc_name) => {
   const validatedCmIdx = validateValue(cm_idx);
   const validatedFcName = validateValue(fc_name);
+
+  // 중복 체크
+  const [exists] = await queryMultiple('SELECT fc_idx FROM tb_aasx_data WHERE fc_name = ?', [validatedFcName]);
+  if (exists && exists.length > 0) {
+    throw new Error('이미 같은 이름의 공장명이 존재합니다.');
+  }
 
   // 가장 마지막 fc_idx 조회
   const maxResult = await querySingle('SELECT MAX(fc_idx) as max_idx FROM tb_aasx_data');
