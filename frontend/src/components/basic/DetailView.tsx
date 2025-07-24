@@ -68,7 +68,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
   onTreeSearch,
 }) => {
   return (
-    <div className='table-outer'>
+    <div className="table-outer" style={{ height: '100%' }}>
       <SearchBox
         buttons={[
           {

@@ -84,7 +84,7 @@ export const EditView: React.FC<EditViewProps> = ({
 
   return (
     <>
-      <div>
+      <div className="table-outer" style={{ height: '100%' }}>
         <SearchBox
           buttons={[
             {

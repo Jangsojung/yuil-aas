@@ -184,7 +184,7 @@ export default function DashboardPage() {
                     <TableCell>{file.fc_name || '-'}</TableCell>
                     <TableCell>{file.af_name}</TableCell>
                     <TableCell>{file.base_name || '삭제된 기초코드'}</TableCell>
-                    <TableCell>{file.sn_length || 0}</TableCell>
+                    <TableCell>{file.sn_length ? file.sn_length : '-'}</TableCell>
                     <TableCell>{formatDate(file.createdAt)}</TableCell>
                   </TableRow>
                 ))}
@@ -240,7 +240,7 @@ export default function DashboardPage() {
                     },
                   })
                 }
-                disabled={!selectedJson}
+                disabled={!selectedJson || !!(jsonFileSize && jsonFileSize >= FILE.MAX_SIZE)}
                 variant='outlined'
                 size='small'
                 sx={{ ml: 2 }}
@@ -307,7 +307,7 @@ export default function DashboardPage() {
                     },
                   })
                 }
-                disabled={!selectedAasx}
+                disabled={!selectedAasx || !!(aasxFileSize && aasxFileSize >= FILE.MAX_SIZE)}
                 variant='outlined'
                 size='small'
               >
