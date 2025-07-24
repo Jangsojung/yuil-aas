@@ -52,6 +52,7 @@ export default function DataList() {
     sortField,
     sortDirection,
     handleSort,
+    resetSort,
   } = useSortableData(filteredWords, 'as_kr', 'asc');
 
   // 정렬 컬럼 정의
@@ -81,8 +82,9 @@ export default function DataList() {
       handleUnmatchedOnly(false);
       // 데이터 다시 로드
       getWords();
+      resetSort();
     }
-  }, [navigationReset, handleSearchKeywordChange, handleUnmatchedOnly, getWords]);
+  }, [navigationReset, handleSearchKeywordChange, handleUnmatchedOnly, getWords, resetSort]);
 
   const handleSaveClick = async () => {
     const result = await handleSave();
@@ -98,6 +100,13 @@ export default function DataList() {
   };
 
   const checkAllCurrentPageSelected = () => isAllCurrentPageSelected(pagedData);
+
+  const handleReset = () => {
+    handleSearchKeywordChange('');
+    handleUnmatchedOnly(false);
+    getWords();
+    resetSort();
+  };
 
   return (
     <div className='table-outer'>

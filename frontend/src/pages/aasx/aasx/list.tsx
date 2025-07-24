@@ -64,7 +64,8 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
     sortField,
     sortDirection,
     handleSort,
-  } = useSortableData<File>(files, 'createdAt', 'desc');
+    resetSort,
+  } = useSortableData<File>(files, undefined, 'desc');
 
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<File>[] = [
@@ -152,11 +153,13 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
   };
 
   const handleReset = () => {
+    setSelectedFiles([]);
     setStartDate(null);
     setEndDate(null);
     setSelectedFactory('');
-    setSelectedFiles([]);
-    setFiles([]); // 파일 목록 초기화
+    setFiles([]);
+    setSelectAll(false);
+    resetSort();
   };
 
   const getFiles = async (start = startDate, end = endDate) => {
@@ -232,6 +235,12 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
       setSelectAll(false);
     }
   }, [selectedFiles, files]);
+
+  useEffect(() => {
+    if (navigationReset) {
+      resetSort();
+    }
+  }, [navigationReset, resetSort]);
 
   // getFiles를 ref로 노출
   useImperativeHandle(ref, () => ({

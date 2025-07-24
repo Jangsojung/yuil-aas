@@ -53,6 +53,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     sortField,
     sortDirection,
     handleSort,
+    resetSort,
   } = useSortableData<EdgeGateway>(filteredEdgeGateways, 'createdAt', 'desc');
 
   // 정렬 컬럼 정의
@@ -117,6 +118,7 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
     setStartDate(null);
     setEndDate(null);
     setFilteredEdgeGateways(edgeGateways);
+    resetSort();
   };
 
   // 날짜 변경 핸들러

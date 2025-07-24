@@ -52,12 +52,7 @@ export default function ConvertPage() {
     onConfirm: undefined,
   });
 
-  const {
-    sortedData: sortedBases,
-    sortField,
-    sortDirection,
-    handleSort,
-  } = useSortableData<Base>(filteredBases, 'createdAt', 'desc');
+  const { sortedData: sortedBases, sortField, sortDirection, handleSort, resetSort } = useSortableData<Base>(filteredBases, 'createdAt', 'desc');
 
   const sortableColumns: SortableColumn<Base>[] = [
     { field: 'fc_name', label: '공장명', maxWidth: 180 },
@@ -151,11 +146,8 @@ export default function ConvertPage() {
     setStartDate(null);
     setEndDate(null);
     setSelectedFactory('');
-    setSelectedConvert(null);
-    setBaseDates({});
-    setBases([]);
-    setFilteredBases([]);
-    handlePageChange(null, 0);
+    setFilteredBases(bases);
+    resetSort();
   };
 
   const handleFactoryChange = (factoryId: number) => {

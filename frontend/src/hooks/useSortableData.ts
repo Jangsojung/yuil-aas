@@ -76,7 +76,7 @@ export const useSortableData = <T extends Record<string, any>>(
   );
 
   const resetSort = useCallback(() => {
-    setSortField(defaultSortField);
+    setSortField(undefined);
     setSortDirection(defaultSortDirection);
   }, [defaultSortField, defaultSortDirection]);
 

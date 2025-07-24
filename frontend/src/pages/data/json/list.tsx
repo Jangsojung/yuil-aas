@@ -72,6 +72,7 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
     sortField,
     sortDirection,
     handleSort,
+    resetSort,
   } = useSortableData<File>(files, 'createdAt', 'desc');
 
   // 정렬 컬럼 정의
@@ -146,12 +147,13 @@ const JSONList = forwardRef<{ refresh: () => void }, JSONListProps>(function JSO
   };
 
   const handleReset = () => {
+    setSelectedFiles([]);
     setStartDate(null);
     setEndDate(null);
     setSelectedFactory('');
-    setSelectedFiles([]);
-    setFiles([]); // 파일 목록 초기화
-    setIsSearchActive(false);
+    setFiles([]);
+    setSelectAll(false);
+    resetSort();
   };
 
   const getFiles = useCallback(

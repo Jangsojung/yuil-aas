@@ -36,9 +36,9 @@ export const useBasicList = (
   const { searchKeyword, startDate, endDate, selectedFactory } = searchCondition;
 
   // 정렬 및 페이지네이션
-  const { sortedData, sortField, sortDirection, handleSort } = useSortableData<Base>(
+  const { sortedData, sortField, sortDirection, handleSort, resetSort } = useSortableData<Base>(
     filteredBases,
-    'createdAt',
+    undefined,
     'desc'
   );
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
@@ -309,6 +309,12 @@ export const useBasicList = (
       setHasSearched(false);
     }
   }, [navigationReset, setSearchCondition, setSelectedBases, setHasSearched]);
+
+  useEffect(() => {
+    if (navigationReset) {
+      resetSort();
+    }
+  }, [navigationReset, resetSort]);
 
   return {
     // 상태
