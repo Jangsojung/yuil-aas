@@ -231,7 +231,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       }
       if (!currentFgIdx) {
         setError('설비그룹 인덱스가 올바르지 않습니다.');
-        console.error('설비 등록 직전 currentFgIdx가 undefined/null입니다!');
         setLoading(false);
         return;
       }
@@ -253,7 +252,7 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
           setFacilityInput('');
           await new Promise((resolve) => setTimeout(resolve, 200));
         } catch (error) {
-          console.error('설비 목록 재조회 에러:', error);
+          // 설비 목록 재조회 에러 무시
         }
       } else {
         const selectedFacility = facilityList.find((f) => f.fa_name === facilityValue);
@@ -261,7 +260,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
       }
       if (!currentFaIdx) {
         setError('설비 인덱스가 올바르지 않습니다.');
-        console.error('센서 등록 직전 currentFaIdx가 undefined/null입니다!');
         setLoading(false);
         return;
       }
@@ -295,7 +293,6 @@ export default function FacilityAddModal({ open, onClose, onSuccess }: FacilityA
         });
       } else {
         setError('설비 추가 중 오류가 발생했습니다.');
-        console.error('설비 추가 중 오류:', error);
       }
     } finally {
       setLoading(false);
