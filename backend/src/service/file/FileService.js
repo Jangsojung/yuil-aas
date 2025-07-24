@@ -75,13 +75,14 @@ export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate 
           f.createdAt,
           f.updatedAt,
           f.fc_idx,
-          d.fc_name
+          d.fc_name,
+          f.link_name
         FROM tb_aasx_file f
         LEFT JOIN tb_aasx_data d
           ON f.fc_idx = d.fc_idx
         WHERE ${baseWhereClause}
         ${dateClause}
-        GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name
+        GROUP BY f.af_idx, f.af_name, f.createdAt, f.updatedAt, f.fc_idx, d.fc_name, f.link_name
         ORDER BY f.af_idx DESC`;
     if (validatedLimit) query += ` LIMIT ?`;
   } else {
@@ -122,6 +123,7 @@ export const getFilesFromDB = async (af_kind, fc_idx, startDate = null, endDate 
         updatedAt: file.updatedAt,
         fc_idx: file.fc_idx,
         fc_name: file.fc_name || '-',
+        link_name: file.link_name || '',
       };
     } else {
       return {
@@ -282,6 +284,34 @@ export const updateAASXFileToDB = async (af_idx, fileName, user_idx, fc_idx, lin
     connection = await pool.promise().getConnection();
     await connection.beginTransaction();
 
+    // 파일이 없는 경우 (링크명만 수정)
+    if (!fileName) {
+      // AASX 파일의 link_name만 업데이트
+      const updateAasxQuery = `UPDATE tb_aasx_file SET link_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_idx = ? AND af_kind = ?`;
+      await connection.query(updateAasxQuery, [linkName, user_idx, af_idx, FILE_KINDS.AASX_KIND]);
+
+      // AAS 파일의 link_name도 업데이트 (같은 파일명의 AAS 파일 찾아서)
+      const [aasxRows] = await connection.query('SELECT af_name FROM tb_aasx_file WHERE af_idx = ? AND af_kind = ?', [
+        af_idx,
+        FILE_KINDS.AASX_KIND,
+      ]);
+
+      if (aasxRows.length > 0) {
+        const oldAasxFileName = aasxRows[0].af_name;
+        const oldAasFileName = oldAasxFileName.replace(/\.aasx$/i, '.json');
+        
+        const updateAasQuery = `UPDATE tb_aasx_file SET link_name = ?, updater = ?, updatedAt = CURRENT_TIMESTAMP WHERE af_name = ? AND af_kind = ?`;
+        await connection.query(updateAasQuery, [linkName, user_idx, oldAasFileName, FILE_KINDS.AAS_KIND]);
+      }
+
+      await connection.commit();
+      return {
+        success: true,
+        message: '링크명이 성공적으로 수정되었습니다.',
+      };
+    }
+
+    // 파일이 있는 경우 (기존 로직)
     const newAasxFileName = fileName.replace(/\.json$/i, '.aasx');
     const [existing] = await connection.query(
       'SELECT af_idx FROM tb_aasx_file WHERE af_name = ? AND (af_kind = ? OR af_kind = ?) AND af_idx != ?',

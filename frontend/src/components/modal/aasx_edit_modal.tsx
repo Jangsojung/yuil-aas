@@ -162,8 +162,8 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         updateProgress(5, '작업 시작...');
 
         updateProgress(10, '파일 검증 중...');
-        // 파일 검증 로직
-        if (!uploadFile || !uploadFile.name) {
+        // 파일 검증 로직 (파일이 선택된 경우에만)
+        if (uploadFile && (!uploadFile.name)) {
           throw new Error('업로드할 파일이 없습니다.');
         }
 
@@ -174,15 +174,19 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         }
 
         updateProgress(20, '공장 정보 조회 중...');
-        const fcIdxResult = await getFileFCIdxAPI(uploadFile.name, KINDS.JSON_KIND);
-        const fc_idx = fcIdxResult?.data?.fc_idx || 1;
+        // 파일이 선택된 경우에만 공장 정보 조회
+        let fc_idx = 1;
+        if (uploadFile) {
+          const fcIdxResult = await getFileFCIdxAPI(uploadFile.name, KINDS.JSON_KIND);
+          fc_idx = fcIdxResult?.data?.fc_idx || 1;
+        }
 
         updateProgress(30, '새 AAS 파일 생성 중...');
         // 새 AAS 파일 생성 작업
 
         updateProgress(50, '새 AASX 파일 생성 중...');
         // 새 AASX 파일 생성 작업
-        result = await updateAASXFileAPI(af_idx, uploadFile.name, userIdx, fc_idx, linkName);
+        result = await updateAASXFileAPI(af_idx, uploadFile ? uploadFile.name : null, userIdx, fc_idx, linkName);
         if (result && result.success === false) {
           setAlertModal({
             open: true,
@@ -325,17 +329,33 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
   };
 
   const handleEdit = async () => {
-    const { name } = uploadFile;
+    // 파일이 선택된 경우에만 파일 검증
+    if (uploadFile) {
+      const { name } = uploadFile;
 
-    if (!name.toLowerCase().endsWith('.json')) {
-      setAlertModal({
-        open: true,
-        title: '알림',
-        content: 'JSON 파일만 업로드 가능합니다.',
-        type: 'alert',
-        onConfirm: undefined,
-      });
-      return;
+      if (!name.toLowerCase().endsWith('.json')) {
+        setAlertModal({
+          open: true,
+          title: '알림',
+          content: 'JSON 파일만 업로드 가능합니다.',
+          type: 'alert',
+          onConfirm: undefined,
+        });
+        return;
+      }
+
+      // 파일 크기 체크 (50MB)
+      const fileSizeMB = uploadFile.size / (1024 * 1024);
+      if (fileSizeMB > 50) {
+        setAlertModal({
+          open: true,
+          title: 'AASX 파일 변환',
+          content: '파일의 크기가 50MB를 초과할 경우 AASX 파일 변환에 다소 시간이 소요될 수 있습니다.\n변환하시겠습니까?',
+          type: 'confirm',
+          onConfirm: executeEdit,
+        });
+        return;
+      }
     }
 
     if (fileData && !af_idx) {
@@ -345,19 +365,6 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
         content: '파일 정보가 올바르지 않습니다.',
         type: 'alert',
         onConfirm: undefined,
-      });
-      return;
-    }
-
-    // 파일 크기 체크 (50MB)
-    const fileSizeMB = uploadFile.size / (1024 * 1024);
-    if (fileSizeMB > 50) {
-      setAlertModal({
-        open: true,
-        title: 'AASX 파일 변환',
-        content: '파일의 크기가 50MB를 초과할 경우 AASX 파일 변환에 다소 시간이 소요될 수 있습니다.\n변환하시겠습니까?',
-        type: 'confirm',
-        onConfirm: executeEdit,
       });
       return;
     }
@@ -469,7 +476,7 @@ export default function CustomizedDialogs({ open, handleClose, fileData = null, 
           <FileUpload {...fileUploadProp} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleEdit} variant='contained' color='primary' disabled={uploadFile == null}>
+          <Button onClick={handleEdit} variant='contained' color='primary'>
             확인
           </Button>
 

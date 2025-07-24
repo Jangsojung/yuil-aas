@@ -54,7 +54,7 @@ const routes = [
     method: 'post',
     path: '/aasx/update',
     controller: updateAASXFile,
-    extractor: (req) => [req.query.af_idx, req.body.fileName, req.query.user_idx, req.query.fc_idx, req.body.linkName],
+    extractor: (req) => [req.query.af_idx, req.body.fileName || null, req.query.user_idx, req.query.fc_idx, req.body.linkName],
     middleware: [afIdxValidationMiddleware],
   },
   {
