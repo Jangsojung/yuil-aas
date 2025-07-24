@@ -566,6 +566,7 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback = null) =
     }
     let processedCount = 0;
     let skippedCount = 0;
+    let errorCount = 0;
     
     for (let i = 0; i < sensorInfoRows.length; i++) {
       // 진행률 업데이트 (100개마다)
@@ -574,8 +575,7 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback = null) =
         if (progressCallback) {
           progressCallback(currentProgress, `센서 매칭 동기화 중... (${i + 1}/${sensorCount})`);
         }
-        if (processedCount > 0) {
-        }
+
       }
       
       // 첫 번째 항목 처리 시에도 진행률 업데이트
@@ -626,11 +626,17 @@ export const synchronizeFacilityData = async (cm_idx, progressCallback = null) =
           }
         }
       } catch (err) {
-        console.error(`[동기화][센서][${i}] 에러:`, err, '센서 row:', row);
+        errorCount++;
+        // 개별 센서 에러는 추적하되 계속 진행
       }
     }
     // 반복문 종료 후 마지막 커밋
     await connection.commit();
+    
+    // 에러가 있으면 요약 로그 출력
+    if (errorCount > 0) {
+      console.error(`[동기화] 센서 동기화 중 ${errorCount}개 에러 발생`);
+    }
 
     // 완료 시 100%로 설정
     if (progressCallback) {
