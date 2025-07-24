@@ -77,6 +77,13 @@ export default function FactorySelect({
         displayEmpty
         disabled={disabled || factories.length === 0}
         IconComponent={ExpandMoreIcon}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 300,
+            },
+          },
+        }}
       >
         <MenuItem disabled value=''>
           {factories.length === 0 ? '공장 정보 없음' : placeholder}

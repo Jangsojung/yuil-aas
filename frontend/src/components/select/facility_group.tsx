@@ -94,7 +94,7 @@ export default function FacilityGroupSelect({
         MenuProps={{
           PaperProps: {
             style: {
-              maxHeight: 500,
+              maxHeight: 300,
             },
           },
         }}

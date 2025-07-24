@@ -55,6 +55,13 @@ export default function SelectSmall({ setSelectedFile, files: externalFiles, dis
         IconComponent={ExpandMoreIcon}
         displayEmpty
         disabled={disabled}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 300,
+            },
+          },
+        }}
       >
         <MenuItem disabled value='' className='menu-item-disabled'>
           {displayFiles && displayFiles.length > 0 ? 'aasx 파일을 선택해 주세요.' : 'aasx 파일이 없습니다.'}

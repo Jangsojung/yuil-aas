@@ -57,7 +57,15 @@ export default function SelectJSONFile({ setSelectedFile, selectedFactory }: Pro
 
   return (
     <FormControl sx={{ width: '100%' }} size='small'>
-      <Select value={currentFile} onChange={handleChange} IconComponent={ExpandMoreIcon} displayEmpty>
+      <Select value={currentFile} onChange={handleChange} IconComponent={ExpandMoreIcon} displayEmpty
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 300,
+            },
+          },
+        }}
+      >
         <MenuItem disabled value='' className='menu-item-disabled'>
           JSON 파일을 선택해 주세요.
         </MenuItem>
