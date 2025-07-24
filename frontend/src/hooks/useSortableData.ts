@@ -6,6 +6,7 @@ export interface SortableColumn<T> {
   field: keyof T;
   label: string;
   sortable?: boolean;
+  maxWidth?: number | string;
 }
 
 export const useSortableData = <T extends Record<string, any>>(

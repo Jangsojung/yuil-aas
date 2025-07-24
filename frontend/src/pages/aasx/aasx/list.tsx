@@ -68,10 +68,11 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
 
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<File>[] = [
-    { field: 'fc_name', label: '공장명' },
-    { field: 'af_name', label: '파일명' },
-    { field: 'createdAt', label: '생성 일자' },
-    { field: 'updatedAt', label: '수정 일자' },
+    { field: 'fc_name', label: '공장명', maxWidth: 180 },
+    { field: 'af_name', label: '파일명', maxWidth: 690.78 },
+    { field: 'createdAt', label: '생성 일자', maxWidth: 250 },
+    { field: 'updatedAt', label: '수정 일자', maxWidth: 250 },
+    // 필요시 비고 등 추가
   ];
 
   const { currentPage, rowsPerPage, handlePageChange, handleRowsPerPageChange, paginatedData } = useTablePagination({
@@ -306,7 +307,15 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
 
       <div className='table-wrap'>
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+          <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
+            <colgroup>
+              <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
+              <col style={{ maxWidth: '180px' }} />
+              <col style={{ maxWidth: '690.78px' }} />
+              <col style={{ maxWidth: '250px' }} />
+              <col style={{ maxWidth: '250px' }} />
+              <col style={{ maxWidth: '180px' }} />
+            </colgroup>
             <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
                 <TableCell padding='checkbox' sx={{ backgroundColor: 'white' }}>
@@ -340,7 +349,7 @@ export default forwardRef(function AASXList({ onEditClick, onAddClick }: AASXLis
                   />
                 ))
               ) : (
-                <TableEmptyRow colSpan={sortableColumns.length + 3} />
+                <TableEmptyRow colSpan={sortableColumns.length + 2} />
               )}
             </TableBody>
           </Table>

@@ -176,7 +176,16 @@ export const ListView: React.FC<ListViewProps> = ({
 
       <div className='table-wrap'>
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+          <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
+            <colgroup>
+              <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
+              <col style={{ maxWidth: '180px' }} />
+              <col style={{ maxWidth: '475.78px' }} />
+              <col style={{ maxWidth: '180px' }} />
+              <col style={{ maxWidth: '250px' }} />
+              <col style={{ maxWidth: '250px' }} />
+              <col style={{ maxWidth: '215px' }} />
+            </colgroup>
             <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
                 <TableCell padding='checkbox' sx={{ backgroundColor: 'white' }}>

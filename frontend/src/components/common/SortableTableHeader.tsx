@@ -65,7 +65,7 @@ export const SortableTableHeader = <T extends Record<string, any>>({
         </TableCell>
       )}
       {columns.map((column, idx) => (
-        <TableCell key={idx} sx={{ backgroundColor: 'white' }}>
+        <TableCell key={idx} sx={{ backgroundColor: 'white', maxWidth: column.maxWidth }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
             <span>{column.label}</span>
             {renderSortButton(column.field, column.sortable)}

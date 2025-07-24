@@ -48,12 +48,12 @@ export const useBasicList = (
 
   // 정렬 컬럼 정의
   const sortableColumns = [
-    { field: 'fc_name' as keyof Base, label: '공장명' },
-    { field: 'ab_name' as keyof Base, label: '기초코드명' },
-    { field: 'sn_length' as keyof Base, label: '센서 개수' },
-    { field: 'createdAt' as keyof Base, label: '생성 일자' },
-    { field: 'updatedAt' as keyof Base, label: '수정 일자' },
-    { field: 'ab_note' as keyof Base, label: '비고', sortable: false },
+    { field: 'fc_name' as keyof Base, label: '공장명', maxWidth: 180 },
+    { field: 'ab_name' as keyof Base, label: '기초코드명', maxWidth: 475.78 },
+    { field: 'sn_length' as keyof Base, label: '센서 개수', maxWidth: 180 },
+    { field: 'createdAt' as keyof Base, label: '생성 일자', maxWidth: 250 },
+    { field: 'updatedAt' as keyof Base, label: '수정 일자', maxWidth: 250 },
+    { field: 'ab_note' as keyof Base, label: '비고', sortable: false, maxWidth: 215 },
   ];
 
   const calculatedTotalPages = Math.ceil((sortedData?.length || 0) / rowsPerPage);

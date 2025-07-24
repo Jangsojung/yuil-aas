@@ -60,10 +60,11 @@ export default function ConvertPage() {
   } = useSortableData<Base>(filteredBases, 'createdAt', 'desc');
 
   const sortableColumns: SortableColumn<Base>[] = [
-    { field: 'fc_name', label: '공장명' },
-    { field: 'ab_name', label: '기초코드명' },
-    { field: 'sn_length', label: '센서 개수' },
-    { field: 'createdAt', label: '생성 일자' },
+    { field: 'fc_name', label: '공장명', maxWidth: 180 },
+    { field: 'ab_name', label: '기초코드명', maxWidth: 440.78 },
+    { field: 'sn_length', label: '센서 개수', maxWidth: 180 },
+    { field: 'createdAt', label: '생성 일자', maxWidth: 250 },
+    // 필요시 비고 등 추가
   ];
 
   const { currentPage, rowsPerPage, handlePageChange, handleRowsPerPageChange, paginatedData } = useTablePagination({
@@ -457,7 +458,16 @@ export default function ConvertPage() {
 
         <div className='table-wrap'>
           <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+            <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
+              <colgroup>
+                <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
+                <col style={{ maxWidth: '180px' }} />
+                <col style={{ maxWidth: '440.78px' }} />
+                <col style={{ maxWidth: '180px' }} />
+                <col style={{ maxWidth: '250px' }} />
+                <col style={{ maxWidth: '250px' }} />
+                <col style={{ maxWidth: '250px' }} />
+              </colgroup>
               <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
                 <TableRow>
                   <TableCell sx={{ width: '50px', backgroundColor: 'white' }}></TableCell>

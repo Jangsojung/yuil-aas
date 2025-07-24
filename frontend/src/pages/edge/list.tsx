@@ -57,11 +57,11 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
 
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<EdgeGateway>[] = [
-    { field: 'eg_pc_name', label: 'PC명' },
-    { field: 'eg_ip_port', label: 'IP:Port' },
-    { field: 'eg_network', label: '네트워크' },
-    { field: 'createdAt', label: '생성 일자' },
-    { field: 'updatedAt', label: '수정 일자' },
+    { field: 'eg_pc_name', label: 'PC명', maxWidth: 180 },
+    { field: 'eg_ip_port', label: 'IP:Port', maxWidth: 620.78 },
+    { field: 'eg_network', label: '네트워크', maxWidth: 250 },
+    { field: 'createdAt', label: '생성 일자', maxWidth: 250 },
+    { field: 'updatedAt', label: '수정 일자', maxWidth: 250 },
   ];
 
   const { currentPage, rowsPerPage, handlePageChange, handleRowsPerPageChange, paginatedData } = useTablePagination({
@@ -328,7 +328,15 @@ export default forwardRef(function EdgeList({ onAddClick, onEditClick }: EdgeLis
 
       <div className='table-wrap'>
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+          <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
+            <colgroup>
+              <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
+              <col style={{ maxWidth: '180px' }} />
+              <col style={{ maxWidth: '620.78px' }} />
+              <col style={{ maxWidth: '250px' }} />
+              <col style={{ maxWidth: '250px' }} />
+              <col style={{ maxWidth: '250px' }} />
+            </colgroup>
             <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
                 <SortableTableHeader

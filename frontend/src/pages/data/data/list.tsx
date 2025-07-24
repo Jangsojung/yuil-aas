@@ -56,10 +56,10 @@ export default function DataList() {
 
   // 정렬 컬럼 정의
   const sortableColumns: SortableColumn<Word>[] = [
-    { field: 'as_kr', label: '한글명' },
-    { field: 'as_en', label: '식별 ID' },
-    { field: 'createdAt', label: '생성 일자' },
-    { field: 'updatedAt', label: '수정 일자' },
+    { field: 'as_kr', label: '한글명', maxWidth: 262.695 },
+    { field: 'as_en', label: '식별 ID', maxWidth: 262.695 },
+    { field: 'createdAt', label: '생성 일자', maxWidth: 250 },
+    { field: 'updatedAt', label: '수정 일자', maxWidth: 250 },
   ];
 
   const { currentPage, rowsPerPage, paginatedData, goToPage, handleRowsPerPageChange } = usePagination(
@@ -151,7 +151,14 @@ export default function DataList() {
 
       <div className='table-wrap'>
         <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
-          <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+          <Table sx={{ minWidth: 650, tableLayout: 'fixed' }} aria-label='simple table'>
+            <colgroup>
+              <col style={{ width: '50px', minWidth: '50px', maxWidth: '50px' }} />
+              <col style={{ maxWidth: '262.695px' }} />
+              <col style={{ maxWidth: '262.695px' }} />
+              <col style={{ maxWidth: '250px' }} />
+              <col style={{ maxWidth: '250px' }} />
+            </colgroup>
             <TableHead sx={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <TableRow>
                 <SortableTableHeader
