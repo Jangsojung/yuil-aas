@@ -84,7 +84,7 @@ export const EditView: React.FC<EditViewProps> = ({
 
   return (
     <>
-      <div className="table-outer" style={{ height: '100%' }}>
+      <div className="table-outer" style={{ height: 'calc(100% - 25px)' }}>
         <SearchBox
           buttons={[
             {
@@ -157,7 +157,7 @@ export const EditView: React.FC<EditViewProps> = ({
 
         <div className='list-header'>
           <Typography variant='h6' gutterBottom>
-            설비목록
+            설비 목록
           </Typography>
 
           <ActionBox

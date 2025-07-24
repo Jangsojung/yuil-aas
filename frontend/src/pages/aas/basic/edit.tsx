@@ -300,7 +300,7 @@ export default function BasiccodeEditPage() {
   // 렌더링
   if (detailMode) {
     return (
-      <>
+      <div style={{ height: 'calc(100% - 30px)' }}>
         <div
           style={{
             display: 'flex',
@@ -328,13 +328,13 @@ export default function BasiccodeEditPage() {
           hideFactorySelect={detailHideFactorySelect}
           onTreeSearch={handleDetailTreeSearch}
         />
-      </>
+      </div>
     );
   }
 
   if (editMode) {
     return (
-      <>
+      <div style={{ height: 'calc(100% - 35px)' }}>
         <div
           style={{
             display: 'flex',
@@ -372,7 +372,7 @@ export default function BasiccodeEditPage() {
           onSensorSelect={handleSensorSelect}
           hideFactorySelect={true}
         />
-      </>
+      </div>
     );
   }
 

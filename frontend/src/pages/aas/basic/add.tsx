@@ -90,7 +90,7 @@ export default function BasiccodeAddPage() {
   };
 
   return (
-    <>
+    <div style={{ height: 'calc(100% - 30px)' }}>
       <EditView
         treeData={treeData}
         treeLoading={treeLoading}
@@ -141,6 +141,6 @@ export default function BasiccodeAddPage() {
         type={alertModal.type}
         onConfirm={alertModal.onConfirm}
       />
-    </>
+    </div>
   );
 }
